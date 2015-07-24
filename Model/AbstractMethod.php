@@ -1,7 +1,5 @@
 <?php
 /**
- *
- *
  * Paradox Labs, Inc.
  * http://www.paradoxlabs.com
  * 717-431-3330
@@ -15,12 +13,10 @@
 
 namespace ParadoxLabs\TokenBase\Model;
 
-
-// TODO: this
 /**
- * AbstractMethod Class
+ * Common actions and behavior for TokenBase payment methods
  */
-class AbstractMethod extends \Magento\Payment\Model\Method\Cc
+// TODO: this
+abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
 {
-
 }

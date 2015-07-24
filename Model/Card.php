@@ -66,36 +66,81 @@ class Card extends \Magento\Framework\Model\AbstractModel
     protected $orderCollectionFactory;
 
     /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    protected $checkoutSession;
+
+    /**
+     * @var \Magento\Framework\App\State
+     */
+    protected $appState;
+
+    /**
+     * @var \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress
+     */
+    protected $remoteAddress;
+
+    /**
+     * @var \ParadoxLabs\Tokenbase\Model\Card
+     */
+    protected $instance;
+
+    /**
+     * @var \Magento\Framework\ObjectManagerInterface
+     */
+    protected $objectManager;
+
+    /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    protected $scopeConfig;
+
+    /**
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\Model\Resource\AbstractResource $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \Magento\Payment\Helper\Data $paymentHelper
+     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \ParadoxLabs\Tokenbase\Model\Resource\Card\CollectionFactory $cardCollectionFactory
      * @param \Magento\Customer\Model\CustomerFactory $customerFactory
      * @param \Magento\Sales\Model\Resource\Order\CollectionFactory $orderCollectionFactory
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Magento\Framework\App\State $appState
+     * @param \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress
      * @param array $data
      */
     public function __construct(
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
-        \Magento\Framework\Model\Resource\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         \Magento\Payment\Helper\Data $paymentHelper,
+        \Magento\Framework\ObjectManagerInterface $objectManager,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \ParadoxLabs\Tokenbase\Model\Resource\Card\CollectionFactory $cardCollectionFactory,
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Sales\Model\Resource\Order\CollectionFactory $orderCollectionFactory,
+        \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Framework\App\State $appState,
+        \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress,
+        \Magento\Framework\Model\Resource\AbstractResource $resource = null,
+        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
         
         $this->helper                   = $helper;
         $this->paymentHelper            = $paymentHelper;
+        $this->objectManager            = $objectManager;
+        $this->scopeConfig              = $scopeConfig;
         $this->customerFactory          = $customerFactory;
         $this->cardCollectionFactory    = $cardCollectionFactory;
         $this->orderCollectionFactory   = $orderCollectionFactory;
+        $this->checkoutSession          = $checkoutSession;
+        $this->appState                 = $appState;
+        $this->remoteAddress            = $remoteAddress;
     }
 
     /**
@@ -114,7 +159,7 @@ class Card extends \Magento\Framework\Model\AbstractModel
      * @param AbstractMethod $method
      * @return $this
      */
-    public function setMethodInstance( AbstractMethod $method )
+    public function setMethodInstance(AbstractMethod $method)
     {
         $this->method = $method;
 
@@ -129,11 +174,10 @@ class Card extends \Magento\Framework\Model\AbstractModel
      */
     public function getMethodInstance()
     {
-        if( is_null( $this->method ) ) {
-            if( $this->hasData('method') ) {
-                $this->paymentHelper->getMethodInstance( $this->getData('method') );
-            }
-            else {
+        if (is_null($this->method)) {
+            if ($this->hasData('method')) {
+                $this->paymentHelper->getMethodInstance($this->getData('method'));
+            } else {
                 throw new \UnexpectedValueException('Payment method is unknown for the current card.');
             }
         }
@@ -144,81 +188,99 @@ class Card extends \Magento\Framework\Model\AbstractModel
     /**
      * Get the arbitrary type instance for this card.
      * Response will extend ParadoxLabs_TokenBase_Model_Card.
+     *
+     * @return \ParadoxLabs\TokenBase\Model\Card|$this
      */
     public function getTypeInstance()
     {
-        // TODO: how am I supposed to do this?!
-//        if( is_null( $this->_instance ) ) {
-//            if( $this->hasMethod() ) {
-//                $this->_instance = Mage::getModel( $this->getMethod() . '/card' );
-//                $this->_instance->setData( $this->getData() );
-//            }
-//            else {
-//                return $this;
-//            }
-//        }
-//
-//        return $this->_instance;
+        if (is_null($this->instance)) {
+            if ($this->hasData('method')) {
+                // Get model from config for the payment method
+                $cardModel      = $this->scopeConfig->getValue(
+                    'payment/' . $this->getMethod() . '/card_model',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                );
+                
+                if (get_class() != $cardModel) {
+                    // Create and initialize the instance via object man.
+                    $this->instance = $this->objectManager->create($cardModel);
+                    $this->instance->setData($this->getData());
+                } else {
+                    return $this;
+                }
+            } else {
+                return $this;
+            }
+        }
+
+        return $this->instance;
     }
 
     /**
      * Set the customer account (if any) for the card.
-     * 
+     *
      * @param \Magento\Customer\Model\Customer $customer
      * @param \Magento\Payment\Model\InfoInterface|null $payment
      * @return $this
      */
-    public function setCustomer( \Magento\Customer\Model\Customer $customer, \Magento\Payment\Model\InfoInterface $payment=null )
-    {
+    public function setCustomer(
+        \Magento\Customer\Model\Customer $customer,
+        \Magento\Payment\Model\InfoInterface $payment = null
+    ) {
         /** @var \Magento\Payment\Model\Info $payment */
-        if( $customer->getEmail() != '' ) {
-            $this->setCustomerEmail( $customer->getEmail() );
+        if ($customer->getEmail() != '') {
+            $this->setCustomerEmail($customer->getEmail());
 
             /**
              * Make an ID if we don't have one (and hope this doesn't break anything)
              */
-            if( $customer->getId() < 1 ) {
+            if ($customer->getId() < 1) {
                 $customer->save();
             }
 
-            $this->setCustomerId( $customer->getId() );
+            $this->setCustomerId($customer->getId());
 
-            parent::setData( 'customer', $customer );
-        }
-        elseif( !is_null( $payment ) ) {
+            parent::setData('customer', $customer);
+        } elseif (!is_null($payment)) {
             $model = null;
 
             /**
              * If we have no email, try to find it from current scope data.
              */
-            if( $payment->hasData('quote') != null && $payment->getData('quote')->getBillingAddress() != null && $payment->getData('quote')->getBillingAddress()->getCustomerEmail() != '' ) {
+            if ($payment->hasData('quote') != null
+                && $payment->getData('quote')->getBillingAddress() != null
+                && $payment->getData('quote')->getBillingAddress()->getCustomerEmail() != '') {
+                /** @var \Magento\Quote\Model\Quote $model */
                 $model = $payment->getData('quote');
-            }
-            elseif( $payment->hasData('order') != null && ( $payment->getData('order')->getCustomerEmail() != '' || ( $payment->getData('order')->getBillingAddress() != null && $payment->getData('order')->getBillingAddress()->getCustomerEmail() != '' ) ) ) {
+            } elseif ($payment->hasData('order') != null
+                && ($payment->getData('order')->getCustomerEmail() != ''
+                    || ($payment->getData('order')->getBillingAddress() != null
+                        && $payment->getData('order')->getBillingAddress()->getCustomerEmail() != ''))) {
+                /** @var \Magento\Sales\Model\Order $model */
                 $model = $payment->getData('order');
-            }
-            else {
+            } else {
                 /**
                  * This will fall back to checkout/session if onepage has no quote loaded.
                  * Should work for all checkouts that use normal Magento processes.
                  */
-                // TODO: this?
-//                $model = Mage::getSingleton('checkout/type_onepage')->getQuote();
+                /** @var \Magento\Quote\Model\Quote $model */
+                $model = $this->checkoutSession->getQuote();
             }
 
-            if( !is_null( $model ) ) {
-                if( $model->getCustomerEmail() == '' && $model->getBillingAddress() instanceof \Magento\Framework\Object && $model->getBillingAddress()->getEmail() != '' ) {
-                    $model->setCustomerEmail( $model->getBillingAddress()->getEmail() );
+            if (!is_null($model)) {
+                if ($model->getCustomerEmail() == ''
+                    && $model->getBillingAddress() instanceof \Magento\Framework\Object
+                    && $model->getBillingAddress()->getEmail() != '') {
+                    $model->setCustomerEmail($model->getBillingAddress()->getEmail());
                 }
 
-                if( $model->hasEmail() ) {
-                    $this->setCustomerEmail( $model->getEmail() );
+                if ($model->hasData('email')) {
+                    $this->setCustomerEmail($model->getData('email'));
+                } elseif ($model->hasData('customer_email')) {
+                    $this->setCustomerEmail($model->getData('customer_email'));
                 }
-                elseif( $model->hasCustomerEmail() ) {
-                    $this->setCustomerEmail( $model->getCustomerEmail() );
-                }
-
-                $this->setCustomerId( intval( $model->getCustomerId() ) );
+                
+                $this->setCustomerId(intval($model->getCustomerId()));
             }
         }
 
@@ -227,62 +289,66 @@ class Card extends \Magento\Framework\Model\AbstractModel
 
     /**
      * Get the customer object (if any) for the card.
-     * 
+     *
      * @return \Magento\Customer\Model\Customer
      */
     public function getCustomer()
     {
-        if( $this->hasData('customer') ) {
+        if ($this->hasData('customer')) {
             return parent::getData('customer');
         }
 
         /** @var \Magento\Customer\Model\Customer $customer */
         $customer = $this->customerFactory->create();
 
-        if( $this->getData('customer_id') > 0 ) {
-            $customer->load( $this->getData('customer_id') );
-        }
-        else {
-            $customer->setData( 'email', $this->getData('customer_email') );
+        if ($this->getData('customer_id') > 0) {
+            $customer->load($this->getData('customer_id'));
+        } else {
+            $customer->setData('email', $this->getData('customer_email'));
         }
 
-        parent::setData( 'customer', $customer );
+        parent::setData('customer', $customer);
 
         return $customer;
     }
 
     /**
      * Set card payment data from a quote or order payment instance.
-     * 
+     *
      * @param \Magento\Payment\Model\InfoInterface $payment
      * @return $this
      */
-    public function importPaymentInfo( \Magento\Payment\Model\InfoInterface $payment )
+    public function importPaymentInfo(\Magento\Payment\Model\InfoInterface $payment)
     {
-        if( $payment instanceof \Magento\Payment\Model\InfoInterface ) {
+        if ($payment instanceof \Magento\Payment\Model\InfoInterface) {
             /** @var \Magento\Payment\Model\Info $payment */
-            if( $payment->getAdditionalInformation('save') === 0 ) {
-                $this->setData( 'active', 0 );
+            if ($payment->getAdditionalInformation('save') === 0) {
+                $this->setData('active', 0);
             }
 
-            if( $payment->getData('cc_type') != '' ) {
-                $this->setAdditional( 'cc_type', $payment->getData('cc_type') );
+            if ($payment->getData('cc_type') != '') {
+                $this->setAdditional('cc_type', $payment->getData('cc_type'));
             }
 
-            if( $payment->getData('cc_last4') != '' ) {
-                $this->setAdditional( 'cc_last4', $payment->getData('cc_last4') );
+            if ($payment->getData('cc_last4') != '') {
+                $this->setAdditional('cc_last4', $payment->getData('cc_last4'));
             }
 
-            if( $payment->getData('cc_exp_year') > date('Y') || ( $payment->getData('cc_exp_year') == date('Y') && $payment->getData('cc_exp_month') >= date('n') ) ) {
-                $this->setAdditional( 'cc_exp_year', $payment->getData('cc_exp_year') )
-                    ->setAdditional( 'cc_exp_month', $payment->getData('cc_exp_month') )
-                    ->setData( 'expires', sprintf( "%s-%s-%s 23:59:59", $payment->getData('cc_exp_year'), $payment->getData('cc_exp_month'), date( 't', strtotime( $payment->getData('cc_exp_year') . '-' . $payment->getData('cc_exp_month') ) ) ) );
+            if ($payment->getData('cc_exp_year') > date('Y')
+                || ($payment->getData('cc_exp_year') == date('Y') && $payment->getData('cc_exp_month') >= date('n'))) {
+                $yr  = $payment->getData('cc_exp_year');
+                $mo  = $payment->getData('cc_exp_month');
+                $day = date('t', strtotime($payment->getData('cc_exp_year') . '-' . $payment->getData('cc_exp_month')));
+                
+                $this->setAdditional('cc_exp_year', $payment->getData('cc_exp_year'))
+                    ->setAdditional('cc_exp_month', $payment->getData('cc_exp_month'))
+                    ->setData('expires', sprintf("%s-%s-%s 23:59:59", $yr, $mo, $day));
             }
 
-            $this->setData( 'info_instance', $payment );
+            $this->setData('info_instance', $payment);
 
-            if( $this->getMethodInstance()->hasData('info_instance') !== true ) {
-                $this->getMethodInstance()->setInfoInstance( $payment );
+            if ($this->getMethodInstance()->hasData('info_instance') !== true) {
+                $this->getMethodInstance()->setInfoInstance($payment);
             }
         }
 
@@ -291,39 +357,40 @@ class Card extends \Magento\Framework\Model\AbstractModel
 
     /**
      * Check whether customer has permission to use/modify this card. Guests, never.
-     * 
+     *
      * @param int $customerId
      * @return bool
      */
-    public function hasOwner( $customerId )
+    public function hasOwner($customerId)
     {
-        $customerId = intval( $customerId );
+        $customerId = intval($customerId);
 
-        if( $customerId < 1 ) {
+        if ($customerId < 1) {
             return false;
         }
 
-        return ( $this->getData('customer_id') == $customerId ? true : false );
+        return ($this->getData('customer_id') == $customerId ? true : false);
     }
 
     /**
      * Check if card is connected to any pending orders.
-     * 
+     *
      * @return bool
      */
     public function isInUse()
     {
-        $orders	= $this->orderCollectionFactory->create();
-        $orders->addAttributeToSelect( '*' )
-               ->addAttributeToFilter( 'customer_id', $this->getData('customer_id') )
-               ->addAttributeToFilter( 'status', array( 'like' => 'pending%' ) );
+        $orders    = $this->orderCollectionFactory->create();
+        $orders->addAttributeToSelect('*')
+               ->addAttributeToFilter('customer_id', $this->getData('customer_id'))
+               ->addAttributeToFilter('status', array( 'like' => 'pending%' ));
 
-        if( count( $orders ) > 0 ) {
-            foreach( $orders as $order ) {
+        if (count($orders) > 0) {
+            foreach ($orders as $order) {
                 /** @var \Magento\Sales\Model\Order $order */
                 $payment = $order->getPayment();
 
-                if( $payment->getMethod() == $this->getData('method') && $payment->getData('tokenbase_id') == $this->getId() ) {
+                if ($payment->getMethod() == $this->getData('method')
+                    && $payment->getData('tokenbase_id') == $this->getId()) {
                     // If we found an order with this card that is not complete, closed, or canceled,
                     // it is still active and the payment ID is important. No editey.
                     return true;
@@ -339,20 +406,20 @@ class Card extends \Magento\Framework\Model\AbstractModel
      */
     public function updateLastUse()
     {
-        // TODO: Fix date source... ugh
-//        $this->setData( 'last_use', new \Magento\Framework\Stdlib\DateTime()->formatDate(true) );
+        $now = new \DateTime('@' . time());
+        $this->setData('last_use', $now->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT));
 
         return $this;
     }
 
     /**
      * Delete this card, or hide and queue for deletion after the refund period.
-     * 
+     *
      * @return $this
      */
     public function queueDeletion()
     {
-        $this->setData( 'active', 0 );
+        $this->setData('active', 0);
         
         return $this;
     }
@@ -363,29 +430,29 @@ class Card extends \Magento\Framework\Model\AbstractModel
      * @param $hash
      * @return $this
      */
-    public function loadByHash( $hash )
+    public function loadByHash($hash)
     {
         /** @var \ParadoxLabs\TokenBase\Model\Resource\Card $resource */
         $resource = $this->_getResource();
-        $resource->loadByHash( $this, $hash );
+        $resource->loadByHash($this, $hash);
 
         return $this;
     }
 
     /**
      * Get billing address or some part thereof.
-     * 
+     *
      * @param string $key
      * @return mixed|null
      */
-    public function getAddress( $key='' )
+    public function getAddress($key = '')
     {
-        if( is_null( $this->address ) ) {
-            $this->address = unserialize( parent::getData('address') );
+        if (is_null($this->address)) {
+            $this->address = unserialize(parent::getData('address'));
         }
 
-        if( $key !== '' ) {
-            return ( isset( $this->address[ $key ] ) ? $this->address[ $key ] : null );
+        if ($key !== '') {
+            return (isset($this->address[ $key ]) ? $this->address[ $key ] : null);
         }
 
         return $this->address;
@@ -395,18 +462,18 @@ class Card extends \Magento\Framework\Model\AbstractModel
      * Get additional card data.
      * If $key is set, will return that value or null;
      * otherwise, will return an array of all additional date.
-     * 
+     *
      * @param string|null $key
      * @return mixed|null
      */
-    public function getAdditional( $key=null )
+    public function getAdditional($key = null)
     {
-        if( is_null( $this->additional ) ) {
-            $this->additional = unserialize( parent::getData('additional') );
+        if (is_null($this->additional)) {
+            $this->additional = unserialize(parent::getData('additional'));
         }
 
-        if( !is_null( $key ) ) {
-            return ( isset( $this->additional[ $key ] ) ? $this->additional[ $key ] : null );
+        if (!is_null($key)) {
+            return (isset($this->additional[ $key ]) ? $this->additional[ $key ] : null);
         }
 
         return $this->additional;
@@ -416,47 +483,46 @@ class Card extends \Magento\Framework\Model\AbstractModel
      * Set additional card data.
      * Can pass in a key-value pair to set one value,
      * or a single parameter (associative array) to overwrite all data.
-     * 
+     *
      * @param string $key
      * @param string|null $value
      * @return $this
      */
-    public function setAdditional( $key, $value=null )
+    public function setAdditional($key, $value = null)
     {
-        if( !is_null( $value ) ) {
-            if( is_null( $this->additional ) ) {
+        if (!is_null($value)) {
+            if (is_null($this->additional)) {
                 $this->additional = array();
             }
 
             $this->additional[ $key ] = $value;
-        }
-        elseif( is_array( $key ) ) {
+        } elseif (is_array($key)) {
             $this->additional = $key;
         }
 
-        return parent::setData( 'additional', serialize( $this->additional ) );
+        return parent::setData('additional', serialize($this->additional));
     }
 
     /**
      * Set the billing address for the card.
-     * 
+     *
      * @param \Magento\Customer\Model\Address\AbstractAddress $address
      * @return $this
      */
-    public function setAddress( \Magento\Customer\Model\Address\AbstractAddress $address )
+    public function setAddress(\Magento\Customer\Model\Address\AbstractAddress $address)
     {
         $addressData = $address->getData();
 
-        $this->helper->cleanupArray( $addressData );
+        $this->helper->cleanupArray($addressData);
 
         $this->address = null;
 
-        return parent::setData( 'address', serialize( $addressData ) );
+        return parent::setData('address', serialize($addressData));
     }
 
     /**
      * Get customer email
-     * 
+     *
      * @return string
      */
     public function getCustomerEmail()
@@ -466,13 +532,13 @@ class Card extends \Magento\Framework\Model\AbstractModel
 
     /**
      * Set customer email
-     * 
+     *
      * @param string $email
      * @return $this
      */
-    public function setCustomerEmail( $email )
+    public function setCustomerEmail($email)
     {
-        return $this->setData( 'customer_email', $email );
+        return $this->setData('customer_email', $email);
     }
 
     /**
@@ -491,9 +557,9 @@ class Card extends \Magento\Framework\Model\AbstractModel
      * @param int $id
      * @return $this
      */
-    public function setCustomerId( $id )
+    public function setCustomerId($id)
     {
-        return $this->setData( 'customer_id', $id );
+        return $this->setData('customer_id', $id);
     }
 
     /**
@@ -512,9 +578,9 @@ class Card extends \Magento\Framework\Model\AbstractModel
      * @param string $ip
      * @return $this
      */
-    public function setCustomerIp( $ip )
+    public function setCustomerIp($ip)
     {
-        return $this->setData( 'customer_ip', $ip );
+        return $this->setData('customer_ip', $ip);
     }
 
     /**
@@ -533,9 +599,9 @@ class Card extends \Magento\Framework\Model\AbstractModel
      * @param string $profileId
      * @return $this
      */
-    public function setProfileId( $profileId )
+    public function setProfileId($profileId)
     {
-        return $this->setData( 'profile_id', $profileId );
+        return $this->setData('profile_id', $profileId);
     }
 
     /**
@@ -554,9 +620,9 @@ class Card extends \Magento\Framework\Model\AbstractModel
      * @param string $paymentId
      * @return $this
      */
-    public function setPaymentId( $paymentId )
+    public function setPaymentId($paymentId)
     {
-        return $this->setData( 'payment_id', $paymentId );
+        return $this->setData('payment_id', $paymentId);
     }
 
     /**
@@ -575,9 +641,9 @@ class Card extends \Magento\Framework\Model\AbstractModel
      * @param string $method
      * @return $this
      */
-    public function setMethod( $method )
+    public function setMethod($method)
     {
-        return $this->setData( 'method', $method );
+        return $this->setData('method', $method);
     }
 
     /**
@@ -589,10 +655,18 @@ class Card extends \Magento\Framework\Model\AbstractModel
     {
         $hash = $this->getData('hash');
         
-        if( empty( $hash ) ) {
-            $hash = sha1( 'tokenbase' . time() . $this->getData('customer_id') . $this->getData('customer_email') . $this->getData('method') . $this->getData('profile_id') . $this->getData('payment_id') );
+        if (empty($hash)) {
+            $hash = sha1(
+                'tokenbase'
+                . time()
+                . $this->getData('customer_id')
+                . $this->getData('customer_email')
+                . $this->getData('method')
+                . $this->getData('profile_id')
+                . $this->getData('payment_id')
+            );
             
-            $this->setHash( $hash );
+            $this->setHash($hash);
         }
         
         return $hash;
@@ -604,9 +678,9 @@ class Card extends \Magento\Framework\Model\AbstractModel
      * @param string $hash
      * @return $this
      */
-    public function setHash( $hash )
+    public function setHash($hash)
     {
-        return $this->setData( 'hash', $hash );
+        return $this->setData('hash', $hash);
     }
 
     /**
@@ -625,9 +699,9 @@ class Card extends \Magento\Framework\Model\AbstractModel
      * @param int|bool $active
      * @return $this
      */
-    public function setActive( $active )
+    public function setActive($active)
     {
-        return $this->setData( 'active', $active ? 1 : 0 );
+        return $this->setData('active', $active ? 1 : 0);
     }
 
     /**
@@ -646,9 +720,9 @@ class Card extends \Magento\Framework\Model\AbstractModel
      * @param $createdAt
      * @return $this
      */
-    public function setCreatedAt( $createdAt )
+    public function setCreatedAt($createdAt)
     {
-        return $this->setData( 'created_at', $createdAt );
+        return $this->setData('created_at', $createdAt);
     }
 
     /**
@@ -667,9 +741,9 @@ class Card extends \Magento\Framework\Model\AbstractModel
      * @param $updatedAt
      * @return $this
      */
-    public function setUpdatedAt( $updatedAt )
+    public function setUpdatedAt($updatedAt)
     {
-        return $this->setData( 'updated_at', $updatedAt );
+        return $this->setData('updated_at', $updatedAt);
     }
 
     /**
@@ -698,9 +772,9 @@ class Card extends \Magento\Framework\Model\AbstractModel
      * @param string $expires
      * @return $this
      */
-    public function setExpires( $expires )
+    public function setExpires($expires)
     {
-        return $this->setData( 'expires', $expires );
+        return $this->setData('expires', $expires);
     }
 
     /**
@@ -709,20 +783,20 @@ class Card extends \Magento\Framework\Model\AbstractModel
      * @param $lastUse
      * @return $this
      */
-    public function setLastUse( $lastUse )
+    public function setLastUse($lastUse)
     {
-        return $this->setData( 'last_use', $lastUse );
+        return $this->setData('last_use', $lastUse);
     }
 
     /**
      * Get card label (formatted number).
-     * 
+     *
      * @return \Magento\Framework\Phrase|string
      */
     public function getLabel()
     {
-        if( $this->getAdditional('cc_last4') ) {
-            return __( 'XXXX-%s', $this->getAdditional('cc_last4') );
+        if ($this->getAdditional('cc_last4')) {
+            return __('XXXX-%s', $this->getAdditional('cc_last4'));
         }
         
         return '';
@@ -732,7 +806,7 @@ class Card extends \Magento\Framework\Model\AbstractModel
      * Finalize before saving. Instances should sync with the gateway here.
      *
      * Set $this->_dataSaveAllowed to false or throw exception to abort.
-     * 
+     *
      * @return $this
      */
     protected function _beforeSave()
@@ -740,13 +814,13 @@ class Card extends \Magento\Framework\Model\AbstractModel
         /**
          * If the payment ID has changed, look for any duplicate payment records that might be stored.
          */
-        if( $this->getOrigData('payment_id') != $this->getData('payment_id') ) {
+        if ($this->getOrigData('payment_id') != $this->getData('payment_id')) {
             /** @var \ParadoxLabs\TokenBase\Model\Resource\Card\Collection $collection */
             $collection = $this->cardCollectionFactory->create();
-            $collection->addFieldToFilter( 'method', $this->getData('method') )
-                       ->addFieldToFilter( 'profile_id', $this->getData('profile_id') )
-                       ->addFieldToFilter( 'payment_id', $this->getData('payment_id') )
-                       ->addFieldToFilter( 'id', array( 'neq' => $this->getId() ) );
+            $collection->addFieldToFilter('method', $this->getData('method'))
+                       ->addFieldToFilter('profile_id', $this->getData('profile_id'))
+                       ->addFieldToFilter('payment_id', $this->getData('payment_id'))
+                       ->addFieldToFilter('id', array( 'neq' => $this->getId() ));
             
             /** @var \ParadoxLabs\TokenBase\Model\Card $dupe */
             $dupe = $collection->getFirstItem();
@@ -754,27 +828,30 @@ class Card extends \Magento\Framework\Model\AbstractModel
             /**
              * If we find a duplicate, switch to that one, but retain the current customer and active state.
              */
-            if( $dupe && $dupe->getId() > 0 && $dupe->getId() != $this->getId() ) {
-                $this->helper->log( $this->getData('method'), __( 'Merging duplicate payment data into card %s', $dupe->getId() ) );
+            if ($dupe && $dupe->getId() > 0 && $dupe->getId() != $this->getId()) {
+                $this->helper->log(
+                    $this->getData('method'),
+                    __('Merging duplicate payment data into card %s', $dupe->getId())
+                );
 
-                $customerId		= $this->getData('customer_id');
-                $customerEmail	= $this->getData('customer_email');
-                $active			= !is_null( $this->getData('active') ) ? $this->getData('active') : 1;
+                $customerId     = $this->getData('customer_id');
+                $customerEmail  = $this->getData('customer_email');
+                $active         = !is_null($this->getData('active')) ? $this->getData('active') : 1;
 
-                $this->setData( $dupe->getData() )
-                    ->setData( 'customer_id', $customerId )
-                    ->setData( 'customer_email', $customerEmail )
-                    ->setData( 'active', intval( $active ) )
-                    ->isObjectNew( false );
+                $this->setData($dupe->getData())
+                    ->setData('customer_id', $customerId)
+                    ->setData('customer_email', $customerEmail)
+                    ->setData('active', intval($active))
+                    ->isObjectNew(false);
             }
         }
 
         /**
          * If we are not admin, record current IP.
          */
-//        if( Mage::app()->getStore()->isAdmin() == false ) {
-//            $this->setCustomerIp( Mage::helper('core/http')->getRemoteAddr() );
-//        }
+        if ($this->appState->getAreaCode() == \Magento\Framework\App\Area::AREA_FRONTEND) {
+            $this->setCustomerIp($this->remoteAddress->getRemoteAddress());
+        }
 
         /**
          * Create unique hash for security purposes.
@@ -784,11 +861,13 @@ class Card extends \Magento\Framework\Model\AbstractModel
         /**
          * Update dates.
          */
-        if( $this->isObjectNew() ) {
-//            $this->setData( 'created_at', now() );
+        $now = new \DateTime('@' . time());
+        
+        if ($this->isObjectNew()) {
+            $this->setData('created_at', $now->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT));
         }
 
-//        $this->setData( 'updated_at', now() );
+        $this->setData('updated_at', $now->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT));
 
         return $this;
     }

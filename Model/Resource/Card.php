@@ -39,7 +39,7 @@ class Card extends \Magento\Framework\Model\Resource\Db\AbstractDb
         \ParadoxLabs\TokenBase\Model\Card $card,
         $hash
     ) {
-//        $adapter = $this->_getReadAdapter();
+        //        $adapter = $this->_getReadAdapter();
 //        $select  = $adapter->select()
 //            ->from( $this->getMainTable(), array( $this->getIdFieldName() ) )
 //            ->where('hash = :hash');
