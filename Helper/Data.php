@@ -28,16 +28,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function cleanupArray(&$array)
     {
-        if( !$array ) {
+        if (!$array) {
             return;
         }
 
-        foreach( $array as $key => $value ) {
-            if( is_object( $value ) ) {
-                unset( $array[ $key ] );
-            }
-            elseif( is_array( $value ) ) {
-                $this->cleanupArray( $array[ $key ] );
+        foreach ($array as $key => $value) {
+            if (is_object($value)) {
+                unset($array[ $key ]);
+            } elseif (is_array($value)) {
+                $this->cleanupArray($array[ $key ]);
             }
         }
     }
@@ -49,26 +48,37 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param mixed $message
      * @return $this
      */
-    public function log( $code, $message )
+    public function log($code, $message)
     {
-        if( is_object( $message ) ) {
-            if( $message instanceof \Magento\Framework\Object ) {
+        if (is_object($message)) {
+            if ($message instanceof \Magento\Framework\Object) {
                 $message = $message->getData();
                 
-                $this->cleanupArray( $message );
-            }
-            else {
+                $this->cleanupArray($message);
+            } else {
                 $message = (array)$message;
             }
         }
         
-        if( is_array( $message ) ) {
-            $message = print_r( $message, 1 );
+        if (is_array($message)) {
+            $message = print_r($message, 1);
         }
         
         // TODO: Custom logger to write to {$code}.log
-        $this->_logger->info( $message );
+        $this->_logger->info($message);
 
         return $this;
+    }
+
+    public function getIsCheckout()
+    {
+    }
+
+    public function getCurrentCustomer()
+    {
+    }
+
+    public function getCurrentStoreId()
+    {
     }
 }

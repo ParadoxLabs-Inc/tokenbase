@@ -789,6 +789,27 @@ class Card extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
+     * Get payment info instance (if any)
+     *
+     * @return \Magento\Payment\Model\InfoInterface|null
+     */
+    public function getInfoInstance()
+    {
+        return $this->getData('info_instance');
+    }
+
+    /**
+     * Set payment info instance
+     *
+     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @return $this
+     */
+    public function setInfoInstance(\Magento\Payment\Model\InfoInterface $payment)
+    {
+        return $this->setData('info_instance', $payment);
+    }
+
+    /**
      * Get card label (formatted number).
      *
      * @return \Magento\Framework\Phrase|string
@@ -809,8 +830,10 @@ class Card extends \Magento\Framework\Model\AbstractModel
      *
      * @return $this
      */
-    protected function _beforeSave()
+    public function beforeSave()
     {
+        parent::beforeSave();
+        
         /**
          * If the payment ID has changed, look for any duplicate payment records that might be stored.
          */
