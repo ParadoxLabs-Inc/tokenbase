@@ -98,8 +98,6 @@ class Card extends \Magento\Framework\Model\AbstractModel
     /**
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
-     * @param \Magento\Framework\Model\Resource\AbstractResource $resource
-     * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \Magento\Payment\Helper\Data $paymentHelper
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
@@ -108,8 +106,9 @@ class Card extends \Magento\Framework\Model\AbstractModel
      * @param \Magento\Customer\Model\CustomerFactory $customerFactory
      * @param \Magento\Sales\Model\Resource\Order\CollectionFactory $orderCollectionFactory
      * @param \Magento\Checkout\Model\Session $checkoutSession
-     * @param \Magento\Framework\App\State $appState
      * @param \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress
+     * @param \Magento\Framework\Model\Resource\AbstractResource $resource
+     * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
      * @param array $data
      */
     public function __construct(
@@ -123,7 +122,6 @@ class Card extends \Magento\Framework\Model\AbstractModel
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Sales\Model\Resource\Order\CollectionFactory $orderCollectionFactory,
         \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Framework\App\State $appState,
         \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress,
         \Magento\Framework\Model\Resource\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
@@ -870,9 +868,9 @@ class Card extends \Magento\Framework\Model\AbstractModel
         }
 
         /**
-         * If we are not admin, record current IP.
+         * If we are on the frontend, record current IP.
          */
-        if ($this->appState->getAreaCode() == \Magento\Framework\App\Area::AREA_FRONTEND) {
+        if ($this->helper->getIsFrontend()) {
             $this->setCustomerIp($this->remoteAddress->getRemoteAddress());
         }
 

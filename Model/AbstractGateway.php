@@ -16,7 +16,6 @@ namespace ParadoxLabs\TokenBase\Model;
 /**
  * Common API gateway methods, logging, exceptions, etc.
  */
-// TODO: this
 abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel
 {
     /**
@@ -96,6 +95,61 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel
     protected $endpointTest     = '';
 
     /**
+     * @var bool
+     */
+    protected $initialized      = false;
+
+    /**
+     * @var bool
+     */
+    protected $haveAuthorized   = false;
+
+    /**
+     * @var \ParadoxLabs\TokenBase\Model\Gateway\Xml
+     */
+    protected $xml;
+
+    /**
+     * @var \ParadoxLabs\TokenBase\Model\Gateway\ResponseFactory
+     */
+    protected $responseFactory;
+
+    /**
+     * @var \ParadoxLabs\TokenBase\Helper\Data
+     */
+    protected $helper;
+
+    /**
+     * Constructor, yeah!
+     *
+     * @param \Magento\Framework\Model\Context $context
+     * @param \Magento\Framework\Registry $registry
+     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
+     * @param \ParadoxLabs\TokenBase\Model\Gateway\Xml $xml
+     * @param \ParadoxLabs\TokenBase\Model\Gateway\ResponseFactory $responseFactory
+     * @param \Magento\Framework\Model\Resource\AbstractResource $resource
+     * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
+     * @param array $data
+     */
+    public function __construct(
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $registry,
+        \ParadoxLabs\TokenBase\Helper\Data $helper,
+        \ParadoxLabs\TokenBase\Model\Gateway\Xml $xml,
+        \ParadoxLabs\TokenBase\Model\Gateway\ResponseFactory $responseFactory,
+        \Magento\Framework\Model\Resource\AbstractResource $resource = null,
+        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        array $data = []
+    ) {
+        $this->helper           = $helper;
+        $this->responseFactory  = $responseFactory;
+        $this->xml              = $xml;
+
+        return parent::__construct($context, $registry, $resource, $resourceCollection, $data);
+    }
+
+
+    /**
      * Initialize the gateway. Input is taken as an array for greater flexibility.
      *
      * @param array $parameters
@@ -119,11 +173,44 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel
 
         $this->clearParameters();
 
+        $this->initialized  = true;
+
+        return $this;
+    }
+
+    /**
+     * Has the gateway been initialized/configured?
+     *
+     * @return bool
+     */
+    public function isInitialized()
+    {
+        return $this->initialized;
+    }
+
+    /**
+     * Undo initialization
+     *
+     * @return $this
+     */
+    public function reset()
+    {
+        $this->defaults     = array();
+        $this->secretKey    = '';
+        $this->testMode     = null;
+        $this->endpoint     = null;
+
+        $this->clearParameters();
+
+        $this->initialized  = false;
+
         return $this;
     }
 
     /**
      * Set the API parameters back to defaults, clearing any runtime values.
+     *
+     * @return $this
      */
     public function clearParameters()
     {
@@ -140,6 +227,8 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel
      * @param string $key
      * @param mixed $val
      * @return $this
+     * @throws \Exception
+     * @throws \Magento\Framework\Exception\PaymentException
      */
     public function setParameter($key, $val)
     {
@@ -157,7 +246,11 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel
                      * Convert special characters to simple ascii equivalent
                      */
                     $val = htmlentities($val, ENT_QUOTES, 'UTF-8');
-                    $val = preg_replace('/&([a-z]{1,2})(acute|cedil|circ|grave|lig|orn|ring|slash|th|tilde|uml);/i', '$1', $val);
+                    $val = preg_replace(
+                        '/&([a-z]{1,2})(acute|cedil|circ|grave|lig|orn|ring|slash|th|tilde|uml);/i',
+                        '$1',
+                        $val
+                    );
                     $val = preg_replace(array( '/[^0-9a-z \.]/i', '/-+/' ), ' ', $val);
                     $val = trim($val);
                 }
@@ -181,13 +274,17 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel
                     if (in_array($val, $this->fields[ $key ]['enum'])) {
                         $this->params[ $key ] = $val;
                     } else {
-                        //                        Mage::throwException( __( sprintf( "Payment Gateway: Invalid value for '%s': '%s'", $key, $val ) ) );
+                        throw new \Magento\Framework\Exception\PaymentException(
+                            __(sprintf("Payment Gateway: Invalid value for '%s': '%s'", $key, $val))
+                        );
                     }
                 } else {
                     $this->params[ $key ] = $val;
                 }
             } else {
-                //                Mage::throwException( __( sprintf( "Payment Gateway: Unknown parameter '%s'", $key ) ) );
+                throw new \Magento\Framework\Exception\LocalizedException(
+                    __(sprintf("Payment Gateway: Unknown parameter '%s'", $key))
+                );
             }
         }
 
@@ -214,7 +311,7 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel
      * @param mixed $default
      * @return mixed
      */
-    public function getParameter($key, $default='')
+    public function getParameter($key, $default = '')
     {
         return (isset($this->params[ $key ]) ? $this->params[ $key ] : $default);
     }
@@ -247,7 +344,7 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel
      */
     public function logLogs()
     {
-        //        log( $this->code, $this->log );
+        $this->helper->log($this->code, $this->log);
 
         return $this;
     }
@@ -278,32 +375,33 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Convert array to XML string. See tokenbase/gateway_xml
+     * Convert array to XML string. See \ParadoxLabs\TokenBase\Model\Gateway\Xml
      *
-     * @param $rootName
-     * @param $array
+     * @param string $rootName
+     * @param array $array
+     * @return string
      */
-    // TODO: This
     protected function arrayToXml($rootName, $array)
     {
-        //        $xml = Mage::getModel('tokenbase/gateway_xml')->createXML( $rootName, $array );
+        $xml = $this->xml->createXML($rootName, $array);
 
-//        return $xml->saveXML();
+        return $xml->saveXML();
     }
 
     /**
-     * Convert XML string to array. See tokenbase/gateway_xml
+     * Convert XML string to array. See \ParadoxLabs\TokenBase\Model\Gateway\Xml
      *
-     * @param $xml
+     * @param string $xml
+     * @return array
      */
-    // TODO: This
     protected function xmlToArray($xml)
     {
-        //        return Mage::getModel('tokenbase/gateway_xml')->createArray( $xml );
+        return $this->xml->createArray($xml);
     }
 
     /**
      * These should be implemented by the child gateway.
+     *
      * @param Card $card
      * @return $this
      */
@@ -312,67 +410,98 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel
         return parent::setData('card', $card);
     }
 
-    public function isInitialized()
+    /**
+     * Set authorization code for the next transaction
+     *
+     * @param string $authCode
+     * @return $this
+     */
+    public function setAuthCode($authCode)
     {
-    }
+        $this->setParameter('auth_code', $authCode);
 
-    public function reset()
-    {
+        return $this;
     }
 
     /**
-     * @param $payment
-     * @param $amount
-     * @return \Magento\Framework\Object
+     * Have we already authorized? Used for certain capture cases.
+     *
+     * @return bool
      */
-    public function authorize($payment, $amount)
-    {
-    }
-
-    public function setHaveAuthorized($true)
-    {
-    }
-
-    public function setAuthCode($int)
-    {
-    }
-
-    public function setTransactionId($int)
-    {
-    }
-
-    /**
-     * @param $payment
-     * @param $amount
-     * @param $realTransactionId
-     * @return \Magento\Framework\Object
-     */
-    public function capture($payment, $amount, $realTransactionId)
-    {
-    }
-
     public function getHaveAuthorized()
     {
-    }
-
-    public function refund($payment, $amount, $realTransactionId)
-    {
+        return $this->haveAuthorized;
     }
 
     /**
-     * @param $payment
-     * @return \Magento\Framework\Object
+     * Set haveAuthorized state for next capture.
+     *
+     * @param $haveAuthorized
+     * @return $this
      */
-    public function void($payment)
+    public function setHaveAuthorized($haveAuthorized)
     {
+        $this->haveAuthorized = (bool)$haveAuthorized;
+
+        return $this;
     }
 
     /**
-     * @param $payment
+     * Set prior transaction ID for next transaction.
+     *
      * @param $transactionId
-     * @return \Magento\Framework\Object
+     * @return $this
      */
-    public function fraudUpdate($payment, $transactionId)
+    public function setTransactionId($transactionId)
     {
+        $this->setParameter('transaction_id', $transactionId);
+
+        return $this;
     }
+
+    /**
+     * Run an auth transaction for $amount with the given payment info
+     *
+     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param float $amount
+     * @return \ParadoxLabs\TokenBase\Model\Gateway\Response
+     */
+    abstract public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount);
+
+    /**
+     * Run a capture transaction for $amount with the given payment info
+     *
+     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param float $amount
+     * @param string $transactionId
+     * @return \ParadoxLabs\TokenBase\Model\Gateway\Response
+     */
+    abstract public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount, $transactionId);
+
+    /**
+     * Run a refund transaction for $amount with the given payment info
+     *
+     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param float $amount
+     * @param string $transactionId
+     * @return \ParadoxLabs\TokenBase\Model\Gateway\Response
+     */
+    abstract public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount, $transactionId);
+
+    /**
+     * Run a void transaction for the given payment info
+     *
+     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @return \ParadoxLabs\TokenBase\Model\Gateway\Response
+     */
+    abstract public function void(\Magento\Payment\Model\InfoInterface $payment);
+
+    /**
+     * Fetch a transaction status update
+     *
+     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param string $transactionId
+     * @return \ParadoxLabs\TokenBase\Model\Gateway\Response
+     */
+    abstract public function fraudUpdate(\Magento\Payment\Model\InfoInterface $payment, $transactionId);
 }

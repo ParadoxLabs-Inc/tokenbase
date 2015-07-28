@@ -13,16 +13,163 @@
 
 namespace ParadoxLabs\TokenBase\Helper;
 
-use Magento\Framework\App\Helper\Context;
-
 /**
  * Class Data
  */
-class Data extends \Magento\Framework\App\Helper\AbstractHelper
+class Data extends \Magento\Payment\Helper\Data
 {
     /**
+     * @var \ParadoxLabs\TokenBase\Model\Card
+     */
+    protected $card;
+
+    /**
+     * @var \ParadoxLabs\TokenBase\Model\Resource\Card\Collection[]
+     */
+    protected $cards;
+
+    /**
+     * @var \Magento\Framework\App\State
+     */
+    protected $appState;
+
+    /**
+     * Construct
+     *
+     * @param \Magento\Framework\App\Helper\Context $context
+     * @param \Magento\Framework\View\LayoutFactory $layoutFactory
+     * @param \Magento\Payment\Model\Method\Factory $paymentMethodFactory
+     * @param \Magento\Store\Model\App\Emulation $appEmulation
+     * @param \Magento\Payment\Model\Config $paymentConfig
+     * @param \Magento\Framework\App\Config\Initial $initialConfig
+     * @param \Magento\Framework\App\State $appState
+     */
+    public function __construct(
+        \Magento\Framework\App\Helper\Context $context,
+        \Magento\Framework\View\LayoutFactory $layoutFactory,
+        \Magento\Payment\Model\Method\Factory $paymentMethodFactory,
+        \Magento\Store\Model\App\Emulation $appEmulation,
+        \Magento\Payment\Model\Config $paymentConfig,
+        \Magento\Framework\App\Config\Initial $initialConfig,
+        \Magento\Framework\App\State $appState
+    ) {
+        $this->appState = $appState;
+
+        parent::__construct(
+            $context,
+            $layoutFactory,
+            $paymentMethodFactory,
+            $appEmulation,
+            $paymentConfig,
+            $initialConfig
+        );
+    }
+
+
+    /**
+     * Return active payment methods (if any) implementing tokenbase.
+     *
+     * @return array
+     */
+    public function getActiveMethods()
+    {
+        $methods = [];
+
+        foreach ($this->getPaymentMethods() as $code => $data) {
+            if (isset($data['group']) && $data['group'] == 'tokenbase'
+                && isset($data['active']) && $data['active'] == 1) {
+                $methods[] = $code;
+            }
+        }
+
+        return $methods;
+    }
+
+    /**
+     * Return all tokenbase-derived payment methods, without an active check.
+     *
+     * @return array
+     */
+    public function getAllMethods()
+    {
+        $methods = [];
+
+        foreach ($this->getPaymentMethods() as $code => $data) {
+            if (isset($data['group']) && $data['group'] == 'tokenbase') {
+                $methods[] = $code;
+            }
+        }
+
+        return $methods;
+    }
+
+    /**
+     * Return store scope based on the available info... the admin panel makes this complicated.
+     */
+    public function getCurrentStoreId()
+    {
+        // TODO: this
+        // ???
+
+        return 1;
+    }
+
+    /**
+     * Return current customer based on the available info.
+     */
+    public function getCurrentCustomer()
+    {
+        // TODO: this
+        // ???
+
+        return new \Magento\Customer\Model\Customer;
+    }
+
+    /**
+     * Return active card model for edit (if any).
+     *
+     * @param string|null $method
+     * @return \ParadoxLabs\TokenBase\Model\Card
+     */
+    public function getActiveCard($method = null)
+    {
+        // TODO: this
+        // ???
+
+        return $this->card;
+    }
+
+    /**
+     * Get stored cards for the currently-active method.
+     *
+     * @param string|null $method
+     * @return array
+     */
+    public function getActiveCustomerCardsByMethod($method = null)
+    {
+        // TODO: this
+        // ???
+
+        return $this->cards[ $method ];
+    }
+
+    /**
+     * Check whether we are in the frontend area.
+     *
+     * @return bool
+     */
+    public function getIsFrontend()
+    {
+        if ($this->appState->getAreaCode() == \Magento\Framework\App\Area::AREA_FRONTEND) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Recursively cleanup array from objects
-     * 
+     *
      * @param $array
      * @return void
      */
@@ -43,7 +190,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Write a message to the logs, nice and abstractly.
-     * 
+     *
      * @param string $code
      * @param mixed $message
      * @return $this
@@ -68,17 +215,5 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->_logger->info($message);
 
         return $this;
-    }
-
-    public function getIsCheckout()
-    {
-    }
-
-    public function getCurrentCustomer()
-    {
-    }
-
-    public function getCurrentStoreId()
-    {
     }
 }
