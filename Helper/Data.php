@@ -34,6 +34,11 @@ class Data extends \Magento\Payment\Helper\Data
     protected $appState;
 
     /**
+     * @var \ParadoxLabs\TokenBase\Model\Logger\Logger
+     */
+    protected $tokenbaseLogger;
+
+    /**
      * Construct
      *
      * @param \Magento\Framework\App\Helper\Context $context
@@ -43,6 +48,7 @@ class Data extends \Magento\Payment\Helper\Data
      * @param \Magento\Payment\Model\Config $paymentConfig
      * @param \Magento\Framework\App\Config\Initial $initialConfig
      * @param \Magento\Framework\App\State $appState
+     * @param \ParadoxLabs\TokenBase\Model\Logger\Logger $tokenbaseLogger
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
@@ -51,9 +57,11 @@ class Data extends \Magento\Payment\Helper\Data
         \Magento\Store\Model\App\Emulation $appEmulation,
         \Magento\Payment\Model\Config $paymentConfig,
         \Magento\Framework\App\Config\Initial $initialConfig,
-        \Magento\Framework\App\State $appState
+        \Magento\Framework\App\State $appState,
+        \ParadoxLabs\TokenBase\Model\Logger\Logger $tokenbaseLogger
     ) {
         $this->appState = $appState;
+        $this->tokenbaseLogger = $tokenbaseLogger;
 
         parent::__construct(
             $context,
@@ -210,9 +218,8 @@ class Data extends \Magento\Payment\Helper\Data
         if (is_array($message)) {
             $message = print_r($message, 1);
         }
-        
-        // TODO: Custom logger to write to {$code}.log
-        $this->_logger->info($message);
+
+        $this->tokenbaseLogger->info(sprintf('[%s] %s', $code, $message));
 
         return $this;
     }

@@ -96,6 +96,11 @@ class Card extends \Magento\Framework\Model\AbstractModel
     protected $scopeConfig;
 
     /**
+     * @var \Magento\Customer\Model\Address\AbstractAddressFactory
+     */
+    protected $addressFactory;
+
+    /**
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
@@ -104,6 +109,7 @@ class Card extends \Magento\Framework\Model\AbstractModel
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \ParadoxLabs\Tokenbase\Model\Resource\Card\CollectionFactory $cardCollectionFactory
      * @param \Magento\Customer\Model\CustomerFactory $customerFactory
+     * @param \Magento\Customer\Model\Address\AbstractAddressFactory $addressFactory
      * @param \Magento\Sales\Model\Resource\Order\CollectionFactory $orderCollectionFactory
      * @param \Magento\Checkout\Model\Session $checkoutSession
      * @param \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress
@@ -120,6 +126,7 @@ class Card extends \Magento\Framework\Model\AbstractModel
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \ParadoxLabs\Tokenbase\Model\Resource\Card\CollectionFactory $cardCollectionFactory,
         \Magento\Customer\Model\CustomerFactory $customerFactory,
+        \Magento\Customer\Model\Address\AbstractAddressFactory $addressFactory,
         \Magento\Sales\Model\Resource\Order\CollectionFactory $orderCollectionFactory,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress,
@@ -134,10 +141,10 @@ class Card extends \Magento\Framework\Model\AbstractModel
         $this->objectManager            = $objectManager;
         $this->scopeConfig              = $scopeConfig;
         $this->customerFactory          = $customerFactory;
+        $this->addressFactory           = $addressFactory;
         $this->cardCollectionFactory    = $cardCollectionFactory;
         $this->orderCollectionFactory   = $orderCollectionFactory;
         $this->checkoutSession          = $checkoutSession;
-        $this->appState                 = $appState;
         $this->remoteAddress            = $remoteAddress;
     }
 
@@ -454,6 +461,20 @@ class Card extends \Magento\Framework\Model\AbstractModel
         }
 
         return $this->address;
+    }
+
+    /**
+     * Return a customer address object containing the card address data.
+     *
+     * @return \Magento\Customer\Model\Address\AbstractAddress
+     */
+    public function getAddressObject()
+    {
+        /** @var \Magento\Customer\Model\Address\AbstractAddress $address */
+        $address = $this->addressFactory->create();
+        $address->setData($this->getAddress());
+
+        return $address;
     }
 
     /**
