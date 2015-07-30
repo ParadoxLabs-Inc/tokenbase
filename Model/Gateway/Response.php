@@ -59,4 +59,74 @@ class Response extends \Magento\Framework\Object
     {
         return $this->getData('is_error') ? true : false;
     }
+
+    /**
+     * Get transaction response code
+     *
+     * @return string|int
+     */
+    public function getResponseCode()
+    {
+        return $this->getData('response_code');
+    }
+
+    /**
+     * Get transaction descriptor
+     *
+     * @return string|int
+     */
+    public function getResponseReasonCode()
+    {
+        return $this->getData('response_reason_code');
+    }
+
+    /**
+     * Get transaction type
+     *
+     * @return string
+     */
+    public function getTransactionType()
+    {
+        return $this->getData('transaction_type');
+    }
+
+    /**
+     * Get transaction ID
+     *
+     * @return string|int
+     */
+    public function getTransactionId()
+    {
+        return $this->getData('transaction_id');
+    }
+
+    /**
+     * Get authorization code
+     *
+     * @return string
+     */
+    public function getAuthCode()
+    {
+        return $this->getData('auth_code');
+    }
+
+    /**
+     * Get transaction method
+     *
+     * @return string
+     */
+    public function getMethod()
+    {
+        return $this->getData('method');
+    }
+
+    /**
+     * Get response message
+     *
+     * @return string
+     */
+    public function getResponseReasonText()
+    {
+        return $this->getData('response_reason_text');
+    }
 }

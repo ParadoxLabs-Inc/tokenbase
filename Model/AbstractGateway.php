@@ -39,7 +39,7 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel
     protected $testMode;
 
     /**
-     * $fields sets validation for each input.
+     * $fields defines validation for each API parameter or input.
      *
      * key => array(
      *    'maxLength' => int,
@@ -50,19 +50,19 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel
      *
      * @var array
      */
-    protected $fields           = array();
+    protected $fields           = [];
 
     /**
      * These hold parameters for each request.
      *
      * @var array
      */
-    protected $params           = array();
+    protected $params           = [];
 
     /**
      * @var array
      */
-    protected $defaults         = array();
+    protected $defaults         = [];
 
     /**
      * @var string
@@ -160,10 +160,10 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel
         $this->secretKey    = isset($parameters['secret_key']) ? $parameters['secret_key'] : '';
         $this->testMode     = isset($parameters['test_mode']) ? (bool)$parameters['test_mode'] : false;
 
-        $this->defaults     = array(
+        $this->defaults     = [
             'login'     => $parameters['login'],
             'password'  => $parameters['password']
-        );
+        ];
 
         if (isset($parameters['endpoint'])) {
             $this->endpoint = $parameters['endpoint'];
@@ -195,7 +195,7 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel
      */
     public function reset()
     {
-        $this->defaults     = array();
+        $this->defaults     = [];
         $this->secretKey    = '';
         $this->testMode     = null;
         $this->endpoint     = null;
@@ -251,7 +251,7 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel
                         '$1',
                         $val
                     );
-                    $val = preg_replace(array( '/[^0-9a-z \.]/i', '/-+/' ), ' ', $val);
+                    $val = preg_replace(['/[^0-9a-z \.]/i', '/-+/'], ' ', $val);
                     $val = trim($val);
                 }
 
@@ -492,9 +492,10 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel
      * Run a void transaction for the given payment info
      *
      * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param string $transactionId
      * @return \ParadoxLabs\TokenBase\Model\Gateway\Response
      */
-    abstract public function void(\Magento\Payment\Model\InfoInterface $payment);
+    abstract public function void(\Magento\Payment\Model\InfoInterface $payment, $transactionId = null);
 
     /**
      * Fetch a transaction status update
