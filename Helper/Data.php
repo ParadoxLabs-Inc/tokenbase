@@ -156,6 +156,8 @@ class Data extends \Magento\Payment\Helper\Data
     public function getActiveCustomerCardsByMethod($method = null)
     {
         // TODO: this
+        // TODO: Make sure cards are not returned if missing payment_id.
+        // TODO: trim cards missing payment_id after delay
         // ???
 
         return $this->cards[ $method ];

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../lib/internal/Magento/Framework/Event/etc/events.xsd">
+    <event name="tokenbase_before_load_active_cards">
+        <observer name="tokenbase_check_queue_deletion" instance="ParadoxLabs\TokenBase\Model\Observer\CardLoad" method="checkQueuedForDeletion" />
+    </event>
+    <event name="sales_order_payment_capture">
+        <observer name="tokenbase_capture" instance="ParadoxLabs\TokenBase\Model\Observer\Capture" method="processCapture" />
+    </event>
+    <event name="sales_order_creditmemo_refund">
+        <observer name="tokenbase_refund" instance="ParadoxLabs\TokenBase\Model\Observer\Refund" method="processRefund" />
+    </event>
+</config>
