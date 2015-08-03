@@ -150,23 +150,23 @@ class InstallSchema implements \Magento\Framework\Setup\InstallSchemaInterface
          * Add payment card ID columns
          */
         $setup->getConnection()->addColumn(
-            $setup->getTable('sales_flat_quote_payment'),
+            $setup->getTable('quote_payment'),
             'tokenbase_id',
             [
                 'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
                 'unsigned'  => true,
-            ],
-            'ParadoxLabs_TokenBase Card ID'
+                'comment'   => 'ParadoxLabs_TokenBase Card ID',
+            ]
         );
 
         $setup->getConnection()->addColumn(
-            $setup->getTable('sales_flat_order_payment'),
+            $setup->getTable('sales_order_payment'),
             'tokenbase_id',
             [
                 'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
                 'unsigned'  => true,
-            ],
-            'ParadoxLabs_TokenBase Card ID'
+                'comment'   => 'ParadoxLabs_TokenBase Card ID',
+            ]
         );
 
         $setup->endSetup();

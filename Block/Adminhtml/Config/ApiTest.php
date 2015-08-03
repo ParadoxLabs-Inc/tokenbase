@@ -13,7 +13,10 @@
 
 namespace ParadoxLabs\TokenBase\Block\Adminhtml\Config;
 
-abstract class ApiTest extends \Magento\Framework\View\Element\Text
+/**
+ * ApiTest Class
+ */
+abstract class ApiTest extends \Magento\Config\Block\System\Config\Form\Field
 {
     /**
      * @var \ParadoxLabs\TokenBAse\Helper\Data
@@ -26,16 +29,14 @@ abstract class ApiTest extends \Magento\Framework\View\Element\Text
     protected $storeId = 0;
 
     /**
-     * Constructor
-     *
-     * @param \Magento\Framework\View\Element\Context $context
+     * @param \Magento\Backend\Block\Template\Context $context
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \Magento\Store\Model\StoreFactory $storeFactory
      * @param \Magento\Store\Model\WebsiteFactory $websiteFactory
      * @param array $data
      */
     public function __construct(
-        \Magento\Framework\View\Element\Context $context,
+        \Magento\Backend\Block\Template\Context $context,
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         \Magento\Store\Model\StoreFactory $storeFactory,
         \Magento\Store\Model\WebsiteFactory $websiteFactory,
@@ -77,22 +78,26 @@ abstract class ApiTest extends \Magento\Framework\View\Element\Text
     /**
      * Before rendering html, but after trying to load cache
      *
-     * @return $this
+     * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
+     * @return string
      */
-    protected function _beforeToHtml()
+    protected function _getElementHtml(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
         $html = (string)$this->testApi();
 
         if (strpos($html, 'success') !== false) {
             $html = '<strong style="color:#0a0;">' . $html . '</strong>';
         } else {
-            $html = '<strong class="error">' . $html . '</strong>';
+            $html = '<strong style="color:#D40707;">' . $html . '</strong>';
         }
 
-        $this->setText($html);
-
-        return parent::_beforeToHtml();
+        return $html;
     }
 
+    /**
+     * Method to test the API connection. Should return a string indicating success or error.
+     *
+     * @return mixed
+     */
     abstract protected function testApi();
 }

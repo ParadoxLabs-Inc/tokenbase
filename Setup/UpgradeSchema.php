@@ -50,8 +50,8 @@ class UpgradeSchema implements \Magento\Framework\Setup\UpgradeSchemaInterface
                 [
                     'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
                     'length'    => 10,
-                ],
-                'Unique Hash'
+                    'comment'   => 'Unique Hash',
+                ]
             );
 
             /**
