@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../lib/internal/Magento/Framework/ObjectManager/etc/config.xsd">
+    <type name="ParadoxLabs\TokenBase\Model\Observer\AdminNotification">
+        <arguments>
+            <argument name="feedFactory" xsi:type="object">ParadoxLabs\TokenBase\Model\Observer\AdminNotification\Feed</argument>
+        </arguments>
+    </type>
+</config>
