@@ -55,6 +55,8 @@ class Clean
      */
     public function cleanData()
     {
+        // TODO: trim cards missing payment_id after delay
+
         $cleanOldCards = $this->scopeConfig->getValue(
             'checkout/tokenbase/clean_old_cards',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE

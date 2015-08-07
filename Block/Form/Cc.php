@@ -21,7 +21,7 @@ class Cc extends \Magento\Payment\Block\Form\Cc
     /**
      * @var string
      */
-    protected $_template = 'ParadoxLabs_Tokenbase::form/cc.phtml';
+    protected $_template = 'ParadoxLabs_TokenBase::form/cc.phtml';
 
     /**
      * @var string

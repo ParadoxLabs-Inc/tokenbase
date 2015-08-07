@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="../../../../../lib/internal/Magento/Framework/Object/etc/fieldset.xsd">
+    <scope id="global">
+        <fieldset id="quote_convert_payment">
+            <field name="tokenbase_id">
+                <aspect name="to_order_payment" />
+            </field>
+            <field name="echeck_account_name">
+                <aspect name="to_order_payment" />
+            </field>
+            <field name="echeck_bank_name">
+                <aspect name="to_order_payment" />
+            </field>
+            <field name="echeck_account_type">
+                <aspect name="to_order_payment" />
+            </field>
+            <field name="echeck_routing_number">
+                <aspect name="to_order_payment" />
+            </field>
+            <field name="echeck_routing_no">
+                <aspect name="to_order_payment" />
+            </field>
+            <field name="echeck_account_no">
+                <aspect name="to_order_payment" />
+            </field>
+        </fieldset>
+        <fieldset id="sales_convert_quote_payment">
+            <field name="tokenbase_id">
+                <aspect name="to_order_payment" />
+            </field>
+            <field name="echeck_account_name">
+                <aspect name="to_order_payment" />
+            </field>
+            <field name="echeck_bank_name">
+                <aspect name="to_order_payment" />
+            </field>
+            <field name="echeck_account_type">
+                <aspect name="to_order_payment" />
+            </field>
+            <field name="echeck_routing_number">
+                <aspect name="to_order_payment" />
+            </field>
+            <field name="echeck_routing_no">
+                <aspect name="to_order_payment" />
+            </field>
+            <field name="echeck_account_no">
+                <aspect name="to_order_payment" />
+            </field>
+        </fieldset>
+        <fieldset id="sales_convert_order_payment">
+            <field name="tokenbase_id">
+                <aspect name="to_quote_payment" />
+            </field>
+            <field name="echeck_account_name">
+                <aspect name="to_quote_payment" />
+            </field>
+            <field name="echeck_bank_name">
+                <aspect name="to_quote_payment" />
+            </field>
+            <field name="echeck_account_type">
+                <aspect name="to_quote_payment" />
+            </field>
+            <field name="echeck_routing_number">
+                <aspect name="to_quote_payment" />
+            </field>
+            <field name="echeck_routing_no">
+                <aspect name="to_quote_payment" />
+            </field>
+            <field name="echeck_account_no">
+                <aspect name="to_quote_payment" />
+            </field>
+        </fieldset>
+    </scope>
+</config>

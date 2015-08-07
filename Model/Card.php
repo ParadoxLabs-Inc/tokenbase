@@ -252,17 +252,17 @@ class Card extends \Magento\Framework\Model\AbstractModel
             /**
              * If we have no email, try to find it from current scope data.
              */
-            if ($payment->hasData('quote') != null
-                && $payment->getData('quote')->getBillingAddress() != null
-                && $payment->getData('quote')->getBillingAddress()->getCustomerEmail() != '') {
+            if ($payment->getQuote() != null
+                && $payment->getQuote()->getBillingAddress() != null
+                && $payment->getQuote()->getBillingAddress()->getCustomerEmail() != '') {
                 /** @var \Magento\Quote\Model\Quote $model */
-                $model = $payment->getData('quote');
-            } elseif ($payment->hasData('order') != null
-                && ($payment->getData('order')->getCustomerEmail() != ''
-                    || ($payment->getData('order')->getBillingAddress() != null
-                        && $payment->getData('order')->getBillingAddress()->getCustomerEmail() != ''))) {
+                $model = $payment->getQuote();
+            } elseif ($payment->getOrder() != null
+                && ($payment->getOrder()->getCustomerEmail() != ''
+                    || ($payment->getOrder()->getBillingAddress() != null
+                        && $payment->getOrder()->getBillingAddress()->getCustomerEmail() != ''))) {
                 /** @var \Magento\Sales\Model\Order $model */
-                $model = $payment->getData('order');
+                $model = $payment->getOrder();
             } else {
                 /**
                  * This will fall back to checkout/session if onepage has no quote loaded.
@@ -836,7 +836,7 @@ class Card extends \Magento\Framework\Model\AbstractModel
     public function getLabel()
     {
         if ($this->getAdditional('cc_last4')) {
-            return __('XXXX-%s', $this->getAdditional('cc_last4'));
+            return __('XXXX-%1', $this->getAdditional('cc_last4'));
         }
         
         return '';
@@ -873,7 +873,7 @@ class Card extends \Magento\Framework\Model\AbstractModel
             if ($dupe && $dupe->getId() > 0 && $dupe->getId() != $this->getId()) {
                 $this->helper->log(
                     $this->getData('method'),
-                    __('Merging duplicate payment data into card %s', $dupe->getId())
+                    __('Merging duplicate payment data into card %1', $dupe->getId())
                 );
 
                 $customerId     = $this->getData('customer_id');

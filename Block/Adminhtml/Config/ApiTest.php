@@ -19,7 +19,7 @@ namespace ParadoxLabs\TokenBase\Block\Adminhtml\Config;
 abstract class ApiTest extends \Magento\Config\Block\System\Config\Form\Field
 {
     /**
-     * @var \ParadoxLabs\TokenBAse\Helper\Data
+     * @var \ParadoxLabs\TokenBase\Helper\Data
      */
     protected $helper;
 

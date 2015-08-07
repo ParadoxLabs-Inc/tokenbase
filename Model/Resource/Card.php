@@ -15,6 +15,9 @@
 
 namespace ParadoxLabs\TokenBase\Model\Resource;
 
+/**
+ * Card Resource Model
+ */
 class Card extends \Magento\Framework\Model\Resource\Db\AbstractDb
 {
     /**
@@ -24,34 +27,32 @@ class Card extends \Magento\Framework\Model\Resource\Db\AbstractDb
      */
     protected function _construct()
     {
-        $this->_init('paradoxlabs_tokenbase_card', 'id');
+        $this->_init('paradoxlabs_stored_card', 'id');
     }
 
     /**
      * Load card by hash
-     * TODO: implement loadByHash 
-     * 
+     *
      * @param \ParadoxLabs\TokenBase\Model\Card $card
-     * @param string|int $hash
+     * @param string $hash
      * @return $this
      */
     public function loadByHash(
         \ParadoxLabs\TokenBase\Model\Card $card,
         $hash
     ) {
-        //        $adapter = $this->_getReadAdapter();
-//        $select  = $adapter->select()
-//            ->from( $this->getMainTable(), array( $this->getIdFieldName() ) )
-//            ->where('hash = :hash');
-//
-//        $cardId  = $adapter->fetchOne( $select, array( 'hash' => $hash ) );
-//
-//        if( $cardId ) {
-//            $this->load( $card, $cardId );
-//        }
-//        else {
-//            $card->setData( array() );
-//        }
+        $adapter = $this->_getReadAdapter();
+        $select  = $adapter->select()
+            ->from($this->getMainTable(), [$this->getIdFieldName()])
+            ->where('hash = :hash');
+
+        $cardId  = $adapter->fetchOne($select, ['hash' => $hash]);
+
+        if ($cardId) {
+            $this->load($card, $cardId);
+        } else {
+            $card->setData([]);
+        }
 
         return $this;
     }

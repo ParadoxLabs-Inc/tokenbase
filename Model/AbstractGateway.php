@@ -447,6 +447,16 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
+     * Get transaction ID.
+     *
+     * @return string
+     */
+    public function getTransactionId()
+    {
+        return $this->getParameter('transaction_id');
+    }
+
+    /**
      * Set prior transaction ID for next transaction.
      *
      * @param $transactionId

@@ -47,7 +47,7 @@ class ZeroTotal
         \Magento\Payment\Model\MethodInterface $paymentMethod,
         \Magento\Quote\Model\Quote $quote
     ) {
-        $returnValue = $proceed();
+        $returnValue = $proceed($paymentMethod, $quote);
         
         if ($returnValue !== true && in_array($paymentMethod->getCode(), $this->helper->getActiveMethods())) {
             return true;
