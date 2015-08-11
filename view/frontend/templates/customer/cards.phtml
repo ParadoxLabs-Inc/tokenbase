@@ -1,0 +1,52 @@
+<?php
+/** @var \ParadoxLabs\TokenBase\Block\Customer\Cards $block */
+// @codingStandardsIgnoreFile
+?>
+<div class="block block-addresses-default">
+    <div class="block-title">
+        <strong><?php echo $block->getPaymentMethodTitle(); ?></strong>
+    </div>
+    <div class="block-content">
+    <?php if (count($block->getCards()) > 0): ?>
+        <?php /** @var \ParadoxLabs\TokenBase\Model\Card $card */ ?>
+        <?php foreach ($block->getCards() as $card): ?>
+            <?php $card = $card->getTypeInstance(); ?>
+            <div class="box-address-billing <?php if ($card->getExpires() != '' && strtotime($card->getExpires()) < time()): ?>expired<?php endif; ?>">
+                <?php if ($card->getExpires() != ''): ?>
+                    <small class="sorter"><?php echo date('m/Y', strtotime($card->getExpires())); ?></small>
+                <?php endif; ?>
+                <strong class="box-title">
+                    <span>
+                        <?php echo __('Card: %1', $card->getLabel()) ?>
+                    </span>
+                </strong>
+                <div class="box-content">
+                    <address>
+                        <?php echo $block->getFormattedCardAddress($card->getAddressObject()); ?>
+                    </address>
+                    <div class="box-actions">
+                        <?php if ($card->isInUse()): ?>
+                            <abbr title="<?php echo __('This payment record cannot be modified while associated with pending orders.'); ?>"><?php echo __('Card In Use'); ?></abbr>
+                        <?php else: ?>
+                            <form action="<?php echo $block->getUrl('*/*', ['_secure' => true, 'method' => $card->getMethod()]) ?>" method="post">
+                                <?php echo $block->getBlockHtml('formkey'); ?>
+                                <input type="hidden" name="id" value="<?php echo $card->getHash() ?>" />
+                                <input type="hidden" name="method" value="<?php echo $card->getMethod(); ?>" />
+                                <button class="button" type="submit"><span><span><?php echo __('Edit'); ?></span></span></button>
+                            </form>
+                            <form action="<?php echo $block->getUrl('*/*/delete', ['_secure' => true, 'method' => $card->getMethod()]) ?>" method="post">
+                                <?php echo $block->getBlockHtml('formkey'); ?>
+                                <input type="hidden" name="id" value="<?php echo $card->getHash() ?>" />
+                                <input type="hidden" name="method" value="<?php echo $card->getMethod(); ?>" />
+                                <button class="button" type="submit"><span><span><?php echo __('Delete'); ?></span></span></button>
+                            </form>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <p><?php echo __('You do not have any payment data saved yet.') ?></p>
+    <?php endif; ?>
+    </div>
+</div>

@@ -144,9 +144,12 @@ class Data extends \Magento\Payment\Helper\Data
         $methods = [];
 
         foreach ($this->getPaymentMethods() as $code => $data) {
-            if (isset($data['group']) && $data['group'] == 'tokenbase'
-                && isset($data['active']) && $data['active'] == 1) {
-                $methods[] = $code;
+            if (isset($data['group']) && $data['group'] == 'tokenbase') {
+                $method = $this->getMethodInstance($code);
+
+                if ($method->getConfigData('active') == 1) {
+                    $methods[] = $code;
+                }
             }
         }
 
@@ -221,7 +224,7 @@ class Data extends \Magento\Payment\Helper\Data
     /**
      * Return current customer based on the available info.
      *
-     * @return \Magento\Customer\Model\Customer|null
+     * @return \Magento\Customer\Model\Customer
      */
     public function getCurrentCustomer()
     {
@@ -263,8 +266,6 @@ class Data extends \Magento\Payment\Helper\Data
             $customerSession = $this->objectManager->get('Magento\Customer\Model\Session');
             if ($customerSession->getCustomerId() > 0) {
                 $customer->load($customerSession->getCustomerId());
-            } else {
-                $customer = null;
             }
         }
 
@@ -304,7 +305,47 @@ class Data extends \Magento\Payment\Helper\Data
                 if ($session->hasTokenbaseFormData()) {
                     $data = $session->getTokenbaseFormData(true);
 
-                    // TODO: this bit here
+                    if (isset($data['billing']) && count($data['billing']) > 0) {
+                        /** @var \ParadoxLabs\TokenBase\Helper\Address $addressHelper */
+                        $addressHelper = $this->objectManager->get('ParadoxLabs\TokenBase\Helper\Address');
+
+                        $address = $addressHelper->buildAddressFromInput(
+                            $data['billing'],
+                            $this->card->getAddress()
+                        );
+
+                        $this->card->setAddress($address);
+                    }
+
+                    if (isset($data['payment']) && count($data['payment']) > 0) {
+                        $cardData = $data['payment'];
+                        $cardData['method']     = $method;
+                        $cardData['card_id']    = $data['id'];
+                        // This bypasses the validation check in importData below. Does not matter otherwise.
+                        $cardData['cc_cid']     = '000';
+
+                        unset($cardData['cc_number']);
+                        unset($cardData['echeck_account_no']);
+                        unset($cardData['echeck_routing_no']);
+
+                        /** @var \Magento\Checkout\Model\Session $checkoutSession */
+                        $checkoutSession = $this->objectManager->get('Magento\Checkout\Model\Session');
+
+                        /** @var \Magento\Quote\Model\Quote\Payment $newPayment */
+                        $newPayment = $this->objectManager->get('Magento\Quote\Model\Quote\Payment');
+                        $newPayment->setQuote($checkoutSession->getQuote());
+                        $newPayment->getQuote()->getBillingAddress()->setCountryId(
+                            $this->card->getAddress('country_id')
+                        );
+
+                        try {
+                            $newPayment->importData($cardData);
+                        } catch (\Exception $e) {
+                            // We're only trying to load prior-entered data for the form. Ignore validation errors.
+                        }
+
+                        $this->card->importPaymentInfo($newPayment);
+                    }
                 }
             }
         }
@@ -424,9 +465,10 @@ class Data extends \Magento\Payment\Helper\Data
      *
      * @param string $code
      * @param mixed $message
+     * @param bool $debug
      * @return $this
      */
-    public function log($code, $message)
+    public function log($code, $message, $debug = false)
     {
         if (is_object($message)) {
             if ($message instanceof \Magento\Framework\Object) {
@@ -442,7 +484,15 @@ class Data extends \Magento\Payment\Helper\Data
             $message = print_r($message, 1);
         }
 
-        $this->tokenbaseLogger->info(sprintf('[%s] %s', $code, $message));
+        if ($debug === true) {
+            $this->tokenbaseLogger->debug(
+                sprintf('%s [%s]: %s', $code, $this->_remoteAddress->getRemoteAddress(), $message)
+            );
+        } else {
+            $this->tokenbaseLogger->info(
+                sprintf('%s [%s]: %s', $code, $this->_remoteAddress->getRemoteAddress(), $message)
+            );
+        }
 
         return $this;
     }

@@ -96,9 +96,19 @@ class Card extends \Magento\Framework\Model\AbstractModel
     protected $scopeConfig;
 
     /**
-     * @var \Magento\Customer\Model\Address\AbstractAddressFactory
+     * @var \Magento\Customer\Api\Data\AddressInterfaceFactory
      */
     protected $addressFactory;
+
+    /**
+     * @var \Magento\Customer\Api\Data\RegionInterfaceFactory
+     */
+    protected $addressRegionFactory;
+
+    /**
+     * @var \Magento\Framework\Reflection\DataObjectProcessor
+     */
+    protected $dataProcessor;
 
     /**
      * @param \Magento\Framework\Model\Context $context
@@ -109,10 +119,12 @@ class Card extends \Magento\Framework\Model\AbstractModel
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \ParadoxLabs\Tokenbase\Model\Resource\Card\CollectionFactory $cardCollectionFactory
      * @param \Magento\Customer\Model\CustomerFactory $customerFactory
-     * @param \Magento\Customer\Model\Address\AbstractAddressFactory $addressFactory
+     * @param \Magento\Customer\Api\Data\AddressInterfaceFactory $addressFactory
+     * @param \Magento\Customer\Api\Data\RegionInterfaceFactory $addressRegionFactory
      * @param \Magento\Sales\Model\Resource\Order\CollectionFactory $orderCollectionFactory
      * @param \Magento\Checkout\Model\Session $checkoutSession
      * @param \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress
+     * @param \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor
      * @param \Magento\Framework\Model\Resource\AbstractResource $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
      * @param array $data
@@ -126,10 +138,12 @@ class Card extends \Magento\Framework\Model\AbstractModel
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \ParadoxLabs\Tokenbase\Model\Resource\Card\CollectionFactory $cardCollectionFactory,
         \Magento\Customer\Model\CustomerFactory $customerFactory,
-        \Magento\Customer\Model\Address\AbstractAddressFactory $addressFactory,
+        \Magento\Customer\Api\Data\AddressInterfaceFactory $addressFactory,
+        \Magento\Customer\Api\Data\RegionInterfaceFactory $addressRegionFactory,
         \Magento\Sales\Model\Resource\Order\CollectionFactory $orderCollectionFactory,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress,
+        \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor,
         \Magento\Framework\Model\Resource\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
@@ -142,10 +156,12 @@ class Card extends \Magento\Framework\Model\AbstractModel
         $this->scopeConfig              = $scopeConfig;
         $this->customerFactory          = $customerFactory;
         $this->addressFactory           = $addressFactory;
+        $this->addressRegionFactory     = $addressRegionFactory;
         $this->cardCollectionFactory    = $cardCollectionFactory;
         $this->orderCollectionFactory   = $orderCollectionFactory;
         $this->checkoutSession          = $checkoutSession;
         $this->remoteAddress            = $remoteAddress;
+        $this->dataProcessor            = $dataObjectProcessor;
     }
 
     /**
@@ -181,7 +197,7 @@ class Card extends \Magento\Framework\Model\AbstractModel
     {
         if (is_null($this->method)) {
             if ($this->hasData('method')) {
-                $this->paymentHelper->getMethodInstance($this->getData('method'));
+                $this->method = $this->paymentHelper->getMethodInstance($this->getData('method'));
             } else {
                 throw new \UnexpectedValueException('Payment method is unknown for the current card.');
             }
@@ -452,7 +468,7 @@ class Card extends \Magento\Framework\Model\AbstractModel
      */
     public function getAddress($key = '')
     {
-        if (is_null($this->address)) {
+        if (is_null($this->address) && parent::getData('address')) {
             $this->address = unserialize(parent::getData('address'));
         }
 
@@ -466,13 +482,42 @@ class Card extends \Magento\Framework\Model\AbstractModel
     /**
      * Return a customer address object containing the card address data.
      *
-     * @return \Magento\Customer\Model\Address\AbstractAddress
+     * @return \Magento\Customer\Api\Data\AddressInterface
      */
     public function getAddressObject()
     {
-        /** @var \Magento\Customer\Model\Address\AbstractAddress $address */
-        $address = $this->addressFactory->create();
-        $address->setData($this->getAddress());
+        /** @var \Magento\Customer\Api\Data\AddressInterface $address */
+        $address    = $this->addressFactory->create();
+        $region     = $this->addressRegionFactory->create();
+
+        // ffs.
+
+        $street = $this->getAddress('street');
+        if (!is_array($street)) {
+            $street = explode("\n", $street);
+        }
+
+        $region->setRegion($this->getAddress('region'));
+        $region->setRegionCode($this->getAddress('region_code'));
+        $region->setRegionId($this->getAddress('region_id'));
+
+        $address->setId($this->getAddress('id'));
+        $address->setCustomerId($this->getAddress('customer_id'));
+        $address->setRegion($region);
+        $address->setRegionId($this->getAddress('region_id'));
+        $address->setCountryId($this->getAddress('country_id'));
+        $address->setStreet($street);
+        $address->setCompany($this->getAddress('company'));
+        $address->setTelephone($this->getAddress('telephone'));
+        $address->setFax($this->getAddress('fax'));
+        $address->setPostcode($this->getAddress('postcode'));
+        $address->setCity($this->getAddress('city'));
+        $address->setFirstname($this->getAddress('firstname'));
+        $address->setLastname($this->getAddress('lastname'));
+        $address->setMiddlename($this->getAddress('middlename'));
+        $address->setPrefix($this->getAddress('prefix'));
+        $address->setSuffix($this->getAddress('suffix'));
+        $address->setVatId($this->getAddress('vat_id'));
 
         return $address;
     }
@@ -525,17 +570,30 @@ class Card extends \Magento\Framework\Model\AbstractModel
     /**
      * Set the billing address for the card.
      *
-     * @param \Magento\Customer\Model\Address\AbstractAddress $address
+     * @param \Magento\Customer\Api\Data\AddressInterface $address
      * @return $this
      */
-    public function setAddress(\Magento\Customer\Model\Address\AbstractAddress $address)
+    public function setAddress(\Magento\Customer\Api\Data\AddressInterface $address)
     {
-        $addressData = $address->getData();
+        // Convert address to array
+        $addressData = $this->dataProcessor->buildOutputDataArray(
+            $address,
+            '\Magento\Customer\Api\Data\AddressInterface'
+        );
 
+        $addressData['region_code'] = $address->getRegion()->getRegionCode();
+        $addressData['region']      = $address->getRegion()->getRegion();
+
+        // Clean up
         $this->helper->cleanupArray($addressData);
+
+        if (is_array($addressData['street'])) {
+            $addressData['street'] = implode("\n", $addressData['street']);
+        }
 
         $this->address = null;
 
+        // Store
         return parent::setData('address', serialize($addressData));
     }
 

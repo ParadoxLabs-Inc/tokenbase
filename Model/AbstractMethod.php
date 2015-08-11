@@ -547,7 +547,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
                     ->setIsFraudDetected(true)
                     ->setTransactionAdditionalInfo('is_transaction_fraud', true);
         } else {
-            // TODO: Is this correct?
             $payment->getOrder()->setStatus($this->getConfigData('order_status'));
         }
 
@@ -840,7 +839,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
             $this->setCard($this->getCard());
 
             return $this->getCard();
-        } elseif ($payment->hasData('tokenbase_id')) {
+        } elseif ($payment->hasData('tokenbase_id') && $payment->getData('tokenbase_id')) {
             return $this->loadAndSetCard($payment->getData('tokenbase_id'));
         } elseif ($this->paymentContainsCard($payment) === true) {
             /** @var \ParadoxLabs\TokenBase\Model\Card $card */

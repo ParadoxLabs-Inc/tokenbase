@@ -13,6 +13,8 @@
 
 namespace ParadoxLabs\TokenBase\Model\Logger;
 
+use Magento\Framework\Filesystem\DriverInterface;
+
 /**
  * Custom payment gateway logger
  */
@@ -27,4 +29,20 @@ class Handler extends \Magento\Framework\Logger\Handler\Base
      * @var int
      */
     protected $loggerType = \Monolog\Logger::INFO;
+
+    /**
+     * @param DriverInterface $filesystem
+     * @param string $filePath
+     */
+    public function __construct(
+        DriverInterface $filesystem,
+        $filePath = null
+    ) {
+        parent::__construct($filesystem, $filePath);
+
+        // Change the message format, and hide empty context/extra info.
+        $format = "[%datetime%] %message% %context% %extra%\n";
+
+        $this->setFormatter(new \Monolog\Formatter\LineFormatter($format, null, true, true));
+    }
 }

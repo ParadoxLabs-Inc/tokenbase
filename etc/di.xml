@@ -14,8 +14,17 @@
         <arguments>
             <argument name="name" xsi:type="string">tokenbaseLogger</argument>
             <argument name="handlers" xsi:type="array">
-                <item name="system" xsi:type="object">ParadoxLabs\TokenBase\Model\Logger\Handler</item>
+                <item name="standard" xsi:type="object">ParadoxLabs\TokenBase\Model\Logger\Handler</item>
+                <item name="debug" xsi:type="object">ParadoxLabs\TokenBase\Model\Logger\Debug</item>
             </argument>
         </arguments>
     </type>
+
+    <!--<virtualType name="ParadoxLabs\TokenBase\Block\Form\Cc" type="Magento\Payment\Block\Form" shared="false">-->
+        <!--<arguments>-->
+            <!--<argument name="data" xsi:type="array">-->
+                <!--<item name="template" xsi:type="string">ParadoxLabs_TokenBase::form/cc.phtml</item>-->
+            <!--</argument>-->
+        <!--</arguments>-->
+    <!--</virtualType>-->
 </config>

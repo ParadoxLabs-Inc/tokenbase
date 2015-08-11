@@ -1,0 +1,83 @@
+<?php
+/**
+ * Paradox Labs, Inc.
+ * http://www.paradoxlabs.com
+ * 717-431-3330
+ *
+ * Need help? Open a ticket in our support system:
+ *  http://support.paradoxlabs.com
+ *
+ * @author      Ryan Hoerr <magento@paradoxlabs.com>
+ * @license     http://store.paradoxlabs.com/license.html
+ */
+
+namespace ParadoxLabs\TokenBase\Controller\Paymentinfo;
+
+/**
+ * Index: Show cards and form for the default or chosen payment method.
+ */
+class Index extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
+{
+    /**
+     * Payment data index page
+     *
+     * @return \Magento\Framework\View\Result\Page
+     */
+    public function execute()
+    {
+        /**
+         * Check for active method, or pick one if none given.
+         */
+        if ($this->methodIsValid() !== true) {
+            $methods = $this->helper->getActiveMethods();
+
+            if (count($methods) > 0) {
+                sort($methods);
+
+                $this->registry->register('tokenbase_method', $methods[0]);
+            } else {
+                /** @var \Magento\Framework\Controller\Result\Redirect $resultRedirect */
+                $resultRedirect = $this->resultRedirectFactory->create();
+
+                $this->messageManager->addError(__('No payment methods are currently available.'));
+
+                $resultRedirect->setPath('*/account');
+                return $resultRedirect;
+            }
+        }
+
+        /**
+         * Check for card input and validate if present.
+         */
+        $id    = $this->getRequest()->getParam('id');
+
+        if (empty($id) || $this->formKeyIsValid() !== true) {
+            $id = null;
+
+            if ($this->_getSession()->hasTokenbaseFormData()) {
+                $data = $this->_getSession()->getTokenbaseFormData();
+
+                if (isset($data['id']) && !empty($data['id'])) {
+                    $id = $data['id'];
+                }
+            }
+        }
+
+        if (!empty($id)) {
+            $card = $this->cardFactory->create();
+            $card->loadByHash($id);
+            $card = $card->getTypeInstance();
+
+            if ($card && $card->getHash() == $id && $card->hasOwner($this->helper->getCurrentCustomer()->getId())) {
+                $this->registry->register('active_card', $card, true);
+            }
+        }
+
+        /** @var \Magento\Framework\View\Result\Page $resultPage */
+        $resultPage = $this->resultPageFactory->create();
+        $resultPage->addHandle('customer_paymentinfo_index_' . $this->registry->registry('tokenbase_method'));
+        $resultPage->getConfig()->getTitle()->set(__('My Payment Data'));
+
+        return $resultPage;
+    }
+}

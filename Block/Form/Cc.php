@@ -26,7 +26,7 @@ class Cc extends \Magento\Payment\Block\Form\Cc
     /**
      * @var string
      */
-    protected $brandingImage = 'ParadoxLabs_TokenBase::logo.png';
+    protected $brandingImage = '';
 
     /**
      * @var \ParadoxLabs\TokenBase\Model\Resource\Card\Collection|array
