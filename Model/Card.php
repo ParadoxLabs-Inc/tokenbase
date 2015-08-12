@@ -351,7 +351,9 @@ class Card extends \Magento\Framework\Model\AbstractModel
                 $this->setAdditional('cc_type', $payment->getData('cc_type'));
             }
 
-            if ($payment->getData('cc_last4') != '') {
+            if ($payment->getData('cc_last_4') != '') {
+                $this->setAdditional('cc_last4', $payment->getData('cc_last_4'));
+            } elseif ($payment->getData('cc_last4') != '') {
                 $this->setAdditional('cc_last4', $payment->getData('cc_last4'));
             }
 

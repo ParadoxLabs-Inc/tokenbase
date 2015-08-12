@@ -79,6 +79,16 @@ class Data extends \Magento\Payment\Helper\Data
     protected $currentCustomer;
 
     /**
+     * @var AddressFactory
+     */
+    protected $addressHelperFactory;
+
+    /**
+     * @var \Magento\Quote\Model\Quote\PaymentFactory
+     */
+    protected $paymentFactory;
+
+    /**
      * Construct
      *
      * @param \Magento\Framework\App\Helper\Context $context
@@ -93,9 +103,11 @@ class Data extends \Magento\Payment\Helper\Data
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
      * @param \Magento\Store\Model\WebsiteFactory $websiteFactory
      * @param \Magento\Customer\Model\CustomerFactory $customerFactory
+     * @param \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory
      * @param \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory
      * @param \ParadoxLabs\TokenBase\Model\Resource\Card\CollectionFactory $cardCollectionFactory
      * @param \ParadoxLabs\TokenBase\Model\Logger\Logger $tokenbaseLogger
+     * @param \ParadoxLabs\TokenBase\Helper\AddressFactory $addressHelperFactory
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
@@ -110,9 +122,11 @@ class Data extends \Magento\Payment\Helper\Data
         \Magento\Framework\ObjectManagerInterface $objectManager,
         \Magento\Store\Model\WebsiteFactory $websiteFactory,
         \Magento\Customer\Model\CustomerFactory $customerFactory,
+        \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory,
         \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
         \ParadoxLabs\TokenBase\Model\Resource\Card\CollectionFactory $cardCollectionFactory,
-        \ParadoxLabs\TokenBase\Model\Logger\Logger $tokenbaseLogger
+        \ParadoxLabs\TokenBase\Model\Logger\Logger $tokenbaseLogger,
+        \ParadoxLabs\TokenBase\Helper\AddressFactory $addressHelperFactory
     ) {
         $this->appState = $appState;
         $this->storeManager = $storeManager;
@@ -123,6 +137,8 @@ class Data extends \Magento\Payment\Helper\Data
         $this->cardFactory = $cardFactory;
         $this->cardCollectionFactory = $cardCollectionFactory;
         $this->tokenbaseLogger = $tokenbaseLogger;
+        $this->addressHelperFactory = $addressHelperFactory;
+        $this->paymentFactory = $paymentFactory;
 
         parent::__construct(
             $context,
@@ -307,9 +323,9 @@ class Data extends \Magento\Payment\Helper\Data
 
                     if (isset($data['billing']) && count($data['billing']) > 0) {
                         /** @var \ParadoxLabs\TokenBase\Helper\Address $addressHelper */
-                        $addressHelper = $this->objectManager->get('ParadoxLabs\TokenBase\Helper\Address');
+                        $addressHelper  = $this->addressHelperFactory->create();
 
-                        $address = $addressHelper->buildAddressFromInput(
+                        $address        = $addressHelper->buildAddressFromInput(
                             $data['billing'],
                             $this->card->getAddress()
                         );
@@ -332,7 +348,7 @@ class Data extends \Magento\Payment\Helper\Data
                         $checkoutSession = $this->objectManager->get('Magento\Checkout\Model\Session');
 
                         /** @var \Magento\Quote\Model\Quote\Payment $newPayment */
-                        $newPayment = $this->objectManager->get('Magento\Quote\Model\Quote\Payment');
+                        $newPayment = $this->paymentFactory->create();
                         $newPayment->setQuote($checkoutSession->getQuote());
                         $newPayment->getQuote()->getBillingAddress()->setCountryId(
                             $this->card->getAddress('country_id')
@@ -432,7 +448,9 @@ class Data extends \Magento\Payment\Helper\Data
      */
     public function getIsFrontend()
     {
-        if ($this->appState->getAreaCode() == \Magento\Framework\App\Area::AREA_FRONTEND) {
+        // Standard checkout uses the webapi_rest area (???), so we have to include that.
+        if ($this->appState->getAreaCode() == \Magento\Framework\App\Area::AREA_FRONTEND
+            || $this->appState->getAreaCode() == 'webapi_rest') {
             return true;
         }
 

@@ -170,6 +170,11 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
     protected $card;
 
     /**
+     * @var \ParadoxLabs\TokenBase\Helper\AddressFactory
+     */
+    protected $addressHelperFactory;
+
+    /**
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory
@@ -182,10 +187,10 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \ParadoxLabs\TokenBase\Model\AbstractGateway $gateway
      * @param CardFactory $cardFactory
+     * @param \ParadoxLabs\TokenBase\Helper\AddressFactory $addressHelperFactory
      * @param \Magento\Framework\Model\Resource\AbstractResource $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
      * @param array $data
-     * @internal param Card $card
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -201,6 +206,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         \ParadoxLabs\TokenBase\Model\AbstractGateway $gateway,
         \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
+        \ParadoxLabs\TokenBase\Helper\AddressFactory $addressHelperFactory,
         \Magento\Framework\Model\Resource\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
@@ -208,6 +214,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
         $this->helper = $helper;
         $this->gateway = $gateway;
         $this->cardFactory = $cardFactory;
+        $this->addressHelperFactory = $addressHelperFactory;
         
         $this->setStore($this->helper->getCurrentStoreId());
         
@@ -355,10 +362,10 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
         $this->gateway()->setCard($card);
 
         $this->getInfoInstance()->setData('tokenbase_id', $card->getId())
-                                ->setCcType($card->getAdditional('cc_type'))
-                                ->setCcLast4($card->getAdditional('cc_last4'))
-                                ->setCcExpMonth($card->getAdditional('cc_exp_month'))
-                                ->setCcExpYear($card->getAdditional('cc_exp_year'));
+                                ->setData('cc_type', $card->getAdditional('cc_type'))
+                                ->setData('cc_last_4', $card->getAdditional('cc_last4'))
+                                ->setData('cc_exp_month', $card->getAdditional('cc_exp_month'))
+                                ->setData('cc_exp_year', $card->getAdditional('cc_exp_year'));
 
         return $this;
     }
@@ -402,18 +409,13 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
             }
 
             if ($data->hasData('cc_last4') && $data->getData('cc_last4') != '') {
-                $info->setData('cc_last4', $data->getData('cc_last4'));
+                $info->setData('cc_last_4', $data->getData('cc_last4'));
             }
 
             if ($data->getData('cc_exp_year') != ''  && $data->getData('cc_exp_month') != '') {
                 $info->setData('cc_exp_year', $data->getData('cc_exp_year'))
                      ->setData('cc_exp_month', $data->getData('cc_exp_month'));
             }
-
-            // TODO: Still necessary?
-//            if ($data->hasData('saved_cc_cid') && $data->getData('saved_cc_cid') != '') {
-//                $info->setData('cc_cid', preg_replace('/[^0-9]/', '', $data->getData('saved_cc_cid')));
-//            }
         } else {
             $info->unsetData('tokenbase_id');
         }
@@ -850,9 +852,21 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
                  ->importPaymentInfo($payment);
 
             if ($payment->getOrder()) {
-                $card->setAddress($payment->getOrder()->getBillingAddress());
-            } elseif ($payment->getData('billing_address')) {
-                $card->setAddress($payment->getData('billing_address'));
+                /** @var \Magento\Sales\Model\Order\Address $billingAddress */
+                $billingAddress     = $payment->getOrder()->getBillingAddress();
+                $billingAddressData = $billingAddress->getData();
+
+                // AddressInterface requires an array for street
+                $billingAddressData['street'] = explode("\n", $billingAddressData['street']);
+
+                /** @var \ParadoxLabs\TokenBase\Helper\Address $addressHelper */
+                // Instantiated in this way to avoid session instance except when absolutely necessary
+                $addressHelper      = $this->addressHelperFactory->create();
+
+                /** @var \Magento\Customer\Api\Data\AddressInterface $billingAddress */
+                $billingAddress     = $addressHelper->buildAddressFromInput($billingAddressData);
+
+                $card->setAddress($billingAddress);
             } else {
                 throw new \Magento\Framework\Exception\PaymentException(
                     __('Could not find billing address.')

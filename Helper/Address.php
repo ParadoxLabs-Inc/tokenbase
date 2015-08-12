@@ -29,6 +29,10 @@ class Address extends \Magento\Customer\Controller\Address\FormPost
      */
     public function buildAddressFromInput($addressData, $origAddressData = [], $validate = false)
     {
+        if (!is_array($origAddressData)) {
+            $origAddressData = [];
+        }
+        
         /** @var \Magento\Customer\Model\Metadata\Form $addressForm */
         $addressForm     = $this->_formFactory->create('customer_address', 'customer_address_edit', $origAddressData);
 
@@ -54,7 +58,9 @@ class Address extends \Magento\Customer\Controller\Address\FormPost
             '\Magento\Customer\Api\Data\AddressInterface'
         );
 
-        $addressDataObject->setCustomerId($this->_getSession()->getCustomerId());
+        if (!isset($addressData['customer_id'])) {
+            $addressDataObject->setCustomerId($this->_getSession()->getCustomerId());
+        }
 
         return $addressDataObject;
     }
