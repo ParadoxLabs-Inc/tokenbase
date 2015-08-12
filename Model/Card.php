@@ -891,12 +891,23 @@ class Card extends \Magento\Framework\Model\AbstractModel
     /**
      * Get card label (formatted number).
      *
+     * @param bool $includeType
      * @return \Magento\Framework\Phrase|string
      */
-    public function getLabel()
+    public function getLabel($includeType = true)
     {
         if ($this->getAdditional('cc_last4')) {
-            return __('XXXX-%1', $this->getAdditional('cc_last4'));
+            $cardType = '';
+
+            if ($includeType === true && $this->getAdditional('cc_type')) {
+                $cardType = $this->helper->translateCardType($this->getAdditional('cc_type'));
+            }
+
+            return __(
+                '%1 XXXX-%2',
+                $cardType,
+                $this->getAdditional('cc_last4')
+            );
         }
         
         return '';

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../Magento/Store/etc/config.xsd">
+    <default>
+        <checkout>
+            <tokenbase>
+                <clean_old_cards>1</clean_old_cards>
+            </tokenbase>
+        </checkout>
+    </default>
+</config>

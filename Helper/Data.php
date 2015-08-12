@@ -26,7 +26,7 @@ class Data extends \Magento\Payment\Helper\Data
     /**
      * @var \ParadoxLabs\TokenBase\Model\Resource\Card\Collection[]
      */
-    protected $cards;
+    protected $cards = [];
 
     /**
      * @var \Magento\Framework\App\State
@@ -87,6 +87,18 @@ class Data extends \Magento\Payment\Helper\Data
      * @var \Magento\Quote\Model\Quote\PaymentFactory
      */
     protected $paymentFactory;
+
+    /**
+     * @var array
+     */
+    protected $cardTypeTranslationMap = array(
+        'AE'    => 'American Express',
+        'DI'    => 'Discover',
+        'DC'    => 'Diners Club',
+        'JCB'   => 'JCB',
+        'MC'    => 'MasterCard',
+        'VI'    => 'Visa',
+    );
 
     /**
      * Construct
@@ -379,7 +391,7 @@ class Data extends \Magento\Payment\Helper\Data
     {
         $method = is_null($method) ? $this->registry->registry('tokenbase_method') : $method;
 
-        if (!is_array($this->cards) || !isset($this->cards[ $method ])) {
+        if (!isset($this->cards[ $method ])) {
             $this->_eventManager->dispatch(
                 'tokenbase_before_load_active_cards',
                 [
@@ -397,6 +409,7 @@ class Data extends \Magento\Payment\Helper\Data
                 if ($backendSession->hasQuoteId()
                     && $backendSession->getQuote()->getPayment()->getData('tokenbase_id') > 0
                     && !($this->registry->registry('current_customer') instanceof \Magento\Customer\Model\Customer)) {
+                    // Case where we want to show a card that may not otherwise be (edit or reorder)
                     $tokenbaseId = $backendSession->getQuote()->getPayment()->getData('tokenbase_id');
 
                     if ($this->getCurrentCustomer()->getId() > 0) {
@@ -412,7 +425,12 @@ class Data extends \Magento\Payment\Helper\Data
                     } else {
                         $this->cards[$method]->addFieldToFilter('id', $tokenbaseId);
                     }
+                } elseif ($this->getCurrentCustomer()->getId() > 0) {
+                    // Case where we want to show a customer's stored cards (if any)
+                    $this->cards[ $method ]->addFieldToFilter('active', 1)
+                                           ->addFieldToFilter('customer_id', $this->getCurrentCustomer()->getId());
                 } else {
+                    // Guest
                     return [];
                 }
             } elseif ($this->getCurrentCustomer()->getId() > 0) {
@@ -455,6 +473,21 @@ class Data extends \Magento\Payment\Helper\Data
         }
 
         return false;
+    }
+
+    /**
+     * Turn the given internal card type ID into a proper translated label.
+     *
+     * @param $type
+     * @return \Magento\Framework\Phrase
+     */
+    public function translateCardType($type)
+    {
+        if (isset($this->cardTypeTranslationMap[ $type ])) {
+            return __($this->cardTypeTranslationMap[ $type ]);
+        }
+
+        return __($type);
     }
 
     /**

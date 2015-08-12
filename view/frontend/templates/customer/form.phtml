@@ -4,11 +4,15 @@
 ?>
 <?php $code = $block->getCode(); ?>
 
-<?php if ($block->isEdit()): ?>
-    <h2><?php echo __('Editing Card %1', $block->getCard()->getLabel()); ?></h2>
-<?php else: ?>
-    <h2><?php echo __('Add A Credit Card'); ?></h2>
-<?php endif; ?>
+<div class="block-title">
+    <h2>
+        <?php if ($block->isEdit()): ?>
+            <?php echo __('Editing %1', $block->getCard()->getLabel()); ?>
+        <?php else: ?>
+            <?php echo __('Add A Credit Card'); ?>
+        <?php endif; ?>
+    </h2>
+</div>
 
 <form action="<?php echo $block->getAction(); ?>" method="post" id="form-validate" data-hasrequired="<?php echo __('* Required Fields') ?>">
     <?php echo $block->getBlockHtml('formkey'); ?>
@@ -109,7 +113,7 @@
         <div class="field number required">
             <label for="<?php echo $code ?>_cc_number" class="label"><span><?php echo __('CC Number') ?></span></label>
             <div class="control">
-                <input type="number" id="<?php echo $code ?>_cc_number" name="payment[cc_number]" title="<?php echo __('Credit Card Number') ?>" class="input-text" value="<?php echo $block->getCard()->getLabel(); ?>" data-validate='{"required-number":true, "validate-cc-number":"#<?php echo $code ?>_cc_type", "validate-cc-type":"#<?php echo $code ?>_cc_type"}' autcomplete="off" />
+                <input type="text" id="<?php echo $code ?>_cc_number" name="payment[cc_number]" title="<?php echo __('Credit Card Number') ?>" class="input-text" value="<?php echo $block->getCard()->getLabel(false); ?>" data-validate='{"required-number":true, "validate-cc-number":"#<?php echo $code ?>_cc_type", "validate-cc-type":"#<?php echo $code ?>_cc_type"}' autcomplete="off" />
             </div>
         </div>
         <div class="field date required" id="<?php echo $code ?>_cc_type_exp_div">

@@ -4,7 +4,7 @@
 ?>
 <div class="block block-addresses-default">
     <div class="block-title">
-        <strong><?php echo $block->getPaymentMethodTitle(); ?></strong>
+        <h2><?php echo $block->getPaymentMethodTitle(); ?></h2>
     </div>
     <div class="block-content">
     <?php if (count($block->getCards()) > 0): ?>
@@ -12,14 +12,14 @@
         <?php foreach ($block->getCards() as $card): ?>
             <?php $card = $card->getTypeInstance(); ?>
             <div class="box-address-billing <?php if ($card->getExpires() != '' && strtotime($card->getExpires()) < time()): ?>expired<?php endif; ?>">
-                <?php if ($card->getExpires() != ''): ?>
-                    <small class="sorter"><?php echo date('m/Y', strtotime($card->getExpires())); ?></small>
-                <?php endif; ?>
-                <strong class="box-title">
+                <div class="box-title">
                     <span>
-                        <?php echo __('Card: %1', $card->getLabel()) ?>
+                        <?php echo $card->getLabel(); ?>
                     </span>
-                </strong>
+                    <?php if ($card->getExpires() != ''): ?>
+                        <small><?php echo __('(Expires %1)', date('m/Y', strtotime($card->getExpires()))); ?></small>
+                    <?php endif; ?>
+                </div>
                 <div class="box-content">
                     <address>
                         <?php echo $block->getFormattedCardAddress($card->getAddressObject()); ?>

@@ -44,9 +44,15 @@ class Cc extends \Magento\Payment\Block\Form\Cc
     protected $checkoutSession;
 
     /**
+     * @var \Magento\Payment\Model\CcConfig
+     */
+    protected $ccConfig;
+
+    /**
      * @param \Magento\Framework\View\Element\Template\Context $context
      * @param \Magento\Payment\Model\Config $paymentConfig
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
+     * @param \Magento\Payment\Model\CcConfig $ccConfig
      * @param \Magento\Customer\Model\Session $customerSession
      * @param \Magento\Checkout\Model\Session $checkoutSession
      * @param array $data
@@ -55,11 +61,13 @@ class Cc extends \Magento\Payment\Block\Form\Cc
         \Magento\Framework\View\Element\Template\Context $context,
         \Magento\Payment\Model\Config $paymentConfig,
         \ParadoxLabs\TokenBase\Helper\Data $helper,
+        \Magento\Payment\Model\CcConfig $ccConfig,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Checkout\Model\Session $checkoutSession,
         array $data = []
     ) {
         $this->helper = $helper;
+        $this->ccConfig = $ccConfig;
         $this->customerSession = $customerSession;
         $this->checkoutSession = $checkoutSession;
 
@@ -103,13 +111,17 @@ class Cc extends \Magento\Payment\Block\Form\Cc
     }
 
     /**
-     * Get branding image for the current method. Put here so methods can avoid overriding the entire template.
+     * Get branding image for the current method. Done thus so methods can avoid overriding the entire template.
      *
-     * @return string
+     * @return string|false
      */
     public function getBrandingImage()
     {
-        return $this->brandingImage;
+        if ($this->brandingImage && $this->getMethod()->getConfigData('show_branding') == 1) {
+            return $this->ccConfig->getViewFileUrl($this->brandingImage);
+        }
+
+        return false;
     }
 
     /**
