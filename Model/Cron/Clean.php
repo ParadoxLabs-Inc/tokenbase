@@ -55,8 +55,6 @@ class Clean
      */
     public function cleanData()
     {
-        // TODO: trim cards missing payment_id after delay
-
         $cleanOldCards = $this->scopeConfig->getValue(
             'checkout/tokenbase/clean_old_cards',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
@@ -86,6 +84,37 @@ class Clean
               );
 
         $affectedCount    = 0;
+        $affectedCount   += $this->deleteCards($cards);
+
+        unset($cards);
+
+        /**
+         * Prune any cards missing tokens after 7 days (invalid/unusable)
+         */
+
+        /** @var \ParadoxLabs\TokenBase\Model\Resource\Card\Collection $cards */
+        $cards = $this->cardCollectionFactory->create();
+        $cards->addFieldToFilter('profile_id', ['null' => true])
+              ->addFieldToFilter('payment_id', ['null' => true])
+              ->addFieldToFilter('updated_at', array( 'lt' => date('c', strtotime('-7 days')), 'date' => true ));
+
+        $affectedCount   += $this->deleteCards($cards);
+
+
+        if ($affectedCount > 0) {
+            $this->helper->log('tokenbase', sprintf('Deleted %s queued cards.', $affectedCount));
+        }
+    }
+
+    /**
+     * Permanently delete cards from the given collection, return the number affected.
+     *
+     * @param \ParadoxLabs\TokenBase\Model\Resource\Card\Collection $cards
+     * @return int
+     */
+    protected function deleteCards(\ParadoxLabs\TokenBase\Model\Resource\Card\Collection $cards)
+    {
+        $affectedCount = 0;
 
         /** @var \ParadoxLabs\TokenBase\Model\Card $card */
         foreach ($cards as $card) {
@@ -99,52 +128,11 @@ class Clean
                 $card->delete();
 
                 $affectedCount++;
-
-                /**
-                 * Suspend any profiles using the card.
-                 */
-//                $cardId			= $card->getId();
-//                $cardPaymentId	= $card->getPaymentId();
-//                $profiles	= Mage::getModel('sales/recurring_profile')->getCollection()
-//                                   ->addFieldToFilter( 'method_code', $cardMethod )
-//                                   ->addFieldToFilter( 'additional_info',
-// array( 'like' => '%"' . $cardPaymentId . '"%' ) )
-//                                   ->addFieldToFilter( 'state', array( 'in' => array( 'active', 'pending' ) ) );
-//
-//                $count = 0;
-//                if( count( $profiles ) > 0 ) {
-//                    foreach( $profiles as $profile ) {
-//                        $profile	= Mage::getModel('sales/recurring_profile')
-//->loadByInternalReferenceId( $profile->getInternalReferenceId() );
-//                        $adtl		= $profile->getAdditionalInfo();
-//
-//                        if( $adtl['payment_id'] == $cardPaymentId ) {
-//                            $profile->setState( Mage_Sales_Model_Recurring_Profile::STATE_SUSPENDED )
-//                                    ->save();
-//
-//                            $count++;
-//                        }
-//                    }
-//                }
-//
-//                if( $count > 0 ) {
-//                    $this->helper->log(
-//                        $cardMethod,
-//                        sprintf(
-//                            "Deleted card %s; automatically suspended %s recurring profiles.",
-//                            $cardId,
-//                            $cardMethod,
-//                            $count
-//                        )
-//                    );
-//                }
             } catch (\Exception $e) {
                 $this->helper->log($cardMethod, sprintf('Error deleting card: %s', (string)$e));
             }
         }
 
-        if ($affectedCount > 0) {
-            $this->helper->log('tokenbase', sprintf('Deleted %s queued cards.', $affectedCount));
-        }
+        return $affectedCount;
     }
 }

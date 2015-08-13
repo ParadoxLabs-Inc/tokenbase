@@ -516,6 +516,8 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
     {
         $this->log(sprintf('authorize(%s %s, %s)', get_class($payment), $payment->getId(), $amount));
 
+        /** @var \Magento\Sales\Model\Order\Payment $payment */
+
         $this->loadOrCreateCard($payment);
 
         if ($amount <= 0) {
@@ -544,7 +546,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
         $this->afterAuthorize($payment, $amount, $response);
 
         if ($response->getData('is_fraud') === true) {
-            // TODO: Correct/validate fraud stuff, it's probably changed
             $payment->setIsTransactionPending(true)
                     ->setIsFraudDetected(true)
                     ->setTransactionAdditionalInfo('is_transaction_fraud', true);
@@ -558,7 +559,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
             $response->getData('auth_code')
         ));
 
-        // TODO: Anything needed to support real transactions here?
         $payment->setTransactionId($response->getData('transaction_id'))
                 ->setAdditionalInformation(array_merge($payment->getAdditionalInformation(), $response->getData()))
                 ->setIsTransactionClosed(0);
@@ -581,6 +581,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
     {
         $this->log(sprintf('capture(%s %s, %s)', get_class($payment), $payment->getId(), $amount));
 
+        /** @var \Magento\Sales\Model\Order\Payment $payment */
         $this->loadOrCreateCard($payment);
 
         if ($amount <= 0) {
@@ -636,7 +637,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
         $this->afterCapture($payment, $amount, $response);
 
         if ($response->getData('is_fraud') === true) {
-            // TODO: Is fraud stuff correct?
             $payment->setIsTransactionPending(true)
                     ->setIsFraudDetected(true)
                     ->setTransactionAdditionalInfo('is_transaction_fraud', true);
@@ -650,7 +650,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
         }
 
         if ($response->getData('is_fraud') !== true) {
-            // TODO: correct?
             $payment->setIsTransactionClosed(1);
         }
 
@@ -712,7 +711,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
         $response = $this->gateway()->refund($payment, $amount, $realTransactionId);
         $this->afterRefund($payment, $amount, $response);
 
-        // TODO: Verify transaction bit
         $payment->setIsTransactionClosed(1)
                 ->setAdditionalInformation(array_merge($payment->getAdditionalInformation(), $response->getData()));
 
@@ -732,6 +730,8 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
     public function void(\Magento\Payment\Model\InfoInterface $payment)
     {
         $this->log(sprintf('void(%s %s)', get_class($payment), $payment->getId()));
+
+        /** @var \Magento\Sales\Model\Order\Payment $payment */
 
         $this->loadOrCreateCard($payment);
 
@@ -763,7 +763,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
             false
         );
 
-        // TODO: Is this correct?
         $payment->setTransactionId($transactionId)
                 ->setAdditionalInformation(array_merge($payment->getAdditionalInformation(), $response->getData()))
                 ->setShouldCloseParentTransaction(1)
@@ -801,6 +800,8 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
     {
         $this->log('fetchTransactionInfo('.$transactionId.')');
 
+        /** @var \Magento\Sales\Model\Order\Payment $payment */
+
         $this->loadOrCreateCard($payment);
 
         /**
@@ -810,7 +811,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
         $response = $this->gateway()->fraudUpdate($payment, $transactionId);
         $this->afterFraudUpdate($payment, $transactionId, $response);
 
-        // TODO: Is this chunk correct?
         if ($response->getData('is_approved')) {
             $transaction = $payment->getTransaction($transactionId);
             $transaction->setAdditionalInformation('is_transaction_fraud', false);

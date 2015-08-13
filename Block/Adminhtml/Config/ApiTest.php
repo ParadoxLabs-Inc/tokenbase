@@ -26,7 +26,7 @@ abstract class ApiTest extends \Magento\Config\Block\System\Config\Form\Field
     /**
      * @var int
      */
-    protected $storeId = 0;
+    protected $storeId;
 
     /**
      * @param \Magento\Backend\Block\Template\Context $context
