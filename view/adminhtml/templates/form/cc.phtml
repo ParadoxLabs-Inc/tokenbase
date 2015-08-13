@@ -6,10 +6,8 @@ $code           = $block->getMethodCode();
 $image          = $block->getBrandingImage();
 $storedCards    = $block->getStoredCards();
 $useVault       = $block->haveStoredCards();
-$useCvv         = $block->hasVerification();
 $formData       = [
     "useVault"  => $useVault,
-    "useCvv"    => $useCvv,
     "code"      => $code,
 ];
 $serializedFormData = $this->helper('Magento\Framework\Json\Helper\Data')->jsonEncode($formData);
@@ -18,13 +16,13 @@ $serializedFormData = $this->helper('Magento\Framework\Json\Helper\Data')->jsonE
 <div id="payment_form_<?php echo $code ?>" class="admin__page-section-item" style="display:none;"
      data-mage-init='{"<?php echo $code; ?>FormCc":<?php echo $serializedFormData ?>}'>
     <fieldset class="admin__fieldset">
+        <?php if ($image): ?>
+            <div class="page-actions">
+                <img src="<?php echo $image; ?>" />
+            </div>
+        <?php endif; ?>
         <?php if ($storedCards): ?>
             <div class="admin__field" id="<?php echo $code ?>_card_selector">
-                <?php if ($image): ?>
-                    <div class="page-actions">
-                        <img src="<?php echo $image; ?>" />
-                    </div>
-                <?php endif; ?>
                 <div class="admin__field-control control">
                     <select id="<?php echo $code ?>_card_id" name="payment[card_id]" class="select admin__control-select">
                         <?php /** @var \ParadoxLabs\TokenBase\Model\Card $card */ ?>
@@ -85,12 +83,12 @@ $serializedFormData = $this->helper('Magento\Framework\Json\Helper\Data')->jsonE
                 </div>
             </div>
         <?php endif; ?>
-        <?php if ($useVault): ?>
+        <?php if (!$block->isGuestCheckout()): ?>
             <div id="<?php echo $code ?>_save_div" class="admin__field hide_if_card_selected">
                 <div class="admin__field-control control">
                     <?php if ($block->getMethod()->getConfigData('allow_unsaved')): ?>
                         <input type="hidden" name="payment[save]" value="0" />
-                        <input type="checkbox" title="<?php echo __('Save for next time') ?>" class="input-checkbox" id="<?php echo $code ?>_save" name="payment[save]" value="1" <?php if ($block->getInfoData('save') != 0): ?>checked="checked"<?php endif; ?> />
+                        <input type="checkbox" title="<?php echo __('Save for next time') ?>" class="input-checkbox" id="<?php echo $code ?>_save" name="payment[save]" value="1" <?php if ($block->getInfoData('save') !== 0): ?>checked="checked"<?php endif; ?> />
                         <label for="<?php echo $code ?>_save"><?php echo __('Save for next time') ?></label>
                     <?php else: ?>
                         <input type="hidden" name="payment[save]" value="1" />
