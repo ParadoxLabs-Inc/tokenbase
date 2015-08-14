@@ -47,9 +47,9 @@
 
         <?php $_streetValidationClass = $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('street'); ?>
         <div class="field street required">
-            <label for="street_1" class="label"><span><?php echo __('Street') ?></span></label>
+            <label for="street" class="label"><span><?php echo __('Street') ?></span></label>
             <div class="control">
-                <input type="text" name="billing[street][]" value="<?php echo $block->escapeHtml($block->getStreetLine(1)) ?>" title="<?php echo __('Street Address') ?>" id="street_1" class="input-text <?php echo $_streetValidationClass ?>"  />
+                <input type="text" name="billing[street][]" value="<?php echo $block->escapeHtml($block->getStreetLine(1)) ?>" title="<?php echo __('Street Address') ?>" id="street" class="input-text <?php echo $_streetValidationClass ?>"  />
                 <div class="nested">
                     <?php $_streetValidationClass = trim(str_replace('required-entry', '', $_streetValidationClass)); ?>
                     <?php for ($_i = 1, $_n = $this->helper('Magento\Customer\Helper\Address')->getStreetLines(); $_i < $_n; $_i++): ?>
@@ -72,9 +72,9 @@
             </div>
         </div>
         <div class="field region required">
-            <label class="label" for="region_id"><span><?php echo __('State/Province') ?></span></label>
+            <label class="label" for="region-id"><span><?php echo __('State/Province') ?></span></label>
             <div class="control">
-                <select id="region_id" name="billing[region_id]" title="<?php echo __('State/Province') ?>" class="validate-select" <?php echo(!$block->getConfig('general/region/display_all')) ? ' disabled="disabled"' : '';?>>
+                <select id="region-id" name="billing[region_id]" title="<?php echo __('State/Province') ?>" class="validate-select" <?php echo(!$block->getConfig('general/region/display_all')) ? ' disabled="disabled"' : '';?>>
                     <option value=""><?php echo __('Please select a region, state or province.') ?></option>
                 </select>
                 <input type="text" id="region" name="billing[region]" value="<?php echo $block->escapeHtml($block->getRegion()) ?>"  title="<?php echo __('State/Province') ?>" class="input-text <?php echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('region') ?>"<?php echo(!$block->getConfig('general/region/display_all')) ? ' disabled="disabled"' : '';?>/>
@@ -93,15 +93,15 @@
             </div>
         </div>
     </fieldset>
-    <fieldset class="fieldset payment items ccard <?php echo $code ?>" id="payment_form_<?php echo $code ?>">
+    <fieldset class="fieldset payment items ccard <?php echo $code ?>">
         <legend class="legend"><span><?php echo __('Credit Card Information') ?></span></legend><br>
 
         <div class="field type required">
-            <label for="<?php echo $code ?>_cc_type" class="label"><span><?php echo __('CC Type') ?></span></label>
+            <label for="<?php echo $code ?>-cc-type" class="label"><span><?php echo __('CC Type') ?></span></label>
             <div class="control">
-                <select id="<?php echo $code ?>_cc_type"
-                        data-mage-init='{"creditCardType":{"creditCardTypeContainer":"#<?php echo $code ?>_cc_type_ss_div"}}'
-                        name="payment[cc_type]" data-validate='{required:true, "validate-cc-type-select":"#<?php echo $code ?>_cc_number"}' class="select">
+                <select id="<?php echo $code ?>-cc-type"
+                        data-mage-init='{"creditCardType":{"creditCardTypeContainer":"#<?php echo $code ?>-cc-type"}}'
+                        name="payment[cc_type]" data-validate='{required:true, "validate-cc-type-select":"#<?php echo $code ?>-cc-number"}' class="select">
                     <option value=""><?php echo __('--Please Select--')?></option>
                     <?php $_ccType = $block->getCard()->getAdditional('cc_type') ?>
                     <?php foreach ($block->getCcBlock()->getCcAvailableTypes() as $_typeCode => $_typeName): ?>
@@ -111,18 +111,18 @@
             </div>
         </div>
         <div class="field number required">
-            <label for="<?php echo $code ?>_cc_number" class="label"><span><?php echo __('CC Number') ?></span></label>
+            <label for="<?php echo $code ?>-cc-number" class="label"><span><?php echo __('CC Number') ?></span></label>
             <div class="control">
-                <input type="text" id="<?php echo $code ?>_cc_number" name="payment[cc_number]" title="<?php echo __('Credit Card Number') ?>" class="input-text" value="<?php echo $block->getCard()->getLabel(false); ?>" data-validate='{"required-number":true, "validate-cc-number":"#<?php echo $code ?>_cc_type", "validate-cc-type":"#<?php echo $code ?>_cc_type"}' autcomplete="off" />
+                <input type="text" id="<?php echo $code ?>-cc-number" name="payment[cc_number]" title="<?php echo __('Credit Card Number') ?>" class="input-text" value="<?php echo $block->getCard()->getLabel(false); ?>" data-validate='{"required-number":true, "validate-cc-number":"#<?php echo $code ?>-cc-type", "validate-cc-type":"#<?php echo $code ?>-cc-type"}' autcomplete="off" />
             </div>
         </div>
-        <div class="field date required" id="<?php echo $code ?>_cc_type_exp_div">
-            <label for="<?php echo $code ?>_expiration" class="label"><span><?php echo __('Expiration') ?></span></label>
+        <div class="field date required" id="<?php echo $code ?>-cc-type_exp_div">
+            <label for="<?php echo $code ?>-expiration" class="label"><span><?php echo __('Expiration') ?></span></label>
             <div class="control">
                 <div class="fields group group-2">
                     <div class="field no-label month">
                         <div class="control">
-                            <select id="<?php echo $code ?>_expiration" name="payment[cc_exp_month]" class="select month" data-validate='{required:true, "validate-cc-exp":"#<?php echo $code ?>_expiration_yr"}'>
+                            <select id="<?php echo $code ?>-expiration" name="payment[cc_exp_month]" class="select month" data-validate='{required:true, "validate-cc-exp":"#<?php echo $code ?>-expiration-yr"}'>
                                 <?php $_ccExpMonth = $block->getCard()->getAdditional('cc_exp_month'); ?>
                                 <?php foreach ($block->getCcBlock()->getCcMonths() as $k => $v): ?>
                                     <option value="<?php echo $k ? $k : '' ?>"<?php if ($k == $_ccExpMonth): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
@@ -133,7 +133,7 @@
                     <div class="field no-label year">
                         <div class="control">
                             <?php $_ccExpYear = $block->getCard()->getAdditional('cc_exp_year'); ?>
-                            <select id="<?php echo $code ?>_expiration_yr" name="payment[cc_exp_year]" class="select year" data-validate='{required:true}'>
+                            <select id="<?php echo $code ?>-expiration-yr" name="payment[cc_exp_year]" class="select year" data-validate='{required:true}'>
                                 <?php foreach ($block->getCcBlock()->getCcYears() as $k => $v): ?>
                                     <option value="<?php echo $k ? $k : '' ?>"<?php if ($k == $_ccExpYear): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
                                 <?php endforeach ?>
@@ -144,10 +144,10 @@
             </div>
         </div>
         <?php if ($block->getMethod()->getConfigData('useccv')): ?>
-            <div class="field cvv required" id="<?php echo $code ?>_cc_type_cvv_div">
-                <label for="<?php echo $code ?>_cc_cid" class="label"><span><?php echo __('CCV') ?></span></label>
+            <div class="field cvv required" id="<?php echo $code ?>-cc-type_cvv_div">
+                <label for="<?php echo $code ?>-cc-cid" class="label"><span><?php echo __('CCV') ?></span></label>
                 <div class="control">
-                    <input type="number" title="<?php echo __('Card Verification Number') ?>" class="input-text cvv" id="<?php echo $code ?>_cc_cid" name="payment[cc_cid]" value="" data-validate='{"required-number":true, "validate-cc-cvn":"#<?php echo $code ?>_cc_type"}' autocomplete="off" />
+                    <input type="number" title="<?php echo __('Card Verification Number') ?>" class="input-text cvv" id="<?php echo $code ?>-cc-cid" name="payment[cc_cid]" value="" data-validate='{"required-number":true, "validate-cc-cvn":"#<?php echo $code ?>-cc-type"}' autocomplete="off" />
                     <?php $_content = '<img src=\"' . $block->getViewFileUrl('Magento_Checkout::cvv.png') . '\" alt=\"' . __('Card Verification Number Visual Reference') . '\" title=\"' . __('Card Verification Number Visual Reference') . '\" />'; ?>
                     <div class="note">
                         <a href="#" class="action cvv" title="<?php echo __('What is this?') ?>" data-mage-init='{"tooltip": {"content": "<?php echo $_content ?>"}}'><span><?php echo __('What is this?') ?></span></a>
@@ -175,7 +175,7 @@
         "#country": {
             "regionUpdater": {
                 "optionalRegionAllowed": <?php echo($block->getConfig('general/region/display_all') ? 'true' : 'false'); ?>,
-                "regionListId": "#region_id",
+                "regionListId": "#region-id",
                 "regionInputId": "#region",
                 "postcodeId": "#zip",
                 "form": "#form-validate",

@@ -6,37 +6,39 @@ define([
 
     return {
         options: {
-            code : ""
+            code: '',
+            toggleFieldsSelector: '.hide-if-card-selected',
+            toggleFieldInputs: 'input, select',
+            cartSelectInput: '[name="payment[card_id]"]'
         },
 
-        enableDisableFields: function(disabled) {
-            var toggleFields = $('#payment_form_' + this.options.code + ' .hide_if_card_selected');
+        toggleFields: function(disabled) {
+            var fields = this.element.find(this.options.toggleFieldsSelector);
 
             if (disabled) {
-                toggleFields.hide();
+                fields.hide();
             }
             else {
-                toggleFields.show();
+                fields.show();
             }
 
-            toggleFields.find('input, select').prop('disabled', disabled);
+            fields.find(this.options.toggleFieldInputs).prop('disabled', disabled);
         },
 
         _create: function() {
-            var cardSelect = $('#' + this.options.code + '_card_id');
+            var cardSelect  = this.element.find(this.options.cardSelectInput);
+            var self        = this;
 
             if (cardSelect.length > 0) {
-                var self = this;
-
                 if (cardSelect.val()) {
-                    this.enableDisableFields(true);
+                    this.toggleFields(true);
                 }
 
                 cardSelect.bind('change', function (e) {
                     if ($(this).val()) {
-                        self.enableDisableFields(true);
+                        self.toggleFields(true);
                     } else {
-                        self.enableDisableFields(false);
+                        self.toggleFields(false);
                     }
                 });
             }

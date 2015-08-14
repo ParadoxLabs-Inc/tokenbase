@@ -9,7 +9,6 @@ $useVault       = $block->haveStoredCards();
 ?>
 <fieldset class="fieldset items <?php echo $code ?>" id="payment_form_<?php echo $code ?>" style="display:none;"
           data-mage-init='{"<?php echo $code; ?>FormCc":[]}'>
-    <input type="hidden" id="card_type_autoselect" value="" />
     <?php if ($image): ?>
         <div class="sorter">
             <img src="<?php echo $image; ?>" />
@@ -17,9 +16,9 @@ $useVault       = $block->haveStoredCards();
     <?php endif; ?>
     <?php if ($useVault): ?>
         <div class="field">
-            <label for="<?php echo $code ?>_card_id" class="label"><span><?php echo __('Payment Information') ?></span></label>
+            <label for="<?php echo $code ?>-card-id" class="label"><span><?php echo __('Payment Information') ?></span></label>
             <div class="input-box">
-                <select id="<?php echo $code ?>_card_id" name="payment[card_id]">
+                <select id="<?php echo $code ?>-card-id" name="payment[card_id]">
                     <?php /** @var \ParadoxLabs\TokenBase\Model\Card $card */ ?>
                     <?php foreach ($storedCards as $card): ?>
                         <?php $card = $card->getTypeInstance(); ?>
@@ -32,12 +31,12 @@ $useVault       = $block->haveStoredCards();
             </div>
         </div>
     <?php endif; ?>
-    <div class="field type required hide_if_card_selected">
-        <label for="<?php echo $code ?>_cc_type" class="label"><span><?php echo __('Credit Card Type') ?></span></label>
+    <div class="field type required hide-if-card-selected">
+        <label for="<?php echo $code ?>-cc-type" class="label"><span><?php echo __('Credit Card Type') ?></span></label>
         <div class="control">
-            <select id="<?php echo $code ?>_cc_type"
-                    data-mage-init='{"creditCardType":{"creditCardTypeContainer":"#<?php echo $code ?>_cc_type_ss_div"}}'
-                    name="payment[cc_type]" data-validate='{required:true, "validate-cc-type-select":"#<?php echo $code ?>_cc_number"}' class="select">
+            <select id="<?php echo $code ?>-cc-type"
+                    data-mage-init='{"creditCardType":{"creditCardTypeContainer":"#<?php echo $code ?>-cc-type"}}'
+                    name="payment[cc_type]" data-validate='{required:true, "validate-cc-type-select":"#<?php echo $code ?>-cc-number"}' class="select">
                 <option value=""><?php echo __('--Please Select--')?></option>
                 <?php $_ccType = $block->getInfoData('cc_type') ?>
                 <?php foreach ($block->getCcAvailableTypes() as $_typeCode => $_typeName): ?>
@@ -46,22 +45,22 @@ $useVault       = $block->haveStoredCards();
             </select>
         </div>
     </div>
-    <div class="field number required hide_if_card_selected">
-        <label for="<?php echo $code ?>_cc_number" class="label"><span><?php echo __('Credit Card Number') ?></span></label>
+    <div class="field number required hide-if-card-selected">
+        <label for="<?php echo $code ?>-cc-number" class="label"><span><?php echo __('Credit Card Number') ?></span></label>
         <div class="control">
-            <input type="number" id="<?php echo $code ?>_cc_number" name="payment[cc_number]"
+            <input type="number" id="<?php echo $code ?>-cc-number" name="payment[cc_number]"
                    title="<?php echo __('Credit Card Number') ?>" class="input-text" value="" autocomplete="off"
                    data-container="<?php echo $code ?>-cc-number"
-                   data-validate='{"required-number":true, "validate-cc-number":"#<?php echo $code ?>_cc_type", "validate-cc-type":"#<?php echo $code ?>_cc_type"}' />
+                   data-validate='{"required-number":true, "validate-cc-number":"#<?php echo $code ?>-cc-type", "validate-cc-type":"#<?php echo $code ?>-cc-type"}' />
         </div>
     </div>
-    <div class="field date required hide_if_card_selected" id="<?php echo $code ?>_cc_type_exp_div">
-        <label for="<?php echo $code ?>_expiration" class="label"><span><?php echo __('Expiration Date') ?></span></label>
+    <div class="field date required hide-if-card-selected">
+        <label for="<?php echo $code ?>-expiration" class="label"><span><?php echo __('Expiration Date') ?></span></label>
         <div class="control">
             <div class="fields group group-2">
                 <div class="field no-label month">
                     <div class="control">
-                        <select id="<?php echo $code ?>_expiration" name="payment[cc_exp_month]" class="select month" data-validate='{required:true, "validate-cc-exp":"#<?php echo $code ?>_expiration_yr"}'>
+                        <select id="<?php echo $code ?>-expiration" name="payment[cc_exp_month]" class="select month" data-validate='{required:true, "validate-cc-exp":"#<?php echo $code ?>-expiration-yr"}'>
                             <?php $_ccExpMonth = $block->getInfoData('cc_exp_month') ?>
                             <?php foreach ($block->getCcMonths() as $k => $v): ?>
                                 <option value="<?php echo $k ? $k : '' ?>"<?php if ($k == $_ccExpMonth): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
@@ -72,7 +71,7 @@ $useVault       = $block->haveStoredCards();
                 <div class="field no-label year">
                     <div class="control">
                         <?php $_ccExpYear = $block->getInfoData('cc_exp_year') ?>
-                        <select id="<?php echo $code ?>_expiration_yr" name="payment[cc_exp_year]" class="select year" data-validate='{required:true}'>
+                        <select id="<?php echo $code ?>-expiration-yr" name="payment[cc_exp_year]" class="select year" data-validate='{required:true}'>
                             <?php foreach ($block->getCcYears() as $k => $v): ?>
                                 <option value="<?php echo $k ? $k : '' ?>"<?php if ($k == $_ccExpYear): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
                             <?php endforeach ?>
@@ -83,10 +82,10 @@ $useVault       = $block->haveStoredCards();
         </div>
     </div>
     <?php if ($block->hasVerification()): ?>
-        <div class="field cvv required <?php if ($block->getMethod()->getConfigData('require_ccv') == 0): ?>hide_if_card_selected<?php endif; ?>" id="<?php echo $code ?>_cc_cid_div">
-            <label for="<?php echo $code ?>_cc_cid" class="label"><span><?php echo __('Card Verification Number') ?></span></label>
+        <div class="field cvv required <?php if ($block->getMethod()->getConfigData('require_ccv') == 0): ?>hide-if-card-selected<?php endif; ?>">
+            <label for="<?php echo $code ?>-cc-cid" class="label"><span><?php echo __('Card Verification Number') ?></span></label>
             <div class="control">
-                <input type="number" title="<?php echo __('Card Verification Number') ?>" class="input-text cvv" id="<?php echo $code ?>_cc_cid" name="payment[cc_cid]" value="" data-validate='{"required-number":true, "validate-cc-cvn":"#<?php echo $code ?>_cc_type"}' autocomplete="off" />
+                <input type="number" title="<?php echo __('Card Verification Number') ?>" class="input-text cvv" id="<?php echo $code ?>-cc-cid" name="payment[cc_cid]" value="" data-validate='{"required-number":true, "validate-cc-cvn":"#<?php echo $code ?>_cc_type"}' autocomplete="off" />
                 <?php $_content = '<img src=\"' . $block->getViewFileUrl('Magento_Checkout::cvv.png') . '\" alt=\"' . __('Card Verification Number Visual Reference') . '\" title=\"' . __('Card Verification Number Visual Reference') . '\" />'; ?>
                 <div class="note">
                     <a href="#" class="action cvv" title="<?php echo __('What is this?') ?>" data-mage-init='{"tooltip": {"content": "<?php echo $_content ?>"}}'><span><?php echo __('What is this?') ?></span></a>
@@ -96,7 +95,7 @@ $useVault       = $block->haveStoredCards();
     <?php endif; ?>
 
     <?php if (!$block->isGuestCheckout()): ?>
-        <div class="field save hide_if_card_selected">
+        <div class="field save hide-if-card-selected">
             <div class="control">
                 <?php if ($block->getMethod()->getConfigData('allow_unsaved')): ?>
                     <input type="hidden" name="payment[save]" value="0" />
