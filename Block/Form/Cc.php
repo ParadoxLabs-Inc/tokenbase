@@ -44,6 +44,11 @@ class Cc extends \Magento\Payment\Block\Form\Cc
     protected $checkoutSession;
 
     /**
+     * @var \ParadoxLabs\TokenBase\Helper\Data
+     */
+    protected $helper;
+
+    /**
      * @param \Magento\Framework\View\Element\Template\Context $context
      * @param \Magento\Payment\Model\Config $paymentConfig
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
@@ -131,5 +136,15 @@ class Cc extends \Magento\Payment\Block\Form\Cc
         }
 
         return false;
+    }
+
+    /**
+     * Expose helper to the template.
+     *
+     * @return \ParadoxLabs\TokenBase\Helper\Data
+     */
+    public function getHelper()
+    {
+        return $this->helper;
     }
 }

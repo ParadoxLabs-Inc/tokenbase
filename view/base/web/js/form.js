@@ -4,7 +4,7 @@ define([
 ], function($) {
     "use strict";
 
-    return {
+    $.widget('mage.tokenbaseForm', {
         options: {
             code: '',
             toggleFieldsSelector: '.hide-if-card-selected',
@@ -43,5 +43,7 @@ define([
                 });
             }
         }
-    };
+    });
+
+    return $.mage.tokenbaseForm;
 });

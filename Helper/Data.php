@@ -91,14 +91,23 @@ class Data extends \Magento\Payment\Helper\Data
     /**
      * @var array
      */
-    protected $cardTypeTranslationMap = array(
+    protected $cardTypeTranslationMap = [
         'AE'    => 'American Express',
         'DI'    => 'Discover',
         'DC'    => 'Diners Club',
         'JCB'   => 'JCB',
         'MC'    => 'MasterCard',
         'VI'    => 'Visa',
-    );
+    ];
+
+    /**
+     * @var array
+     */
+    protected $achAccountTypes = [
+        'checking'         => 'Checking',
+        'savings'          => 'Savings',
+        'businessChecking' => 'Business Checking',
+    ];
 
     /**
      * Construct
@@ -488,6 +497,25 @@ class Data extends \Magento\Payment\Helper\Data
         }
 
         return __($type);
+    }
+
+    /**
+     * Return valid ACH account types.
+     *
+     * @param string $code
+     * @return string|array|null
+     */
+    public function getAchAccountTypes($code = null)
+    {
+        if (!is_null($code)) {
+            if (isset($this->achAccountTypes[$code])) {
+                return $this->achAccountTypes[$code];
+            }
+
+            return $code;
+        }
+
+        return $this->achAccountTypes;
     }
 
     /**

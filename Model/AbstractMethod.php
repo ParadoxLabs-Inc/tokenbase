@@ -461,12 +461,13 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
 
     /**
      * Validate the transaction inputs.
+     *
      * @return $this
      * @throws \Magento\Framework\Exception\PaymentException
      */
     public function validate()
     {
-        $this->log(sprintf('validate(%s)', $this->getInfoInstance()->getCardId()));
+        $this->log(sprintf('validate(%s)', $this->getInfoInstance()->getData('tokenbase_id')));
 
         /** @var \Magento\Sales\Model\Order\Payment\Info $info */
         $info = $this->getInfoInstance();

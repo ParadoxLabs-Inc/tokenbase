@@ -5,16 +5,15 @@
 $code           = $block->getMethodCode();
 $image          = $block->getBrandingImage();
 $storedCards    = $block->getStoredCards();
-$useVault       = $block->haveStoredCards();
 ?>
 <fieldset class="fieldset items <?php echo $code ?>" id="payment_form_<?php echo $code ?>" style="display:none;"
-          data-mage-init='{"<?php echo $code; ?>FormCc":[]}'>
+          data-mage-init='{"tokenbaseForm":{"code":"<?php echo $code ?>"}}'>
     <?php if ($image): ?>
         <div class="sorter">
             <img src="<?php echo $image; ?>" />
         </div>
     <?php endif; ?>
-    <?php if ($useVault): ?>
+    <?php if ($block->haveStoredCards()): ?>
         <div class="field">
             <label for="<?php echo $code ?>-card-id" class="label"><span><?php echo __('Payment Information') ?></span></label>
             <div class="input-box">
@@ -86,14 +85,15 @@ $useVault       = $block->haveStoredCards();
             <label for="<?php echo $code ?>-cc-cid" class="label"><span><?php echo __('Card Verification Number') ?></span></label>
             <div class="control">
                 <input type="number" title="<?php echo __('Card Verification Number') ?>" class="input-text cvv" id="<?php echo $code ?>-cc-cid" name="payment[cc_cid]" value="" data-validate='{"required-number":true, "validate-cc-cvn":"#<?php echo $code ?>_cc_type"}' autocomplete="off" />
-                <?php $_content = '<img src=\"' . $block->getViewFileUrl('Magento_Checkout::cvv.png') . '\" alt=\"' . __('Card Verification Number Visual Reference') . '\" title=\"' . __('Card Verification Number Visual Reference') . '\" />'; ?>
-                <div class="note">
-                    <a href="#" class="action cvv" title="<?php echo __('What is this?') ?>" data-mage-init='{"tooltip": {"content": "<?php echo $_content ?>"}}'><span><?php echo __('What is this?') ?></span></a>
-                </div>
+
+            </div>                <?php $_content = '<img src=\"' . $block->getViewFileUrl('Magento_Checkout::cvv.png') . '\" alt=\"' . __('Card Verification Number Visual Reference') . '\" title=\"' . __('Card Verification Number Visual Reference') . '\" />'; ?>
+            <div class="note">
+                <a href="#" class="action cvv" title="<?php echo __('What is this?') ?>" data-mage-init='{"tooltip": {"content": "<?php echo $_content ?>"}}'><span><?php echo __('What is this?') ?></span></a>
             </div>
         </div>
     <?php endif; ?>
 
+    <?php echo $block->getChildHtml(); ?>
     <?php if (!$block->isGuestCheckout()): ?>
         <div class="field save hide-if-card-selected">
             <div class="control">

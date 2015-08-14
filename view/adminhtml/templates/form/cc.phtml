@@ -5,23 +5,17 @@
 $code           = $block->getMethodCode();
 $image          = $block->getBrandingImage();
 $storedCards    = $block->getStoredCards();
-$useVault       = $block->haveStoredCards();
-$formData       = [
-    "useVault"  => $useVault,
-    "code"      => $code,
-];
-$serializedFormData = $this->helper('Magento\Framework\Json\Helper\Data')->jsonEncode($formData);
 ?>
 <input id="<?php echo $code ?>-payment-method" type="hidden" name="payment[method]" value="<?php echo $code ?>" />
 <div id="payment_form_<?php echo $code ?>" class="admin__page-section-item" style="display:none;"
-     data-mage-init='{"<?php echo $code; ?>FormCc":<?php echo $serializedFormData ?>}'>
+     data-mage-init='{"tokenbaseForm":{"code":"<?php echo $code ?>"}}'>
     <fieldset class="admin__fieldset">
         <?php if ($image): ?>
             <div class="page-actions">
                 <img src="<?php echo $image; ?>" />
             </div>
         <?php endif; ?>
-        <?php if ($storedCards): ?>
+        <?php if ($block->haveStoredCards()): ?>
             <div class="admin__field">
                 <div class="admin__field-control control">
                     <select id="<?php echo $code ?>-card-id" name="payment[card_id]" class="select admin__control-select">

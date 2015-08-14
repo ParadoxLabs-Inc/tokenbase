@@ -1,0 +1,174 @@
+<div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
+    <div class="payment-method-title field choice">
+        <input type="radio"
+               name="payment[method]"
+               class="radio"
+               data-bind="attr: {'id': getCode()},
+                          value: getCode(),
+                          checked: isChecked,
+                          click: selectPaymentMethod,
+                          visible: isRadioButtonVisible()"/>
+        <label class="label" data-bind="attr: {'for': getCode()}"><span data-bind="text: getTitle()"></span></label>
+    </div>
+
+    <div class="payment-method-content">
+        <div class="payment-method-billing-address">
+            <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+
+        <fieldset data-bind="attr: {class: 'fieldset payment items ccard ' + getCode(), id: getCode() + '-form-cc'}">
+            <!-- ko if: (isShowLegend())-->
+            <legend class="legend"><span><!-- ko text: $t('Bank Information')--><!-- /ko --></span></legend><br />
+            <!-- /ko -->
+            <!-- ko if: (getLogoImage())-->
+            <div class="sorter">
+                <img data-bind="attr: {'src': getLogoImage()}" />
+            </div>
+            <!--/ko-->
+            <!-- ko if: (useVault()) -->
+            <div>
+                <label data-bind="attr: {for: getCode() + '-card-id'}" class="label">
+                    <span><!-- ko text: $t('Payment Information')--><!-- /ko --></span>
+                </label>
+                <div class="control">
+                    <select name="payment[card_id]" class="select"
+                            data-bind="attr: {id: getCode() + '-card-id', 'data-container': getCode() + '-card-id'},
+                                    enable: true,
+                                    options: getStoredCards(),
+                                    optionsValue: 'id',
+                                    optionsText: 'label',
+                                    optionsCaption: $t('Add new card'),
+                                    value: selectedCard">
+                    </select>
+                </div>
+            </div>
+            <div>&nbsp;</div>
+            <!-- /ko -->
+            <div class="field name required widget" data-bind="visible: isAchFormShown">
+                <label data-bind="attr: {for: getCode() + '-echeck-account-name'}" class="label">
+                    <span><!-- ko text: $t('Name on Account')--><!-- /ko --></span>
+                </label>
+                <div class="control">
+                    <input type="text" name="payment[echeck_account_name]" class="input-text" value="" maxlength="22"
+                           data-bind="attr: {id: getCode() + '-echeck-account-name', title: $t('Name on Account'), 'data-container': getCode() + '-echeck-account-name', 'data-validate': JSON.stringify({'required':true})},
+                    enable: true, value: echeckAccountName"/>
+                </div>
+            </div>
+            <div class="field name required" data-bind="visible: isAchFormShown">
+                <label data-bind="attr: {for: getCode() + '-echeck-bank-name'}" class="label">
+                    <span><!-- ko text: $t('Bank Name')--><!-- /ko --></span>
+                </label>
+                <div class="control">
+                    <input type="text" name="payment[echeck_bank_name]" class="input-text" value="" maxlength="50"
+                           data-bind="attr: {id: getCode() + '-echeck-bank-name', title: $t('Bank Name'), 'data-container': getCode() + '-echeck-bank-name', 'data-validate': JSON.stringify({'required':true})},
+                    enable: true, value: echeckBankName"/>
+                </div>
+            </div>
+            <div class="field number required" data-bind="visible: isAchFormShown">
+                <label data-bind="attr: {for: getCode() + '-echeck-routing-number'}" class="label">
+                    <span><!-- ko text: $t('Routing Number')--><!-- /ko --></span>
+                </label>
+                <div class="control">
+                    <input type="number" name="payment[echeck_routing_no]" class="input-text minimum-length-9" value="" maxlength="9"
+                           data-bind="attr: {id: getCode() + '-echeck-routing-number', title: $t('Routing Number'), 'data-container': getCode() + '-echeck-routing-number', 'data-validate': JSON.stringify({'required-number':true,'validate-length':true})},
+                    enable: true, value: echeckRoutingNumber"/>
+                </div>
+            </div>
+            <div class="field number required" data-bind="visible: isAchFormShown">
+                <label data-bind="attr: {for: getCode() + '-echeck-account-number'}" class="label">
+                    <span><!-- ko text: $t('Account Number')--><!-- /ko --></span>
+                </label>
+                <div class="control">
+                    <input type="number" name="payment[echeck_account_no]" class="input-text minimum-length-5 maximum-length-17" value="" maxlength="9"
+                           data-bind="attr: {id: getCode() + '-echeck-account-number', title: $t('Account Number'), 'data-container': getCode() + '-echeck-account-number', 'data-validate': JSON.stringify({'required-number':true,'validate-length':true})},
+                    enable: true, value: echeckAccountNumber"/>
+                    <div class="field-tooltip toggle">
+                        <span class="field-tooltip-action action-ach"
+                              tabindex="0"
+                              data-toggle="dropdown"
+                              data-bind="attr: {title: $t('Where do I find these numbers?')}, mageInit: {'dropdown':{'activeClass': '_active'}}">
+                            <span><!-- ko text: $t('Where do I find these numbers?')--><!-- /ko --></span>
+                        </span>
+                        <div class="field-tooltip-content"
+                             data-target="dropdown">
+                            <p><!-- ko text: $t('On the bottom of your checks, you will see three groups of numbers. Usually the first one is your routing number, and the second is your account number.')--><!-- /ko --></p>
+                            <img data-bind="attr: {src: getAchImage(), alt: $t('Visual reference for locating routing number and account number on a check')}" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="field type required" data-bind="visible: isAchFormShown">
+                <label data-bind="attr: {for: getCode() + '-echeck-account-type'}" class="label">
+                    <span><!-- ko text: $t('Account Type') --><!-- /ko --></span>
+                </label>
+                <div class="control">
+                    <select name="payment[echeck_account_type]" class="select type"
+                            data-bind="attr: {id: getCode() + '-echeck-account-type', 'data-container': getCode() + '-echeck-account-type', 'data-validate': JSON.stringify({required:true})},
+                                    enable: true,
+                                    options: getAchAccountTypes(),
+                                    optionsValue: 'value',
+                                    optionsText: 'label',
+                                    value: echeckAccountType">
+                    </select>
+                </div>
+            </div>
+            <!-- ko if: (canSaveCard)-->
+            <div class="field" data-bind="visible: isAchFormShown">
+                <label class="label">
+                    <span></span>
+                </label>
+                <div class="control">
+                    <!-- ko if: (forceSaveCard)-->
+                    <input type="hidden"
+                           name="payment[save]"
+                           value="1"
+                           checked="checked"
+                           class="checkbox"
+                           data-bind="checked: save, id: getCode() + '-save'"/>
+                    <label class="label" data-bind="attr: {for: getCode() + '-save'}">
+                        <span><!-- ko text: $t('For your convenience, this data will be stored securely by our payment processor.')--><!-- /ko --></span>
+                    </label>
+                    <!-- /ko -->
+                    <!-- ko if: (!forceSaveCard)-->
+                    <input type="checkbox"
+                           name="payment[save]"
+                           value="1"
+                           checked="checked"
+                           class="checkbox"
+                           data-bind="checked: save, id: getCode() + '-save'"/>
+                    <label class="label" data-bind="attr: {for: getCode() + '-save'}">
+                        <span><!-- ko text: $t('Save for next time')--><!-- /ko --></span>
+                    </label>
+                    <!-- /ko -->
+                </div>
+            </div>
+            <!-- /ko -->
+        </fieldset>
+
+        <div class="payment-method-content">
+            <div class="checkout-agreements-block">
+                <!-- ko foreach: $parent.getRegion('before-place-order') -->
+                <!-- ko template: getTemplate() --><!-- /ko -->
+                <!--/ko-->
+            </div>
+            <div class="actions-toolbar">
+                <div class="primary">
+                    <button class="action primary checkout"
+                            type="submit"
+                            data-bind="
+                        click: placeOrder,
+                        attr: {title: $t('Place Order')},
+                        enable: (getCode() == isChecked()),
+                        css: {disabled: !isPlaceOrderActionAllowed()}
+                        "
+                            disabled>
+                        <span data-bind="text: $t('Place Order')"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

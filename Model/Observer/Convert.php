@@ -19,7 +19,20 @@ namespace ParadoxLabs\TokenBase\Model\Observer;
 class Convert
 {
     /**
-     * Copy tokenbase_id from quote payment to order payment
+     * @var string[]
+     */
+    protected $fields = [
+        'tokenbase_id',
+        'echeck_account_name',
+        'echeck_bank_name',
+        'echec_account_type',
+        'echeck_routing_number',
+        'echeck_routing_no',
+        'echeck_account_no',
+    ];
+
+    /**
+     * Copy fields from quote payment to order payment
      *
      * @param \Magento\Framework\Event\Observer $observer
      * @return $this
@@ -33,13 +46,15 @@ class Convert
         $order  = $observer->getEvent()->getData('order');
 
         // Do the magic. Yeah, this is it.
-        $order->getPayment()->setData('tokenbase_id', $quote->getPayment()->getData('tokenbase_id'));
+        foreach ($this->fields as $field) {
+            $order->getPayment()->setData($field, $quote->getPayment()->getData($field));
+        }
 
         return $this;
     }
 
     /**
-     * Copy tokenbase_id from order payment to quote payment
+     * Copy fields from order payment to quote payment
      *
      * @param \Magento\Framework\Event\Observer $observer
      * @return $this
@@ -53,7 +68,9 @@ class Convert
         $order  = $observer->getEvent()->getData('order');
 
         // Do the magic. Yeah, this is it.
-        $quote->getPayment()->setData('tokenbase_id', $order->getPayment()->getData('tokenbase_id'));
+        foreach ($this->fields as $field) {
+            $quote->getPayment()->setData($field, $order->getPayment()->getData($field));
+        }
 
         return $this;
     }

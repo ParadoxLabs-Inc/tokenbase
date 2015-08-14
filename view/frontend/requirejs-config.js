@@ -2,7 +2,7 @@
 var config = {
     map: {
         '*': {
-            tokenbaseFormCc:            'ParadoxLabs_TokenBase/js/form/cc'
+            tokenbaseForm:            'ParadoxLabs_TokenBase/js/form'
         }
     }
 };
