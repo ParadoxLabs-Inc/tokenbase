@@ -76,7 +76,7 @@ class Cards extends \Magento\Framework\View\Element\Template
     /**
      * Get stored cards for the currently-active method.
      *
-     * @return array|\ParadoxLabs\TokenBase\Model\Resource\Card\Collection
+     * @return array|\ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection
      */
     public function getCards()
     {
@@ -102,6 +102,7 @@ class Cards extends \Magento\Framework\View\Element\Template
      */
     public function getFormattedCardAddress(\Magento\Customer\Api\Data\AddressInterface $address)
     {
+        /** @var \Magento\Customer\Block\Address\Renderer\RendererInterface $renderer */
         $renderer    = $this->addressConfig->getFormatByCode('html')->getRenderer();
         $addressData = $this->addressMapper->toFlatArray($address);
 

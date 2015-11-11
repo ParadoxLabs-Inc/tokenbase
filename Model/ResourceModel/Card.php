@@ -1,6 +1,6 @@
 <?php
 /**
- * Card model collection
+ * Card resource model
  *
  * Paradox Labs, Inc.
  * http://www.paradoxlabs.com
@@ -13,17 +13,20 @@
  * @license        http://store.paradoxlabs.com/license.html
  */
 
-namespace ParadoxLabs\TokenBase\Model\Resource\Card;
+namespace ParadoxLabs\TokenBase\Model\ResourceModel;
 
-class Collection extends \Magento\Framework\Model\Resource\Db\Collection\AbstractCollection
+/**
+ * Card Resource Model
+ */
+class Card extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 {
     /**
-     * Define resource model
+     * Initialize resource model
      *
      * @return void
      */
     protected function _construct()
     {
-        $this->_init('ParadoxLabs\TokenBase\Model\Card', 'ParadoxLabs\TokenBase\Model\Resource\Card');
+        $this->_init('paradoxlabs_stored_card', 'id');
     }
 }

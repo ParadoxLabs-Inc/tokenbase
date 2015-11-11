@@ -112,7 +112,7 @@
         <div class="field number required">
             <label for="<?php echo $code ?>-cc-number" class="label"><span><?php echo __('CC Number') ?></span></label>
             <div class="control">
-                <input type="text" id="<?php echo $code ?>-cc-number" name="payment[cc_number]" title="<?php echo __('Credit Card Number') ?>" class="input-text" value="<?php echo $block->getCard()->getLabel(false); ?>" data-validate='{"required-number":true, "validate-cc-number":"#<?php echo $code ?>-cc-type", "validate-cc-type":"#<?php echo $code ?>-cc-type"}' autcomplete="off" />
+                <input type="text" id="<?php echo $code ?>-cc-number" name="payment[cc_number]" title="<?php echo __('Credit Card Number') ?>" class="input-text" value="<?php echo $block->getCard()->getLabel(false); ?>" data-validate='{"required-number":true, "validate-cc-number":"#<?php echo $code ?>-cc-type", "validate-cc-type":"#<?php echo $code ?>-cc-type"}' autocomplete="off" />
             </div>
         </div>
         <div class="field date required" id="<?php echo $code ?>-cc-type_exp_div">

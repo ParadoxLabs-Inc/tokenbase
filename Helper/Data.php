@@ -24,7 +24,7 @@ class Data extends \Magento\Payment\Helper\Data
     protected $card;
 
     /**
-     * @var \ParadoxLabs\TokenBase\Model\Resource\Card\Collection[]
+     * @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection[]
      */
     protected $cards = [];
 
@@ -69,7 +69,7 @@ class Data extends \Magento\Payment\Helper\Data
     protected $cardFactory;
 
     /**
-     * @var \ParadoxLabs\TokenBase\Model\Resource\Card\CollectionFactory
+     * @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory
      */
     protected $cardCollectionFactory;
 
@@ -126,7 +126,7 @@ class Data extends \Magento\Payment\Helper\Data
      * @param \Magento\Customer\Model\CustomerFactory $customerFactory
      * @param \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory
      * @param \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory
-     * @param \ParadoxLabs\TokenBase\Model\Resource\Card\CollectionFactory $cardCollectionFactory
+     * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
      * @param \ParadoxLabs\TokenBase\Model\Logger\Logger $tokenbaseLogger
      * @param \ParadoxLabs\TokenBase\Helper\AddressFactory $addressHelperFactory
      */
@@ -145,7 +145,7 @@ class Data extends \Magento\Payment\Helper\Data
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory,
         \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
-        \ParadoxLabs\TokenBase\Model\Resource\Card\CollectionFactory $cardCollectionFactory,
+        \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory,
         \ParadoxLabs\TokenBase\Model\Logger\Logger $tokenbaseLogger,
         \ParadoxLabs\TokenBase\Helper\AddressFactory $addressHelperFactory
     ) {
@@ -226,6 +226,8 @@ class Data extends \Magento\Payment\Helper\Data
 
                 // Customers registered through the admin will have store_id=0 with a valid website_id. Try to use that.
                 if ($storeId < 1) {
+                    /** @var \Magento\Store\Model\Website $website */
+
                     $websiteId  = $this->registry->registry('current_customer')->getWebsiteId();
                     $website    = $this->websiteFactory->create();
                     $store      = $website->load($websiteId)->getDefaultStore();
@@ -394,7 +396,7 @@ class Data extends \Magento\Payment\Helper\Data
      * Get stored cards for the currently-active method.
      *
      * @param string|null $method
-     * @return \ParadoxLabs\TokenBase\Model\Resource\Card\Collection|array
+     * @return \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection|array
      */
     public function getActiveCustomerCardsByMethod($method = null)
     {
@@ -519,6 +521,17 @@ class Data extends \Magento\Payment\Helper\Data
     }
 
     /**
+     * Map CC Type to Magento's. Should be implemented by the child method.
+     *
+     * @param string $type
+     * @return string|null
+     */
+    public function mapCcTypeToMagento($type)
+    {
+        return $type;
+    }
+
+    /**
      * Recursively cleanup array from objects
      *
      * @param $array
@@ -550,7 +563,7 @@ class Data extends \Magento\Payment\Helper\Data
     public function log($code, $message, $debug = false)
     {
         if (is_object($message)) {
-            if ($message instanceof \Magento\Framework\Object) {
+            if ($message instanceof \Magento\Framework\DataObject) {
                 $message = $message->getData();
                 
                 $this->cleanupArray($message);

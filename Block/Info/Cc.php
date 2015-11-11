@@ -48,8 +48,8 @@ class Cc extends \Magento\Payment\Block\Info\Cc
     /**
      * Prepare credit card related payment info
      *
-     * @param \Magento\Framework\Object|array $transport
-     * @return \Magento\Framework\Object
+     * @param \Magento\Framework\DataObject|array $transport
+     * @return \Magento\Framework\DataObject
      */
     protected function _prepareSpecificInformation($transport = null)
     {
@@ -59,24 +59,27 @@ class Cc extends \Magento\Payment\Block\Info\Cc
         $transport = \Magento\Payment\Block\Info::_prepareSpecificInformation($transport);
         $data = [];
 
+        /** @var \Magento\Sales\Model\Order\Payment $info */
+        $info = $this->getInfo();
+
         $this->_eventManager->dispatch('tokenbase_before_load_payment_info', [
-            'method'    => $this->getInfo()->getMethod(),
+            'method'    => $info->getMethod(),
             'customer'  => $this->helper->getCurrentCustomer(),
             'transport' => $transport,
-            'info'      => $this->getInfo(),
+            'info'      => $info,
         ]);
 
         // If this is an eCheck, show different info.
         if ($this->isEcheck() === true) {
-            if ($this->getInfo()->getData('echeck_bank_name') != '') {
-                $data[(string)__('Bank Name')] = $this->getInfo()->getData('echeck_bank_name');
-            } elseif ($this->getInfo()->getAdditionalInformation('echeck_bank_name') != '') {
-                $data[(string)__('Bank Name')] = $this->getInfo()->getAdditionalInformation('echeck_bank_name');
+            if ($info->getData('echeck_bank_name') != '') {
+                $data[(string)__('Bank Name')] = $info->getData('echeck_bank_name');
+            } elseif ($info->getAdditionalInformation('echeck_bank_name') != '') {
+                $data[(string)__('Bank Name')] = $info->getAdditionalInformation('echeck_bank_name');
             }
 
             $data[(string)__('Account Number')] = sprintf(
                 'x-%s',
-                $this->getInfo()->getAdditionalInformation('echeck_account_number_last4')
+                $info->getAdditionalInformation('echeck_account_number_last4')
             );
         } else {
             $ccType = $this->getCcTypeName();
@@ -84,23 +87,23 @@ class Cc extends \Magento\Payment\Block\Info\Cc
                 $data[(string)__('Credit Card Type')] = $ccType;
             }
 
-            if ($this->getInfo()->getCcLast4()) {
-                $data[(string)__('Credit Card Number')] = sprintf('XXXX-%s', $this->getInfo()->getCcLast4());
+            if ($info->getCcLast4()) {
+                $data[(string)__('Credit Card Number')] = sprintf('XXXX-%s', $info->getCcLast4());
             }
         }
 
         // If this is admin, show different info.
         if ($this->helper->getIsFrontend() !== true) {
-            $data[(string)__('Transaction ID')] = $this->getInfo()->getAdditionalInformation('transaction_id');
+            $data[(string)__('Transaction ID')] = $info->getAdditionalInformation('transaction_id');
         }
 
         $transport->setData(array_merge($data, $transport->getData()));
 
         $this->_eventManager->dispatch('tokenbase_after_load_payment_info', [
-            'method'    => $this->getInfo()->getMethod(),
+            'method'    => $info->getMethod(),
             'customer'  => $this->helper->getCurrentCustomer(),
             'transport' => $transport,
-            'info'      => $this->getInfo(),
+            'info'      => $info,
         ]);
 
         return $transport;

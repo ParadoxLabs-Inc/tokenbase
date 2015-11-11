@@ -29,7 +29,7 @@ class Clean
     protected $scopeConfig;
 
     /**
-     * @var \ParadoxLabs\TokenBase\Model\Resource\Card\CollectionFactory
+     * @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory
      */
     protected $cardCollectionFactory;
 
@@ -37,12 +37,12 @@ class Clean
      * Constructor, yeah!
      *
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \ParadoxLabs\TokenBase\Model\Resource\Card\CollectionFactory $cardCollectionFactory
+     * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \ParadoxLabs\TokenBase\Model\Resource\Card\CollectionFactory $cardCollectionFactory,
+        \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory,
         \ParadoxLabs\TokenBase\Helper\Data $helper
     ) {
         $this->helper = $helper;
@@ -68,7 +68,7 @@ class Clean
          * Prune inactive cards older than 120 days (beyond auth and refund periods)
          */
 
-        /** @var \ParadoxLabs\TokenBase\Model\Resource\Card\Collection $cards */
+        /** @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection $cards */
         $cards = $this->cardCollectionFactory->create();
         $cards->addFieldToFilter('active', '0')
               ->addFieldToFilter('updated_at', array( 'lt' => date('c', strtotime('-120 days')), 'date' => true ))
@@ -92,7 +92,7 @@ class Clean
          * Prune any cards missing tokens after 7 days (invalid/unusable)
          */
 
-        /** @var \ParadoxLabs\TokenBase\Model\Resource\Card\Collection $cards */
+        /** @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection $cards */
         $cards = $this->cardCollectionFactory->create();
         $cards->addFieldToFilter('profile_id', ['null' => true])
               ->addFieldToFilter('payment_id', ['null' => true])
@@ -109,10 +109,10 @@ class Clean
     /**
      * Permanently delete cards from the given collection, return the number affected.
      *
-     * @param \ParadoxLabs\TokenBase\Model\Resource\Card\Collection $cards
+     * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection $cards
      * @return int
      */
-    protected function deleteCards(\ParadoxLabs\TokenBase\Model\Resource\Card\Collection $cards)
+    protected function deleteCards(\ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection $cards)
     {
         $affectedCount = 0;
 

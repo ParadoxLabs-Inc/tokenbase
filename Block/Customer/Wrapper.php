@@ -13,7 +13,6 @@
 
 namespace ParadoxLabs\TokenBase\Block\Customer;
 
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\View\Element\Template;
 
 /**

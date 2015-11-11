@@ -13,6 +13,8 @@
 
 namespace ParadoxLabs\TokenBase\Controller\Paymentinfo;
 
+use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Framework\Api\DataObjectHelper;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Exception\LocalizedException;
@@ -37,6 +39,8 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
      * @param Context $context
      * @param Session $customerSession
      * @param PageFactory $resultPageFactory
+     * @param CustomerRepositoryInterface $customerRepository
+     * @param DataObjectHelper $dataObjectHelper
      * @param \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator
      * @param \Magento\Framework\Registry $registry
      * @param \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory
@@ -49,6 +53,8 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
         Context $context,
         Session $customerSession,
         PageFactory $resultPageFactory,
+        CustomerRepositoryInterface $customerRepository,
+        DataObjectHelper $dataObjectHelper,
         \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator,
         \Magento\Framework\Registry $registry,
         \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
@@ -64,6 +70,8 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
             $context,
             $customerSession,
             $resultPageFactory,
+            $customerRepository,
+            $dataObjectHelper,
             $formKeyValidator,
             $registry,
             $cardFactory,
@@ -93,8 +101,9 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
                 /**
                  * Load the card and verify we are actually the cardholder before doing anything.
                  */
+
+                /** @var \ParadoxLabs\TokenBase\Model\Card $card */
                 $card       = $this->cardFactory->create();
-                $card->setMethod($method);
                 $card->loadByHash($id);
                 $card       = $card->getTypeInstance();
                 $customer   = $this->helper->getCurrentCustomer();
@@ -147,14 +156,14 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
                     $card->importPaymentInfo($newPayment);
                     $card->save();
 
-                    $this->_getSession()->unsTokenbaseFormData();
+                    $this->session->unsData('tokenbase_form_data');
 
                     $this->messageManager->addSuccess(__('Payment data saved successfully.'));
                 } else {
                     $this->messageManager->addError(__('Invalid Request.'));
                 }
             } catch (\Exception $e) {
-                $this->_getSession()->setTokenbaseFormData($this->getRequest()->getParams());
+                $this->session->setData('tokenbase_form_data', $this->getRequest()->getParams());
 
                 $this->helper->log($method, (string)$e);
                 $this->messageManager->addError(__($e->getMessage()));

@@ -51,7 +51,7 @@ class Card extends \Magento\Framework\Model\AbstractModel
     protected $method;
     
     /**
-     * @var \ParadoxLabs\Tokenbase\Model\Resource\Card\CollectionFactory
+     * @var \ParadoxLabs\Tokenbase\Model\ResourceModel\Card\CollectionFactory
      */
     protected $cardCollectionFactory;
 
@@ -61,7 +61,7 @@ class Card extends \Magento\Framework\Model\AbstractModel
     protected $customerFactory;
     
     /**
-     * @var \Magento\Sales\Model\Resource\Order\CollectionFactory
+     * @var \Magento\Sales\Model\ResourceModel\Order\CollectionFactory
      */
     protected $orderCollectionFactory;
 
@@ -117,15 +117,15 @@ class Card extends \Magento\Framework\Model\AbstractModel
      * @param \Magento\Payment\Helper\Data $paymentHelper
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \ParadoxLabs\Tokenbase\Model\Resource\Card\CollectionFactory $cardCollectionFactory
+     * @param \ParadoxLabs\Tokenbase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
      * @param \Magento\Customer\Model\CustomerFactory $customerFactory
      * @param \Magento\Customer\Api\Data\AddressInterfaceFactory $addressFactory
      * @param \Magento\Customer\Api\Data\RegionInterfaceFactory $addressRegionFactory
-     * @param \Magento\Sales\Model\Resource\Order\CollectionFactory $orderCollectionFactory
+     * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
      * @param \Magento\Checkout\Model\Session $checkoutSession
      * @param \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress
      * @param \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor
-     * @param \Magento\Framework\Model\Resource\AbstractResource $resource
+     * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
      * @param array $data
      */
@@ -136,15 +136,15 @@ class Card extends \Magento\Framework\Model\AbstractModel
         \Magento\Payment\Helper\Data $paymentHelper,
         \Magento\Framework\ObjectManagerInterface $objectManager,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \ParadoxLabs\Tokenbase\Model\Resource\Card\CollectionFactory $cardCollectionFactory,
+        \ParadoxLabs\Tokenbase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory,
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Customer\Api\Data\AddressInterfaceFactory $addressFactory,
         \Magento\Customer\Api\Data\RegionInterfaceFactory $addressRegionFactory,
-        \Magento\Sales\Model\Resource\Order\CollectionFactory $orderCollectionFactory,
+        \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress,
         \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor,
-        \Magento\Framework\Model\Resource\AbstractResource $resource = null,
+        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
@@ -171,7 +171,7 @@ class Card extends \Magento\Framework\Model\AbstractModel
      */
     protected function _construct()
     {
-        $this->_init('ParadoxLabs\Tokenbase\Model\Resource\Card');
+        $this->_init('ParadoxLabs\Tokenbase\Model\ResourceModel\Card');
     }
 
     /**
@@ -268,6 +268,9 @@ class Card extends \Magento\Framework\Model\AbstractModel
             /**
              * If we have no email, try to find it from current scope data.
              */
+
+            /** @var \Magento\Sales\Model\Order\Payment $payment */
+
             if ($payment->getQuote() != null
                 && $payment->getQuote()->getBillingAddress() != null
                 && $payment->getQuote()->getBillingAddress()->getCustomerEmail() != '') {
@@ -290,7 +293,7 @@ class Card extends \Magento\Framework\Model\AbstractModel
 
             if (!is_null($model)) {
                 if ($model->getCustomerEmail() == ''
-                    && $model->getBillingAddress() instanceof \Magento\Framework\Object
+                    && $model->getBillingAddress() instanceof \Magento\Framework\DataObject
                     && $model->getBillingAddress()->getEmail() != '') {
                     $model->setCustomerEmail($model->getBillingAddress()->getEmail());
                 }
@@ -455,11 +458,7 @@ class Card extends \Magento\Framework\Model\AbstractModel
      */
     public function loadByHash($hash)
     {
-        /** @var \ParadoxLabs\TokenBase\Model\Resource\Card $resource */
-        $resource = $this->_getResource();
-        $resource->loadByHash($this, $hash);
-
-        return $this;
+        return $this->load( $hash, 'hash' );
     }
 
     /**
@@ -490,6 +489,7 @@ class Card extends \Magento\Framework\Model\AbstractModel
     {
         /** @var \Magento\Customer\Api\Data\AddressInterface $address */
         $address    = $this->addressFactory->create();
+        /** @var \Magento\Customer\Api\Data\RegionInterface $region */
         $region     = $this->addressRegionFactory->create();
 
         // ffs.
@@ -928,7 +928,7 @@ class Card extends \Magento\Framework\Model\AbstractModel
          * If the payment ID has changed, look for any duplicate payment records that might be stored.
          */
         if ($this->getOrigData('payment_id') != $this->getData('payment_id')) {
-            /** @var \ParadoxLabs\TokenBase\Model\Resource\Card\Collection $collection */
+            /** @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection $collection */
             $collection = $this->cardCollectionFactory->create();
             $collection->addFieldToFilter('method', $this->getData('method'))
                        ->addFieldToFilter('profile_id', $this->getData('profile_id'))

@@ -54,8 +54,8 @@ class Index extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
         if (empty($id) || $this->formKeyIsValid() !== true) {
             $id = null;
 
-            if ($this->_getSession()->hasTokenbaseFormData()) {
-                $data = $this->_getSession()->getTokenbaseFormData();
+            if ($this->session->hasData('tokenbase_form_data')) {
+                $data = $this->session->getData('tokenbase_form_data');
 
                 if (isset($data['id']) && !empty($data['id'])) {
                     $id = $data['id'];
@@ -64,6 +64,7 @@ class Index extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
         }
 
         if (!empty($id)) {
+            /** @var \ParadoxLabs\TokenBase\Model\Card $card */
             $card = $this->cardFactory->create();
             $card->loadByHash($id);
             $card = $card->getTypeInstance();

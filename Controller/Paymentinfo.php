@@ -13,6 +13,8 @@
 
 namespace ParadoxLabs\TokenBase\Controller;
 
+use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Framework\Api\DataObjectHelper;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
@@ -20,7 +22,7 @@ use Magento\Framework\View\Result\PageFactory;
 /**
  * Paymentinfo abstract controller
  */
-class Paymentinfo extends \Magento\Customer\Controller\Account
+abstract class Paymentinfo extends \Magento\Customer\Controller\Account\Edit
 {
     /**
      * @var \Magento\Framework\Registry
@@ -51,6 +53,8 @@ class Paymentinfo extends \Magento\Customer\Controller\Account
      * @param Context $context
      * @param Session $customerSession
      * @param PageFactory $resultPageFactory
+     * @param CustomerRepositoryInterface $customerRepository
+     * @param DataObjectHelper $dataObjectHelper
      * @param \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator
      * @param \Magento\Framework\Registry $registry
      * @param \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory
@@ -61,6 +65,8 @@ class Paymentinfo extends \Magento\Customer\Controller\Account
         Context $context,
         Session $customerSession,
         PageFactory $resultPageFactory,
+        CustomerRepositoryInterface $customerRepository,
+        DataObjectHelper $dataObjectHelper,
         \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator,
         \Magento\Framework\Registry $registry,
         \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
@@ -73,7 +79,13 @@ class Paymentinfo extends \Magento\Customer\Controller\Account
         $this->cardFactory = $cardFactory;
         $this->addressHelper = $addressHelper;
 
-        parent::__construct($context, $customerSession, $resultPageFactory);
+        parent::__construct(
+            $context,
+            $customerSession,
+            $resultPageFactory,
+            $customerRepository,
+            $dataObjectHelper
+        );
     }
 
     /**

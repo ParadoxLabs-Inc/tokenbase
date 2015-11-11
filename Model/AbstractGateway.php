@@ -127,7 +127,7 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \ParadoxLabs\TokenBase\Model\Gateway\Xml $xml
      * @param \ParadoxLabs\TokenBase\Model\Gateway\ResponseFactory $responseFactory
-     * @param \Magento\Framework\Model\Resource\AbstractResource $resource
+     * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
      * @param array $data
      */
@@ -137,7 +137,7 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         \ParadoxLabs\TokenBase\Model\Gateway\Xml $xml,
         \ParadoxLabs\TokenBase\Model\Gateway\ResponseFactory $responseFactory,
-        \Magento\Framework\Model\Resource\AbstractResource $resource = null,
+        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
@@ -405,9 +405,19 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel
      * @param Card $card
      * @return $this
      */
-    public function setCard(\ParadoxLabs\Tokenbase\Model\Card $card)
+    public function setCard(\ParadoxLabs\TokenBase\Model\Card $card)
     {
         return parent::setData('card', $card);
+    }
+
+    /**
+     * Return the card set on the gateway (if any).
+     *
+     * @return \ParadoxLabs\TokenBase\Model\Card
+     */
+    public function getCard()
+    {
+        return parent::getData('card');
     }
 
     /**

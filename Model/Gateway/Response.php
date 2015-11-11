@@ -16,7 +16,7 @@ namespace ParadoxLabs\TokenBase\Model\Gateway;
 /**
  * Response object: Container for various response data (txn ID, status, etc.)
  */
-class Response extends \Magento\Framework\Object
+class Response extends \Magento\Framework\DataObject
 {
     /**
      * Mark response as fraud or not fraud

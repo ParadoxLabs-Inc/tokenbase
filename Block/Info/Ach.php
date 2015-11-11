@@ -26,8 +26,8 @@ class Ach extends Cc
     /**
      * Prepare payment info
      *
-     * @param \Magento\Framework\Object|array $transport
-     * @return \Magento\Framework\Object
+     * @param \Magento\Framework\DataObject|array $transport
+     * @return \Magento\Framework\DataObject
      */
     protected function _prepareSpecificInformation($transport = null)
     {

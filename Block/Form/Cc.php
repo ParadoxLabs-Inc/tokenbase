@@ -29,7 +29,7 @@ class Cc extends \Magento\Payment\Block\Form\Cc
     protected $brandingImage = '';
 
     /**
-     * @var \ParadoxLabs\TokenBase\Model\Resource\Card\Collection|array
+     * @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection|array
      */
     protected $cards;
 
@@ -74,7 +74,7 @@ class Cc extends \Magento\Payment\Block\Form\Cc
     /**
      * Get/load stored cards for the current customer and method.
      *
-     * @return \ParadoxLabs\TokenBase\Model\Resource\Card\Collection|array
+     * @return \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection|array
      */
     public function getStoredCards()
     {

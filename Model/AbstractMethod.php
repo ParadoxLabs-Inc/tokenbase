@@ -188,7 +188,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
      * @param \ParadoxLabs\TokenBase\Model\AbstractGateway $gateway
      * @param CardFactory $cardFactory
      * @param \ParadoxLabs\TokenBase\Helper\AddressFactory $addressHelperFactory
-     * @param \Magento\Framework\Model\Resource\AbstractResource $resource
+     * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
      * @param array $data
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
@@ -207,7 +207,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
         \ParadoxLabs\TokenBase\Model\AbstractGateway $gateway,
         \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
         \ParadoxLabs\TokenBase\Helper\AddressFactory $addressHelperFactory,
-        \Magento\Framework\Model\Resource\AbstractResource $resource = null,
+        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
@@ -373,15 +373,15 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
     /**
      * Update the CC info during the checkout process.
      *
-     * @param \Magento\Framework\Object|mixed $data
+     * @param \Magento\Framework\DataObject|mixed $data
      * @return $this
      */
-    public function assignData($data)
+    public function assignData(\Magento\Framework\DataObject $data)
     {
         $this->log(sprintf('assignData(%s)', $data->getData('card_id')));
 
-        if (!($data instanceof \Magento\Framework\Object)) {
-            $data = new \Magento\Framework\Object($data);
+        if (!$data instanceof \Magento\Framework\DataObject) {
+            $data = new \Magento\Framework\DataObject($data);
         }
 
         parent::assignData($data);
@@ -435,7 +435,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
     public function canVoid()
     {
         if (parent::canVoid()) {
-            /** @var \Magento\Sales\Model\Order\Payment\Info $payment */
+            /** @var \Magento\Sales\Model\Order\Payment $payment */
             $payment = $this->getInfoInstance();
             
             /** @var \Magento\Sales\Model\Order $order */
@@ -673,6 +673,8 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
      */
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
+        /** @var \Magento\Sales\Model\Order\Payment $payment */
+
         $this->log(sprintf('refund(%s %s, %s)', get_class($payment), $payment->getId(), $amount));
 
         $this->loadOrCreateCard($payment);
@@ -813,7 +815,8 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
         $this->afterFraudUpdate($payment, $transactionId, $response);
 
         if ($response->getData('is_approved')) {
-            $transaction = $payment->getTransaction($transactionId);
+            $payment->setData('parent_transaction_id', $transactionId);
+            $transaction = $payment->getAuthorizationTransaction();
             $transaction->setAdditionalInformation('is_transaction_fraud', false);
 
             $payment->setIsTransactionApproved(true);
@@ -837,6 +840,8 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
     protected function loadOrCreateCard(\Magento\Payment\Model\InfoInterface $payment)
     {
         $this->log(sprintf('loadOrCreateCard(%s %s)', get_class($payment), $payment->getId()));
+
+        /** @var \Magento\Sales\Model\Order\Payment $payment */
 
         if (!is_null($this->getCard())) {
             $this->setCard($this->getCard());

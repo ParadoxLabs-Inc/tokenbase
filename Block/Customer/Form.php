@@ -57,8 +57,8 @@ class Form extends \Magento\Customer\Block\Address\Edit
      * @param \Magento\Directory\Helper\Data $directoryHelper
      * @param \Magento\Framework\Json\EncoderInterface $jsonEncoder
      * @param \Magento\Framework\App\Cache\Type\Config $configCacheType
-     * @param \Magento\Directory\Model\Resource\Region\CollectionFactory $regionCollectionFactory
-     * @param \Magento\Directory\Model\Resource\Country\CollectionFactory $countryCollectionFactory
+     * @param \Magento\Directory\Model\ResourceModel\Region\CollectionFactory $regionCollectionFactory
+     * @param \Magento\Directory\Model\ResourceModel\Country\CollectionFactory $countryCollectionFactory
      * @param \Magento\Customer\Model\Session $customerSession
      * @param \Magento\Customer\Api\AddressRepositoryInterface $addressRepository
      * @param \Magento\Customer\Api\Data\AddressInterfaceFactory $addressDataFactory
@@ -76,8 +76,8 @@ class Form extends \Magento\Customer\Block\Address\Edit
         \Magento\Directory\Helper\Data $directoryHelper,
         \Magento\Framework\Json\EncoderInterface $jsonEncoder,
         \Magento\Framework\App\Cache\Type\Config $configCacheType,
-        \Magento\Directory\Model\Resource\Region\CollectionFactory $regionCollectionFactory,
-        \Magento\Directory\Model\Resource\Country\CollectionFactory $countryCollectionFactory,
+        \Magento\Directory\Model\ResourceModel\Region\CollectionFactory $regionCollectionFactory,
+        \Magento\Directory\Model\ResourceModel\Country\CollectionFactory $countryCollectionFactory,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Customer\Api\AddressRepositoryInterface $addressRepository,
         \Magento\Customer\Api\Data\AddressInterfaceFactory $addressDataFactory,
@@ -188,10 +188,11 @@ class Form extends \Magento\Customer\Block\Address\Edit
      */
     public function getNameBlockHtml()
     {
+        /** @var \Magento\Customer\Block\Widget\Name $nameBlock */
         $nameBlock = $this->getLayout()
-                          ->createBlock('Magento\Customer\Block\Widget\Name')
-                          ->setObject($this->getAddress());
+                          ->createBlock('Magento\Customer\Block\Widget\Name');
 
+        $nameBlock->setObject($this->getAddress());
         $nameBlock->setData('field_name_format', 'billing[%s]');
 
         return $nameBlock->toHtml();

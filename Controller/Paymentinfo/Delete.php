@@ -36,6 +36,8 @@ class Delete extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
                 /**
                  * Load the card and verify we are actually the cardholder before doing anything.
                  */
+
+                /** @var \ParadoxLabs\TokenBase\Model\Card $card */
                 $card = $this->cardFactory->create();
                 $card->loadByHash($id);
                 $card = $card->getTypeInstance();

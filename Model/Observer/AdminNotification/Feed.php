@@ -39,7 +39,7 @@ class Feed extends \Magento\AdminNotification\Model\Feed
      * @param \Magento\Framework\UrlInterface $urlBuilder
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \Magento\Framework\Module\ResourceInterface $moduleResource
-     * @param \Magento\Framework\Model\Resource\AbstractResource $resource
+     * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
      * @param array $data
      */
@@ -54,7 +54,7 @@ class Feed extends \Magento\AdminNotification\Model\Feed
         \Magento\Framework\UrlInterface $urlBuilder,
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         \Magento\Framework\Module\ResourceInterface $moduleResource,
-        \Magento\Framework\Model\Resource\AbstractResource $resource = null,
+        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {

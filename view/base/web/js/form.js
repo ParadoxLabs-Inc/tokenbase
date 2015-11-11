@@ -34,7 +34,7 @@ define([
                     this.toggleFields(true);
                 }
 
-                cardSelect.bind('change', function (e) {
+                cardSelect.bind('change', function () {
                     if ($(this).val()) {
                         self.toggleFields(true);
                     } else {
