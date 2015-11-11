@@ -11,12 +11,12 @@
  * @license     http://store.paradoxlabs.com/license.html
  */
 
-namespace ParadoxLabs\TokenBase\Model\Observer;
+namespace ParadoxLabs\TokenBase\Observer;
 
 /**
  * Check for extension updates/notifications
  */
-class AdminNotification extends \Magento\AdminNotification\Observer\PredispathAdminActionControllerObserver
+class AdminNotificationObserver extends \Magento\AdminNotification\Observer\PredispathAdminActionControllerObserver
 {
     /**
      * We inject our feed factory via DI. magic.

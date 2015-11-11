@@ -11,12 +11,12 @@
  * @license     http://store.paradoxlabs.com/license.html
  */
 
-namespace ParadoxLabs\TokenBase\Model\Observer;
+namespace ParadoxLabs\TokenBase\Observer;
 
 /**
  * Refund Observer
  */
-class Refund
+class ProcessRefundObserver implements \Magento\Framework\Event\ObserverInterface
 {
     /**
      * @var \ParadoxLabs\TokenBase\Helper\Data
@@ -36,12 +36,12 @@ class Refund
      * unless the full amount is done.
      *
      * @param \Magento\Framework\Event\Observer $observer
-     * @return $this
+     * @return void
      */
-    public function processRefund(\Magento\Framework\Event\Observer $observer)
+    public function execute(\Magento\Framework\Event\Observer $observer)
     {
-        $memo       = $observer->getEvent()->getData('creditmemo');
-        $methods    = $this->helper->getAllMethods();
+        $memo    = $observer->getEvent()->getData('creditmemo');
+        $methods = $this->helper->getAllMethods();
 
         if (in_array($memo->getOrder()->getPayment()->getMethod(), $methods)) {
             if ($memo->getInvoice()
@@ -49,7 +49,5 @@ class Refund
                 $memo->getInvoice()->setIsUsedForRefund(false);
             }
         }
-
-        return $this;
     }
 }

@@ -15,6 +15,9 @@
 
 namespace ParadoxLabs\TokenBase\Model\ResourceModel\Card;
 
+/**
+ * Collection Class
+ */
 class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
 {
     /**

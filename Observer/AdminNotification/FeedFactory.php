@@ -11,7 +11,7 @@
  * @license     http://store.paradoxlabs.com/license.html
  */
 
-namespace ParadoxLabs\TokenBase\Model\Observer\AdminNotification;
+namespace ParadoxLabs\TokenBase\Observer\AdminNotification;
 
 /**
  * Factory for the TokenBase Feed class
@@ -40,7 +40,7 @@ class FeedFactory extends \Magento\AdminNotification\Model\FeedFactory
      */
     public function __construct(
         \Magento\Framework\ObjectManagerInterface $objectManager,
-        $instanceName = '\\ParadoxLabs\\TokenBase\\Model\\Observer\\AdminNotification\\Feed'
+        $instanceName = '\\ParadoxLabs\\TokenBase\\Observer\\AdminNotification\\Feed'
     ) {
         $this->_objectManager = $objectManager;
         $this->_instanceName = $instanceName;
@@ -50,7 +50,7 @@ class FeedFactory extends \Magento\AdminNotification\Model\FeedFactory
      * Create class instance with specified parameters
      *
      * @param array $data
-     * @return \ParadoxLabs\TokenBase\Model\Observer\AdminNotification\Feed
+     * @return \ParadoxLabs\TokenBase\Observer\AdminNotification\Feed
      */
     public function create(array $data = array())
     {

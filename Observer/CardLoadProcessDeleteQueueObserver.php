@@ -11,12 +11,12 @@
  * @license     http://store.paradoxlabs.com/license.html
  */
 
-namespace ParadoxLabs\TokenBase\Model\Observer;
+namespace ParadoxLabs\TokenBase\Observer;
 
 /**
  * CardLoad Observer
  */
-class CardLoad
+class CardLoadProcessDeleteQueueObserver implements \Magento\Framework\Event\ObserverInterface
 {
     /**
      * @var \Magento\Framework\Registry
@@ -37,9 +37,9 @@ class CardLoad
      * actually save it there, so we register and do it here instead. Magic.
      *
      * @param \Magento\Framework\Event\Observer $observer
-     * @return $this
+     * @return void
      */
-    public function checkQueuedForDeletion(\Magento\Framework\Event\Observer $observer)
+    public function execute(\Magento\Framework\Event\Observer $observer)
     {
         /** @var \ParadoxLabs\TokenBase\Model\Card $card */
         $card = $this->registry->registry('queue_card_deletion');
@@ -49,7 +49,5 @@ class CardLoad
                  ->setData('no_sync', true)
                  ->save();
         }
-
-        return $this;
     }
 }

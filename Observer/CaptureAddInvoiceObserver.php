@@ -11,28 +11,26 @@
  * @license     http://store.paradoxlabs.com/license.html
  */
 
-namespace ParadoxLabs\TokenBase\Model\Observer;
+namespace ParadoxLabs\TokenBase\Observer;
 
 /**
  * In core, invoice is not directly accessible from the payment. What's with that?.
  */
-class Capture
+class CaptureAddInvoiceObserver implements \Magento\Framework\Event\ObserverInterface
 {
     /**
      * Add invoice to payment info instance on capture
      *
      * @param \Magento\Framework\Event\Observer $observer
-     * @return $this
+     * @return void
      */
-    public function processCapture(\Magento\Framework\Event\Observer $observer)
+    public function execute(\Magento\Framework\Event\Observer $observer)
     {
-        $payment    = $observer->getEvent()->getData('payment');
-        $invoice    = $observer->getEvent()->getData('invoice');
+        $payment = $observer->getEvent()->getData('payment');
+        $invoice = $observer->getEvent()->getData('invoice');
 
-        if (!$payment->hasInvoice()) {
-            $payment->setInvoice($invoice);
+        if (!$payment->hasData('invoice')) {
+            $payment->setData('invoice', $invoice);
         }
-
-        return $this;
     }
 }

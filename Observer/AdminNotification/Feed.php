@@ -11,7 +11,7 @@
  * @license     http://store.paradoxlabs.com/license.html
  */
 
-namespace ParadoxLabs\TokenBase\Model\Observer\AdminNotification;
+namespace ParadoxLabs\TokenBase\Observer\AdminNotification;
 
 /**
  * Check for extension updates/notifications and add any to the system.
