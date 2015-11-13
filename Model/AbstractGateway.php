@@ -39,6 +39,11 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel
     protected $testMode;
 
     /**
+     * @var bool
+     */
+    protected $verifySsl;
+
+    /**
      * $fields defines validation for each API parameter or input.
      *
      * key => array(
@@ -159,6 +164,7 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel
     {
         $this->secretKey    = isset($parameters['secret_key']) ? $parameters['secret_key'] : '';
         $this->testMode     = isset($parameters['test_mode']) ? (bool)$parameters['test_mode'] : false;
+        $this->verifySsl    = isset($parameters['verify_ssl']) ? (bool)$parameters['verify_ssl'] : false;
 
         $this->defaults     = [
             'login'     => $parameters['login'],

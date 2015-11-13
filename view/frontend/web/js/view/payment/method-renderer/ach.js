@@ -1,7 +1,3 @@
-/**
- * Copyright © 2015 Magento. All rights reserved.
- * See COPYING.txt for license details.
- */
 define(
     [
         'ko',
@@ -22,7 +18,7 @@ define(
             defaults: {
                 template: 'ParadoxLabs_TokenBase/payment/ach',
                 isAchFormShown: true,
-                save: config ? config.canSaveCard : false,
+                save: config ? config.canSaveCard && config.defaultSaveCard : false,
                 selectedCard: config ? config.selectedCard : '',
                 storedCards: config ? config.storedCards : {},
                 achAccountTypes: config ? config.achAccountTypes : {},
@@ -35,8 +31,9 @@ define(
                 echeckAccountType: ''
             },
             initVars: function() {
-                this.canSaveCard    = config ? config.canSaveCard : false;
-                this.forceSaveCard  = config ? config.forceSaveCard : false;
+                this.canSaveCard     = config ? config.canSaveCard : false;
+                this.forceSaveCard   = config ? config.forceSaveCard : false;
+                this.defaultSaveCard = config ? config.defaultSaveCard : false;
             },
             /**
              * @override

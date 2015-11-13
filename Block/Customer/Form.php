@@ -230,4 +230,14 @@ class Form extends \Magento\Customer\Block\Address\Edit
 
         return $this->ccBlock;
     }
+
+    /**
+     * Retrieve the Customer Data using the customer Id from the customer session.
+     *
+     * @return \Magento\Customer\Api\Data\CustomerInterface
+     */
+    public function getCustomer()
+    {
+        return $this->helper->getCurrentCustomer();
+    }
 }

@@ -82,7 +82,7 @@ $storedCards    = $block->getStoredCards();
                 <div class="admin__field-control control">
                     <?php if ($block->getMethod()->getConfigData('allow_unsaved')): ?>
                         <input type="hidden" name="payment[save]" value="0" />
-                        <input type="checkbox" title="<?php echo __('Save for next time') ?>" class="input-checkbox" id="<?php echo $code ?>-save" name="payment[save]" value="1" <?php if ($block->getInfoData('save') !== 0): ?>checked="checked"<?php endif; ?> />
+                        <input type="checkbox" title="<?php echo __('Save for next time') ?>" class="input-checkbox" id="<?php echo $code ?>-save" name="payment[save]" value="1" <?php if ($block->getMethod()->getConfigData('savecard_opt_out') && $block->getInfoData('save') !== 0): ?>checked="checked"<?php endif; ?> />
                         <label for="<?php echo $code ?>-save"><?php echo __('Save for next time') ?></label>
                     <?php else: ?>
                         <input type="hidden" name="payment[save]" value="1" />

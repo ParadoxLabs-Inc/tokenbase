@@ -1,7 +1,3 @@
-/**
- * Copyright © 2015 Magento. All rights reserved.
- * See COPYING.txt for license details.
- */
 define(
     [
         'ko',
@@ -20,7 +16,7 @@ define(
             defaults: {
                 template: 'ParadoxLabs_TokenBase/payment/cc',
                 isCcFormShown: true,
-                save: config ? config.canSaveCard : false,
+                save: config ? config.canSaveCard && config.defaultSaveCard : false,
                 selectedCard: config ? config.selectedCard : '',
                 storedCards: config ? config.storedCards : {},
                 availableCardTypes: config ? config.availableCardTypes : {},
@@ -29,9 +25,10 @@ define(
                 logoImage: config ? config.logoImage : false
             },
             initVars: function() {
-                this.canSaveCard    = config ? config.canSaveCard : false;
-                this.forceSaveCard  = config ? config.forceSaveCard : false;
-                this.requireCcv     = config ? config.requireCcv : false;
+                this.canSaveCard     = config ? config.canSaveCard : false;
+                this.forceSaveCard   = config ? config.forceSaveCard : false;
+                this.defaultSaveCard = config ? config.defaultSaveCard : false;
+                this.requireCcv      = config ? config.requireCcv : false;
             },
             /**
              * @override
@@ -67,14 +64,14 @@ define(
             getData: function () {
                 return {
                     'method': this.item.method,
-                    'cc_type': this.selectedCardType() != '' ? this.selectedCardType() : this.creditCardType(),
-                    'cc_exp_year': this.creditCardExpYear(),
-                    'cc_exp_month': this.creditCardExpMonth(),
-                    'cc_number': this.creditCardNumber(),
                     additional_data: {
                         'save': this.save(),
+                        'cc_type': this.selectedCardType() != '' ? this.selectedCardType() : this.creditCardType(),
+                        'cc_exp_year': this.creditCardExpYear(),
+                        'cc_exp_month': this.creditCardExpMonth(),
+                        'cc_number': this.creditCardNumber(),
                         'cc_cid': this.creditCardVerificationNumber(),
-                        'card_id': this.selectedCard()
+                        'card_id': this.selectedCard(),
                     }
                 };
             },

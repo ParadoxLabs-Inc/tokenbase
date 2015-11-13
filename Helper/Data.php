@@ -487,6 +487,22 @@ class Data extends \Magento\Payment\Helper\Data
     }
 
     /**
+     * Check whether we are in a card management account area.
+     *
+     * It's not flawless, but more reliable than trying to detect checkout.
+     *
+     * @return bool
+     */
+    public function getIsAccount()
+    {
+        if ($this->registry->registry('tokenbase_method') !== null) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Turn the given internal card type ID into a proper translated label.
      *
      * @param $type

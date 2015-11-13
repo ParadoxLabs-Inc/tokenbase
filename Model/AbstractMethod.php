@@ -175,6 +175,11 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
     protected $addressHelperFactory;
 
     /**
+     * @var \Magento\Sales\Model\Order\Payment\Transaction\Repository
+     */
+    protected $transactionRepository;
+
+    /**
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory
@@ -184,6 +189,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
      * @param \Magento\Payment\Model\Method\Logger $logger
      * @param \Magento\Framework\Module\ModuleListInterface $moduleList
      * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate
+     * @param \Magento\Sales\Model\Order\Payment\Transaction\Repository $transactionRepostory
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \ParadoxLabs\TokenBase\Model\AbstractGateway $gateway
      * @param CardFactory $cardFactory
@@ -203,6 +209,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
         \Magento\Payment\Model\Method\Logger $logger,
         \Magento\Framework\Module\ModuleListInterface $moduleList,
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate,
+        \Magento\Sales\Model\Order\Payment\Transaction\Repository $transactionRepostory,
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         \ParadoxLabs\TokenBase\Model\AbstractGateway $gateway,
         \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
@@ -215,6 +222,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
         $this->gateway = $gateway;
         $this->cardFactory = $cardFactory;
         $this->addressHelperFactory = $addressHelperFactory;
+        $this->transactionRepository = $transactionRepostory;
         
         $this->setStore($this->helper->getCurrentStoreId());
         
@@ -294,6 +302,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
                 'password'   => $this->getConfigData('trans_key'),
                 'secret_key' => $this->getConfigData('secrey_key'),
                 'test_mode'  => $this->getConfigData('test'),
+                'verify_ssl' => $this->getConfigData('verify_ssl'),
             ));
         }
 
@@ -546,11 +555,16 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
         $response = $this->gateway()->authorize($payment, $amount);
         $this->afterAuthorize($payment, $amount, $response);
 
+        $payment->setTransactionAdditionalInfo(
+            \Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS,
+            $response->getData()
+        );
+
         if ($response->getData('is_fraud') === true) {
             $payment->setIsTransactionPending(true)
                     ->setIsFraudDetected(true)
                     ->setTransactionAdditionalInfo('is_transaction_fraud', true);
-        } else {
+        } elseif ($payment->getOrder()->getStatus() != $this->getConfigData('order_status')) {
             $payment->getOrder()->setStatus($this->getConfigData('order_status'));
         }
 
@@ -560,7 +574,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
             $response->getData('auth_code')
         ));
 
-        $payment->setTransactionId($response->getData('transaction_id'))
+        $payment->setTransactionId($this->getValidTransactionId($payment, $response->getData('transaction_id')))
                 ->setAdditionalInformation(array_merge($payment->getAdditionalInformation(), $response->getData()))
                 ->setIsTransactionClosed(0);
 
@@ -596,7 +610,12 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
         if (!empty($transactionId[1])) {
             $this->gateway()->setHaveAuthorized(true);
             $this->gateway()->setAuthCode($transactionId[1]);
-            $this->gateway()->setTransactionId($transactionId[0]);
+
+            if ($payment->getParentTransactionId() != '') {
+                $this->gateway()->setTransactionId($payment->getParentTransactionId());
+            } else {
+                $this->gateway()->setTransactionId($transactionId[0]);
+            }
         } else {
             $this->gateway()->setHaveAuthorized(false);
         }
@@ -604,7 +623,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
         /**
          * Grab transaction ID from the invoice in case partial invoicing.
          */
-        $realTransactionId    = null;
 
         /** @var \Magento\Sales\Model\Order\Invoice $invoice */
         $invoice = null;
@@ -618,7 +636,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
 
         if (!is_null($invoice)) {
             if ($invoice->getTransactionId() != '') {
-                $realTransactionId = $invoice->getTransactionId();
+                $this->gateway()->setTransactionId($invoice->getTransactionId());
             }
 
             if ($this->getConfigData('send_line_items')) {
@@ -634,28 +652,43 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
         $this->resyncStoredCard($payment);
 
         $this->beforeCapture($payment, $amount);
-        $response = $this->gateway()->capture($payment, $amount, $realTransactionId);
+        $response = $this->gateway()->capture($payment, $amount);
         $this->afterCapture($payment, $amount, $response);
+
+        $payment->setTransactionAdditionalInfo(
+            \Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS,
+            $response->getData()
+        );
 
         if ($response->getData('is_fraud') === true) {
             $payment->setIsTransactionPending(true)
                     ->setIsFraudDetected(true)
                     ->setTransactionAdditionalInfo('is_transaction_fraud', true);
         } elseif ($this->gateway()->getHaveAuthorized() === false) {
-            $payment->getOrder()->setStatus($this->getConfigData('order_status'))
-                                      ->setExtOrderId(sprintf(
-                                          '%s:%s',
-                                          $response->getTransactionId(),
-                                          $response->getAuthCode()
-                                      ));
+            if ($payment->getOrder()->getStatus() != $this->getConfigData('order_status')) {
+                $payment->getOrder()->setStatus($this->getConfigData('order_status'));
+            }
+
+            $payment->getOrder()->setExtOrderId(sprintf(
+                 '%s:%s',
+                 $response->getTransactionId(),
+                 $response->getAuthCode()
+            ));
         }
 
-        if ($response->getData('is_fraud') !== true) {
-            $payment->setIsTransactionClosed(1);
+        $payment->setIsTransactionClosed(0);
+
+        // Set transaction id iff different from the last txn id -- use Magento's generated ID otherwise.
+        if ($payment->getParentTransactionId() != $response->getTransactionId()) {
+            $payment->setTransactionId($this->getValidTransactionId($payment, $response->getTransactionId()));
         }
 
-        $payment->setTransactionId($response->getData('transaction_id'))
-                ->setAdditionalInformation(array_merge($payment->getAdditionalInformation(), $response->getData()));
+        if ($this->gateway()->getHaveAuthorized()) {
+            $payment->setData('parent_transaction_id', $this->gateway()->getTransactionId());
+            $payment->setShouldCloseParentTransaction(1);
+        }
+
+        $payment->setAdditionalInformation(array_merge($payment->getAdditionalInformation(), $response->getData()));
 
         $this->getCard()->updateLastUse()->save();
 
@@ -683,39 +716,68 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
             return $this;
         }
 
+        /** @var \Magento\Sales\Model\Order\Creditmemo $creditmemo */
+        $creditmemo = $payment->getData('creditmemo');
+
         /**
          * Grab transaction ID from the order
          */
-        $transactionId = explode(':', $payment->getOrder()->getExtOrderId());
+        if ($payment->getParentTransactionId() != '') {
+            $transactionId = substr(
+                $payment->getParentTransactionId(),
+                0,
+                strcspn($payment->getParentTransactionId(), '-')
+            );
+        } else {
+            if ($creditmemo && $creditmemo->getInvoice()->getTransactionId() != '') {
+                $transactionId = $creditmemo->getInvoice()->getTransactionId();
+            } else {
+                $transactionId = explode(':', $payment->getOrder()->getExtOrderId());
+                $transactionId = $transactionId[0];
+            }
+        }
 
-        $this->gateway()->setTransactionId($transactionId[0]);
+        $this->gateway()->setTransactionId($transactionId);
 
         /**
-         * Grab transaction ID from the invoice in case partial invoicing.
+         * Add line items.
          */
-        $realTransactionId    = null;
-        $creditmemo           = $payment->getData('creditmemo');
-        if (!is_null($creditmemo)) {
-            if ($creditmemo->getData('invoice')->getTransactionId() != '') {
-                $realTransactionId = $creditmemo->getData('invoice')->getTransactionId();
-            }
-
-            if ($this->getConfigData('send_line_items')) {
+        if ($this->getConfigData('send_line_items')) {
+            if ($creditmemo) {
                 $this->gateway()->setLineItems($creditmemo->getAllItems());
+            } else {
+                $this->gateway()->setLineItems($payment->getOrder()->getAllVisibleItems());
             }
-        } elseif ($this->getConfigData('send_line_items')) {
-            $this->gateway()->setLineItems($payment->getOrder()->getAllVisibleItems());
         }
 
         /**
          * Process transaction and results
          */
         $this->beforeRefund($payment, $amount);
-        $response = $this->gateway()->refund($payment, $amount, $realTransactionId);
+        $response = $this->gateway()->refund($payment, $amount);
         $this->afterRefund($payment, $amount, $response);
 
-        $payment->setIsTransactionClosed(1)
-                ->setAdditionalInformation(array_merge($payment->getAdditionalInformation(), $response->getData()));
+        $payment->setAdditionalInformation(array_merge($payment->getAdditionalInformation(), $response->getData()))
+                ->setIsTransactionClosed(1);
+
+        $payment->setTransactionAdditionalInfo(
+            \Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS,
+            $response->getData()
+        );
+
+        if ($response->getTransactionId() != '' && $response->getTransactionId() != $transactionId) {
+            $payment->setTransactionId($this->getValidTransactionId($payment, $response->getTransactionId()));
+        } else {
+            $payment->setTransactionId($this->getValidTransactionId($payment, $transactionId . '-refund'));
+        }
+
+        if ($creditmemo
+            && $creditmemo->getInvoice()
+            && $creditmemo->getInvoice()->getBaseTotalRefunded() < $creditmemo->getInvoice()->getBaseGrandTotal()) {
+            $payment->setShouldCloseParentTransaction(0);
+        } else {
+            $payment->setShouldCloseParentTransaction(1);
+        }
 
         $this->getCard()->updateLastUse()->save();
 
@@ -741,9 +803,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
         /**
          * Grab transaction ID from the order
          */
-        $transactionId = explode(':', $payment->getOrder()->getExtOrderId());
-
-        $this->gateway()->setTransactionId($transactionId[0]);
+        $this->gateway()->setTransactionId($payment->getParentTransactionId());
 
         /**
          * Process transaction and results
@@ -753,24 +813,21 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
         $this->afterVoid($payment, $response);
 
         if ($response->getData('transaction_id') != '' && $response->getData('transaction_id') != '0') {
-            $transactionId = $response->getData('transaction_id');
+            $transactionId = $response->getTransactionId();
         } else {
-            $transactionId = $transactionId[0].'-2';
+            $transactionId = $payment->getTransactionId();
         }
 
         $payment->getOrder()->setExtOrderId($transactionId);
 
-        $payment->getOrder()->addStatusToHistory(
-            false,
-            __('Voided transaction ID "%1"', $this->gateway()->getTransactionId()),
-            false
-        );
-
-        $payment->setTransactionId($transactionId)
-                ->setAdditionalInformation(array_merge($payment->getAdditionalInformation(), $response->getData()))
+        $payment->setAdditionalInformation(array_merge($payment->getAdditionalInformation(), $response->getData()))
                 ->setShouldCloseParentTransaction(1)
-                ->setIsTransactionClosed(1)
-                ->save();
+                ->setIsTransactionClosed(1);
+
+        $payment->setTransactionAdditionalInfo(
+            \Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS,
+            $response->getData()
+        );
 
         $this->getCard()->updateLastUse()->save();
 
@@ -826,7 +883,43 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
 
         $this->log(json_encode($response->getData()));
 
-        return parent::fetchTransactionInfo($payment, $transactionId);
+        return array_merge(parent::fetchTransactionInfo($payment, $transactionId), $response->getData());
+    }
+
+    /**
+     * We can't have two transactions with the same ID. Make sure that doesn't happen.
+     *
+     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param string $transactionId
+     * @return string
+     */
+    protected function getValidTransactionId(\Magento\Payment\Model\InfoInterface $payment, $transactionId)
+    {
+        /** @var \Magento\Sales\Model\Order\Payment $payment */
+
+        $baseId        = $transactionId;
+        $increment    = 1;
+
+        /**
+         * Try to load a transaction by ID, incrementing until we get one that does not exist.
+         * will try txnId, txnId-1, txnId-2, etc.
+         */
+        do {
+            $found = false;
+
+            $transaction = $this->transactionRepository->getByTransactionId(
+                $transactionId,
+                $payment->getId(),
+                $payment->getOrder()->getId()
+            );
+
+            if ($transaction !== false) {
+                $found = true;
+                $transactionId = $baseId . '-' . $increment++;
+            }
+        } while ($found == true);
+
+        return $transactionId;
     }
 
     /**
