@@ -12,7 +12,7 @@
             <block class="Magento\Framework\View\Element\Template" name="customer_account_dashboard_top" as="top" />
 
             <!-- The active payment method can inject itself into this wrapper with handle customer_paymentinfo_index_{method}. -->
-            <block class="ParadoxLabs\TokenBase\Block\Customer\Wrapper" name="tokenbase_customer_wrapper" template="ParadoxLabs_TokenBase::customer/wrapper.phtml" />
+            <block class="ParadoxLabs\TokenBase\Block\Customer\Wrapper" name="tokenbase_customer_wrapper" template="ParadoxLabs_TokenBase::customer/wrapper.phtml" cacheable="false" />
         </referenceContainer>
     </body>
 </page>

@@ -502,7 +502,7 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel
      * @param string $transactionId
      * @return \ParadoxLabs\TokenBase\Model\Gateway\Response
      */
-    abstract public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount, $transactionId);
+    abstract public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount, $transactionId = null);
 
     /**
      * Run a refund transaction for $amount with the given payment info
@@ -512,7 +512,7 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel
      * @param string $transactionId
      * @return \ParadoxLabs\TokenBase\Model\Gateway\Response
      */
-    abstract public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount, $transactionId);
+    abstract public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount, $transactionId = null);
 
     /**
      * Run a void transaction for the given payment info

@@ -476,10 +476,10 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
      */
     public function validate()
     {
-        $this->log(sprintf('validate(%s)', $this->getInfoInstance()->getData('tokenbase_id')));
-
         /** @var \Magento\Sales\Model\Order\Payment\Info $info */
         $info = $this->getInfoInstance();
+
+        $this->log(sprintf('validate(%s)', $info->getData('tokenbase_id')));
 
         /**
          * If no tokenbase ID, we must have a new card. Make sure all the details look valid.
@@ -524,9 +524,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
      */
     public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
-        $this->log(sprintf('authorize(%s %s, %s)', get_class($payment), $payment->getId(), $amount));
-
         /** @var \Magento\Sales\Model\Order\Payment $payment */
+
+        $this->log(sprintf('authorize(%s %s, %s)', get_class($payment), $payment->getId(), $amount));
 
         $this->loadOrCreateCard($payment);
 
@@ -594,9 +594,10 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
      */
     public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
+        /** @var \Magento\Sales\Model\Order\Payment $payment */
+
         $this->log(sprintf('capture(%s %s, %s)', get_class($payment), $payment->getId(), $amount));
 
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
         $this->loadOrCreateCard($payment);
 
         if ($amount <= 0) {
@@ -670,9 +671,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
             }
 
             $payment->getOrder()->setExtOrderId(sprintf(
-                 '%s:%s',
-                 $response->getTransactionId(),
-                 $response->getAuthCode()
+                '%s:%s',
+                $response->getTransactionId(),
+                $response->getAuthCode()
             ));
         }
 
@@ -794,9 +795,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
      */
     public function void(\Magento\Payment\Model\InfoInterface $payment)
     {
-        $this->log(sprintf('void(%s %s)', get_class($payment), $payment->getId()));
-
         /** @var \Magento\Sales\Model\Order\Payment $payment */
+
+        $this->log(sprintf('void(%s %s)', get_class($payment), $payment->getId()));
 
         $this->loadOrCreateCard($payment);
 
@@ -844,6 +845,8 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
      */
     public function cancel(\Magento\Payment\Model\InfoInterface $payment)
     {
+        /** @var \Magento\Sales\Model\Order\Payment $payment */
+
         $this->log(sprintf('cancel(%s %s)', get_class($payment), $payment->getId()));
 
         return $this->void($payment);
@@ -932,9 +935,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
      */
     protected function loadOrCreateCard(\Magento\Payment\Model\InfoInterface $payment)
     {
-        $this->log(sprintf('loadOrCreateCard(%s %s)', get_class($payment), $payment->getId()));
-
         /** @var \Magento\Sales\Model\Order\Payment $payment */
+
+        $this->log(sprintf('loadOrCreateCard(%s %s)', get_class($payment), $payment->getId()));
 
         if (!is_null($this->getCard())) {
             $this->setCard($this->getCard());
@@ -997,6 +1000,8 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
      */
     protected function paymentContainsCard(\Magento\Payment\Model\InfoInterface $payment)
     {
+        /** @var \Magento\Sales\Model\Order\Payment $payment */
+
         if ($payment->hasData('cc_number') && $payment->hasData('cc_exp_year') && $payment->hasData('cc_exp_month')) {
             return true;
         }
@@ -1012,6 +1017,8 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
      */
     protected function resyncStoredCard(\Magento\Payment\Model\InfoInterface $payment)
     {
+        /** @var \Magento\Sales\Model\Order\Payment $payment */
+
         $this->log(sprintf('resyncStoredCard(%s %s)', get_class($payment), $payment->getId()));
 
         if ($this->getCard() instanceof \ParadoxLabs\TokenBase\Model\Card && $this->getCard()->getId() > 0) {

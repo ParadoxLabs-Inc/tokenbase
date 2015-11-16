@@ -13,8 +13,6 @@
 
 namespace ParadoxLabs\TokenBase\Controller\Paymentinfo;
 
-use Magento\Customer\Api\CustomerRepositoryInterface;
-use Magento\Framework\Api\DataObjectHelper;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Exception\LocalizedException;
@@ -39,8 +37,6 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
      * @param Context $context
      * @param Session $customerSession
      * @param PageFactory $resultPageFactory
-     * @param CustomerRepositoryInterface $customerRepository
-     * @param DataObjectHelper $dataObjectHelper
      * @param \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator
      * @param \Magento\Framework\Registry $registry
      * @param \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory
@@ -53,8 +49,6 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
         Context $context,
         Session $customerSession,
         PageFactory $resultPageFactory,
-        CustomerRepositoryInterface $customerRepository,
-        DataObjectHelper $dataObjectHelper,
         \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator,
         \Magento\Framework\Registry $registry,
         \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
@@ -70,8 +64,6 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
             $context,
             $customerSession,
             $resultPageFactory,
-            $customerRepository,
-            $dataObjectHelper,
             $formKeyValidator,
             $registry,
             $cardFactory,

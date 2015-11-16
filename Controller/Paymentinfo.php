@@ -13,8 +13,6 @@
 
 namespace ParadoxLabs\TokenBase\Controller;
 
-use Magento\Customer\Api\CustomerRepositoryInterface;
-use Magento\Framework\Api\DataObjectHelper;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
@@ -22,7 +20,7 @@ use Magento\Framework\View\Result\PageFactory;
 /**
  * Paymentinfo abstract controller
  */
-abstract class Paymentinfo extends \Magento\Customer\Controller\Account\Edit
+abstract class Paymentinfo extends \Magento\Customer\Controller\AbstractAccount
 {
     /**
      * @var \Magento\Framework\Registry
@@ -50,11 +48,19 @@ abstract class Paymentinfo extends \Magento\Customer\Controller\Account\Edit
     protected $addressHelper;
 
     /**
+     * @var Session
+     */
+    protected $session;
+
+    /**
+     * @var PageFactory
+     */
+    protected $resultPageFactory;
+
+    /**
      * @param Context $context
      * @param Session $customerSession
      * @param PageFactory $resultPageFactory
-     * @param CustomerRepositoryInterface $customerRepository
-     * @param DataObjectHelper $dataObjectHelper
      * @param \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator
      * @param \Magento\Framework\Registry $registry
      * @param \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory
@@ -65,8 +71,6 @@ abstract class Paymentinfo extends \Magento\Customer\Controller\Account\Edit
         Context $context,
         Session $customerSession,
         PageFactory $resultPageFactory,
-        CustomerRepositoryInterface $customerRepository,
-        DataObjectHelper $dataObjectHelper,
         \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator,
         \Magento\Framework\Registry $registry,
         \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
@@ -78,13 +82,11 @@ abstract class Paymentinfo extends \Magento\Customer\Controller\Account\Edit
         $this->helper = $helper;
         $this->cardFactory = $cardFactory;
         $this->addressHelper = $addressHelper;
+        $this->session = $customerSession;
+        $this->resultPageFactory = $resultPageFactory;
 
         parent::__construct(
-            $context,
-            $customerSession,
-            $resultPageFactory,
-            $customerRepository,
-            $dataObjectHelper
+            $context
         );
     }
 

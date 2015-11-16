@@ -2,48 +2,40 @@
 /** @var \ParadoxLabs\TokenBase\Block\Customer\Cards $block */
 // @codingStandardsIgnoreFile
 ?>
-<div class="block block-addresses-default">
+<div class="block block-addresses-list">
     <div class="block-title">
         <h2><?php echo $block->getPaymentMethodTitle(); ?></h2>
     </div>
-    <div class="block-content">
+    <div class="block-content items addresses">
     <?php if (count($block->getCards()) > 0): ?>
         <?php /** @var \ParadoxLabs\TokenBase\Model\Card $card */ ?>
         <?php foreach ($block->getCards() as $card): ?>
             <?php $card = $card->getTypeInstance(); ?>
-            <div class="box-address-billing <?php if ($card->getExpires() != '' && strtotime($card->getExpires()) < time()): ?>expired<?php endif; ?>">
-                <div class="box-title">
-                    <span>
-                        <?php echo $card->getLabel(); ?>
-                    </span>
+            <fieldset class="box-address-billing fieldset<?php if ($card->getExpires() != '' && strtotime($card->getExpires()) < time()): ?> expired<?php endif; ?>">
+                <legend class="box-title legend">
+                    <strong>
+                        <span>
+                            <?php echo $card->getLabel(); ?>
+                        </span>
+                    </strong>
                     <?php if ($card->getExpires() != ''): ?>
                         <small><?php echo __('(Expires %1)', date('m/Y', strtotime($card->getExpires()))); ?></small>
                     <?php endif; ?>
-                </div>
+                </legend>
                 <div class="box-content">
                     <address>
                         <?php echo $block->getFormattedCardAddress($card->getAddressObject()); ?>
                     </address>
-                    <div class="box-actions">
+                    <div class="item actions">
                         <?php if ($card->isInUse()): ?>
                             <abbr title="<?php echo __('This payment record cannot be modified while associated with pending orders.'); ?>"><?php echo __('Card In Use'); ?></abbr>
                         <?php else: ?>
-                            <form action="<?php echo $block->getUrl('*/*', ['_secure' => true, 'method' => $card->getMethod()]) ?>" method="post">
-                                <?php echo $block->getBlockHtml('formkey'); ?>
-                                <input type="hidden" name="id" value="<?php echo $card->getHash() ?>" />
-                                <input type="hidden" name="method" value="<?php echo $card->getMethod(); ?>" />
-                                <button class="button" type="submit"><span><span><?php echo __('Edit'); ?></span></span></button>
-                            </form>
-                            <form action="<?php echo $block->getUrl('*/*/delete', ['_secure' => true, 'method' => $card->getMethod()]) ?>" method="post">
-                                <?php echo $block->getBlockHtml('formkey'); ?>
-                                <input type="hidden" name="id" value="<?php echo $card->getHash() ?>" />
-                                <input type="hidden" name="method" value="<?php echo $card->getMethod(); ?>" />
-                                <button class="button" type="submit"><span><span><?php echo __('Delete'); ?></span></span></button>
-                            </form>
+                            <a class="action edit" href="<?php echo $block->getUrl('*/*', ['_secure' => true, 'form_key' => $block->getFormKey(), 'method' => $card->getMethod(), 'id' => $card->getHash()]) ?>"><span><?php echo __('Edit') ?></span></a>
+                            <a class="action delete" href="<?php echo $block->getUrl('*/*/delete', ['_secure' => true, 'form_key' => $block->getFormKey(), 'method' => $card->getMethod(), 'id' => $card->getHash()]) ?>"><span><?php echo __('Delete') ?></span></a>
                         <?php endif; ?>
                     </div>
                 </div>
-            </div>
+            </fieldset>
         <?php endforeach; ?>
     <?php else: ?>
         <p><?php echo __('You do not have any payment data saved yet.') ?></p>

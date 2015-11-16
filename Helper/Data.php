@@ -302,9 +302,10 @@ class Data extends \Magento\Payment\Helper\Data
             $customer = $this->registry->registry('current_customer');
         } else {
             // We don't necessarily want to inject this since that would initialize the session every time.
-            $customerSession = $this->objectManager->get('Magento\Customer\Model\Session');
-            if ($customerSession->getCustomerId() > 0) {
-                $customer->load($customerSession->getCustomerId());
+            /** @var \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer */
+            $currentCustomer = $this->objectManager->get('Magento\Customer\Helper\Session\CurrentCustomer');
+            if ($currentCustomer->getCustomerId() > 0) {
+                $customer = $currentCustomer->getCustomer();
             }
         }
 

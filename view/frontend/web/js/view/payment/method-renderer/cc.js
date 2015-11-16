@@ -71,7 +71,7 @@ define(
                         'cc_exp_month': this.creditCardExpMonth(),
                         'cc_number': this.creditCardNumber(),
                         'cc_cid': this.creditCardVerificationNumber(),
-                        'card_id': this.selectedCard(),
+                        'card_id': this.selectedCard()
                     }
                 };
             },

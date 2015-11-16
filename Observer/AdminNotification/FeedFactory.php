@@ -19,20 +19,6 @@ namespace ParadoxLabs\TokenBase\Observer\AdminNotification;
 class FeedFactory extends \Magento\AdminNotification\Model\FeedFactory
 {
     /**
-     * Object Manager instance
-     *
-     * @var \Magento\Framework\ObjectManagerInterface
-     */
-    protected $_objectManager = null;
-
-    /**
-     * Instance name to create
-     *
-     * @var string
-     */
-    protected $_instanceName = null;
-
-    /**
      * Factory constructor
      *
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
@@ -42,8 +28,7 @@ class FeedFactory extends \Magento\AdminNotification\Model\FeedFactory
         \Magento\Framework\ObjectManagerInterface $objectManager,
         $instanceName = '\\ParadoxLabs\\TokenBase\\Observer\\AdminNotification\\Feed'
     ) {
-        $this->_objectManager = $objectManager;
-        $this->_instanceName = $instanceName;
+        parent::__construct($objectManager, $instanceName);
     }
 
     /**
@@ -54,6 +39,6 @@ class FeedFactory extends \Magento\AdminNotification\Model\FeedFactory
      */
     public function create(array $data = array())
     {
-        return $this->_objectManager->create($this->_instanceName, $data);
+        return parent::create($data);
     }
 }

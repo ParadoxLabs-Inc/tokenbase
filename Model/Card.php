@@ -458,7 +458,7 @@ class Card extends \Magento\Framework\Model\AbstractModel
      */
     public function loadByHash($hash)
     {
-        return $this->load( $hash, 'hash' );
+        return $this->load($hash, 'hash');
     }
 
     /**
