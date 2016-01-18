@@ -939,23 +939,10 @@ class Card extends \Magento\Framework\Model\AbstractModel
             $dupe = $collection->getFirstItem();
             
             /**
-             * If we find a duplicate, switch to that one, but retain the current customer and active state.
+             * If we find a duplicate, switch to that one, but retain the current info otherwise.
              */
             if ($dupe && $dupe->getId() > 0 && $dupe->getId() != $this->getId()) {
-                $this->helper->log(
-                    $this->getData('method'),
-                    __('Merging duplicate payment data into card %1', $dupe->getId())
-                );
-
-                $customerId     = $this->getData('customer_id');
-                $customerEmail  = $this->getData('customer_email');
-                $active         = !is_null($this->getData('active')) ? $this->getData('active') : 1;
-
-                $this->setData($dupe->getData())
-                    ->setData('customer_id', $customerId)
-                    ->setData('customer_email', $customerEmail)
-                    ->setData('active', intval($active))
-                    ->isObjectNew(false);
+                $this->mergeCardOnto($dupe);
             }
         }
 
@@ -981,6 +968,27 @@ class Card extends \Magento\Framework\Model\AbstractModel
         }
 
         $this->setData('updated_at', $now->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT));
+
+        return $this;
+    }
+
+    /**
+     * Mege the current card info over the given one. Retain the given card's ID.
+     *
+     * It is assumed that the current card and the one given have the same gateway reference.
+     *
+     * @param Card $card Card to merge current data onto.
+     * @return $this
+     */
+    protected function mergeCardOnto(\ParadoxLabs\TokenBase\Model\Card $card)
+    {
+        $this->helper->log(
+            $this->getData('method'),
+            __('Merging duplicate payment data into card %1', $card->getId())
+        );
+
+        $this->setId($card->getId());
+        $this->isObjectNew(false);
 
         return $this;
     }

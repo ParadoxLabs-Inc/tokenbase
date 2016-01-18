@@ -16,16 +16,14 @@
         "monolog/monolog": "~1.11"
     },
     "type": "magento2-module",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "license": [
         "proprietary"
     ],
-    "extra": {
-        "map": [
-            [
-                "*",
-                "ParadoxLabs/TokenBase"
-            ]
-        ]
+    "autoload": {
+        "files": [ "registration.php" ],
+        "psr-4": {
+            "ParadoxLabs\\TokenBase\\": ""
+        }
     }
 }

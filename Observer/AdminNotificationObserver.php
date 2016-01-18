@@ -16,7 +16,7 @@ namespace ParadoxLabs\TokenBase\Observer;
 /**
  * Check for extension updates/notifications
  */
-class AdminNotificationObserver extends \Magento\AdminNotification\Observer\PredispathAdminActionControllerObserver
+class AdminNotificationObserver extends \Magento\AdminNotification\Observer\PredispatchAdminActionControllerObserver
 {
     /**
      * We inject our feed factory via DI. magic.

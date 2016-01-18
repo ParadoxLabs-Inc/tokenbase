@@ -270,7 +270,7 @@ class Data extends \Magento\Payment\Helper\Data
         if (!is_null($this->currentCustomer)) {
             return $this->currentCustomer;
         }
-        
+
         $customer = $this->customerFactory->create();
 
         if (!$this->getIsFrontend()) {
@@ -570,6 +570,30 @@ class Data extends \Magento\Payment\Helper\Data
     }
 
     /**
+     * Pull a value from a nested array safely (without notices, default fallback)
+     *
+     * @param  array  $data    source array
+     * @param  string $path    path to pull, separated by slashes
+     * @param  string $default default response (if key DNE)
+     * @return mixed           target value or default
+     */
+    public function getArrayValue($data, $path, $default = '')
+    {
+        $path = explode('/', $path);
+        $val =& $data;
+
+        foreach ($path as $key) {
+            if (!isset($val[$key])) {
+                return $default;
+            }
+
+            $val =& $val[$key];
+        }
+
+        return $val;
+    }
+
+    /**
      * Write a message to the logs, nice and abstractly.
      *
      * @param string $code
@@ -582,13 +606,13 @@ class Data extends \Magento\Payment\Helper\Data
         if (is_object($message)) {
             if ($message instanceof \Magento\Framework\DataObject) {
                 $message = $message->getData();
-                
+
                 $this->cleanupArray($message);
             } else {
                 $message = (array)$message;
             }
         }
-        
+
         if (is_array($message)) {
             $message = print_r($message, 1);
         }

@@ -539,7 +539,12 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
          */
         $transactionId = explode(':', $payment->getOrder()->getExtOrderId());
         if (!empty($transactionId[1])) {
+            $parentTransactionId = $payment->getParentTransactionId();
+            $payment->setData('parent_transaction_id', $transactionId[0]);
+
             $this->void($payment);
+
+            $payment->setData('parent_transaction_id', $parentTransactionId);
         }
 
         /**
@@ -575,7 +580,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
         ));
 
         $payment->setTransactionId($this->getValidTransactionId($payment, $response->getData('transaction_id')))
-                ->setAdditionalInformation(array_merge($payment->getAdditionalInformation(), $response->getData()))
+                ->setAdditionalInformation(
+                    array_replace_recursive($payment->getAdditionalInformation(), $response->getData())
+                )
                 ->setIsTransactionClosed(0);
 
         $this->getCard()->updateLastUse()->save();
@@ -689,7 +696,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
             $payment->setShouldCloseParentTransaction(1);
         }
 
-        $payment->setAdditionalInformation(array_merge($payment->getAdditionalInformation(), $response->getData()));
+        $payment->setAdditionalInformation(
+            array_replace_recursive($payment->getAdditionalInformation(), $response->getData())
+        );
 
         $this->getCard()->updateLastUse()->save();
 
@@ -758,7 +767,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
         $response = $this->gateway()->refund($payment, $amount);
         $this->afterRefund($payment, $amount, $response);
 
-        $payment->setAdditionalInformation(array_merge($payment->getAdditionalInformation(), $response->getData()))
+        $payment->setAdditionalInformation(
+                    array_replace_recursive($payment->getAdditionalInformation(), $response->getData())
+                )
                 ->setIsTransactionClosed(1);
 
         $payment->setTransactionAdditionalInfo(
@@ -821,7 +832,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
 
         $payment->getOrder()->setExtOrderId($transactionId);
 
-        $payment->setAdditionalInformation(array_merge($payment->getAdditionalInformation(), $response->getData()))
+        $payment->setAdditionalInformation(
+                    array_replace_recursive($payment->getAdditionalInformation(), $response->getData())
+                )
                 ->setShouldCloseParentTransaction(1)
                 ->setIsTransactionClosed(1);
 
@@ -886,7 +899,10 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
 
         $this->log(json_encode($response->getData()));
 
-        return array_merge(parent::fetchTransactionInfo($payment, $transactionId), $response->getData());
+        return array_replace_recursive(
+            parent::fetchTransactionInfo($payment, $transactionId),
+            $response->getData()
+        );
     }
 
     /**
