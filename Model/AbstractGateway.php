@@ -13,10 +13,12 @@
 
 namespace ParadoxLabs\TokenBase\Model;
 
+use ParadoxLabs\TokenBase\Api\GatewayInterface;
+
 /**
  * Common API gateway methods, logging, exceptions, etc.
  */
-abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel
+abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel implements GatewayInterface
 {
     /**
      * @var string

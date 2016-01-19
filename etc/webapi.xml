@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <route url="/V1/tokenbase/:cardId" method="GET">
+        <service class="ParadoxLabs\TokenBase\Api\CardRepositoryInterface" method="getById"/>
+        <resources>
+            <resource ref="ParadoxLabs_TokenBase::card"/>
+        </resources>
+    </route>
+    <route url="/V1/tokenbase/search" method="GET">
+        <service class="ParadoxLabs\TokenBase\Api\CardRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="ParadoxLabs_TokenBase::card"/>
+        </resources>
+    </route>
+    <route url="/V1/tokenbase" method="POST">
+        <service class="ParadoxLabs\TokenBase\Api\CardRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="ParadoxLabs_TokenBase::card"/>
+        </resources>
+    </route>
+    <route url="/V1/tokenbase/:cardId" method="PUT">
+        <service class="ParadoxLabs\TokenBase\Api\CardRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="ParadoxLabs_TokenBase::card"/>
+        </resources>
+    </route>
+    <route url="/V1/tokenbase/:cardId" method="DELETE">
+        <service class="ParadoxLabs\TokenBase\Api\CardRepositoryInterface" method="deleteById"/>
+        <resources>
+            <resource ref="ParadoxLabs_TokenBase::card"/>
+        </resources>
+    </route>
+</routes>

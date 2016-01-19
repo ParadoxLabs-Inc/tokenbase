@@ -13,10 +13,12 @@
 
 namespace ParadoxLabs\TokenBase\Model;
 
+use ParadoxLabs\TokenBase\Api\MethodInterface;
+
 /**
  * Common actions and behavior for TokenBase payment methods
  */
-abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
+abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implements MethodInterface
 {
     /**
      * @var string
@@ -768,9 +770,10 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
         $this->afterRefund($payment, $amount, $response);
 
         $payment->setAdditionalInformation(
-                    array_replace_recursive($payment->getAdditionalInformation(), $response->getData())
-                )
-                ->setIsTransactionClosed(1);
+            array_replace_recursive($payment->getAdditionalInformation(), $response->getData())
+        );
+
+        $payment->setIsTransactionClosed(1);
 
         $payment->setTransactionAdditionalInfo(
             \Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS,
@@ -833,9 +836,10 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc
         $payment->getOrder()->setExtOrderId($transactionId);
 
         $payment->setAdditionalInformation(
-                    array_replace_recursive($payment->getAdditionalInformation(), $response->getData())
-                )
-                ->setShouldCloseParentTransaction(1)
+            array_replace_recursive($payment->getAdditionalInformation(), $response->getData())
+        );
+
+        $payment->setShouldCloseParentTransaction(1)
                 ->setIsTransactionClosed(1);
 
         $payment->setTransactionAdditionalInfo(

@@ -16,7 +16,7 @@ namespace ParadoxLabs\TokenBase\Model;
 /**
  * Payment record storage
  */
-class Card extends \Magento\Framework\Model\AbstractModel
+class Card extends \Magento\Framework\Model\AbstractModel implements \ParadoxLabs\TokenBase\Api\Data\CardInterface
 {
     /**
      * Prefix of model events names

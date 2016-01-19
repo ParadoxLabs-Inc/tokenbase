@@ -29,6 +29,16 @@ abstract class ApiTest extends \Magento\Config\Block\System\Config\Form\Field
     protected $storeId;
 
     /**
+     * @var \Magento\Store\Model\StoreFactory
+     */
+    protected $storeFactory;
+
+    /**
+     * @var \Magento\Store\Model\WebsiteFactory
+     */
+    protected $websiteFactory;
+
+    /**
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \Magento\Store\Model\StoreFactory $storeFactory

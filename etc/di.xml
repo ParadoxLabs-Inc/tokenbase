@@ -19,4 +19,25 @@
             </argument>
         </arguments>
     </type>
+
+    <!-- Adding tokenbase card repository -->
+    <preference for="ParadoxLabs\TokenBase\Api\Data\CardSearchResultsInterface" type="Magento\Framework\Api\SearchResults" />
+    <preference for="ParadoxLabs\TokenBase\Api\Data\CardInterface" type="ParadoxLabs\TokenBase\Model\Card" />
+    <preference for="ParadoxLabs\TokenBase\Api\CardRepositoryInterface" type="ParadoxLabs\TokenBase\Model\CardRepository" />
+
+    <!-- Adding tokenbase_id field to quote API calls -->
+    <type name="Magento\Quote\Model\Quote">
+        <plugin name="quotePaymentLoadTokenbaseId" type="\ParadoxLabs\TokenBase\Plugin\QuotePaymentLoadTokenbaseId" />
+    </type>
+    <type name="Magento\Quote\Api\CartRepositoryInterface">
+        <plugin name="quotePaymentSaveTokenbaseId" type="\ParadoxLabs\TokenBase\Plugin\QuotePaymentSaveTokenbaseId" />
+    </type>
+
+    <!-- Adding tokenbase_id field to order API calls -->
+    <type name="Magento\Sales\Model\Order">
+        <plugin name="orderPaymentLoadTokenbaseId" type="\ParadoxLabs\TokenBase\Plugin\OrderPaymentLoadTokenbaseId" />
+    </type>
+    <type name="Magento\sales\Api\OrderRepositoryInterface">
+        <plugin name="orderPaymentSaveTokenbaseId" type="\ParadoxLabs\TokenBase\Plugin\OrderPaymentSaveTokenbaseId" />
+    </type>
 </config>

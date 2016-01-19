@@ -174,6 +174,8 @@ class Data extends \Magento\Payment\Helper\Data
     /**
      * Return active payment methods (if any) implementing tokenbase.
      *
+     * @api
+     *
      * @return array
      */
     public function getActiveMethods()
@@ -195,6 +197,8 @@ class Data extends \Magento\Payment\Helper\Data
 
     /**
      * Return all tokenbase-derived payment methods, without an active check.
+     *
+     * @api
      *
      * @return array
      */
@@ -478,7 +482,7 @@ class Data extends \Magento\Payment\Helper\Data
      */
     public function getIsFrontend()
     {
-        // Standard checkout uses the webapi_rest area (???), so we have to include that.
+        // The REST API has to be considered part of the frontend, as standard checkout uses it.
         if ($this->appState->getAreaCode() == \Magento\Framework\App\Area::AREA_FRONTEND
             || $this->appState->getAreaCode() == 'webapi_rest') {
             return true;
@@ -505,6 +509,8 @@ class Data extends \Magento\Payment\Helper\Data
 
     /**
      * Turn the given internal card type ID into a proper translated label.
+     *
+     * @api
      *
      * @param $type
      * @return \Magento\Framework\Phrase
@@ -539,6 +545,8 @@ class Data extends \Magento\Payment\Helper\Data
 
     /**
      * Map CC Type to Magento's. Should be implemented by the child method.
+     *
+     * @api
      *
      * @param string $type
      * @return string|null
