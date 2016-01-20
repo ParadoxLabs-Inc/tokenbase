@@ -171,7 +171,7 @@ class Card extends \Magento\Framework\Model\AbstractModel implements \ParadoxLab
      */
     protected function _construct()
     {
-        $this->_init('ParadoxLabs\Tokenbase\Model\ResourceModel\Card');
+        $this->_init('ParadoxLabs\TokenBase\Model\ResourceModel\Card');
     }
 
     /**

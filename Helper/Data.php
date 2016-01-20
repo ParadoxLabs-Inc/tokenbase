@@ -34,11 +34,6 @@ class Data extends \Magento\Payment\Helper\Data
     protected $appState;
 
     /**
-     * @var \ParadoxLabs\TokenBase\Model\Logger\Logger
-     */
-    protected $tokenbaseLogger;
-
-    /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $storeManager;
@@ -89,6 +84,11 @@ class Data extends \Magento\Payment\Helper\Data
     protected $paymentFactory;
 
     /**
+     * @var \ParadoxLabs\TokenBase\Helper\Operation
+     */
+    protected $operationHelper;
+
+    /**
      * @var array
      */
     protected $cardTypeTranslationMap = [
@@ -127,8 +127,8 @@ class Data extends \Magento\Payment\Helper\Data
      * @param \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory
      * @param \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory
      * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
-     * @param \ParadoxLabs\TokenBase\Model\Logger\Logger $tokenbaseLogger
      * @param \ParadoxLabs\TokenBase\Helper\AddressFactory $addressHelperFactory
+     * @param \ParadoxLabs\TokenBase\Helper\Operation $operationHelper
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
@@ -146,8 +146,8 @@ class Data extends \Magento\Payment\Helper\Data
         \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory,
         \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
         \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory,
-        \ParadoxLabs\TokenBase\Model\Logger\Logger $tokenbaseLogger,
-        \ParadoxLabs\TokenBase\Helper\AddressFactory $addressHelperFactory
+        \ParadoxLabs\TokenBase\Helper\AddressFactory $addressHelperFactory,
+        \ParadoxLabs\TokenBase\Helper\Operation $operationHelper
     ) {
         $this->appState = $appState;
         $this->storeManager = $storeManager;
@@ -157,9 +157,9 @@ class Data extends \Magento\Payment\Helper\Data
         $this->customerFactory = $customerFactory;
         $this->cardFactory = $cardFactory;
         $this->cardCollectionFactory = $cardCollectionFactory;
-        $this->tokenbaseLogger = $tokenbaseLogger;
         $this->addressHelperFactory = $addressHelperFactory;
         $this->paymentFactory = $paymentFactory;
+        $this->operationHelper = $operationHelper;
 
         parent::__construct(
             $context,
@@ -564,17 +564,7 @@ class Data extends \Magento\Payment\Helper\Data
      */
     public function cleanupArray(&$array)
     {
-        if (!$array) {
-            return;
-        }
-
-        foreach ($array as $key => $value) {
-            if (is_object($value)) {
-                unset($array[ $key ]);
-            } elseif (is_array($value)) {
-                $this->cleanupArray($array[ $key ]);
-            }
-        }
+        $this->operationHelper->cleanupArray($array);
     }
 
     /**
@@ -587,18 +577,7 @@ class Data extends \Magento\Payment\Helper\Data
      */
     public function getArrayValue($data, $path, $default = '')
     {
-        $path = explode('/', $path);
-        $val =& $data;
-
-        foreach ($path as $key) {
-            if (!isset($val[$key])) {
-                return $default;
-            }
-
-            $val =& $val[$key];
-        }
-
-        return $val;
+        return $this->operationHelper->getArrayValue($data, $path, $default);
     }
 
     /**
@@ -611,30 +590,6 @@ class Data extends \Magento\Payment\Helper\Data
      */
     public function log($code, $message, $debug = false)
     {
-        if (is_object($message)) {
-            if ($message instanceof \Magento\Framework\DataObject) {
-                $message = $message->getData();
-
-                $this->cleanupArray($message);
-            } else {
-                $message = (array)$message;
-            }
-        }
-
-        if (is_array($message)) {
-            $message = print_r($message, 1);
-        }
-
-        if ($debug === true) {
-            $this->tokenbaseLogger->debug(
-                sprintf('%s [%s]: %s', $code, $this->_remoteAddress->getRemoteAddress(), $message)
-            );
-        } else {
-            $this->tokenbaseLogger->info(
-                sprintf('%s [%s]: %s', $code, $this->_remoteAddress->getRemoteAddress(), $message)
-            );
-        }
-
-        return $this;
+        return $this->operationHelper->log($code, $message, $debug);
     }
 }
