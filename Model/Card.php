@@ -16,7 +16,7 @@ namespace ParadoxLabs\TokenBase\Model;
 /**
  * Payment record storage
  */
-class Card extends \Magento\Framework\Model\AbstractModel implements \ParadoxLabs\TokenBase\Api\Data\CardInterface
+class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements \ParadoxLabs\TokenBase\Api\Data\CardInterface
 {
     /**
      * Prefix of model events names
@@ -113,6 +113,8 @@ class Card extends \Magento\Framework\Model\AbstractModel implements \ParadoxLab
     /**
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
+     * @param \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory
+     * @param \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \Magento\Payment\Helper\Data $paymentHelper
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
@@ -132,6 +134,8 @@ class Card extends \Magento\Framework\Model\AbstractModel implements \ParadoxLab
     public function __construct(
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
+        \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory,
+        \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory,
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         \Magento\Payment\Helper\Data $paymentHelper,
         \Magento\Framework\ObjectManagerInterface $objectManager,
@@ -148,7 +152,15 @@ class Card extends \Magento\Framework\Model\AbstractModel implements \ParadoxLab
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
-        parent::__construct($context, $registry, $resource, $resourceCollection, $data);
+        parent::__construct(
+            $context,
+            $registry,
+            $extensionFactory,
+            $customAttributeFactory,
+            $resource,
+            $resourceCollection,
+            $data
+        );
         
         $this->helper                   = $helper;
         $this->paymentHelper            = $paymentHelper;
@@ -991,5 +1003,27 @@ class Card extends \Magento\Framework\Model\AbstractModel implements \ParadoxLab
         $this->isObjectNew(false);
 
         return $this;
+    }
+
+    /**
+     * Retrieve existing extension attributes object or create a new one.
+     *
+     * @return \ParadoxLabs\TokenBase\Api\Data\CardExtensionInterface|null
+     */
+    public function getExtensionAttributes()
+    {
+        return $this->_getExtensionAttributes();
+    }
+
+    /**
+     * Set an extension attributes object.
+     *
+     * @param \ParadoxLabs\TokenBase\Api\Data\CardExtensionInterface $extensionAttributes
+     * @return $this
+     */
+    public function setExtensionAttributes(
+        \ParadoxLabs\TokenBase\Api\Data\CardExtensionInterface $extensionAttributes
+    ) {
+        return $this->_setExtensionAttributes($extensionAttributes);
     }
 }

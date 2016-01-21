@@ -13,8 +13,6 @@
 
 namespace ParadoxLabs\TokenBase\Observer;
 
-use Magento\Framework\Event\Observer;
-
 /**
  * Custom data field conversion -- quote to order, etc, etc.
  */

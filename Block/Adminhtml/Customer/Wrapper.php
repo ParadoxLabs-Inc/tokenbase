@@ -7,18 +7,16 @@
  * Need help? Open a ticket in our support system:
  *  http://support.paradoxlabs.com
  *
- * @author      Ryan Hoerr <support@paradoxlabs.com>
+ * @author      Ryan Hoerr <magento@paradoxlabs.com>
  * @license     http://store.paradoxlabs.com/license.html
  */
 
-namespace ParadoxLabs\TokenBase\Block\Customer;
-
-use Magento\Framework\View\Element\Template;
+namespace ParadoxLabs\TokenBase\Block\Adminhtml\Customer;
 
 /**
  * Wrapper Class
  */
-class Wrapper extends \Magento\Framework\View\Element\Template
+class Wrapper extends \Magento\Backend\Block\Template
 {
     /**
      * @var \ParadoxLabs\TokenBase\Helper\Data
@@ -31,15 +29,15 @@ class Wrapper extends \Magento\Framework\View\Element\Template
     protected $registry;
 
     /**
-     * Constructor
+     * Wrapper constructor.
      *
-     * @param \Magento\Framework\View\Element\Template\Context $context
+     * @param \Magento\Backend\Block\Template\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param array $data
      */
     public function __construct(
-        \Magento\Framework\View\Element\Template\Context $context,
+        \Magento\Backend\Block\Template\Context $context,
         \Magento\Framework\Registry $registry,
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         array $data = []
