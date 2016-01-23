@@ -2,43 +2,34 @@
 /** @var \ParadoxLabs\TokenBase\Block\Adminhtml\Customer\Cards $block */
 // @codingStandardsIgnoreFile
 ?>
-<div class="block block-addresses-list">
-    <div class="block-title">
-        <h2><?php echo $block->getPaymentMethodTitle(); ?></h2>
-    </div>
-    <div class="block-content items addresses">
-        <?php if (count($block->getCards()) > 0): ?>
-            <?php /** @var \ParadoxLabs\TokenBase\Model\Card $card */ ?>
-            <?php foreach ($block->getCards() as $card): ?>
-                <?php $card = $card->getTypeInstance(); ?>
-                <fieldset class="box-address-billing fieldset<?php if ($card->getExpires() != '' && strtotime($card->getExpires()) < time()): ?> expired<?php endif; ?>">
-                    <legend class="box-title legend">
-                        <strong>
-                        <span>
-                            <?php echo $card->getLabel(); ?>
-                        </span>
-                        </strong>
-                        <?php if ($card->getExpires() != ''): ?>
-                            <small><?php echo __('(Expires %1)', date('m/Y', strtotime($card->getExpires()))); ?></small>
-                        <?php endif; ?>
-                    </legend>
-                    <div class="box-content">
-                        <address>
-                            <?php echo $block->getFormattedCardAddress($card->getAddressObject()); ?>
-                        </address>
-                        <div class="item actions">
-                            <?php if ($card->isInUse()): ?>
-                                <abbr title="<?php echo __('This payment record cannot be modified while associated with pending orders.'); ?>"><?php echo __('Card In Use'); ?></abbr>
-                            <?php else: ?>
-                                <a class="action edit" href="<?php echo $block->getUrl('*/*', ['_secure' => true, 'form_key' => $block->getFormKey(), 'method' => $card->getMethod(), 'id' => $card->getHash()]) ?>"><span><?php echo __('Edit') ?></span></a>
-                                <a class="action delete" href="<?php echo $block->getUrl('*/*/delete', ['_secure' => true, 'form_key' => $block->getFormKey(), 'method' => $card->getMethod(), 'id' => $card->getHash()]) ?>"><span><?php echo __('Delete') ?></span></a>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </fieldset>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <p><?php echo __('The customer does not have any payment data saved yet.') ?></p>
-        <?php endif; ?>
-    </div>
-</div>
+<ul class="address-list ui-tabs-nav">
+    <?php if (count($block->getCards()) > 0): ?>
+        <?php /** @var \ParadoxLabs\TokenBase\Model\Card $card */ ?>
+        <?php foreach ($block->getCards() as $card): ?>
+            <?php $card = $card->getTypeInstance(); ?>
+            <li class="address-list-item<?php if ($card->getExpires() != '' && strtotime($card->getExpires()) < time()): ?> expired<?php endif; ?>">
+                <div class="address-list-item-actions">
+                    <?php if ($card->isInUse()): ?>
+                        <abbr title="<?php echo __('This payment record cannot be modified while associated with pending orders.'); ?>"><?php echo __('Card In Use'); ?></abbr>
+                    <?php else: ?>
+                        <a class="action edit" href="<?php echo $block->getUrl('*/*/*', ['_secure' => true, 'form_key' => $block->getFormKey(), 'method' => $card->getMethod(), 'id' => $card->getHash()]) ?>"><span><?php echo __('Edit') ?></span></a>
+                        <a class="action delete" href="<?php echo $block->getUrl('*/*/paymentinfoDelete', ['_secure' => true, 'form_key' => $block->getFormKey(), 'method' => $card->getMethod(), 'id' => $card->getHash()]) ?>"><span><?php echo __('Delete') ?></span></a>
+                        <button class="action-delete" type="button">
+                            <span>Remove Card</span>
+                        </button>
+                    <?php endif; ?>
+                </div>
+                <address>
+                    <span><?php echo $card->getLabel(); ?></span><br />
+                    <?php if ($card->getExpires() != ''): ?>
+                        <small><?php echo __('(Expires %1)', date('m/Y', strtotime($card->getExpires()))); ?></small>
+                    <?php endif; ?>
+
+                    <?php echo $block->getFormattedCardAddress($card->getAddressObject()); ?>
+                </address>
+            </li>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <p><?php echo __('The customer does not have any payment data saved yet.') ?></p>
+    <?php endif; ?>
+</ul>

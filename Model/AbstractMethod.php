@@ -299,13 +299,13 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
     public function gateway()
     {
         if ($this->gateway->isInitialized() !== true) {
-            $this->gateway->init(array(
+            $this->gateway->init([
                 'login'      => $this->getConfigData('login'),
                 'password'   => $this->getConfigData('trans_key'),
                 'secret_key' => $this->getConfigData('secrey_key'),
                 'test_mode'  => $this->getConfigData('test'),
                 'verify_ssl' => $this->getConfigData('verify_ssl'),
-            ));
+            ]);
         }
 
         return $this->gateway;

@@ -16,7 +16,7 @@
 
 <form action="<?php echo $block->getAction(); ?>" method="post" id="form-validate" data-hasrequired="<?php echo __('* Required Fields') ?>">
     <?php echo $block->getBlockHtml('formkey'); ?>
-    <input type="hidden" name="id" value="<?php echo $block->getCard()->getHash(); ?>" />
+    <input type="hidden" name="id" value="<?php echo $block->getCard()->getId() ? $block->getCard()->getHash() : ''; ?>" />
     <input type="hidden" name="method" value="<?php echo $code; ?>" />
     <fieldset class="fieldset">
         <legend class="legend"><span><?php echo __('Cardholder Information') ?></span></legend><br>

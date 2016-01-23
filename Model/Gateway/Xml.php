@@ -158,6 +158,11 @@ class Xml
      */
     public static function &createArray($input_xml)
     {
+        // Strip out any characters proceeding starting XML tag, flexibility measure
+        if ($input_xml[0] != '<') {
+            $input_xml = substr($input_xml, strcspn($input_xml, '<'));
+        }
+
         $xml = self::getXMLRoot();
         if (is_string($input_xml)) {
             $parsed = @$xml->loadXML($input_xml);

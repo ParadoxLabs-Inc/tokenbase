@@ -204,7 +204,7 @@ class Form extends \Magento\Customer\Block\Address\Edit
      */
     public function getAction()
     {
-        return $this->getUrl('*/*/save', ['_secure' => true]);
+        return $this->getUrl('*/*/paymentinfoSave', ['_secure' => true]);
     }
 
     /**
