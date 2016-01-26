@@ -18,159 +18,146 @@
     <?php echo $block->getBlockHtml('formkey'); ?>
     <input type="hidden" name="card_id" value="<?php echo $block->getCard()->getId() ? $block->getCard()->getHash() : ''; ?>" />
     <input type="hidden" name="method" value="<?php echo $code; ?>" />
-    <fieldset class="fieldset">
+    <fieldset class="admin__fieldset">
         <div class="admin__fieldset-wrapper-title">
             <strong class="title">
                 <span><?php echo __('Cardholder Information') ?></span>
             </strong>
         </div>
-        <div class="admin__fieldset-wrapper-content">
-            <div class="admin__field field-name-firstname _required">
-                <label class="admin__field-label" for="<?php echo $code; ?>-firstname"><span><?php echo __('First Name') ?></span></label>
-                <div class="admin__field-control">
-                    <input type="text" name="billing[firstname]" id="<?php echo $code; ?>-firstname" title="<?php echo __('First Name') ?>" value="<?php echo $block->escapeHtml($block->getAddress()->getFirstname()) ?>" class="admin__control-text <?php echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('firstname') ?>" data-validate='{required:true}'>
-                </div>
+        <div class="admin__field field-name-firstname _required">
+            <label class="admin__field-label" for="<?php echo $code; ?>-firstname"><span><?php echo __('First Name') ?></span></label>
+            <div class="admin__field-control">
+                <input type="text" name="billing[firstname]" id="<?php echo $code; ?>-firstname" title="<?php echo __('First Name') ?>" value="<?php echo $block->escapeHtml($block->getAddress()->getFirstname()) ?>" class="admin__control-text <?php echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('firstname') ?>" data-validate='{required:true}'>
             </div>
-            <div class="admin__field field-name-lastname _required">
-                <label class="admin__field-label" for="<?php echo $code; ?>-lastname"><span><?php echo __('Last Name') ?></span></label>
-                <div class="admin__field-control">
-                    <input type="text" name="billing[lastname]" id="<?php echo $code; ?>-lastname" title="<?php echo __('Last Name') ?>" value="<?php echo $block->escapeHtml($block->getAddress()->getLastname()) ?>" class="admin__control-text <?php echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('lastname') ?>" data-validate='{required:true}'>
-                </div>
+        </div>
+        <div class="admin__field field-name-lastname _required">
+            <label class="admin__field-label" for="<?php echo $code; ?>-lastname"><span><?php echo __('Last Name') ?></span></label>
+            <div class="admin__field-control">
+                <input type="text" name="billing[lastname]" id="<?php echo $code; ?>-lastname" title="<?php echo __('Last Name') ?>" value="<?php echo $block->escapeHtml($block->getAddress()->getLastname()) ?>" class="admin__control-text <?php echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('lastname') ?>" data-validate='{required:true}'>
             </div>
-            <div class="admin__field company">
-                <label class="admin__field-label" for="<?php echo $code; ?>-company"><span><?php echo __('Company') ?></span></label>
-                <div class="admin__field-control">
-                    <input type="text" name="billing[company]" id="<?php echo $code; ?>-company" title="<?php echo __('Company') ?>" value="<?php echo $block->escapeHtml($block->getAddress()->getCompany()) ?>" class="admin__control-text <?php echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('company') ?>">
-                </div>
+        </div>
+        <div class="admin__field company">
+            <label class="admin__field-label" for="<?php echo $code; ?>-company"><span><?php echo __('Company') ?></span></label>
+            <div class="admin__field-control">
+                <input type="text" name="billing[company]" id="<?php echo $code; ?>-company" title="<?php echo __('Company') ?>" value="<?php echo $block->escapeHtml($block->getAddress()->getCompany()) ?>" class="admin__control-text <?php echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('company') ?>">
             </div>
-            <div class="admin__field telephone _required">
-                <label class="admin__field-label" for="<?php echo $code; ?>-telephone"><span><?php echo __('Phone Number') ?></span></label>
-                <div class="admin__field-control">
-                    <input type="text" name="billing[telephone]" value="<?php echo $block->escapeHtml($block->getAddress()->getTelephone()) ?>" title="<?php echo __('Phone Number') ?>" class="admin__control-text <?php echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('telephone') ?>" id="<?php echo $code; ?>-telephone" data-validate='{required:true}'>
-                </div>
+        </div>
+        <div class="admin__field telephone _required">
+            <label class="admin__field-label" for="<?php echo $code; ?>-telephone"><span><?php echo __('Phone Number') ?></span></label>
+            <div class="admin__field-control">
+                <input type="text" name="billing[telephone]" value="<?php echo $block->escapeHtml($block->getAddress()->getTelephone()) ?>" title="<?php echo __('Phone Number') ?>" class="admin__control-text <?php echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('telephone') ?>" id="<?php echo $code; ?>-telephone" data-validate='{required:true}'>
             </div>
-            <?php /* Just why?
-            <div class="admin__field fax">
-                <label class="ladmin__field-abel" for="<?php echo $code; ?>-fax"><span><?php echo __('Fax') ?></span></label>
-                <div class="admin__field-control">
-                    <input type="text" name="billing[fax]" id="<?php echo $code; ?>-fax" title="<?php echo __('Fax') ?>" value="<?php echo $block->escapeHtml($block->getAddress()->getFax()) ?>" class="admin__control-text <?php echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('fax') ?>">
-                </div>
-            </div> */ ?>
         </div>
     </fieldset>
-    <fieldset class="fieldset">
+    <fieldset class="admin__fieldset">
         <div class="admin__fieldset-wrapper-title">
             <strong class="title">
                 <span><?php echo __('Cardholder Address') ?></span>
             </strong>
         </div>
-        <div class="admin__fieldset-wrapper-content">
-            <?php $_streetValidationClass = $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('street'); ?>
-            <div class="admin__field street _required">
-                <label for="<?php echo $code; ?>-street" class="admin__field-label"><span><?php echo __('Street') ?></span></label>
-                <div class="admin__field-control">
-                    <input type="text" name="billing[street][]" value="<?php echo $block->escapeHtml($block->getStreetLine(1)) ?>" title="<?php echo __('Street Address') ?>" id="<?php echo $code; ?>-street" class="admin__control-text <?php echo $_streetValidationClass ?>" data-validate='{required:true}' />
-                    <div class="nested">
-                        <?php $_streetValidationClass = trim(str_replace('required-entry', '', $_streetValidationClass)); ?>
-                        <?php for ($_i = 1, $_n = $this->helper('Magento\Customer\Helper\Address')->getStreetLines(); $_i < $_n; $_i++): ?>
-                            <div class="admin__field additional">
-                                <label class="admin__field-label" for="<?php echo $code; ?>-street_<?php echo $_i+1 ?>">
-                                    <span><?php echo __('Street Address %1', $_i+1) ?></span>
-                                </label>
-                                <div class="admin__field-control">
-                                    <input type="text" name="billing[street][]" value="<?php echo $block->escapeHtml($block->getStreetLine($_i+1)) ?>" title="<?php echo __('Street Address %1', $_i+1) ?>" id="<?php echo $code; ?>-street_<?php echo $_i+1 ?>" class="admin__control-text <?php echo $_streetValidationClass ?>">
-                                </div>
+        <?php $_streetValidationClass = $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('street'); ?>
+        <div class="admin__field street _required">
+            <label for="<?php echo $code; ?>-street" class="admin__field-label"><span><?php echo __('Street') ?></span></label>
+            <div class="admin__field-control">
+                <input type="text" name="billing[street][]" value="<?php echo $block->escapeHtml($block->getStreetLine(1)) ?>" title="<?php echo __('Street Address') ?>" id="<?php echo $code; ?>-street" class="admin__control-text <?php echo $_streetValidationClass ?>" data-validate='{required:true}' />
+                <div class="nested">
+                    <?php $_streetValidationClass = trim(str_replace('required-entry', '', $_streetValidationClass)); ?>
+                    <?php for ($_i = 1, $_n = $this->helper('Magento\Customer\Helper\Address')->getStreetLines(); $_i < $_n; $_i++): ?>
+                        <div class="admin__field additional">
+                            <label class="admin__field-label" for="<?php echo $code; ?>-street_<?php echo $_i+1 ?>">
+                                <span><?php echo __('Street Address %1', $_i+1) ?></span>
+                            </label>
+                            <div class="admin__field-control">
+                                <input type="text" name="billing[street][]" value="<?php echo $block->escapeHtml($block->getStreetLine($_i+1)) ?>" title="<?php echo __('Street Address %1', $_i+1) ?>" id="<?php echo $code; ?>-street_<?php echo $_i+1 ?>" class="admin__control-text <?php echo $_streetValidationClass ?>">
                             </div>
-                        <?php endfor; ?>
-                    </div>
-                </div>
-            </div>
-            <div class="admin__field city _required">
-                <label class="admin__field-label" for="<?php echo $code; ?>-city"><span><?php echo __('City') ?></span></label>
-                <div class="admin__field-control">
-                    <input type="text" name="billing[city]" value="<?php echo $block->escapeHtml($block->getAddress()->getCity()) ?>" title="<?php echo __('City') ?>" class="admin__control-text <?php echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('city') ?>" id="<?php echo $code; ?>-city" data-validate='{required:true}'>
-                </div>
-            </div>
-            <div class="admin__field region _required">
-                <label class="admin__field-label" for="<?php echo $code; ?>-region-id"><span><?php echo __('State/Province') ?></span></label>
-                <div class="admin__field-control">
-                    <select id="<?php echo $code; ?>-region-id" name="billing[region_id]" title="<?php echo __('State/Province') ?>" class="validate-select" <?php echo(!$block->getConfig('general/region/display_all')) ? ' disabled="disabled"' : '';?>>
-                        <option value=""><?php echo __('Please select a region, state or province.') ?></option>
-                    </select>
-                    <input type="text" id="<?php echo $code; ?>-region" name="billing[region]" value="<?php echo $block->escapeHtml($block->getRegion()) ?>"  title="<?php echo __('State/Province') ?>" class="admin__control-text <?php echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('region') ?>"<?php echo(!$block->getConfig('general/region/display_all')) ? ' disabled="disabled"' : '';?>/>
-                </div>
-            </div>
-            <div class="admin__field zip _required">
-                <label class="admin__field-label" for="<?php echo $code; ?>-zip"><span><?php echo __('Zip/Postal Code') ?></span></label>
-                <div class="admin__field-control">
-                    <input type="text" name="billing[postcode]" value="<?php echo $block->escapeHtml($block->getAddress()->getPostcode()) ?>" title="<?php echo __('Zip/Postal Code') ?>" id="<?php echo $code; ?>-zip" class="admin__control-text validate-zip-international <?php echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('postcode') ?>">
-                </div>
-            </div>
-            <div class="admin__field country _required">
-                <label class="admin__field-label" for="<?php echo $code; ?>-country"><span><?php echo __('Country') ?></span></label>
-                <div class="admin__field-control">
-                    <?php echo $block->getCountryHtmlSelect($block->getAddress()->getCountryId(), 'billing[country_id]', $code . '-country') ?>
+                        </div>
+                    <?php endfor; ?>
                 </div>
             </div>
         </div>
+        <div class="admin__field city _required">
+            <label class="admin__field-label" for="<?php echo $code; ?>-city"><span><?php echo __('City') ?></span></label>
+            <div class="admin__field-control">
+                <input type="text" name="billing[city]" value="<?php echo $block->escapeHtml($block->getAddress()->getCity()) ?>" title="<?php echo __('City') ?>" class="admin__control-text <?php echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('city') ?>" id="<?php echo $code; ?>-city" data-validate='{required:true}'>
+            </div>
+        </div>
+        <div class="admin__field region _required">
+            <label class="admin__field-label" for="<?php echo $code; ?>-region-id"><span><?php echo __('State/Province') ?></span></label>
+            <div class="admin__field-control">
+                <select id="<?php echo $code; ?>-region-id" name="billing[region_id]" title="<?php echo __('State/Province') ?>" class="admin__control-select validate-select" <?php echo(!$block->getConfig('general/region/display_all')) ? ' disabled="disabled"' : '';?>>
+                    <option value=""><?php echo __('Please select a region, state or province.') ?></option>
+                </select>
+                <input type="text" id="<?php echo $code; ?>-region" name="billing[region]" value="<?php echo $block->escapeHtml($block->getRegion()) ?>"  title="<?php echo __('State/Province') ?>" class="admin__control-text <?php echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('region') ?>"<?php echo(!$block->getConfig('general/region/display_all')) ? ' disabled="disabled"' : '';?>/>
+            </div>
+        </div>
+        <div class="admin__field zip _required">
+            <label class="admin__field-label" for="<?php echo $code; ?>-zip"><span><?php echo __('Zip/Postal Code') ?></span></label>
+            <div class="admin__field-control">
+                <input type="text" name="billing[postcode]" value="<?php echo $block->escapeHtml($block->getAddress()->getPostcode()) ?>" title="<?php echo __('Zip/Postal Code') ?>" id="<?php echo $code; ?>-zip" class="admin__control-text validate-zip-international <?php echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('postcode') ?>">
+            </div>
+        </div>
+        <div class="admin__field country _required">
+            <label class="admin__field-label" for="<?php echo $code; ?>-country"><span><?php echo __('Country') ?></span></label>
+            <div class="admin__field-control">
+                <?php echo str_replace('class="', 'class="admin__control-select ', $block->getCountryHtmlSelect($block->getAddress()->getCountryId(), 'billing[country_id]', $code . '-country')) ?>
+            </div>
+        </div>
     </fieldset>
-    <fieldset class="fieldset payment items ccard <?php echo $code ?>">
+    <fieldset class="admin__fieldset payment items ccard <?php echo $code ?>">
         <div class="admin__fieldset-wrapper-title">
             <strong class="title">
                 <span><?php echo __('Bank Information') ?></span>
             </strong>
         </div>
-        <div class="admin__fieldset-wrapper-content">
-            <div class="admin__field name _required hide-if-card-selected">
-                <label for="<?php echo $code ?>-echeck-account-name" class="admin__field-label"><span><?php echo __('Name on Account') ?></span></label>
-                <div class="admin__field-control">
-                    <input type="text" id="<?php echo $code ?>-echeck-account-name" name="payment[echeck_account_name]"
-                           title="<?php echo __('Name on Account') ?>" class="admin__control-text" maxlength="22"
-                           value="<?php echo $block->escapeHtml($block->getCard()->getAdditional('echeck_account_name')); ?>"
-                           data-validate='{required:true}' />
-                </div>
+        <div class="admin__field name _required">
+            <label for="<?php echo $code ?>-echeck-account-name" class="admin__field-label"><span><?php echo __('Name on Account') ?></span></label>
+            <div class="admin__field-control">
+                <input type="text" id="<?php echo $code ?>-echeck-account-name" name="payment[echeck_account_name]"
+                       title="<?php echo __('Name on Account') ?>" class="admin__control-text" maxlength="22"
+                       value="<?php echo $block->escapeHtml($block->getCard()->getAdditional('echeck_account_name')); ?>"
+                       data-validate='{required:true}' />
             </div>
-            <div class="admin__field name _required hide-if-card-selected">
-                <label for="<?php echo $code ?>-echeck-bank-name" class="admin__field-label"><span><?php echo __('Bank Name') ?></span></label>
-                <div class="admin__field-control">
-                    <input type="text" id="<?php echo $code ?>-echeck-bank-name" name="payment[echeck_bank_name]"
-                           title="<?php echo __('Bank Name') ?>" class="admin__control-text" maxlength="50" autocomplete="off"
-                           value="<?php echo $block->escapeHtml($block->getCard()->getAdditional('echeck_bank_name')); ?>"
-                           data-validate='{required:true}' />
-                </div>
+        </div>
+        <div class="admin__field name _required">
+            <label for="<?php echo $code ?>-echeck-bank-name" class="admin__field-label"><span><?php echo __('Bank Name') ?></span></label>
+            <div class="admin__field-control">
+                <input type="text" id="<?php echo $code ?>-echeck-bank-name" name="payment[echeck_bank_name]"
+                       title="<?php echo __('Bank Name') ?>" class="admin__control-text" maxlength="50" autocomplete="off"
+                       value="<?php echo $block->escapeHtml($block->getCard()->getAdditional('echeck_bank_name')); ?>"
+                       data-validate='{required:true}' />
             </div>
-            <div class="admin__field number _required hide-if-card-selected">
-                <label for="<?php echo $code ?>-echeck-routing-number" class="admin__field-label"><span><?php echo __('Routing Number') ?></span></label>
-                <div class="admin__field-control">
-                    <input type="text" id="<?php echo $code ?>-echeck-routing-number" name="payment[echeck_routing_no]"
-                           title="<?php echo __('Routing Number') ?>" class="admin__control-text minimum-length-9" maxlength="9"
-                           value="<?php if ($block->getCard()->getId() && $block->getCard()->getAdditional('echeck_routing_number_last4') != ''): ?>XXXX<?php echo $block->getCard()->getAdditional('echeck_routing_number_last4'); ?><?php endif; ?>" autocomplete="off"
-                           data-validate='{"required-number":true,"validate-length":true}' />
-                </div>
+        </div>
+        <div class="admin__field number _required">
+            <label for="<?php echo $code ?>-echeck-routing-number" class="admin__field-label"><span><?php echo __('Routing Number') ?></span></label>
+            <div class="admin__field-control">
+                <input type="text" id="<?php echo $code ?>-echeck-routing-number" name="payment[echeck_routing_no]"
+                       title="<?php echo __('Routing Number') ?>" class="admin__control-text minimum-length-9" maxlength="9"
+                       value="<?php if ($block->getCard()->getId() && $block->getCard()->getAdditional('echeck_routing_number_last4') != ''): ?>XXXX<?php echo $block->getCard()->getAdditional('echeck_routing_number_last4'); ?><?php endif; ?>" autocomplete="off"
+                       data-validate='{"required-number":true,"validate-length":true}' />
             </div>
-            <div class="admin__field number _required hide-if-card-selected">
-                <label for="<?php echo $code ?>-echeck-account-number" class="admin__field-label"><span><?php echo __('Account Number') ?></span></label>
-                <div class="admin__field-control">
-                    <input type="text" id="<?php echo $code ?>-echeck-account-number" name="payment[echeck_account_no]"
-                           title="<?php echo __('Account Number') ?>" class="admin__control-text minimum-length-5 maximum-length-17"
-                           value="<?php if ($block->getCard()->getId() && $block->getCard()->getAdditional('echeck_account_number_last4') != ''): ?>XXXX<?php echo $block->getCard()->getAdditional('echeck_account_number_last4'); ?><?php endif; ?>" maxlength="17"
-                           data-validate='{"required-number":true,"validate-length":true}' autocomplete="off" />
-                </div>
+        </div>
+        <div class="admin__field number _required">
+            <label for="<?php echo $code ?>-echeck-account-number" class="admin__field-label"><span><?php echo __('Account Number') ?></span></label>
+            <div class="admin__field-control">
+                <input type="text" id="<?php echo $code ?>-echeck-account-number" name="payment[echeck_account_no]"
+                       title="<?php echo __('Account Number') ?>" class="admin__control-text minimum-length-5 maximum-length-17"
+                       value="<?php if ($block->getCard()->getId() && $block->getCard()->getAdditional('echeck_account_number_last4') != ''): ?>XXXX<?php echo $block->getCard()->getAdditional('echeck_account_number_last4'); ?><?php endif; ?>" maxlength="17"
+                       data-validate='{"required-number":true,"validate-length":true}' autocomplete="off" />
             </div>
-            <div class="admin__field type _required hide-if-card-selected">
-                <label for="<?php echo $code ?>-echeck-account-type-checking" class="admin__field-label"><span><?php echo __('Account Type') ?></span></label>
-                <div class="admin__field-control">
-                    <?php $typeValue = $block->getCard()->getAdditional('echeck_account_type') ?: 'checking'; ?>
-                    <?php foreach ($block->getHelper()->getAchAccountTypes() as $k => $v): ?>
-                        <div>
-                            <input type="radio" name="payment[echeck_account_type]"
-                                   id="<?php echo $code ?>-echeck-account-type-<?php echo $k; ?>"
-                                   value="<?php echo $k; ?>" <?php if ($k == $typeValue): ?>checked="checked"<?php endif ?>
-                                   data-validate='{"validate-one-required-by-name":true}' />
-                            <label for="<?php echo $code ?>-echeck-account-type-<?php echo $k; ?>"><?php echo $v; ?></label>
-                        </div>
-                    <?php endforeach ?>
-                </div>
+        </div>
+        <div class="admin__field type _required">
+            <label for="<?php echo $code ?>-echeck-account-type-checking" class="admin__field-label"><span><?php echo __('Account Type') ?></span></label>
+            <div class="admin__field-control">
+                <?php $typeValue = $block->getCard()->getAdditional('echeck_account_type') ?: 'checking'; ?>
+                <?php foreach ($block->getHelper()->getAchAccountTypes() as $k => $v): ?>
+                    <div>
+                        <input type="radio" name="payment[echeck_account_type]"
+                               id="<?php echo $code ?>-echeck-account-type-<?php echo $k; ?>"
+                               value="<?php echo $k; ?>" <?php if ($k == $typeValue): ?>checked="checked"<?php endif ?>
+                               data-validate='{"validate-one-required-by-name":true}' />
+                        <label for="<?php echo $code ?>-echeck-account-type-<?php echo $k; ?>"><?php echo $v; ?></label>
+                    </div>
+                <?php endforeach ?>
             </div>
         </div>
     </fieldset>
@@ -186,7 +173,7 @@
     </div>
 </form>
 <script type="text/javascript">
-    //<![CDATA[
+//<![CDATA[
     <?php // @see Magento\Customer\Block\Adminhtml\Edit\Renderer\Region::render() ?>
     require(["prototype", "mage/adminhtml/form"], function(){
         jQuery("#<?php echo $code; ?>-region-id").attr("defaultValue", "<?php echo $block->getRegionId() ?>");
@@ -197,5 +184,5 @@
     require(["jquery", "jquery/ui", "jquery/validate", "mage/translate"], function($) {
         $('#<?php echo $code; ?>-form-validate').trigger('contentUpdated');
     });
-    //]]>
+//]]>
 </script>

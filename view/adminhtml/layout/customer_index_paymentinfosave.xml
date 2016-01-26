@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/layout_generic.xsd">
-    <container name="root" label="Root">
-        <!-- The active payment method can inject itself into this wrapper with handle customer_index_paymentinfo_{method}. -->
-        <block class="ParadoxLabs\TokenBase\Block\Adminhtml\Customer\Wrapper" name="tokenbase_customer_wrapper" template="ParadoxLabs_TokenBase::customer/wrapper.phtml" cacheable="false" />
-    </container>
-</layout>

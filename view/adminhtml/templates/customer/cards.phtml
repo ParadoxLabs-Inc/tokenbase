@@ -5,9 +5,10 @@
 <ul class="address-list ui-tabs-nav">
     <?php if (count($block->getCards()) > 0): ?>
         <?php /** @var \ParadoxLabs\TokenBase\Model\Card $card */ ?>
+        <?php $currentCardId = $block->getCurrentCard() ? $block->getCurrentCard()->getId() : null; ?>
         <?php foreach ($block->getCards() as $card): ?>
             <?php $card = $card->getTypeInstance(); ?>
-            <li class="address-list-item<?php if ($card->getExpires() != '' && strtotime($card->getExpires()) < time()): ?> expired<?php endif; ?>">
+            <li class="address-list-item<?php if ($card->getExpires() != '' && strtotime($card->getExpires()) < time()): ?> expired<?php endif; ?><?php if ($card->getId() == $currentCardId): ?> ui-state-active<?php endif; ?>">
                 <div class="address-list-item-actions">
                     <?php if ($card->isInUse()): ?>
                         <abbr title="<?php echo __('This payment record cannot be modified while associated with pending orders.'); ?>"><?php echo __('Card In Use'); ?></abbr>
@@ -27,6 +28,6 @@
             </li>
         <?php endforeach; ?>
     <?php else: ?>
-        <p><?php echo __('The customer does not have any payment data saved yet.') ?></p>
+        <li><?php echo __('The customer does not have any payment data saved yet.') ?></li>
     <?php endif; ?>
 </ul>

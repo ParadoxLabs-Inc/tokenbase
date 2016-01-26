@@ -191,10 +191,10 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
      * @param \Magento\Payment\Model\Method\Logger $logger
      * @param \Magento\Framework\Module\ModuleListInterface $moduleList
      * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate
-     * @param \Magento\Sales\Model\Order\Payment\Transaction\Repository $transactionRepostory
+     * @param \Magento\Sales\Model\Order\Payment\Transaction\Repository $transactionRepository
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \ParadoxLabs\TokenBase\Model\AbstractGateway $gateway
-     * @param CardFactory $cardFactory
+     * @param \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $cardFactory
      * @param \ParadoxLabs\TokenBase\Helper\AddressFactory $addressHelperFactory
      * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
@@ -211,7 +211,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
         \Magento\Payment\Model\Method\Logger $logger,
         \Magento\Framework\Module\ModuleListInterface $moduleList,
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate,
-        \Magento\Sales\Model\Order\Payment\Transaction\Repository $transactionRepostory,
+        \Magento\Sales\Model\Order\Payment\Transaction\Repository $transactionRepository,
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         \ParadoxLabs\TokenBase\Model\AbstractGateway $gateway,
         \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $cardFactory,
@@ -224,7 +224,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
         $this->gateway = $gateway;
         $this->cardFactory = $cardFactory;
         $this->addressHelperFactory = $addressHelperFactory;
-        $this->transactionRepository = $transactionRepostory;
+        $this->transactionRepository = $transactionRepository;
         
         $this->setStore($this->helper->getCurrentStoreId());
         
@@ -293,6 +293,8 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
 
     /**
      * Initialize/return the API gateway class.
+     *
+     * @api
      *
      * @return \ParadoxLabs\TokenBase\Api\GatewayInterface
      */
@@ -686,17 +688,13 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
             ));
         }
 
-        $payment->setIsTransactionClosed(0);
-
         // Set transaction id iff different from the last txn id -- use Magento's generated ID otherwise.
         if ($payment->getParentTransactionId() != $response->getTransactionId()) {
             $payment->setTransactionId($this->getValidTransactionId($payment, $response->getTransactionId()));
         }
 
-        if ($this->gateway()->getHaveAuthorized()) {
-            $payment->setData('parent_transaction_id', $this->gateway()->getTransactionId());
-            $payment->setShouldCloseParentTransaction(1);
-        }
+        $payment->setIsTransactionClosed(0);
+        $payment->setShouldCloseParentTransaction(1);
 
         $payment->setAdditionalInformation(
             array_replace_recursive($payment->getAdditionalInformation(), $response->getData())
@@ -1041,7 +1039,8 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
 
         $this->log(sprintf('resyncStoredCard(%s %s)', get_class($payment), $payment->getId()));
 
-        if ($this->getCard() instanceof \ParadoxLabs\TokenBase\Api\Data\CardInterface && $this->getCard()->getId() > 0) {
+        if ($this->getCard() instanceof \ParadoxLabs\TokenBase\Api\Data\CardInterface
+            && $this->getCard()->getId() > 0) {
             $haveChanges = false;
 
             /**

@@ -12,8 +12,6 @@
  */
 namespace ParadoxLabs\TokenBase\Api;
 
-use ParadoxLabs\TokenBase\Model\Card;
-
 /**
  * Common API gateway methods, logging, exceptions, etc.
  *

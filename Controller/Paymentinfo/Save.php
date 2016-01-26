@@ -144,6 +144,7 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
                      * Save payment data
                      */
                     $card->setMethod($method);
+                    $card->setActive(1);
                     $card->setCustomer($customer);
                     $card->setAddress($newAddr);
                     $card->importPaymentInfo($newPayment);

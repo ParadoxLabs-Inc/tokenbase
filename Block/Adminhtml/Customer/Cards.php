@@ -92,6 +92,16 @@ class Cards extends Template
     }
 
     /**
+     * Get currently-active card (if any)
+     *
+     * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface|null
+     */
+    public function getCurrentCard()
+    {
+        return $this->registry->registry('active_card');
+    }
+
+    /**
      * Get session form key.
      *
      * @return string

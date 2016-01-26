@@ -44,7 +44,7 @@ interface MethodInterface
     /**
      * Get the current card
      *
-     * @return Card
+     * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
      */
     public function getCard();
 

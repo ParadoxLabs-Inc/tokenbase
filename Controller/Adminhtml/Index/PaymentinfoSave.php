@@ -229,6 +229,7 @@ class PaymentinfoSave extends Paymentinfo
                      * Save payment data
                      */
                     $card->setMethod($method);
+                    $card->setActive(1);
                     $card->setCustomer($customer);
                     $card->setAddress($newAddr);
                     $card->importPaymentInfo($newPayment);
@@ -256,7 +257,11 @@ class PaymentinfoSave extends Paymentinfo
             return $resultJson->setData($response);
         } else {
             // If successful, rebuild and output the entire tab.
-            return parent::execute();
+
+            /** @var \Magento\Framework\Controller\Result\Forward $resultForward */
+            $resultForward = $this->resultForwardFactory->create();
+            $resultForward->forward('paymentinfo');
+            return $resultForward;
         }
     }
 }
