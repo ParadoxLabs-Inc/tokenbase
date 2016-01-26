@@ -48,6 +48,11 @@ class Paymentinfo extends \Magento\Customer\Controller\Adminhtml\Index
     protected $session;
 
     /**
+     * @var bool
+     */
+    protected $skipCardLoad = false;
+
+    /**
      * Paymentinfo constructor.
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\Registry $coreRegistry
@@ -151,6 +156,8 @@ class Paymentinfo extends \Magento\Customer\Controller\Adminhtml\Index
      */
     public function execute()
     {
+        $this->getCustomer();
+
         /**
          * Check for active method, or pick one if none given.
          */
@@ -161,16 +168,13 @@ class Paymentinfo extends \Magento\Customer\Controller\Adminhtml\Index
                 sort($methods);
 
                 $this->_coreRegistry->register('tokenbase_method', $methods[0]);
-            } else {
-                // TODO: No redirects. Push out a message here somehow.
-//                $this->messageManager->addError(__('No payment methods are currently available.'));
             }
         }
 
         /**
          * Check for card input and validate if present.
          */
-        $id    = $this->getRequest()->getParam('id');
+        $id    = $this->getRequest()->getParam('card_id');
 
         if (empty($id) || $this->formKeyIsValid() !== true) {
             $id = null;
@@ -178,19 +182,19 @@ class Paymentinfo extends \Magento\Customer\Controller\Adminhtml\Index
             if ($this->session->hasData('tokenbase_form_data')) {
                 $data = $this->session->getData('tokenbase_form_data');
 
-                if (isset($data['id']) && !empty($data['id'])) {
-                    $id = $data['id'];
+                if (isset($data['card_id']) && !empty($data['card_id'])) {
+                    $id = $data['card_id'];
                 }
             }
         }
 
-        if (!empty($id)) {
+        if (!empty($id) && $this->skipCardLoad !== true) {
             /** @var \ParadoxLabs\TokenBase\Model\Card $card */
             $card = $this->cardFactory->create();
             $card->loadByHash($id);
             $card = $card->getTypeInstance();
 
-            if ($card && $card->getHash() == $id && $card->hasOwner($this->helper->getCurrentCustomer()->getId())) {
+            if ($card && $card->getHash() == $id) {
                 $this->_coreRegistry->register('active_card', $card, true);
             }
         }
@@ -231,5 +235,27 @@ class Paymentinfo extends \Magento\Customer\Controller\Adminhtml\Index
         }
 
         return false;
+    }
+
+    /**
+     * Get current customer model.
+     *
+     * @return \Magento\Customer\Model\Customer
+     */
+    protected function getCustomer()
+    {
+        if ($this->_coreRegistry->registry('current_customer')) {
+            return $this->_coreRegistry->registry('current_customer');
+        }
+
+        $customerId = $this->initCurrentCustomer();
+
+        /** @var \Magento\Customer\Model\Customer $customer */
+        $customer = $this->_customerFactory->create();
+        $customer->load($customerId);
+
+        $this->_coreRegistry->register('current_customer', $customer);
+
+        return $customer;
     }
 }

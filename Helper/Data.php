@@ -309,7 +309,7 @@ class Data extends \Magento\Payment\Helper\Data
             /** @var \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer */
             $currentCustomer = $this->objectManager->get('Magento\Customer\Helper\Session\CurrentCustomer');
             if ($currentCustomer->getCustomerId() > 0) {
-                $customer = $currentCustomer->getCustomer();
+                $customer->load($currentCustomer->getCustomerId());
             }
         }
 

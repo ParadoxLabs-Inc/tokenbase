@@ -97,6 +97,7 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
                 /** @var \ParadoxLabs\TokenBase\Model\Card $card */
                 $card       = $this->cardFactory->create();
                 $card->loadByHash($id);
+                $card->setMethod($card->getMethod() ?: $method);
                 $card       = $card->getTypeInstance();
                 $customer   = $this->helper->getCurrentCustomer();
 
@@ -127,7 +128,7 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
                      */
                     $cardData = $this->getRequest()->getParam('payment');
                     $cardData['method']     = $method;
-                    $cardData['card_id']    = $card->getHash();
+                    $cardData['card_id']    = $card->getId() > 0 ? $card->getHash() : '';
 
                     if (isset($cardData['cc_number'])) {
                         $cardData['cc_last4'] = substr($cardData['cc_number'], -4);

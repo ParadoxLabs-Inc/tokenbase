@@ -50,6 +50,11 @@ class Form extends \Magento\Customer\Block\Address\Edit
     protected $ccBlock;
 
     /**
+     * @var \Magento\Framework\Data\Form\FormKey
+     */
+    protected $formKey;
+
+    /**
      * Constructor
      *
      * @param \Magento\Framework\View\Element\Template\Context $context
@@ -64,6 +69,7 @@ class Form extends \Magento\Customer\Block\Address\Edit
      * @param \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer
      * @param \Magento\Framework\Api\DataObjectHelper $dataObjectHelper
      * @param \Magento\Framework\Registry $registry
+     * @param \Magento\Framework\Data\Form\FormKey $formKey
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory
      * @param array $data
@@ -83,6 +89,7 @@ class Form extends \Magento\Customer\Block\Address\Edit
         \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer,
         \Magento\Framework\Api\DataObjectHelper $dataObjectHelper,
         \Magento\Framework\Registry $registry,
+        \Magento\Framework\Data\Form\FormKey $formKey,
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
         array $data = []
@@ -90,6 +97,7 @@ class Form extends \Magento\Customer\Block\Address\Edit
         $this->helper = $helper;
         $this->cardFactory = $cardFactory;
         $this->registry = $registry;
+        $this->formKey = $formKey;
 
         $this->method = $this->helper->getMethodInstance($this->getCode());
 
@@ -204,7 +212,13 @@ class Form extends \Magento\Customer\Block\Address\Edit
      */
     public function getAction()
     {
-        return $this->getUrl('*/*/paymentinfoSave', ['_secure' => true]);
+        return $this->getUrl(
+            '*/*/paymentinfoSave',
+            [
+                '_secure' => true,
+                'id' => $this->getRequest()->getParam('id')
+            ]
+        );
     }
 
     /**
@@ -238,5 +252,23 @@ class Form extends \Magento\Customer\Block\Address\Edit
     public function getCustomer()
     {
         return $this->helper->getCurrentCustomer();
+    }
+
+    /**
+     * Return the Url to go back.
+     *
+     * @return string
+     */
+    public function getBackUrl()
+    {
+        return $this->getUrl(
+            '*/*/paymentinfo',
+            [
+                '_secure' => true,
+                'id' => $this->getRequest()->getParam('id'),
+                'method' => $this->getMethod(),
+                'form_key' => $this->formKey->getFormKey(),
+            ]
+        );
     }
 }

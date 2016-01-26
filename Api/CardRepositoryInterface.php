@@ -32,7 +32,7 @@ interface CardRepositoryInterface
     /**
      * Retrieve card.
      *
-     * @param int $cardId
+     * @param int|string $cardId
      * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */

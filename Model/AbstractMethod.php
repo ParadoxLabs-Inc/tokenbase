@@ -162,12 +162,12 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
     protected $customer;
 
     /**
-     * @var \ParadoxLabs\TokenBase\Model\CardFactory
+     * @var \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory
      */
     protected $cardFactory;
 
     /**
-     * @var \ParadoxLabs\TokenBase\Model\Card
+     * @var \ParadoxLabs\TokenBase\Api\Data\CardInterface
      */
     protected $card;
 
@@ -214,7 +214,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
         \Magento\Sales\Model\Order\Payment\Transaction\Repository $transactionRepostory,
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         \ParadoxLabs\TokenBase\Model\AbstractGateway $gateway,
-        \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
+        \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $cardFactory,
         \ParadoxLabs\TokenBase\Helper\AddressFactory $addressHelperFactory,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
@@ -294,7 +294,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
     /**
      * Initialize/return the API gateway class.
      *
-     * @return \ParadoxLabs\TokenBase\Model\AbstractGateway
+     * @return \ParadoxLabs\TokenBase\Api\GatewayInterface
      */
     public function gateway()
     {
@@ -316,7 +316,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
      *
      * @param int|string $cardId
      * @param bool $byHash
-     * @return Card
+     * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
      * @throws \Magento\Framework\Exception\PaymentException
      */
     public function loadAndSetCard($cardId, $byHash = false)
@@ -351,7 +351,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
     /**
      * Get the current card
      *
-     * @return Card
+     * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
      */
     public function getCard()
     {
@@ -361,10 +361,10 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
     /**
      * Set the current payment card
      *
-     * @param Card $card
+     * @param \ParadoxLabs\TokenBase\Api\Data\CardInterface $card
      * @return $this
      */
-    public function setCard(\ParadoxLabs\TokenBase\Model\Card $card)
+    public function setCard(\ParadoxLabs\TokenBase\Api\Data\CardInterface $card)
     {
         $this->log(sprintf('setCard(%s)', $card->getId()));
 
@@ -950,7 +950,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
      * one if none exists.
      *
      * @param \Magento\Payment\Model\InfoInterface $payment
-     * @return Card
+     * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
      * @throws \Magento\Framework\Exception\PaymentException
      */
     protected function loadOrCreateCard(\Magento\Payment\Model\InfoInterface $payment)
@@ -966,7 +966,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
         } elseif ($payment->hasData('tokenbase_id') && $payment->getData('tokenbase_id')) {
             return $this->loadAndSetCard($payment->getData('tokenbase_id'));
         } elseif ($this->paymentContainsCard($payment) === true) {
-            /** @var \ParadoxLabs\TokenBase\Model\Card $card */
+            /** @var Card $card */
             $card = $this->cardFactory->create();
             $card->setMethod($this->_code)
                  ->setMethodInstance($this)
@@ -1041,7 +1041,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
 
         $this->log(sprintf('resyncStoredCard(%s %s)', get_class($payment), $payment->getId()));
 
-        if ($this->getCard() instanceof \ParadoxLabs\TokenBase\Model\Card && $this->getCard()->getId() > 0) {
+        if ($this->getCard() instanceof \ParadoxLabs\TokenBase\Api\Data\CardInterface && $this->getCard()->getId() > 0) {
             $haveChanges = false;
 
             /**

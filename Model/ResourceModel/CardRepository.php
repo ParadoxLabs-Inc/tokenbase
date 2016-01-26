@@ -11,7 +11,7 @@
  * @license     http://store.paradoxlabs.com/license.html
  */
 
-namespace ParadoxLabs\TokenBase\Model;
+namespace ParadoxLabs\TokenBase\Model\ResourceModel;
 
 use ParadoxLabs\TokenBase\Api\Data;
 use ParadoxLabs\TokenBase\Api\CardRepositoryInterface;
@@ -119,7 +119,11 @@ class CardRepository implements CardRepositoryInterface
     {
         $card = $this->cardFactory->create();
 
-        $this->resource->load($card, $cardId);
+        if (!is_numeric($cardId)) {
+            $card->loadByHash($cardId);
+        } else {
+            $this->resource->load($card, $cardId);
+        }
 
         if (!$card->getId()) {
             throw new NoSuchEntityException(__('Card with id "%1" does not exist.', $cardId));

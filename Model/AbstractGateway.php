@@ -410,10 +410,10 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel im
     /**
      * These should be implemented by the child gateway.
      *
-     * @param Card $card
+     * @param \ParadoxLabs\TokenBase\Api\Data\CardInterface $card
      * @return $this
      */
-    public function setCard(\ParadoxLabs\TokenBase\Model\Card $card)
+    public function setCard(\ParadoxLabs\TokenBase\Api\Data\CardInterface $card)
     {
         return parent::setData('card', $card);
     }
@@ -421,7 +421,7 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel im
     /**
      * Return the card set on the gateway (if any).
      *
-     * @return \ParadoxLabs\TokenBase\Model\Card
+     * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
      */
     public function getCard()
     {

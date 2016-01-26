@@ -20,10 +20,13 @@
         </arguments>
     </type>
 
+    <preference for="ParadoxLabs\TokenBase\Api\MethodInterface" type="ParadoxLabs\TokenBase\Model\AbstractMethod" />
+    <preference for="ParadoxLabs\TokenBase\Api\GatewayInterface" type="ParadoxLabs\TokenBase\Model\AbstractGateway" />
+
     <!-- Adding tokenbase card repository -->
     <preference for="ParadoxLabs\TokenBase\Api\Data\CardSearchResultsInterface" type="Magento\Framework\Api\SearchResults" />
     <preference for="ParadoxLabs\TokenBase\Api\Data\CardInterface" type="ParadoxLabs\TokenBase\Model\Card" />
-    <preference for="ParadoxLabs\TokenBase\Api\CardRepositoryInterface" type="ParadoxLabs\TokenBase\Model\CardRepository" />
+    <preference for="ParadoxLabs\TokenBase\Api\CardRepositoryInterface" type="ParadoxLabs\TokenBase\Model\ResourceModel\CardRepository" />
 
     <!-- Adding tokenbase_id field to quote API calls -->
     <type name="Magento\Quote\Model\Quote">

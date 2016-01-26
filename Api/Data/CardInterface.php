@@ -57,15 +57,15 @@ interface CardInterface
     /**
      * Set the method instance for this card. This is often necessary to route card data properly.
      *
-     * @param \ParadoxLabs\TokenBase\Model\AbstractMethod $method
+     * @param \ParadoxLabs\TokenBase\Api\MethodInterface $method
      * @return $this
      */
-    public function setMethodInstance(\ParadoxLabs\TokenBase\Model\AbstractMethod $method);
+    public function setMethodInstance(\ParadoxLabs\TokenBase\Api\MethodInterface $method);
 
     /**
      * Get the arbitrary method instance.
      *
-     * @return AbstractMethod Gateway-specific payment method
+     * @return \ParadoxLabs\TokenBase\Api\MethodInterface Gateway-specific payment method
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getMethodInstance();

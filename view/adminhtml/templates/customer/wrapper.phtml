@@ -6,7 +6,7 @@
     <ul class="links">
         <?php foreach ($block->getActiveMethods() as $method): ?>
             <li <?php if ($block->getCurrentMethod() == $method): ?>class="active"<?php endif; ?>>
-                <a href="<?php echo $block->getUrl('*/*/*', array( 'method' => $method )); ?>">
+                <a href="<?php echo $block->getUrl('*/*/paymentinfo', [ 'method' => $method, 'id' => $block->getRequest()->getParam('id') ]); ?>">
                     <?php echo $block->getMethodTitle($method); ?>
                 </a>
             </li>
@@ -14,6 +14,59 @@
     </ul>
 <?php endif; ?>
 
-<div class="manage-payment-method">
-    <?php echo $block->getChildHtml(); ?>
+<div class="manage-payment-method" id="tokenbase-wrapper">
+    <?php if (count($block->getActiveMethods()) > 0): ?>
+        <?php echo $block->getChildHtml(); ?>
+    <?php else: ?>
+        <?php echo __('There are currently no active TokenBase payment methods.'); ?>
+    <?php endif; ?>
 </div>
+
+<script type="text/javascript">
+//<![CDATA[
+    require(["jquery", "jquery/ui", "mage/translate"], function($) {
+        var wrapper = $('#tokenbase-wrapper');
+
+        // Catch deletes
+        wrapper.find('.action-delete').click(function(e) {
+            e.preventDefault();
+
+            if (confirm($.mage.__("Are you sure you want to delete this?"))) {
+                var card = this;
+
+                $.post(this.href, function(data) {
+                    if(data.success) {
+                        $(card).closest('li').slideUp();
+                    }
+                    else if(typeof data.message != 'undefined') {
+                        alert(data.message);
+                    }
+                }, 'json');
+            }
+        });
+
+        // Catch method changes and card edits
+        wrapper.find('.links a, .action-edit, .action-back').click(function(e) {
+            e.preventDefault();
+
+            wrapper.parent().load(this.href);
+        });
+
+        // Catch saves
+        wrapper.find('form').submit(function(e) {
+            e.preventDefault();
+
+            $.post(this.action, $(this).serialize(), function(data) {
+                if(typeof data === 'object') {
+                    if(typeof data.message != 'undefined') {
+                        alert(data.message);
+                    }
+                }
+                else {
+                    wrapper.parent().html(data);
+                }
+            });
+        });
+    });
+    //]]!>
+</script>

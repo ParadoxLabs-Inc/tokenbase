@@ -16,7 +16,9 @@ namespace ParadoxLabs\TokenBase\Model;
 /**
  * Payment record storage
  */
-class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements \ParadoxLabs\TokenBase\Api\Data\CardInterface
+class Card
+    extends \Magento\Framework\Model\AbstractExtensibleModel
+    implements \ParadoxLabs\TokenBase\Api\Data\CardInterface
 {
     /**
      * Prefix of model events names
@@ -44,12 +46,12 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements \
      * @var \Magento\Payment\Helper\Data
      */
     protected $paymentHelper;
-    
+
     /**
      * @var \ParadoxLabs\TokenBase\Model\AbstractMethod
      */
     protected $method;
-    
+
     /**
      * @var \ParadoxLabs\Tokenbase\Model\ResourceModel\Card\CollectionFactory
      */
@@ -59,7 +61,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements \
      * @var \Magento\Customer\Model\CustomerFactory
      */
     protected $customerFactory;
-    
+
     /**
      * @var \Magento\Sales\Model\ResourceModel\Order\CollectionFactory
      */
@@ -189,10 +191,10 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements \
     /**
      * Set the method instance for this card. This is often necessary to route card data properly.
      *
-     * @param AbstractMethod $method
+     * @param \ParadoxLabs\TokenBase\Api\MethodInterface $method
      * @return $this
      */
-    public function setMethodInstance(AbstractMethod $method)
+    public function setMethodInstance(\ParadoxLabs\TokenBase\Api\MethodInterface $method)
     {
         $this->method = $method;
 
@@ -202,7 +204,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements \
     /**
      * Get the arbitrary method instance.
      *
-     * @return AbstractMethod Gateway-specific payment method
+     * @return \ParadoxLabs\TokenBase\Api\MethodInterface Gateway-specific payment method
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getMethodInstance()
@@ -222,7 +224,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements \
      * Get the arbitrary type instance for this card.
      * Response will extend ParadoxLabs_TokenBase_Model_Card.
      *
-     * @return \ParadoxLabs\TokenBase\Model\Card|$this
+     * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface|$this
      */
     public function getTypeInstance()
     {
@@ -233,7 +235,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements \
                     'payment/' . $this->getMethod() . '/card_model',
                     \Magento\Store\Model\ScopeInterface::SCOPE_STORE
                 );
-                
+
                 if (get_class() != $cardModel) {
                     // Create and initialize the instance via object man.
                     $this->instance = $this->objectManager->create($cardModel);
@@ -315,7 +317,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements \
                 } elseif ($model->hasData('customer_email')) {
                     $this->setCustomerEmail($model->getData('customer_email'));
                 }
-                
+
                 $this->setCustomerId(intval($model->getCustomerId()));
             }
         }
@@ -377,7 +379,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements \
                 $yr  = $payment->getData('cc_exp_year');
                 $mo  = $payment->getData('cc_exp_month');
                 $day = date('t', strtotime($payment->getData('cc_exp_year') . '-' . $payment->getData('cc_exp_month')));
-                
+
                 $this->setAdditional('cc_exp_year', $payment->getData('cc_exp_year'))
                     ->setAdditional('cc_exp_month', $payment->getData('cc_exp_month'))
                     ->setData('expires', sprintf("%s-%s-%s 23:59:59", $yr, $mo, $day));
@@ -458,7 +460,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements \
     public function queueDeletion()
     {
         $this->setData('active', 0);
-        
+
         return $this;
     }
 
@@ -745,7 +747,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements \
     public function getHash()
     {
         $hash = $this->getData('hash');
-        
+
         if (empty($hash)) {
             $hash = sha1(
                 'tokenbase'
@@ -756,10 +758,10 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements \
                 . $this->getData('profile_id')
                 . $this->getData('payment_id')
             );
-            
+
             $this->setHash($hash);
         }
-        
+
         return $hash;
     }
 
@@ -846,7 +848,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements \
     {
         return $this->getData('last_use');
     }
-    
+
     /**
      * Get expires
      *
@@ -921,7 +923,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements \
                 $this->getAdditional('cc_last4')
             );
         }
-        
+
         return '';
     }
 
@@ -935,7 +937,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements \
     public function beforeSave()
     {
         parent::beforeSave();
-        
+
         /**
          * If the payment ID has changed, look for any duplicate payment records that might be stored.
          */
@@ -946,10 +948,10 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements \
                        ->addFieldToFilter('profile_id', $this->getData('profile_id'))
                        ->addFieldToFilter('payment_id', $this->getData('payment_id'))
                        ->addFieldToFilter('id', array( 'neq' => $this->getId() ));
-            
+
             /** @var \ParadoxLabs\TokenBase\Model\Card $dupe */
             $dupe = $collection->getFirstItem();
-            
+
             /**
              * If we find a duplicate, switch to that one, but retain the current info otherwise.
              */
@@ -974,7 +976,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements \
          * Update dates.
          */
         $now = new \DateTime('@' . time());
-        
+
         if ($this->isObjectNew()) {
             $this->setData('created_at', $now->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT));
         }
