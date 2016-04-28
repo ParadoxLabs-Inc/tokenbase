@@ -67,7 +67,6 @@ class PaymentinfoDelete extends Paymentinfo
      * @param \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \ParadoxLabs\TokenBase\Helper\Address $addressHelper
-     * @param \Magento\Backend\Model\Session $session
      * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
      */
     public function __construct(
@@ -99,7 +98,6 @@ class PaymentinfoDelete extends Paymentinfo
         \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         \ParadoxLabs\TokenBase\Helper\Address $addressHelper,
-        \Magento\Backend\Model\Session $session,
         \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
     ) {
         $this->cardRepository = $cardRepository;
@@ -132,8 +130,7 @@ class PaymentinfoDelete extends Paymentinfo
             $resultJsonFactory,
             $cardFactory,
             $helper,
-            $addressHelper,
-            $session
+            $addressHelper
         );
     }
 

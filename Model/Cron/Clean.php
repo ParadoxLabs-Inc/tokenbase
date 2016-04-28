@@ -15,6 +15,8 @@ namespace ParadoxLabs\TokenBase\Model\Cron;
 
 /**
  * Perform scheduled maintenance actions
+ *
+ * TODO: Support multi-website configuration
  */
 class Clean
 {

@@ -110,6 +110,16 @@ class Data extends \Magento\Payment\Helper\Data
     ];
 
     /**
+     * @var \Magento\Backend\Model\Session\Quote
+     */
+    protected $backendSession;
+
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    protected $checkoutSession;
+
+    /**
      * Construct
      *
      * @param \Magento\Framework\App\Helper\Context $context
@@ -125,6 +135,8 @@ class Data extends \Magento\Payment\Helper\Data
      * @param \Magento\Store\Model\WebsiteFactory $websiteFactory
      * @param \Magento\Customer\Model\CustomerFactory $customerFactory
      * @param \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory
+     * @param \Magento\Backend\Model\Session\Quote\Proxy $backendSession
+     * @param \Magento\Checkout\Model\Session\Proxy $checkoutSession
      * @param \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory
      * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
      * @param \ParadoxLabs\TokenBase\Helper\AddressFactory $addressHelperFactory
@@ -144,6 +156,8 @@ class Data extends \Magento\Payment\Helper\Data
         \Magento\Store\Model\WebsiteFactory $websiteFactory,
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory,
+        \Magento\Backend\Model\Session\Quote\Proxy $backendSession,
+        \Magento\Checkout\Model\Session\Proxy $checkoutSession,
         \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
         \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory,
         \ParadoxLabs\TokenBase\Helper\AddressFactory $addressHelperFactory,
@@ -160,6 +174,8 @@ class Data extends \Magento\Payment\Helper\Data
         $this->addressHelperFactory = $addressHelperFactory;
         $this->paymentFactory = $paymentFactory;
         $this->operationHelper = $operationHelper;
+        $this->backendSession = $backendSession;
+        $this->checkoutSession = $checkoutSession;
 
         parent::__construct(
             $context,
@@ -247,14 +263,8 @@ class Data extends \Magento\Payment\Helper\Data
             } elseif ($this->registry->registry('current_creditmemo') != null) {
                 return $this->registry->registry('current_creditmemo')->getStoreId();
             } else {
-                // Don't like to use the object manager directly but this is how the core does it.
-                // @see \Magento\Sales\Controller\Adminhtml\Order\Create::_getSession()
-
-                /** @var \Magento\Backend\Model\Session\Quote $backendSession */
-                $backendSession = $this->objectManager->get('Magento\Backend\Model\Session\Quote');
-
-                if ($backendSession->getStoreId() > 0) {
-                    return $backendSession->getStoreId();
+                if ($this->backendSession->getStoreId() > 0) {
+                    return $this->backendSession->getStoreId();
                 } else {
                     return 0;
                 }
@@ -287,18 +297,11 @@ class Data extends \Magento\Payment\Helper\Data
             } elseif ($this->registry->registry('current_creditmemo') != null) {
                 $customer->load($this->registry->registry('current_creditmemo')->getCustomerId());
             } else {
-                // Don't like to use the object manager directly but this is how the core does it.
-                // We don't necessarily want to inject it since that would initialize the session every time.
-                // @see \Magento\Sales\Controller\Adminhtml\Order\Create::_getSession()
-
-                /** @var \Magento\Backend\Model\Session\Quote $backendSession */
-                $backendSession = $this->objectManager->get('Magento\Backend\Model\Session\Quote');
-
-                if ($backendSession->hasQuoteId()) {
-                    if ($backendSession->getQuote()->getCustomerId() > 0) {
-                        $customer->load($backendSession->getQuote()->getCustomerId());
-                    } elseif ($backendSession->getQuote()->getCustomerEmail() != '') {
-                        $customer->setData('email', $backendSession->getQuote()->getCustomerEmail());
+                if ($this->backendSession->hasQuoteId()) {
+                    if ($this->backendSession->getQuote()->getCustomerId() > 0) {
+                        $customer->load($this->backendSession->getQuote()->getCustomerId());
+                    } elseif ($this->backendSession->getQuote()->getCustomerEmail() != '') {
+                        $customer->setData('email', $this->backendSession->getQuote()->getCustomerEmail());
                     }
                 }
             }
@@ -372,12 +375,9 @@ class Data extends \Magento\Payment\Helper\Data
                         unset($cardData['echeck_account_no']);
                         unset($cardData['echeck_routing_no']);
 
-                        /** @var \Magento\Checkout\Model\Session $checkoutSession */
-                        $checkoutSession = $this->objectManager->get('Magento\Checkout\Model\Session');
-
                         /** @var \Magento\Quote\Model\Quote\Payment $newPayment */
                         $newPayment = $this->paymentFactory->create();
-                        $newPayment->setQuote($checkoutSession->getQuote());
+                        $newPayment->setQuote($this->checkoutSession->getQuote());
                         $newPayment->getQuote()->getBillingAddress()->setCountryId(
                             $this->card->getAddress('country_id')
                         );

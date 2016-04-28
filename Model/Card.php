@@ -443,6 +443,8 @@ class Card
 
     /**
      * Change last_use date to the current time.
+     *
+     * @return $this
      */
     public function updateLastUse()
     {

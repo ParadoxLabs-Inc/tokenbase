@@ -78,7 +78,6 @@ class PaymentinfoSave extends Paymentinfo
      * @param \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \ParadoxLabs\TokenBase\Helper\Address $addressHelper
-     * @param \Magento\Backend\Model\Session $session
      * @param \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory
      * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
      */
@@ -111,7 +110,6 @@ class PaymentinfoSave extends Paymentinfo
         \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         \ParadoxLabs\TokenBase\Helper\Address $addressHelper,
-        \Magento\Backend\Model\Session $session,
         \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
     ) {
@@ -146,8 +144,7 @@ class PaymentinfoSave extends Paymentinfo
             $resultJsonFactory,
             $cardFactory,
             $helper,
-            $addressHelper,
-            $session
+            $addressHelper
         );
     }
 
@@ -235,14 +232,14 @@ class PaymentinfoSave extends Paymentinfo
                     $card->importPaymentInfo($newPayment);
                     $card->save();
 
-                    $this->session->unsData('tokenbase_form_data');
+                    $this->_session->unsData('tokenbase_form_data');
 
                     $response['success'] = true;
                 } else {
                     $response['message'] = __('Invalid card reference.');
                 }
             } catch (\Exception $e) {
-                $this->session->setData('tokenbase_form_data', $this->getRequest()->getParams());
+                $this->_session->setData('tokenbase_form_data', $this->getRequest()->getParams());
 
                 $this->helper->log($method, (string)$e);
                 $response['message'] = __($e->getMessage());

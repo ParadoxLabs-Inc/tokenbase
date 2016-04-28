@@ -68,7 +68,7 @@ interface CardInterface
      * @return \ParadoxLabs\TokenBase\Api\MethodInterface Gateway-specific payment method
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getMethodInstance();
+//    public function getMethodInstance();
 
     /**
      * Get the arbitrary type instance for this card.
@@ -76,14 +76,14 @@ interface CardInterface
      *
      * @return \ParadoxLabs\TokenBase\Model\Card|$this
      */
-    public function getTypeInstance();
+//    public function getTypeInstance();
 
     /**
      * Get the customer object (if any) for the card.
      *
      * @return \Magento\Customer\Model\Customer
      */
-    public function getCustomer();
+//    public function getCustomer();
 
     /**
      * Set the customer account (if any) for the card.
@@ -122,6 +122,8 @@ interface CardInterface
 
     /**
      * Change last_use date to the current time.
+     *
+     * @return $this
      */
     public function updateLastUse();
 
@@ -369,7 +371,7 @@ interface CardInterface
      *
      * @return \Magento\Payment\Model\InfoInterface|null
      */
-    public function getInfoInstance();
+//    public function getInfoInstance();
 
     /**
      * Set payment info instance

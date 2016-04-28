@@ -46,18 +46,12 @@ class Cards extends Template
     protected $addressConfig;
 
     /**
-     * @var \Magento\Framework\Data\Form\FormKey
-     */
-    protected $formKey;
-
-    /**
      * Constructor
      *
      * @param Template\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Customer\Model\Address\Mapper $addressMapper
      * @param \Magento\Customer\Model\Address\Config $addressConfig
-     * @param \Magento\Framework\Data\Form\FormKey $formKey
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param array $data
      */
@@ -66,7 +60,6 @@ class Cards extends Template
         \Magento\Framework\Registry $registry,
         \Magento\Customer\Model\Address\Mapper $addressMapper,
         \Magento\Customer\Model\Address\Config $addressConfig,
-        \Magento\Framework\Data\Form\FormKey $formKey,
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         array $data = []
     ) {
@@ -74,7 +67,6 @@ class Cards extends Template
         $this->registry = $registry;
         $this->addressMapper = $addressMapper;
         $this->addressConfig = $addressConfig;
-        $this->formKey = $formKey;
 
         $this->method = $this->helper->getMethodInstance($this->registry->registry('tokenbase_method'));
 

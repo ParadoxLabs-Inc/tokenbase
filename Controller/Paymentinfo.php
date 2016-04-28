@@ -69,7 +69,7 @@ abstract class Paymentinfo extends \Magento\Customer\Controller\AbstractAccount
      */
     public function __construct(
         Context $context,
-        Session $customerSession,
+        Session\Proxy $customerSession,
         PageFactory $resultPageFactory,
         \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator,
         \Magento\Framework\Registry $registry,

@@ -441,38 +441,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
     }
 
     /**
-     * Check whether void is available for the given order.
-     *
-     * @return bool
-     */
-    public function canVoid()
-    {
-        if (parent::canVoid()) {
-            /** @var \Magento\Sales\Model\Order\Payment $payment */
-            $payment = $this->getInfoInstance();
-            
-            /** @var \Magento\Sales\Model\Order $order */
-            $order   = $payment->getOrder();
-
-            if (($order instanceof \Magento\Sales\Model\Order) && $order->canCancel()) {
-                /**
-                 * Bad convention: Auth code is stored as the second part of ext_order_id.
-                 * If there is no auth code, it has already been voided or is not relevant.
-                 */
-                $transactionId = explode(':', $order->getExtOrderId(), 2);
-
-                if (!isset($transactionId[1]) || empty($transactionId[1])) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Validate the transaction inputs.
      *
      * @return $this
@@ -541,10 +509,10 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
         /**
          * Check for existing authorization, and void it if so.
          */
-        $transactionId = explode(':', $payment->getOrder()->getExtOrderId());
-        if (!empty($transactionId[1])) {
+        $priorAuth = $payment->getAuthorizationTransaction();
+        if ($priorAuth != false) {
             $parentTransactionId = $payment->getParentTransactionId();
-            $payment->setData('parent_transaction_id', $transactionId[0]);
+            $payment->setData('parent_transaction_id', $priorAuth->getTransactionId());
 
             $this->void($payment);
 
@@ -576,12 +544,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
         } elseif ($payment->getOrder()->getStatus() != $this->getConfigData('order_status')) {
             $payment->getOrder()->setStatus($this->getConfigData('order_status'));
         }
-
-        $payment->getOrder()->setExtOrderId(sprintf(
-            '%s:%s',
-            $response->getData('transaction_id'),
-            $response->getData('auth_code')
-        ));
 
         $payment->setTransactionId($this->getValidTransactionId($payment, $response->getData('transaction_id')))
                 ->setAdditionalInformation(
@@ -618,15 +580,22 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
         /**
          * Check for existing auth code.
          */
-        $transactionId = explode(':', $payment->getOrder()->getExtOrderId());
-        if (!empty($transactionId[1])) {
+        $authTxn = $payment->getAuthorizationTransaction();
+        if ($authTxn != false && $authTxn->getIsClosed() == 0) {
             $this->gateway()->setHaveAuthorized(true);
-            $this->gateway()->setAuthCode($transactionId[1]);
 
+            $authTxnInfo = $authTxn->getAdditionalInformation(
+                \Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS
+            );
+
+            if (is_array($authTxnInfo) && isset($authTxnInfo['auth_code'])) {
+                $this->gateway()->setAuthCode($authTxnInfo['auth_code']);
+            }
+            
             if ($payment->getParentTransactionId() != '') {
                 $this->gateway()->setTransactionId($payment->getParentTransactionId());
             } else {
-                $this->gateway()->setTransactionId($transactionId[0]);
+                $this->gateway()->setTransactionId($authTxn->getTransactionId());
             }
         } else {
             $this->gateway()->setHaveAuthorized(false);
@@ -680,12 +649,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
             if ($payment->getOrder()->getStatus() != $this->getConfigData('order_status')) {
                 $payment->getOrder()->setStatus($this->getConfigData('order_status'));
             }
-
-            $payment->getOrder()->setExtOrderId(sprintf(
-                '%s:%s',
-                $response->getTransactionId(),
-                $response->getAuthCode()
-            ));
         }
 
         // Set transaction id iff different from the last txn id -- use Magento's generated ID otherwise.
@@ -742,8 +705,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
             if ($creditmemo && $creditmemo->getInvoice()->getTransactionId() != '') {
                 $transactionId = $creditmemo->getInvoice()->getTransactionId();
             } else {
-                $transactionId = explode(':', $payment->getOrder()->getExtOrderId());
-                $transactionId = $transactionId[0];
+                $transactionId = $payment->getLastTransId();
             }
         }
 
@@ -830,8 +792,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
         } else {
             $transactionId = $payment->getTransactionId();
         }
-
-        $payment->getOrder()->setExtOrderId($transactionId);
 
         $payment->setAdditionalInformation(
             array_replace_recursive($payment->getAdditionalInformation(), $response->getData())

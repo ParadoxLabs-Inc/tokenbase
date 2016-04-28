@@ -94,7 +94,9 @@ class Operation extends \Magento\Framework\App\Helper\AbstractHelper
     public function log($code, $message, $debug = false)
     {
         if (is_object($message)) {
-            if ($message instanceof \Magento\Framework\DataObject) {
+            if ($message instanceof \Magento\Framework\Phrase) {
+                $message = (string)$message;
+            } elseif ($message instanceof \Magento\Framework\DataObject) {
                 $message = $message->getData();
 
                 $this->cleanupArray($message);

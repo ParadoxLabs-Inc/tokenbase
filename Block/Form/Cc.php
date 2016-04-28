@@ -15,6 +15,8 @@ namespace ParadoxLabs\TokenBase\Block\Form;
 
 /**
  * Credit card input form on checkout for TokenBase methods.
+ *
+ * TODO: admin form is not selecting a card by default
  */
 class Cc extends \Magento\Payment\Block\Form\Cc
 {

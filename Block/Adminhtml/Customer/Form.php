@@ -15,7 +15,6 @@ namespace ParadoxLabs\TokenBase\Block\Adminhtml\Customer;
 
 /**
  * Form Class
- * TODO: Might have problems from extended class scope
  */
 class Form extends \Magento\Customer\Block\Address\Edit
 {

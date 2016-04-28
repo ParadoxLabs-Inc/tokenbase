@@ -43,11 +43,6 @@ class Paymentinfo extends \Magento\Customer\Controller\Adminhtml\Index
     protected $addressHelper;
 
     /**
-     * @var \Magento\Backend\Model\Session
-     */
-    protected $session;
-
-    /**
      * @var bool
      */
     protected $skipCardLoad = false;
@@ -82,7 +77,6 @@ class Paymentinfo extends \Magento\Customer\Controller\Adminhtml\Index
      * @param \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \ParadoxLabs\TokenBase\Helper\Address $addressHelper
-     * @param \Magento\Backend\Model\Session $session
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
@@ -112,13 +106,11 @@ class Paymentinfo extends \Magento\Customer\Controller\Adminhtml\Index
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
         \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
         \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \ParadoxLabs\TokenBase\Helper\Address $addressHelper,
-        \Magento\Backend\Model\Session $session
+        \ParadoxLabs\TokenBase\Helper\Address $addressHelper
     ) {
         $this->cardFactory = $cardFactory;
         $this->helper = $helper;
         $this->addressHelper = $addressHelper;
-        $this->session = $session;
 
         parent::__construct(
             $context,
@@ -179,8 +171,8 @@ class Paymentinfo extends \Magento\Customer\Controller\Adminhtml\Index
         if (empty($id) || $this->formKeyIsValid() !== true) {
             $id = null;
 
-            if ($this->session->hasData('tokenbase_form_data')) {
-                $data = $this->session->getData('tokenbase_form_data');
+            if ($this->_session->hasData('tokenbase_form_data')) {
+                $data = $this->_session->getData('tokenbase_form_data');
 
                 if (isset($data['card_id']) && !empty($data['card_id'])) {
                     $id = $data['card_id'];
