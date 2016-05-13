@@ -44,6 +44,7 @@ class QuotePaymentSaveTokenbaseId
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function aroundSave(
+        /** @noinspection PhpUnusedParameterInspection */
         \Magento\Quote\Api\CartRepositoryInterface $subject,
         \Closure $proceed,
         \Magento\Quote\Api\Data\CartInterface $quote,

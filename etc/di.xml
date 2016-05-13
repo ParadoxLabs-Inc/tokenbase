@@ -4,6 +4,15 @@
         <plugin name="allowTokenbaseZeroTotal" type="ParadoxLabs\TokenBase\Plugin\ZeroTotal" sortOrder="100" disabled="false" />
     </type>
 
+    <preference for="Magento\Sales\Model\Order\Payment\State\AuthorizeCommand"
+                type="ParadoxLabs\TokenBase\Model\Override\Magento\Sales\Model\Order\Payment\State\AuthorizeCommand" />
+    <preference for="Magento\Sales\Model\Order\Payment\State\CaptureCommand"
+                type="ParadoxLabs\TokenBase\Model\Override\Magento\Sales\Model\Order\Payment\State\CaptureCommand" />
+
+    <type name="Magento\Sales\Model\Order\Config">
+        <plugin name="tokenbaseAllowPendingStatus" type="ParadoxLabs\TokenBase\Plugin\AllowPendingStatus" sortOrder="100" disabled="false" />
+    </type>
+
     <type name="ParadoxLabs\TokenBase\Model\Logger\Handler">
         <arguments>
             <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>

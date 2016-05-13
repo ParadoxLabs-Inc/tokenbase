@@ -44,6 +44,7 @@ class OrderPaymentSaveTokenbaseId
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function aroundSave(
+        /** @noinspection PhpUnusedParameterInspection */
         \Magento\Sales\Api\OrderRepositoryInterface $subject,
         \Closure $proceed,
         \Magento\Sales\Api\Data\OrderInterface $order,

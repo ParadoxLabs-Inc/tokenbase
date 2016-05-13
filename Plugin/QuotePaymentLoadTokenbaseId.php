@@ -51,6 +51,7 @@ class QuotePaymentLoadTokenbaseId
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function aroundLoad(
+        /** @noinspection PhpUnusedParameterInspection */
         \Magento\Quote\Api\Data\CartInterface $subject,
         \Closure $proceed,
         $modelId,
