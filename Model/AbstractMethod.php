@@ -397,6 +397,15 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
             $data = new \Magento\Framework\DataObject($data);
         }
 
+        if ($data->hasData('additional_data')) {
+            // Shouldn't Magento handle this? Move values from additional_data if needed.
+            foreach ($data->getData('additional_data') as $key => $value) {
+                if ($data->getData($key) == false) {
+                    $data->setData($key, $value);
+                }
+            }
+        }
+
         parent::assignData($data);
 
         /** @var \Magento\Sales\Model\Order\Payment\Info $info */
@@ -774,6 +783,21 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
         $this->log(sprintf('void(%s %s)', get_class($payment), $payment->getId()));
 
         $this->loadOrCreateCard($payment);
+
+        /**
+         * Short-circuit if we don't have a real transaction ID. That means reauth not working or failed.
+         * Not doing this can result in voiding a valid (potentially already-captured) transaction. Bad.
+         */
+        if (strpos($payment->getParentTransactionId(), '-auth') !== false) {
+            $this->log(
+                sprintf(
+                    'Skipping void; do not have a valid auth transaction ID. (%s)',
+                    $payment->getParentTransactionId()
+                )
+            );
+
+            return $this;
+        }
 
         /**
          * Grab transaction ID from the order

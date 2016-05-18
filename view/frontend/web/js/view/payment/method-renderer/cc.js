@@ -1,9 +1,14 @@
 define(
     [
         'ko',
-        'Magento_Payment/js/view/payment/cc-form'
+        'jquery',
+        'Magento_Payment/js/view/payment/cc-form',
+        'Magento_Checkout/js/action/place-order',
+        'Magento_Payment/js/model/credit-card-validation/credit-card-number-validator',
+        'Magento_Checkout/js/model/payment/additional-validators',
+        'Magento_Ui/js/modal/alert'
     ],
-    function (ko, Component) {
+    function (ko, $, Component, placeOrderAction, cardNumberValidator, additionalValidators, alert) {
         'use strict';
         var config=null;
         return Component.extend({
@@ -92,6 +97,46 @@ define(
             },
             getLogoImage: function() {
                 return this.logoImage;
+            },
+            /**
+             * @override
+             */
+            placeOrder: function (data, event) {
+                var self = this,
+                    placeOrder;
+
+                if (event) {
+                    event.preventDefault();
+                }
+
+                if (this.validate() && additionalValidators.validate()) {
+                    this.isPlaceOrderActionAllowed(false);
+
+                    placeOrder = placeOrderAction(this.getData(), this.redirectAfterPlaceOrder, this.messageContainer);
+
+                    $.when(placeOrder)
+                        .fail(function (response) {
+                            self.isPlaceOrderActionAllowed(true);
+
+                            var error = JSON.parse(response.responseText);
+                            if (error && typeof error.message != 'undefined') {
+                                alert({
+                                    content: error.message
+                                });
+                            }
+                        })
+                        .done(this.afterPlaceOrder.bind(this));
+
+                    return true;
+                }
+
+                return false;
+            },
+            /**
+             * @override
+             */
+            validate: function () {
+                return true;
             }
         });
     }

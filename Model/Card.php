@@ -53,7 +53,7 @@ class Card
     protected $method;
 
     /**
-     * @var \ParadoxLabs\Tokenbase\Model\ResourceModel\Card\CollectionFactory
+     * @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory
      */
     protected $cardCollectionFactory;
 
@@ -83,7 +83,7 @@ class Card
     protected $remoteAddress;
 
     /**
-     * @var \ParadoxLabs\Tokenbase\Model\Card
+     * @var \ParadoxLabs\TokenBase\Model\Card
      */
     protected $instance;
 
@@ -121,7 +121,7 @@ class Card
      * @param \Magento\Payment\Helper\Data $paymentHelper
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \ParadoxLabs\Tokenbase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
+     * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
      * @param \Magento\Customer\Model\CustomerFactory $customerFactory
      * @param \Magento\Customer\Api\Data\AddressInterfaceFactory $addressFactory
      * @param \Magento\Customer\Api\Data\RegionInterfaceFactory $addressRegionFactory
@@ -142,7 +142,7 @@ class Card
         \Magento\Payment\Helper\Data $paymentHelper,
         \Magento\Framework\ObjectManagerInterface $objectManager,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \ParadoxLabs\Tokenbase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory,
+        \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory,
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Customer\Api\Data\AddressInterfaceFactory $addressFactory,
         \Magento\Customer\Api\Data\RegionInterfaceFactory $addressRegionFactory,
@@ -362,6 +362,8 @@ class Card
             /** @var \Magento\Payment\Model\Info $payment */
             if ($payment->getAdditionalInformation('save') === 0) {
                 $this->setData('active', 0);
+            } elseif ($payment->getAdditionalInformation('save') === 1) {
+                $this->setData('active', 1);
             }
 
             if ($payment->getData('cc_type') != '') {
@@ -574,7 +576,7 @@ class Card
     {
         if (!is_null($value)) {
             if (is_null($this->additional)) {
-                $this->additional = array();
+                $this->getAdditional();
             }
 
             $this->additional[ $key ] = $value;
@@ -949,7 +951,11 @@ class Card
             $collection->addFieldToFilter('method', $this->getData('method'))
                        ->addFieldToFilter('profile_id', $this->getData('profile_id'))
                        ->addFieldToFilter('payment_id', $this->getData('payment_id'))
-                       ->addFieldToFilter('id', array( 'neq' => $this->getId() ));
+                       ->setPageSize(1);
+            
+            if ($this->getId() > 0) {
+                $collection->addFieldToFilter('id', ['neq' => $this->getId()]);
+            }
 
             /** @var \ParadoxLabs\TokenBase\Model\Card $dupe */
             $dupe = $collection->getFirstItem();
