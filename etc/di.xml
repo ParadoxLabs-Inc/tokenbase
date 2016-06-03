@@ -52,4 +52,10 @@
     <type name="Magento\sales\Api\OrderRepositoryInterface">
         <plugin name="orderPaymentSaveTokenbaseId" type="ParadoxLabs\TokenBase\Plugin\OrderPaymentSaveTokenbaseId" />
     </type>
+
+    <!-- Fix a core bug -->
+    <type name="Magento\Sales\Model\Order\Payment\Transaction\Repository">
+        <plugin name="tokenbaseForceTransactionOrder"
+                type="ParadoxLabs\TokenBase\Plugin\Sales\Model\Order\Payment\Transaction\Repository\Plugin" />
+    </type>
 </config>

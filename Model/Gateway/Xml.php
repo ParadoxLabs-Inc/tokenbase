@@ -65,7 +65,7 @@ class Xml
      * @param array $arr - aray to be converterd
      * @return \DomDocument
      */
-    public static function &createXML($node_name, $arr = array())
+    public static function &createXML($node_name, $arr = [])
     {
         $xml = self::getXMLRoot();
         $xml->appendChild(self::convertArrayToXml($node_name, $arr));
@@ -82,7 +82,7 @@ class Xml
      * @return \DOMNode
      * @throws \Exception
      */
-    private static function &convertArrayToXml($node_name, $arr = array())
+    private static function &convertArrayToXml($node_name, $arr = [])
     {
         $xml = self::getXMLRoot();
         $node = $xml->createElement($node_name);
@@ -190,7 +190,7 @@ class Xml
      */
     private static function &convertXmlToArray($node)
     {
-        $output = array();
+        $output = [];
 
         switch ($node->nodeType) {
             case XML_CDATA_SECTION_NODE:
@@ -211,7 +211,7 @@ class Xml
 
                         // assume more nodes of same kind are coming
                         if (!isset($output[$t])) {
-                            $output[$t] = array();
+                            $output[$t] = [];
                         }
                         $output[$t][] = $v;
                     } else {
@@ -236,13 +236,13 @@ class Xml
 
                 // loop through the attributes and collect them
                 if ($node->attributes->length) {
-                    $a = array();
+                    $a = [];
                     foreach ($node->attributes as $attrName => $attrNode) {
                         $a[$attrName] = (string) $attrNode->value;
                     }
                     // if its an leaf node, store the value in @value instead of directly storing it.
                     if (!is_array($output)) {
-                        $output = array('@value' => $output);
+                        $output = ['@value' => $output];
                     }
                     $output['@attributes'] = $a;
                 }

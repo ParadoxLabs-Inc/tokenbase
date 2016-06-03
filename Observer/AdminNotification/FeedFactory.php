@@ -37,7 +37,7 @@ class FeedFactory extends \Magento\AdminNotification\Model\FeedFactory
      * @param array $data
      * @return \ParadoxLabs\TokenBase\Observer\AdminNotification\Feed
      */
-    public function create(array $data = array())
+    public function create(array $data = [])
     {
         return parent::create($data);
     }

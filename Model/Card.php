@@ -424,7 +424,7 @@ class Card
         $orders    = $this->orderCollectionFactory->create();
         $orders->addAttributeToSelect('*')
                ->addAttributeToFilter('customer_id', $this->getData('customer_id'))
-               ->addAttributeToFilter('status', array( 'like' => 'pending%' ));
+               ->addAttributeToFilter('status', ['like' => 'pending%']);
 
         if (count($orders) > 0) {
             foreach ($orders as $order) {

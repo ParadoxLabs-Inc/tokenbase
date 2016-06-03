@@ -6,7 +6,7 @@
     <ul class="links">
         <?php foreach ($block->getActiveMethods() as $method): ?>
             <li <?php if ($block->getCurrentMethod() == $method): ?>class="active"<?php endif; ?>>
-                <a href="<?php echo $block->getUrl('*/*/*', array( 'method' => $method )); ?>">
+                <a href="<?php echo $block->getUrl('*/*/*', ['method' => $method]); ?>">
                     <?php echo $block->getMethodTitle($method); ?>
                 </a>
             </li>

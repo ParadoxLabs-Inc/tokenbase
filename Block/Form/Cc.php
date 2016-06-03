@@ -90,7 +90,7 @@ class Cc extends \Magento\Payment\Block\Form\Cc
             if ($this->helper->getIsFrontend() !== true || ($customer && $customer->getId() > 0)) {
                 $this->cards = $this->helper->getActiveCustomerCardsByMethod($this->getMethodCode());
             } else {
-                $this->cards = array();
+                $this->cards = [];
             }
         }
 

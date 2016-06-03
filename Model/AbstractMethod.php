@@ -920,7 +920,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
 
             if ($transaction !== false) {
                 $found = true;
-                $transactionId = $baseId . '-' . $increment++;
+                $transactionId = $baseId . '-' . ($increment++);
             }
         } while ($found == true);
 
@@ -1042,7 +1042,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
             }
 
             if (isset($address) && $address instanceof \Magento\Customer\Model\Address\AbstractAddress) {
-                $fields = array(
+                $fields = [
                     'firstname',
                     'lastname',
                     'company',
@@ -1052,7 +1052,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
                     'region',
                     'region_id',
                     'postcode',
-                );
+                ];
 
                 foreach ($fields as $field) {
                     if ($this->getCard()->getAddress($field) != $address->getData($field)) {
