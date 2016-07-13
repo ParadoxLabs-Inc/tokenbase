@@ -1,11 +1,15 @@
 define(
     [
         'ko',
-        'underscore',
-        'Magento_Checkout/js/view/payment/default',
-        'mage/translate'
+        'jquery',
+        'Magento_Payment/js/view/payment/default',
+        'mage/translate',
+        'Magento_Checkout/js/action/place-order',
+        'Magento_Checkout/js/model/payment/additional-validators',
+        'Magento_Ui/js/modal/alert',
+        'Magento_Checkout/js/action/redirect-on-success'
     ],
-    function (ko, _, Component, $t) {
+    function (ko, $, Component, $t, placeOrderAction, additionalValidators, alert, redirectOnSuccessAction) {
         'use strict';
         var config=null;
         return Component.extend({
@@ -117,6 +121,65 @@ define(
                     {'name': $t('Name on Account'), value: this.echeckAccountName()},
                     {'name': $t('Type'), value: $t(this.getAchTypeTitleByCode(this.echeckAccountType()))}
                 ];
+            },
+            /**
+             * @override
+             */
+            placeOrder: function (data, event) {
+                var self = this,
+                    placeOrder;
+
+                if (event) {
+                    event.preventDefault();
+                }
+
+                if (this.validate() && additionalValidators.validate()) {
+                    this.isPlaceOrderActionAllowed(false);
+
+                    // This mess for CE 2.0 compatibility, following CE 2.1 interface change. If 2.1+...
+                    if( typeof this.getPlaceOrderDeferredObject === 'function' ) {
+                        this.getPlaceOrderDeferredObject()
+                            .fail(
+                                function () {
+                                    self.isPlaceOrderActionAllowed(true);
+                                }
+                            ).done(
+                                function () {
+                                    self.afterPlaceOrder();
+
+                                    if (self.redirectAfterPlaceOrder) {
+                                        redirectOnSuccessAction.execute();
+                                    }
+                                }
+                            );
+                    }
+                    else {
+                        // If 2.0...
+                        $.when(
+                            placeOrderAction(this.getData(), this.redirectAfterPlaceOrder, this.messageContainer)
+                        ).fail(function (response) {
+                            self.isPlaceOrderActionAllowed(true);
+
+                            var error = JSON.parse(response.responseText);
+                            if (error && typeof error.message != 'undefined') {
+                                alert({
+                                    content: error.message
+                                });
+                            }
+                        })
+                        .done(this.afterPlaceOrder.bind(this));
+                    }
+
+                    return true;
+                }
+
+                return false;
+            },
+            /**
+             * @override
+             */
+            validate: function () {
+                return true;
             }
         });
     }

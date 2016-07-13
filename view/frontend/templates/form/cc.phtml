@@ -34,7 +34,6 @@ $storedCards    = $block->getStoredCards();
         <label for="<?php echo $code ?>-cc-type" class="label"><span><?php echo __('Credit Card Type') ?></span></label>
         <div class="control">
             <select id="<?php echo $code ?>-cc-type"
-                    data-mage-init='{"creditCardType":{"creditCardTypeContainer":"#<?php echo $code ?>-cc-type"}}'
                     name="payment[cc_type]" data-validate='{required:true, "validate-cc-type-select":"#<?php echo $code ?>-cc-number"}' class="select">
                 <option value=""><?php echo __('--Please Select--')?></option>
                 <?php $_ccType = $block->getInfoData('cc_type') ?>

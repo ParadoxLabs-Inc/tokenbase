@@ -6,9 +6,10 @@ define(
         'Magento_Checkout/js/action/place-order',
         'Magento_Payment/js/model/credit-card-validation/credit-card-number-validator',
         'Magento_Checkout/js/model/payment/additional-validators',
-        'Magento_Ui/js/modal/alert'
+        'Magento_Ui/js/modal/alert',
+        'Magento_Checkout/js/action/redirect-on-success'
     ],
-    function (ko, $, Component, placeOrderAction, cardNumberValidator, additionalValidators, alert) {
+    function (ko, $, Component, placeOrderAction, cardNumberValidator, additionalValidators, alert, redirectOnSuccessAction) {
         'use strict';
         var config=null;
         return Component.extend({
@@ -112,10 +113,28 @@ define(
                 if (this.validate() && additionalValidators.validate()) {
                     this.isPlaceOrderActionAllowed(false);
 
-                    placeOrder = placeOrderAction(this.getData(), this.redirectAfterPlaceOrder, this.messageContainer);
+                    // This mess for CE 2.0 compatibility, following CE 2.1 interface change. If 2.1+...
+                    if( typeof this.getPlaceOrderDeferredObject === 'function' ) {
+                        this.getPlaceOrderDeferredObject()
+                            .fail(
+                                function () {
+                                    self.isPlaceOrderActionAllowed(true);
+                                }
+                            ).done(
+                                function () {
+                                    self.afterPlaceOrder();
 
-                    $.when(placeOrder)
-                        .fail(function (response) {
+                                    if (self.redirectAfterPlaceOrder) {
+                                        redirectOnSuccessAction.execute();
+                                    }
+                                }
+                            );
+                    }
+                    else {
+                        // If 2.0...
+                        $.when(
+                            placeOrderAction(this.getData(), this.redirectAfterPlaceOrder, this.messageContainer)
+                        ).fail(function (response) {
                             self.isPlaceOrderActionAllowed(true);
 
                             var error = JSON.parse(response.responseText);
@@ -126,6 +145,7 @@ define(
                             }
                         })
                         .done(this.afterPlaceOrder.bind(this));
+                    }
 
                     return true;
                 }
