@@ -6,10 +6,9 @@ define(
         'Magento_Checkout/js/action/place-order',
         'Magento_Payment/js/model/credit-card-validation/credit-card-number-validator',
         'Magento_Checkout/js/model/payment/additional-validators',
-        'Magento_Ui/js/modal/alert',
-        'Magento_Checkout/js/action/redirect-on-success'
+        'Magento_Ui/js/modal/alert'
     ],
-    function (ko, $, Component, placeOrderAction, cardNumberValidator, additionalValidators, alert, redirectOnSuccessAction) {
+    function (ko, $, Component, placeOrderAction, cardNumberValidator, additionalValidators, alert) {
         'use strict';
         var config=null;
         return Component.extend({
@@ -125,7 +124,12 @@ define(
                                     self.afterPlaceOrder();
 
                                     if (self.redirectAfterPlaceOrder) {
-                                        redirectOnSuccessAction.execute();
+                                        // This dependency doesn't exist prior to 2.1. Can't require it up-front.
+                                        require(['Magento_Checkout/js/action/redirect-on-success'],
+                                            function(redirectOnSuccessAction) {
+                                                redirectOnSuccessAction.execute();
+                                            }
+                                        );
                                     }
                                 }
                             );

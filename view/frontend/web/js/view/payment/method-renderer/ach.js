@@ -2,14 +2,13 @@ define(
     [
         'ko',
         'jquery',
-        'Magento_Payment/js/view/payment/default',
+        'Magento_Checkout/js/view/payment/default',
         'mage/translate',
         'Magento_Checkout/js/action/place-order',
         'Magento_Checkout/js/model/payment/additional-validators',
-        'Magento_Ui/js/modal/alert',
-        'Magento_Checkout/js/action/redirect-on-success'
+        'Magento_Ui/js/modal/alert'
     ],
-    function (ko, $, Component, $t, placeOrderAction, additionalValidators, alert, redirectOnSuccessAction) {
+    function (ko, $, Component, $t, placeOrderAction, additionalValidators, alert) {
         'use strict';
         var config=null;
         return Component.extend({
@@ -148,7 +147,12 @@ define(
                                     self.afterPlaceOrder();
 
                                     if (self.redirectAfterPlaceOrder) {
-                                        redirectOnSuccessAction.execute();
+                                        // This dependency doesn't exist prior to 2.1. Can't require it up-front.
+                                        require(['Magento_Checkout/js/action/redirect-on-success'],
+                                            function(redirectOnSuccessAction) {
+                                                redirectOnSuccessAction.execute();
+                                            }
+                                        );
                                     }
                                 }
                             );
