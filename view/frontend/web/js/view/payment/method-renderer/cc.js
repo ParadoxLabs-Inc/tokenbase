@@ -116,8 +116,15 @@ define(
                     if( typeof this.getPlaceOrderDeferredObject === 'function' ) {
                         this.getPlaceOrderDeferredObject()
                             .fail(
-                                function () {
+                                function (response) {
                                     self.isPlaceOrderActionAllowed(true);
+
+                                    var error = JSON.parse(response.responseText);
+                                    if (error && typeof error.message != 'undefined') {
+                                        alert({
+                                            content: error.message
+                                        });
+                                    }
                                 }
                             ).done(
                                 function () {
