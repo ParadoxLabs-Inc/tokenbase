@@ -125,8 +125,7 @@ define(
              * @override
              */
             placeOrder: function (data, event) {
-                var self = this,
-                    placeOrder;
+                var self = this;
 
                 if (event) {
                     event.preventDefault();

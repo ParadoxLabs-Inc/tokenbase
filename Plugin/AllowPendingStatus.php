@@ -48,6 +48,7 @@ class AllowPendingStatus
      * Add labels by default. Return plain array of statuses, if no labels.
      *
      * @param \Magento\Sales\Model\Order\Config $subject
+     * @param \Closure $proceed
      * @param mixed $state
      * @param bool $addLabels
      * @return array

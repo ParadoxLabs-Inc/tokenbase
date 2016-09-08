@@ -392,17 +392,17 @@ interface CardInterface
     /**
      * Retrieve existing extension attributes object or create a new one.
      *
-     * @return \ParadoxLabs\TokenBase\Api\Data\CardExtensionInterface|null
+     * @return \Magento\Framework\Api\ExtensionAttributesInterface|null
      */
     public function getExtensionAttributes();
 
     /**
      * Set an extension attributes object.
      *
-     * @param \ParadoxLabs\TokenBase\Api\Data\CardExtensionInterface $extensionAttributes
+     * @param \Magento\Framework\Api\ExtensionAttributesInterface $extensionAttributes
      * @return $this
      */
     public function setExtensionAttributes(
-        \ParadoxLabs\TokenBase\Api\Data\CardExtensionInterface $extensionAttributes
+        \Magento\Framework\Api\ExtensionAttributesInterface $extensionAttributes
     );
 }

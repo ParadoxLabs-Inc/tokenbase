@@ -811,12 +811,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
         $response = $this->gateway()->void($payment);
         $this->afterVoid($payment, $response);
 
-        if ($response->getData('transaction_id') != '' && $response->getData('transaction_id') != '0') {
-            $transactionId = $response->getTransactionId();
-        } else {
-            $transactionId = $payment->getTransactionId();
-        }
-
         $payment->setAdditionalInformation(
             array_replace_recursive($payment->getAdditionalInformation(), $response->getData())
         );
