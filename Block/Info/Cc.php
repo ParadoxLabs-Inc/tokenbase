@@ -93,7 +93,7 @@ class Cc extends \Magento\Payment\Block\Info\Cc
         }
 
         // If this is admin, show different info.
-        if ($this->helper->getIsFrontend() !== true) {
+        if ($this->getIsSecureMode() === false) {
             $data[(string)__('Transaction ID')] = $info->getAdditionalInformation('transaction_id');
         }
 

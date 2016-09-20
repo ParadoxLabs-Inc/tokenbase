@@ -34,7 +34,7 @@ class Ach extends Cc
         $transport  = parent::_prepareSpecificInformation($transport);
         $data       = [];
 
-        if ($this->helper->getIsFrontend() === false && $this->isEcheck() === true) {
+        if ($this->getIsSecureMode() === false && $this->isEcheck() === true) {
             /** @var \Magento\Sales\Model\Order\Payment\Info $info */
             $info = $this->getInfo();
 
