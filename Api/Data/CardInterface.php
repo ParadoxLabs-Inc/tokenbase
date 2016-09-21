@@ -19,26 +19,6 @@ namespace ParadoxLabs\TokenBase\Api\Data;
  */
 interface CardInterface
 {
-    /**#@+
-     * Constants defined for keys of array, makes typos less likely
-     */
-    const ID             = 'id';
-    const HASH           = 'hash';
-    const ACTIVE         = 'active';
-    const ADDITIONAL     = 'additional';
-    const ADDRESS        = 'address';
-    const CUSTOMER_EMAIL = 'customer_email';
-    const CREATED_AT     = 'created_at';
-    const PROFILE_ID     = 'profile_id';
-    const PAYMENT_ID     = 'payment_id';
-    const UPDATED_AT     = 'updated_at';
-    const EXPIRES        = 'expires';
-    const LAST_USE       = 'last_use';
-    const METHOD         = 'method';
-    const CUSTOMER_ID    = 'customer_id';
-    const CUSTOMER_IP    = 'customer_ip';
-    /**#@-*/
-
     /**
      * Get ID
      *

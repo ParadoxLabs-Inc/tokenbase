@@ -16,9 +16,8 @@ namespace ParadoxLabs\TokenBase\Model;
 /**
  * Payment record storage
  */
-class Card
-    extends \Magento\Framework\Model\AbstractExtensibleModel
-    implements \ParadoxLabs\TokenBase\Api\Data\CardInterface
+class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implements
+    \ParadoxLabs\TokenBase\Api\Data\CardInterface
 {
     /**
      * Prefix of model events names
@@ -265,14 +264,6 @@ class Card
         /** @var \Magento\Payment\Model\Info $payment */
         if ($customer->getEmail() != '') {
             $this->setCustomerEmail($customer->getEmail());
-
-            /**
-             * Make an ID if we don't have one (and hope this doesn't break anything)
-             */
-            if ($customer->getId() < 1) {
-                $customer->save();
-            }
-
             $this->setCustomerId($customer->getId());
 
             parent::setData('customer', $customer);
@@ -1035,5 +1026,328 @@ class Card
         \Magento\Framework\Api\ExtensionAttributesInterface $extensionAttributes
     ) {
         return $this->_setExtensionAttributes($extensionAttributes);
+    }
+
+    /**
+     * Mapping methods for compatibility with \Magento\Vault\Api\Data\PaymentTokenInterface
+     */
+
+    /**
+     * Get public hash
+     *
+     * @return string
+     */
+    public function getPublicHash()
+    {
+        return $this->getHash();
+    }
+
+    /**
+     * Set public hash
+     *
+     * @param string $hash
+     * @return $this
+     */
+    public function setPublicHash($hash)
+    {
+        return $this->setHash($hash);
+    }
+
+    /**
+     * Get payment method code
+     *
+     * @return string
+     */
+    public function getPaymentMethodCode()
+    {
+        return $this->getMethod();
+    }
+
+    /**
+     * Set payment method code
+     *
+     * @param string $code
+     * @return $this
+     */
+    public function setPaymentMethodCode($code)
+    {
+        return $this->setMethod($code);
+    }
+
+    /**
+     * Get type
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->getAdditional('cc_type');
+    }
+
+    /**
+     * Set type
+     *
+     * @param string $type
+     * @return $this
+     */
+    public function setType($type)
+    {
+        return $this->setAdditional('cc_type', $type);
+    }
+
+    /**
+     * Get token expiration timestamp
+     *
+     * @return string|null
+     */
+    public function getExpiresAt()
+    {
+        return $this->getExpires();
+    }
+
+    /**
+     * Set token expiration timestamp
+     *
+     * @param string $timestamp
+     * @return $this
+     */
+    public function setExpiresAt($timestamp)
+    {
+        return $this->setExpires($timestamp);
+    }
+
+    /**
+     * Get gateway token ID
+     *
+     * @return string
+     */
+    public function getGatewayToken()
+    {
+        return $this->getPaymentId();
+    }
+
+    /**
+     * Set gateway token ID
+     *
+     * @param string $token
+     * @return $this
+     */
+    public function setGatewayToken($token)
+    {
+        return $this->setPaymentId($token);
+    }
+
+    /**
+     * Get token details
+     *
+     * @return string
+     */
+    public function getTokenDetails()
+    {
+        return $this->getAdditional();
+    }
+
+    /**
+     * Set token details
+     *
+     * @param string $details
+     * @return $this
+     */
+    public function setTokenDetails($details)
+    {
+        return $this->setAdditional($details);
+    }
+
+    /**
+     * Gets is vault payment record active.
+     *
+     * @return bool Is active.
+     * @SuppressWarnings(PHPMD.BooleanGetMethodName)
+     */
+    public function getIsActive()
+    {
+        return $this->getActive();
+    }
+
+    /**
+     * Sets is vault payment record active.
+     *
+     * @param bool $isActive
+     * @return $this
+     */
+    public function setIsActive($isActive)
+    {
+        return $this->setActive($isActive);
+    }
+
+    /**
+     * Gets is vault payment record visible.
+     *
+     * @return bool Is visible.
+     * @SuppressWarnings(PHPMD.BooleanGetMethodName)
+     */
+    public function getIsVisible()
+    {
+        return $this->getActive();
+    }
+
+    /**
+     * Sets is vault payment record visible.
+     *
+     * @param bool $isVisible
+     * @return $this
+     */
+    public function setIsVisible($isVisible)
+    {
+        return $this->setActive($isVisible);
+    }
+}
+
+/**
+ * This is messy. Sorry. Supporting 2.1 Vault without breaking 2.0 compatibility.
+ *
+ * The constructors are needed to prevent DI compilation errors. Don't ask me why.
+ */
+if (interface_exists('\Magento\Vault\Api\Data\PaymentTokenInterface', false)) {
+    /**
+     * Card Class -- 2.1+ version with Vault support
+     */
+    class Card extends CardImp implements \Magento\Vault\Api\Data\PaymentTokenInterface
+    {
+        /**
+         * @param \Magento\Framework\Model\Context $context
+         * @param \Magento\Framework\Registry $registry
+         * @param \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory
+         * @param \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory
+         * @param \ParadoxLabs\TokenBase\Helper\Data $helper
+         * @param \Magento\Payment\Helper\Data $paymentHelper
+         * @param \Magento\Framework\ObjectManagerInterface $objectManager
+         * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+         * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
+         * @param \Magento\Customer\Model\CustomerFactory $customerFactory
+         * @param \Magento\Customer\Api\Data\AddressInterfaceFactory $addressFactory
+         * @param \Magento\Customer\Api\Data\RegionInterfaceFactory $addressRegionFactory
+         * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
+         * @param \Magento\Checkout\Model\Session $checkoutSession
+         * @param \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress
+         * @param \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor
+         * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
+         * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
+         * @param array $data
+         */
+        public function __construct(
+            \Magento\Framework\Model\Context $context,
+            \Magento\Framework\Registry $registry,
+            \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory,
+            \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory,
+            \ParadoxLabs\TokenBase\Helper\Data $helper,
+            \Magento\Payment\Helper\Data $paymentHelper,
+            \Magento\Framework\ObjectManagerInterface $objectManager,
+            \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+            \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory,
+            \Magento\Customer\Model\CustomerFactory $customerFactory,
+            \Magento\Customer\Api\Data\AddressInterfaceFactory $addressFactory,
+            \Magento\Customer\Api\Data\RegionInterfaceFactory $addressRegionFactory,
+            \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
+            \Magento\Checkout\Model\Session $checkoutSession,
+            \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress,
+            \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor,
+            \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+            \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+            array $data = []
+        ) {
+            parent::__construct(
+                $context,
+                $registry,
+                $extensionFactory,
+                $customAttributeFactory,
+                $helper,
+                $paymentHelper,
+                $objectManager,
+                $scopeConfig,
+                $cardCollectionFactory,
+                $customerFactory,
+                $addressFactory,
+                $addressRegionFactory,
+                $orderCollectionFactory,
+                $checkoutSession,
+                $remoteAddress,
+                $dataObjectProcessor,
+                $resource,
+                $resourceCollection,
+                $data
+            );
+        }
+    }
+} else {
+    /**
+     * Card Class -- 2.0 version without Vault support
+     */
+    class Card extends CardImp
+    {
+        /**
+         * @param \Magento\Framework\Model\Context $context
+         * @param \Magento\Framework\Registry $registry
+         * @param \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory
+         * @param \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory
+         * @param \ParadoxLabs\TokenBase\Helper\Data $helper
+         * @param \Magento\Payment\Helper\Data $paymentHelper
+         * @param \Magento\Framework\ObjectManagerInterface $objectManager
+         * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+         * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
+         * @param \Magento\Customer\Model\CustomerFactory $customerFactory
+         * @param \Magento\Customer\Api\Data\AddressInterfaceFactory $addressFactory
+         * @param \Magento\Customer\Api\Data\RegionInterfaceFactory $addressRegionFactory
+         * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
+         * @param \Magento\Checkout\Model\Session $checkoutSession
+         * @param \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress
+         * @param \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor
+         * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
+         * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
+         * @param array $data
+         */
+        public function __construct(
+            \Magento\Framework\Model\Context $context,
+            \Magento\Framework\Registry $registry,
+            \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory,
+            \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory,
+            \ParadoxLabs\TokenBase\Helper\Data $helper,
+            \Magento\Payment\Helper\Data $paymentHelper,
+            \Magento\Framework\ObjectManagerInterface $objectManager,
+            \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+            \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory,
+            \Magento\Customer\Model\CustomerFactory $customerFactory,
+            \Magento\Customer\Api\Data\AddressInterfaceFactory $addressFactory,
+            \Magento\Customer\Api\Data\RegionInterfaceFactory $addressRegionFactory,
+            \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
+            \Magento\Checkout\Model\Session $checkoutSession,
+            \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress,
+            \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor,
+            \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+            \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+            array $data = []
+        ) {
+            parent::__construct(
+                $context,
+                $registry,
+                $extensionFactory,
+                $customAttributeFactory,
+                $helper,
+                $paymentHelper,
+                $objectManager,
+                $scopeConfig,
+                $cardCollectionFactory,
+                $customerFactory,
+                $addressFactory,
+                $addressRegionFactory,
+                $orderCollectionFactory,
+                $checkoutSession,
+                $remoteAddress,
+                $dataObjectProcessor,
+                $resource,
+                $resourceCollection,
+                $data
+            );
+        }
     }
 }
