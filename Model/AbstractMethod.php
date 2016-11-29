@@ -439,7 +439,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
                      ->setData('cc_exp_month', $data->getData('cc_exp_month'));
             }
         } else {
-            $info->unsetData('tokenbase_id');
+            $info->setData('tokenbase_id', null);
         }
 
         if ($data->hasData('save')) {
@@ -1067,6 +1067,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
                 $this->getCard()->setInfoInstance($payment);
 
                 $this->getCard()->save();
+
+                $this->_registry->unregister('tokenbase_ensure_checkout_card_save');
+                $this->_registry->register('tokenbase_ensure_checkout_card_save', $this->getCard());
             }
         }
 

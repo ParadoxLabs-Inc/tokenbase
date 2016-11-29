@@ -1208,7 +1208,7 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
  *
  * The constructors are needed to prevent DI compilation errors. Don't ask me why.
  */
-if (interface_exists('\Magento\Vault\Api\Data\PaymentTokenInterface', false)) {
+if (interface_exists('\Magento\Vault\Api\Data\PaymentTokenInterface')) {
     /**
      * Card Class -- 2.1+ version with Vault support
      */

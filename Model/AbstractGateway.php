@@ -294,6 +294,8 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel im
                     __(sprintf("Payment Gateway: Unknown parameter '%s'", $key))
                 );
             }
+        } elseif ($val === null) {
+            unset($this->params[$key]);
         }
 
         return $this;
@@ -383,6 +385,17 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel im
     }
 
     /**
+     * Mask certain values in the XML for secure logging purposes.
+     *
+     * @param $string
+     * @return mixed
+     */
+    protected function sanitizeLog($string)
+    {
+        return $string;
+    }
+
+    /**
      * Convert array to XML string. See \ParadoxLabs\TokenBase\Model\Gateway\Xml
      *
      * @param string $rootName
@@ -401,10 +414,17 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel im
      *
      * @param string $xml
      * @return array
+     * @throws \Exception
      */
     protected function xmlToArray($xml)
     {
-        return $this->xml->createArray($xml);
+        try {
+            return $this->xml->createArray($xml);
+        } catch (\Exception $e) {
+            $this->helper->log($this->code, $e->getMessage() . "\n" . $this->sanitizeLog($xml));
+
+            throw $e;
+        }
     }
 
     /**
@@ -415,7 +435,9 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel im
      */
     public function setCard(\ParadoxLabs\TokenBase\Api\Data\CardInterface $card)
     {
-        return parent::setData('card', $card);
+        parent::setData('card', $card);
+
+        return $this;
     }
 
     /**
