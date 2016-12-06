@@ -54,7 +54,6 @@ class AllowPendingStatus
      * @return array
      */
     public function aroundGetStateStatuses(
-        /** @noinspection PhpUnusedParameterInspection */
         \Magento\Sales\Model\Order\Config $subject,
         \Closure $proceed,
         $state,

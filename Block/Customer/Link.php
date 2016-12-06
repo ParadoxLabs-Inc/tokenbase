@@ -61,7 +61,7 @@ class Link extends \Magento\Framework\View\Element\Html\Link\Current
     {
         $activeMethods = $this->helper->getActiveMethods();
 
-        if (count($activeMethods) > 0) {
+        if (!empty($activeMethods)) {
             return parent::_toHtml();
         }
 

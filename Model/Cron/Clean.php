@@ -36,20 +36,28 @@ class Clean
     protected $cardCollectionFactory;
 
     /**
+     * @var \ParadoxLabs\TokenBase\Api\CardRepositoryInterface
+     */
+    protected $cardRepository;
+
+    /**
      * Constructor, yeah!
      *
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
+     * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory,
-        \ParadoxLabs\TokenBase\Helper\Data $helper
+        \ParadoxLabs\TokenBase\Helper\Data $helper,
+        \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
     ) {
         $this->helper = $helper;
         $this->scopeConfig = $scopeConfig;
         $this->cardCollectionFactory = $cardCollectionFactory;
+        $this->cardRepository = $cardRepository;
     }
 
     /**
@@ -102,7 +110,6 @@ class Clean
 
         $affectedCount   += $this->deleteCards($cards);
 
-
         if ($affectedCount > 0) {
             $this->helper->log('tokenbase', sprintf('Deleted %s queued cards.', $affectedCount));
         }
@@ -127,7 +134,7 @@ class Clean
                 /**
                  * Delete the card.
                  */
-                $card->delete();
+                $this->cardRepository->delete($card);
 
                 $affectedCount++;
             } catch (\Exception $e) {

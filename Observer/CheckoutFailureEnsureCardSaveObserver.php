@@ -29,15 +29,23 @@ class CheckoutFailureEnsureCardSaveObserver implements \Magento\Framework\Event\
     protected $registry;
 
     /**
+     * @var \ParadoxLabs\TokenBase\Api\CardRepositoryInterface
+     */
+    protected $cardRepository;
+
+    /**
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \Magento\Framework\Registry $registry
+     * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
      */
     public function __construct(
         \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \Magento\Framework\Registry $registry
+        \Magento\Framework\Registry $registry,
+        \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
     ) {
         $this->helper = $helper;
         $this->registry = $registry;
+        $this->cardRepository = $cardRepository;
     }
 
     /**
@@ -53,8 +61,9 @@ class CheckoutFailureEnsureCardSaveObserver implements \Magento\Framework\Event\
             $card = $this->registry->registry('tokenbase_ensure_checkout_card_save');
 
             if ($card instanceof \ParadoxLabs\TokenBase\Model\Card && $card->getId() > 0) {
-                $card->setData('no_sync', true)
-                     ->save();
+                $card->setData('no_sync', true);
+
+                $this->cardRepository->save($card);
             }
         } catch (\Exception $e) {
             // Log and ignore any errors; we don't want to throw them in this context.

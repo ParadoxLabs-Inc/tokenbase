@@ -120,13 +120,33 @@ class CardRepository implements CardRepositoryInterface
         $card = $this->cardFactory->create();
 
         if (!is_numeric($cardId)) {
-            $card->loadByHash($cardId);
+            $this->resource->load($card, $cardId, 'hash');
         } else {
             $this->resource->load($card, $cardId);
         }
 
         if (!$card->getId()) {
             throw new NoSuchEntityException(__('Card with id "%1" does not exist.', $cardId));
+        }
+
+        return $card;
+    }
+
+    /**
+     * Retrieve card. Will accept hash only.
+     *
+     * @param string $cardHash
+     * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getByHash($cardHash)
+    {
+        $card = $this->cardFactory->create();
+
+        $this->resource->load($card, $cardHash, 'hash');
+
+        if (!$card->getId()) {
+            throw new NoSuchEntityException(__('Card with id "%1" does not exist.', $cardHash));
         }
 
         return $card;
@@ -150,7 +170,7 @@ class CardRepository implements CardRepositoryInterface
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @param SearchCriteriaInterface $criteria
-     * @return \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection
+     * @return \ParadoxLabs\TokenBase\Api\Data\CardSearchResultsInterface
      */
     public function getList(SearchCriteriaInterface $criteria)
     {

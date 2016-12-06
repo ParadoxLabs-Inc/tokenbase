@@ -22,17 +22,17 @@ interface MethodInterface
     /**
      * Get the current customer; fetch from session if necessary.
      *
-     * @return \Magento\Customer\Model\Customer
+     * @return \Magento\Customer\Api\Data\CustomerInterface
      */
     public function getCustomer();
 
     /**
      * Set the customer to use for payment/card operations.
      *
-     * @param \Magento\Customer\Model\Customer $customer
+     * @param \Magento\Customer\Api\Data\CustomerInterface $customer
      * @return $this
      */
-    public function setCustomer(\Magento\Customer\Model\Customer $customer);
+    public function setCustomer(\Magento\Customer\Api\Data\CustomerInterface $customer);
 
     /**
      * Initialize/return the API gateway class.

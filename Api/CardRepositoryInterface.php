@@ -30,13 +30,22 @@ interface CardRepositoryInterface
     public function save(Data\CardInterface $card);
 
     /**
-     * Retrieve card.
+     * Retrieve card. Will accept numeric ID or hash.
      *
      * @param string $cardId
      * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getById($cardId);
+
+    /**
+     * Retrieve card. Will accept hash only.
+     *
+     * @param string $cardHash
+     * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getByHash($cardHash);
 
     /**
      * Retrieve card.

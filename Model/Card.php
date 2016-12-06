@@ -57,9 +57,14 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
     protected $cardCollectionFactory;
 
     /**
-     * @var \Magento\Customer\Model\CustomerFactory
+     * @var \Magento\Customer\Api\Data\CustomerInterfaceFactory
      */
     protected $customerFactory;
+
+    /**
+     * @var \Magento\Customer\Api\CustomerRepositoryInterface
+     */
+    protected $customerRepository;
 
     /**
      * @var \Magento\Sales\Model\ResourceModel\Order\CollectionFactory
@@ -87,14 +92,9 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
     protected $instance;
 
     /**
-     * @var \Magento\Framework\ObjectManagerInterface
+     * @var Card\Factory
      */
-    protected $objectManager;
-
-    /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    protected $scopeConfig;
+    protected $cardFactory;
 
     /**
      * @var \Magento\Customer\Api\Data\AddressInterfaceFactory
@@ -112,22 +112,21 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
     protected $dataProcessor;
 
     /**
+     * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
+     */
+    protected $dateProcessor;
+
+    /**
+     * @var \Magento\Framework\Unserialize\Unserialize
+     */
+    protected $unserialize;
+
+    /**
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory
      * @param \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \Magento\Payment\Helper\Data $paymentHelper
-     * @param \Magento\Framework\ObjectManagerInterface $objectManager
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
-     * @param \Magento\Customer\Model\CustomerFactory $customerFactory
-     * @param \Magento\Customer\Api\Data\AddressInterfaceFactory $addressFactory
-     * @param \Magento\Customer\Api\Data\RegionInterfaceFactory $addressRegionFactory
-     * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
-     * @param \Magento\Checkout\Model\Session $checkoutSession
-     * @param \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress
-     * @param \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor
+     * @param Card\Context $cardContext
      * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
      * @param array $data
@@ -137,18 +136,7 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
         \Magento\Framework\Registry $registry,
         \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory,
         \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory,
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \Magento\Payment\Helper\Data $paymentHelper,
-        \Magento\Framework\ObjectManagerInterface $objectManager,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory,
-        \Magento\Customer\Model\CustomerFactory $customerFactory,
-        \Magento\Customer\Api\Data\AddressInterfaceFactory $addressFactory,
-        \Magento\Customer\Api\Data\RegionInterfaceFactory $addressRegionFactory,
-        \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
-        \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress,
-        \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor,
+        \ParadoxLabs\TokenBase\Model\Card\Context $cardContext,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
@@ -162,19 +150,21 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
             $resourceCollection,
             $data
         );
-        
-        $this->helper                   = $helper;
-        $this->paymentHelper            = $paymentHelper;
-        $this->objectManager            = $objectManager;
-        $this->scopeConfig              = $scopeConfig;
-        $this->customerFactory          = $customerFactory;
-        $this->addressFactory           = $addressFactory;
-        $this->addressRegionFactory     = $addressRegionFactory;
-        $this->cardCollectionFactory    = $cardCollectionFactory;
-        $this->orderCollectionFactory   = $orderCollectionFactory;
-        $this->checkoutSession          = $checkoutSession;
-        $this->remoteAddress            = $remoteAddress;
-        $this->dataProcessor            = $dataObjectProcessor;
+
+        $this->helper                   = $cardContext->getHelper();
+        $this->paymentHelper            = $cardContext->getPaymentHelper();
+        $this->cardFactory              = $cardContext->getCardFactory();
+        $this->customerFactory          = $cardContext->getCustomerFactory();
+        $this->customerRepository       = $cardContext->getCustomerRepository();
+        $this->addressFactory           = $cardContext->getAddressFactory();
+        $this->addressRegionFactory     = $cardContext->getAddressRegionFactory();
+        $this->cardCollectionFactory    = $cardContext->getCardCollectionFactory();
+        $this->orderCollectionFactory   = $cardContext->getOrderCollectionFactory();
+        $this->checkoutSession          = $cardContext->getCheckoutSession();
+        $this->remoteAddress            = $cardContext->getRemoteAddress();
+        $this->dataProcessor            = $cardContext->getDataObjectProcessor();
+        $this->dateProcessor            = $cardContext->getDateProcessor();
+        $this->unserialize              = $cardContext->getUnserialize();
     }
 
     /**
@@ -208,7 +198,7 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
      */
     public function getMethodInstance()
     {
-        if (is_null($this->method)) {
+        if ($this->method === null) {
             if ($this->hasData('method')) {
                 $this->method = $this->paymentHelper->getMethodInstance($this->getData('method'));
             } else {
@@ -220,31 +210,14 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
     }
 
     /**
-     * Get the arbitrary type instance for this card.
-     * Response will extend ParadoxLabs_TokenBase_Model_Card.
+     * Get the specific type implementation for this card.
      *
      * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface|$this
      */
     public function getTypeInstance()
     {
-        if (is_null($this->instance)) {
-            if ($this->hasData('method')) {
-                // Get model from config for the payment method
-                $cardModel      = $this->scopeConfig->getValue(
-                    'payment/' . $this->getMethod() . '/card_model',
-                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-                );
-
-                if (get_class() != $cardModel) {
-                    // Create and initialize the instance via object man.
-                    $this->instance = $this->objectManager->create($cardModel);
-                    $this->instance->setData($this->getData());
-                } else {
-                    return $this;
-                }
-            } else {
-                return $this;
-            }
+        if ($this->instance === null) {
+            $this->instance = $this->cardFactory->getTypeInstance($this);
         }
 
         return $this->instance;
@@ -253,21 +226,20 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
     /**
      * Set the customer account (if any) for the card.
      *
-     * @param \Magento\Customer\Model\Customer $customer
+     * @param \Magento\Customer\Api\Data\CustomerInterface $customer
      * @param \Magento\Payment\Model\InfoInterface|null $payment
      * @return $this
      */
     public function setCustomer(
-        \Magento\Customer\Model\Customer $customer,
+        \Magento\Customer\Api\Data\CustomerInterface $customer,
         \Magento\Payment\Model\InfoInterface $payment = null
     ) {
-        /** @var \Magento\Payment\Model\Info $payment */
         if ($customer->getEmail() != '') {
             $this->setCustomerEmail($customer->getEmail());
             $this->setCustomerId($customer->getId());
 
             parent::setData('customer', $customer);
-        } elseif (!is_null($payment)) {
+        } elseif ($payment !== null) {
             $model = null;
 
             /**
@@ -296,7 +268,7 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
                 $model = $this->checkoutSession->getQuote();
             }
 
-            if (!is_null($model)) {
+            if ($model !== null) {
                 if ($model->getCustomerEmail() == ''
                     && $model->getBillingAddress() instanceof \Magento\Framework\DataObject
                     && $model->getBillingAddress()->getEmail() != '') {
@@ -309,7 +281,7 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
                     $this->setCustomerEmail($model->getData('customer_email'));
                 }
 
-                $this->setCustomerId(intval($model->getCustomerId()));
+                $this->setCustomerId((int)$model->getCustomerId());
             }
         }
 
@@ -319,7 +291,7 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
     /**
      * Get the customer object (if any) for the card.
      *
-     * @return \Magento\Customer\Model\Customer
+     * @return \Magento\Customer\Api\Data\CustomerInterface
      */
     public function getCustomer()
     {
@@ -327,13 +299,12 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
             return parent::getData('customer');
         }
 
-        /** @var \Magento\Customer\Model\Customer $customer */
         $customer = $this->customerFactory->create();
 
         if ($this->getData('customer_id') > 0) {
-            $customer->load($this->getData('customer_id'));
+            $customer = $this->customerRepository->getById($this->getData('customer_id'));
         } else {
-            $customer->setData('email', $this->getData('customer_email'));
+            $customer->setEmail($this->getData('customer_email'));
         }
 
         parent::setData('customer', $customer);
@@ -396,7 +367,7 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
      */
     public function hasOwner($customerId)
     {
-        $customerId = intval($customerId);
+        $customerId = (int)$customerId;
 
         if ($customerId < 1) {
             return false;
@@ -417,7 +388,10 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
                ->addAttributeToFilter('customer_id', $this->getData('customer_id'))
                ->addAttributeToFilter('status', ['like' => 'pending%']);
 
-        if (count($orders) > 0) {
+        /**
+         * TODO: Verify this works as expected for collections
+         */
+        if (!empty($orders)) {
             foreach ($orders as $order) {
                 /** @var \Magento\Sales\Model\Order $order */
                 $payment = $order->getPayment();
@@ -441,7 +415,7 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
      */
     public function updateLastUse()
     {
-        $now = new \DateTime('@' . time());
+        $now = $this->dateProcessor->date();
         $this->setData('last_use', $now->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT));
 
         return $this;
@@ -460,17 +434,6 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
     }
 
     /**
-     * Load card by security hash.
-     *
-     * @param $hash
-     * @return $this
-     */
-    public function loadByHash($hash)
-    {
-        return $this->load($hash, 'hash');
-    }
-
-    /**
      * Get billing address or some part thereof.
      *
      * @param string $key
@@ -478,8 +441,8 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
      */
     public function getAddress($key = '')
     {
-        if (is_null($this->address) && parent::getData('address')) {
-            $this->address = unserialize(parent::getData('address'));
+        if ($this->address === null && parent::getData('address')) {
+            $this->address = $this->unserialize->unserialize(parent::getData('address'));
         }
 
         if ($key !== '') {
@@ -543,11 +506,11 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
      */
     public function getAdditional($key = null)
     {
-        if (is_null($this->additional)) {
-            $this->additional = unserialize(parent::getData('additional'));
+        if ($this->additional === null) {
+            $this->additional = $this->unserialize->unserialize(parent::getData('additional'));
         }
 
-        if (!is_null($key)) {
+        if ($key !== null) {
             return (isset($this->additional[ $key ]) ? $this->additional[ $key ] : null);
         }
 
@@ -565,8 +528,8 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
      */
     public function setAdditional($key, $value = null)
     {
-        if (!is_null($value)) {
-            if (is_null($this->additional)) {
+        if ($value !== null) {
+            if ($this->additional === null) {
                 $this->getAdditional();
             }
 
@@ -575,7 +538,9 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
             $this->additional = $key;
         }
 
-        return parent::setData('additional', serialize($this->additional));
+        parent::setData('additional', serialize($this->additional));
+
+        return $this;
     }
 
     /**
@@ -605,7 +570,9 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
         $this->address = null;
 
         // Store
-        return parent::setData('address', serialize($addressData));
+        parent::setData('address', serialize($addressData));
+
+        return $this;
     }
 
     /**
@@ -942,7 +909,8 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
             $collection->addFieldToFilter('method', $this->getData('method'))
                        ->addFieldToFilter('profile_id', $this->getData('profile_id'))
                        ->addFieldToFilter('payment_id', $this->getData('payment_id'))
-                       ->setPageSize(1);
+                       ->setPageSize(1)
+                       ->setCurPage(1);
             
             if ($this->getId() > 0) {
                 $collection->addFieldToFilter('id', ['neq' => $this->getId()]);
@@ -974,7 +942,7 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
         /**
          * Update dates.
          */
-        $now = new \DateTime('@' . time());
+        $now = $this->dateProcessor->date();
 
         if ($this->isObjectNew()) {
             $this->setData('created_at', $now->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT));
@@ -1219,18 +1187,7 @@ if (interface_exists('\Magento\Vault\Api\Data\PaymentTokenInterface')) {
          * @param \Magento\Framework\Registry $registry
          * @param \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory
          * @param \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory
-         * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-         * @param \Magento\Payment\Helper\Data $paymentHelper
-         * @param \Magento\Framework\ObjectManagerInterface $objectManager
-         * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-         * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
-         * @param \Magento\Customer\Model\CustomerFactory $customerFactory
-         * @param \Magento\Customer\Api\Data\AddressInterfaceFactory $addressFactory
-         * @param \Magento\Customer\Api\Data\RegionInterfaceFactory $addressRegionFactory
-         * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
-         * @param \Magento\Checkout\Model\Session $checkoutSession
-         * @param \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress
-         * @param \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor
+         * @param Card\Context $cardContext
          * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
          * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
          * @param array $data
@@ -1240,18 +1197,7 @@ if (interface_exists('\Magento\Vault\Api\Data\PaymentTokenInterface')) {
             \Magento\Framework\Registry $registry,
             \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory,
             \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory,
-            \ParadoxLabs\TokenBase\Helper\Data $helper,
-            \Magento\Payment\Helper\Data $paymentHelper,
-            \Magento\Framework\ObjectManagerInterface $objectManager,
-            \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-            \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory,
-            \Magento\Customer\Model\CustomerFactory $customerFactory,
-            \Magento\Customer\Api\Data\AddressInterfaceFactory $addressFactory,
-            \Magento\Customer\Api\Data\RegionInterfaceFactory $addressRegionFactory,
-            \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
-            \Magento\Checkout\Model\Session $checkoutSession,
-            \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress,
-            \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor,
+            \ParadoxLabs\TokenBase\Model\Card\Context $cardContext,
             \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
             \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
             array $data = []
@@ -1261,18 +1207,7 @@ if (interface_exists('\Magento\Vault\Api\Data\PaymentTokenInterface')) {
                 $registry,
                 $extensionFactory,
                 $customAttributeFactory,
-                $helper,
-                $paymentHelper,
-                $objectManager,
-                $scopeConfig,
-                $cardCollectionFactory,
-                $customerFactory,
-                $addressFactory,
-                $addressRegionFactory,
-                $orderCollectionFactory,
-                $checkoutSession,
-                $remoteAddress,
-                $dataObjectProcessor,
+                $cardContext,
                 $resource,
                 $resourceCollection,
                 $data
@@ -1290,18 +1225,7 @@ if (interface_exists('\Magento\Vault\Api\Data\PaymentTokenInterface')) {
          * @param \Magento\Framework\Registry $registry
          * @param \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory
          * @param \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory
-         * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-         * @param \Magento\Payment\Helper\Data $paymentHelper
-         * @param \Magento\Framework\ObjectManagerInterface $objectManager
-         * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-         * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
-         * @param \Magento\Customer\Model\CustomerFactory $customerFactory
-         * @param \Magento\Customer\Api\Data\AddressInterfaceFactory $addressFactory
-         * @param \Magento\Customer\Api\Data\RegionInterfaceFactory $addressRegionFactory
-         * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
-         * @param \Magento\Checkout\Model\Session $checkoutSession
-         * @param \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress
-         * @param \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor
+         * @param Card\Context $cardContext
          * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
          * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
          * @param array $data
@@ -1311,18 +1235,7 @@ if (interface_exists('\Magento\Vault\Api\Data\PaymentTokenInterface')) {
             \Magento\Framework\Registry $registry,
             \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory,
             \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory,
-            \ParadoxLabs\TokenBase\Helper\Data $helper,
-            \Magento\Payment\Helper\Data $paymentHelper,
-            \Magento\Framework\ObjectManagerInterface $objectManager,
-            \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-            \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory,
-            \Magento\Customer\Model\CustomerFactory $customerFactory,
-            \Magento\Customer\Api\Data\AddressInterfaceFactory $addressFactory,
-            \Magento\Customer\Api\Data\RegionInterfaceFactory $addressRegionFactory,
-            \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
-            \Magento\Checkout\Model\Session $checkoutSession,
-            \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress,
-            \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor,
+            \ParadoxLabs\TokenBase\Model\Card\Context $cardContext,
             \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
             \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
             array $data = []
@@ -1332,18 +1245,7 @@ if (interface_exists('\Magento\Vault\Api\Data\PaymentTokenInterface')) {
                 $registry,
                 $extensionFactory,
                 $customAttributeFactory,
-                $helper,
-                $paymentHelper,
-                $objectManager,
-                $scopeConfig,
-                $cardCollectionFactory,
-                $customerFactory,
-                $addressFactory,
-                $addressRegionFactory,
-                $orderCollectionFactory,
-                $checkoutSession,
-                $remoteAddress,
-                $dataObjectProcessor,
+                $cardContext,
                 $resource,
                 $resourceCollection,
                 $data

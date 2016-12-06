@@ -9,12 +9,13 @@
         </strong>
     </div>
     <div class="admin__fieldset-wrapper-content">
-        <?php if (count($block->getActiveMethods()) > 1): ?>
+        <?php $activeMethods = $block->getActiveMethods(); ?>
+        <?php if (count($activeMethods) > 1): ?>
             <ul class="links">
-                <?php foreach ($block->getActiveMethods() as $method): ?>
+                <?php foreach ($activeMethods as $method): ?>
                     <li <?php if ($block->getCurrentMethod() == $method): ?>class="active"<?php endif; ?>>
-                        <a href="<?php echo $block->getUrl('*/*/paymentinfo', [ 'method' => $method, 'id' => $block->getRequest()->getParam('id') ]); ?>">
-                            <?php echo $block->getMethodTitle($method); ?>
+                        <a href="<?php echo $block->escapeUrl($block->getUrl('*/*/paymentinfo', [ 'method' => $method, 'id' => $block->getRequest()->getParam('id') ])); ?>">
+                            <?php echo $block->escapeHtml($block->getMethodTitle($method)); ?>
                         </a>
                     </li>
                 <?php endforeach; ?>
@@ -22,7 +23,7 @@
         <?php endif; ?>
 
         <div class="manage-payment-method">
-            <?php if (count($block->getActiveMethods()) > 0): ?>
+            <?php if (!empty($activeMethods)): ?>
                 <?php echo $block->getChildHtml(); ?>
             <?php else: ?>
                 <?php echo __('There are currently no active TokenBase payment methods.'); ?>

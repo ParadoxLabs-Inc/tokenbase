@@ -66,7 +66,7 @@ abstract class ApiTest extends \Magento\Config\Block\System\Config\Form\Field
      */
     protected function getStoreId()
     {
-        if (is_null($this->storeId)) {
+        if ($this->storeId === null) {
             if ($this->_request->getParam('store') != '') {
                 /** @var \Magento\Store\Model\Store $store */
                 $store = $this->storeFactory->create();

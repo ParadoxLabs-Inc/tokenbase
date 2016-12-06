@@ -38,25 +38,25 @@ class Delete extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
                  */
 
                 /** @var \ParadoxLabs\TokenBase\Model\Card $card */
-                $card = $this->cardFactory->create();
-                $card->loadByHash($id);
+                $card = $this->cardRepository->getByHash($id);
                 $card = $card->getTypeInstance();
 
                 if ($card && $card->getHash() == $id && $card->hasOwner($this->helper->getCurrentCustomer()->getId())) {
-                    $card->queueDeletion()
-                         ->save();
+                    $card->queueDeletion();
 
-                    $this->messageManager->addSuccess(__('Payment record deleted.'));
+                    $this->cardRepository->save($card);
+
+                    $this->messageManager->addSuccessMessage(__('Payment record deleted.'));
                 } else {
-                    $this->messageManager->addError(__('Invalid Request.'));
+                    $this->messageManager->addErrorMessage(__('Invalid Request.'));
                 }
             } catch (\Exception $e) {
                 $this->helper->log($method, (string)$e);
 
-                $this->messageManager->addError($e->getMessage());
+                $this->messageManager->addErrorMessage($e->getMessage());
             }
         } else {
-            $this->messageManager->addError(__('Invalid Request.'));
+            $this->messageManager->addErrorMessage(__('Invalid Request.'));
         }
 
         $resultRedirect->setPath('*/*', ['method' => $method, '_secure' => true]);

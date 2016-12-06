@@ -16,10 +16,11 @@
     <type name="ParadoxLabs\TokenBase\Model\Logger\Handler">
         <arguments>
             <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+            <argument name="lineFormatter" xsi:type="object">ParadoxLabs\TokenBase\Model\Logger\LineFormatter</argument>
         </arguments>
     </type>
 
-    <type name="ParadoxLabs\TokenBase\Model\Logger\Logger">
+    <virtualType name="ParadoxLabs\TokenBase\Model\Logger\Logger" type="Monolog\Logger">
         <arguments>
             <argument name="name" xsi:type="string">tokenbaseLogger</argument>
             <argument name="handlers" xsi:type="array">
@@ -27,7 +28,16 @@
                 <item name="debug" xsi:type="object">ParadoxLabs\TokenBase\Model\Logger\Debug</item>
             </argument>
         </arguments>
-    </type>
+    </virtualType>
+
+    <virtualType name="ParadoxLabs\TokenBase\Model\Logger\LineFormatter" type="Monolog\Formatter\LineFormatter">
+        <arguments>
+            <argument name="format" xsi:type="string">[%datetime%] %message% %context% %extra%\n</argument>
+            <argument name="dateFormat" xsi:type="null" />
+            <argument name="allowInlineLineBreaks" xsi:type="boolean">true</argument>
+            <argument name="ignoreEmptyContextAndExtra" xsi:type="boolean">true</argument>
+        </arguments>
+    </virtualType>
 
     <preference for="ParadoxLabs\TokenBase\Api\MethodInterface" type="ParadoxLabs\TokenBase\Model\AbstractMethod" />
     <preference for="ParadoxLabs\TokenBase\Api\GatewayInterface" type="ParadoxLabs\TokenBase\Model\AbstractGateway" />

@@ -34,11 +34,6 @@ class PaymentinfoSave extends Paymentinfo
     protected $skipCardLoad = true;
 
     /**
-     * @var \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory
-     */
-    protected $cardFactory;
-
-    /**
      * @var \Magento\Quote\Model\Quote\PaymentFactory
      */
     protected $paymentFactory;
@@ -47,6 +42,11 @@ class PaymentinfoSave extends Paymentinfo
      * @var \Magento\Quote\Api\CartRepositoryInterface
      */
     protected $quoteRepository;
+
+    /**
+     * @var \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory
+     */
+    protected $cardFactory;
 
     /**
      * PaymentinfoDelete constructor.
@@ -75,11 +75,12 @@ class PaymentinfoSave extends Paymentinfo
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      * @param \Magento\Backend\Model\View\Result\ForwardFactory $resultForwardFactory
      * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
-     * @param \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory
+     * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \ParadoxLabs\TokenBase\Helper\Address $addressHelper
      * @param \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory
      * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
+     * @param \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $cardFactory
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
@@ -107,14 +108,16 @@ class PaymentinfoSave extends Paymentinfo
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Magento\Backend\Model\View\Result\ForwardFactory $resultForwardFactory,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
-        \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
+        \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository,
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         \ParadoxLabs\TokenBase\Helper\Address $addressHelper,
         \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory,
-        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
+        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
+        \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $cardFactory
     ) {
         $this->paymentFactory = $paymentFactory;
         $this->quoteRepository = $quoteRepository;
+        $this->cardFactory = $cardFactory;
 
         parent::__construct(
             $context,
@@ -142,7 +145,7 @@ class PaymentinfoSave extends Paymentinfo
             $resultPageFactory,
             $resultForwardFactory,
             $resultJsonFactory,
-            $cardFactory,
+            $cardRepository,
             $helper,
             $addressHelper
         );
@@ -151,7 +154,7 @@ class PaymentinfoSave extends Paymentinfo
     /**
      * View customer's stored cards list (active view)
      *
-     * @return \Magento\Framework\View\Result\Layout
+     * @return \Magento\Framework\Controller\ResultInterface
      */
     public function execute()
     {
@@ -175,16 +178,20 @@ class PaymentinfoSave extends Paymentinfo
                  */
 
                 /** @var \ParadoxLabs\TokenBase\Model\Card $card */
-                $card       = $this->cardFactory->create();
-                $card->loadByHash($id);
-                $card->setMethod($card->getMethod() ?: $method);
+                if (!empty($id)) {
+                    $card = $this->cardRepository->getByHash($id);
+                } else {
+                    $card = $this->cardFactory->create();
+                    $card->setMethod($card->getMethod() ?: $method);
+                }
+
                 $card       = $card->getTypeInstance();
 
                 if ($card && (empty($id) || $card->getHash() == $id)) {
                     /**
                      * Process address data
                      */
-                    $newAddrId    = intval($this->getRequest()->getParam('billing_address_id'));
+                    $newAddrId    = (int)$this->getRequest()->getParam('billing_address_id');
 
                     if ($newAddrId > 0) {
                         // Existing address
@@ -230,7 +237,8 @@ class PaymentinfoSave extends Paymentinfo
                     $card->setCustomer($customer);
                     $card->setAddress($newAddr);
                     $card->importPaymentInfo($newPayment);
-                    $card->save();
+
+                    $this->cardRepository->save($card);
 
                     $this->_session->unsData('tokenbase_form_data');
 

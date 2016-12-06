@@ -48,10 +48,8 @@ class OrderPaymentLoadTokenbaseId
      * @param int $modelId
      * @param null $field
      * @return \Magento\Sales\Api\Data\OrderInterface
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function aroundLoad(
-        /** @noinspection PhpUnusedParameterInspection */
         \Magento\Sales\Api\Data\OrderInterface $subject,
         \Closure $proceed,
         $modelId,

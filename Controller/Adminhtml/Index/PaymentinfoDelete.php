@@ -137,7 +137,7 @@ class PaymentinfoDelete extends Paymentinfo
     /**
      * View customer's stored cards list (active view)
      *
-     * @return \Magento\Framework\View\Result\Layout
+     * @return \Magento\Framework\Controller\Result\Json
      */
     public function execute()
     {

@@ -24,11 +24,20 @@ class CardLoadProcessDeleteQueueObserver implements \Magento\Framework\Event\Obs
     protected $registry;
 
     /**
-     * @param \Magento\Framework\Registry $registry
+     * @var \ParadoxLabs\TokenBase\Api\CardRepositoryInterface
      */
-    public function __construct(\Magento\Framework\Registry $registry)
-    {
+    protected $cardRepository;
+
+    /**
+     * @param \Magento\Framework\Registry $registry
+     * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
+     */
+    public function __construct(
+        \Magento\Framework\Registry $registry,
+        \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
+    ) {
         $this->registry = $registry;
+        $this->cardRepository = $cardRepository;
     }
 
     /**
@@ -46,8 +55,9 @@ class CardLoadProcessDeleteQueueObserver implements \Magento\Framework\Event\Obs
 
         if ($card && $card->getActive() == 1 && $card->getId() > 0) {
             $card->queueDeletion()
-                 ->setData('no_sync', true)
-                 ->save();
+                 ->setData('no_sync', true);
+
+            $this->cardRepository->save($card);
         }
     }
 }

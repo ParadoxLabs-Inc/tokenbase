@@ -51,13 +51,11 @@ class QuotePaymentLoadTokenbaseId
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function aroundLoad(
-        /** @noinspection PhpUnusedParameterInspection */
         \Magento\Quote\Api\Data\CartInterface $subject,
         \Closure $proceed,
         $modelId,
         $field = null
     ) {
-        /** @var \Magento\Quote\Api\Data\CartInterface $quote */
         $quote = $proceed($modelId, $field);
 
         $payment = $quote->getPayment();

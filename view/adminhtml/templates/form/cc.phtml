@@ -2,7 +2,7 @@
 /** @var \ParadoxLabs\TokenBase\Block\Form\Cc $block */
 // @codingStandardsIgnoreFile
 
-$code           = $block->getMethodCode();
+$code           = $block->escapeHtml($block->getMethodCode());
 $image          = $block->getBrandingImage();
 $storedCards    = $block->getStoredCards();
 ?>
@@ -12,7 +12,7 @@ $storedCards    = $block->getStoredCards();
     <fieldset class="admin__fieldset">
         <?php if ($image): ?>
             <div class="page-actions">
-                <img src="<?php echo $image; ?>" />
+                <img src="<?php echo $block->escapeUrl($image); ?>" />
             </div>
         <?php endif; ?>
         <?php if ($block->haveStoredCards()): ?>
@@ -22,8 +22,8 @@ $storedCards    = $block->getStoredCards();
                         <?php /** @var \ParadoxLabs\TokenBase\Model\Card $card */ ?>
                         <?php foreach ($storedCards as $card): ?>
                             <?php $card = $card->getTypeInstance(); ?>
-                            <option value="<?php echo $card->getHash() ?>" <?php if ($card->getId() == $block->getInfoData('tokenbase_id') || count($storedCards) == 1): ?>selected="selected"<?php endif; ?>>
-                                <?php echo $card->getLabel() ?>
+                            <option value="<?php echo $block->escapeHtml($card->getHash()) ?>" <?php if ($card->getId() == $block->getInfoData('tokenbase_id') || count($storedCards) == 1): ?>selected="selected"<?php endif; ?>>
+                                <?php echo $block->escapeHtml($card->getLabel()) ?>
                             </option>
                         <?php endforeach; ?>
                         <option value='' <?php if (count($storedCards) > 1 && $block->getInfoData('tokenbase_id') == ''): ?>selected="selected"<?php endif; ?>><?php echo __('Add new card') ?></option>
@@ -38,7 +38,7 @@ $storedCards    = $block->getStoredCards();
                     <option value="">--<?php echo __('Please Select')?>--</option>
                     <?php $_ccType = $block->getInfoData('cc_type') ?>
                     <?php foreach ($block->getCcAvailableTypes() as $_typeCode => $_typeName): ?>
-                        <option value="<?php echo $_typeCode ?>"<?php if ($_typeCode==$_ccType): ?> selected="selected"<?php endif ?>><?php echo $_typeName ?></option>
+                        <option value="<?php echo $block->escapeHtml($_typeCode) ?>"<?php if ($_typeCode==$_ccType): ?> selected="selected"<?php endif ?>><?php echo $block->escapeHtml($_typeName) ?></option>
                     <?php endforeach ?>
                 </select>
             </div>
@@ -46,7 +46,7 @@ $storedCards    = $block->getStoredCards();
         <div class="admin__field hide-if-card-selected">
             <label class="label admin__field-label" for="<?php echo $code ?>-cc-number"><?php echo __('Credit Card Number') ?><span class="required">*</span></label>
             <div class="admin__field-control control">
-                <input type="text" id="<?php echo $code ?>-cc-number" name="payment[cc_number]"  title="<?php echo __('Credit Card Number') ?>" class="input-text admin__control-text validate-cc-number validate-cc-type" value="<?php echo $block->getInfoData('cc_number'); ?>" autocomplete="off" />
+                <input type="text" id="<?php echo $code ?>-cc-number" name="payment[cc_number]"  title="<?php echo __('Credit Card Number') ?>" class="input-text admin__control-text validate-cc-number validate-cc-type" value="<?php echo $block->escapeHtml($block->getInfoData('cc_number')); ?>" autocomplete="off" />
             </div>
         </div>
         <div class="admin__field hide-if-card-selected">
@@ -55,13 +55,13 @@ $storedCards    = $block->getStoredCards();
                 <select id="<?php echo $code ?>-expiration" name="payment[cc_exp_month]" class="month validate-cc-exp required-entry _required select admin__control-select">
                     <?php $_ccExpMonth = $block->getInfoData('cc_exp_month') ?>
                     <?php foreach ($block->getCcMonths() as $k=>$v): ?>
-                        <option value="<?php echo $k?$k:'' ?>"<?php if ($k==$_ccExpMonth): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+                        <option value="<?php echo $k?$block->escapeHtml($k):'' ?>"<?php if ($k==$_ccExpMonth): ?> selected="selected"<?php endif ?>><?php echo $block->escapeHtml($v) ?></option>
                     <?php endforeach ?>
                 </select>
                 <?php $_ccExpYear = $block->getInfoData('cc_exp_year') ?>
                 <select id="<?php echo $code ?>-expiration-yr" name="payment[cc_exp_year]" class="year required-entry _required select admin__control-select">
                     <?php foreach ($block->getCcYears() as $k=>$v): ?>
-                        <option value="<?php echo $k?$k:'' ?>"<?php if ($k==$_ccExpYear): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+                        <option value="<?php echo $k?$block->escapeHtml($k):'' ?>"<?php if ($k==$_ccExpYear): ?> selected="selected"<?php endif ?>><?php echo $block->escapeHtml($v) ?></option>
                     <?php endforeach ?>
                 </select>
             </div>
@@ -72,7 +72,7 @@ $storedCards    = $block->getStoredCards();
                 <label class="label admin__field-label" for="<?php echo $code ?>-cc-cid" ><?php echo __('Card Verification Number') ?><span class="required">*</span></label>
                 <div class="admin__field-control control">
                     <div class="v-fix">
-                        <input type="text" title="<?php echo __('Card Verification Number') ?>" class="input-text admin__control-text cvv required-entry validate-cc-cvn" id="<?php echo $code ?>-cc-cid" name="payment[cc_cid]" value="<?php echo $block->getInfoData('cc_cid'); ?>" autocomplete="off" />
+                        <input type="text" title="<?php echo __('Card Verification Number') ?>" class="input-text admin__control-text cvv required-entry validate-cc-cvn" id="<?php echo $code ?>-cc-cid" name="payment[cc_cid]" value="<?php echo $block->escapeHtml($block->getInfoData('cc_cid')); ?>" autocomplete="off" />
                     </div>
                 </div>
             </div>

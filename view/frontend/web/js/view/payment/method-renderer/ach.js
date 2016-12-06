@@ -2,13 +2,14 @@ define(
     [
         'ko',
         'jquery',
+        'underscore',
         'Magento_Checkout/js/view/payment/default',
         'mage/translate',
         'Magento_Checkout/js/action/place-order',
         'Magento_Checkout/js/model/payment/additional-validators',
         'Magento_Ui/js/modal/alert'
     ],
-    function (ko, $, Component, $t, placeOrderAction, additionalValidators, alert) {
+    function (ko, $, _, Component, $t, placeOrderAction, additionalValidators, alert) {
         'use strict';
         var config=null;
         return Component.extend({

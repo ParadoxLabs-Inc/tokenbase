@@ -3,22 +3,23 @@
 // @codingStandardsIgnoreFile
 ?>
 <ul class="address-list ui-tabs-nav">
-    <?php if (count($block->getCards()) > 0): ?>
+    <?php $cards = $block->getCards(); ?>
+    <?php if (!empty($cards)): ?>
         <?php /** @var \ParadoxLabs\TokenBase\Model\Card $card */ ?>
         <?php $currentCardId = $block->getCurrentCard() ? $block->getCurrentCard()->getId() : null; ?>
-        <?php foreach ($block->getCards() as $card): ?>
+        <?php foreach ($cards as $card): ?>
             <?php $card = $card->getTypeInstance(); ?>
             <li class="address-list-item<?php if ($card->getExpires() != '' && strtotime($card->getExpires()) < time()): ?> expired<?php endif; ?><?php if ($card->getId() == $currentCardId): ?> ui-state-active<?php endif; ?>">
                 <div class="address-list-item-actions">
                     <?php if ($card->isInUse()): ?>
                         <abbr title="<?php echo __('This payment record cannot be modified while associated with pending orders.'); ?>"><?php echo __('Card In Use'); ?></abbr>
                     <?php else: ?>
-                        <a class="action-edit" href="<?php echo $block->getUrl('*/*/*', ['_secure' => true, 'id' => $block->getRequest()->getParam('id'), 'form_key' => $block->getFormKey(), 'method' => $card->getMethod(), 'card_id' => $card->getHash()]) ?>"><span><?php echo __('Edit') ?></span></a>
-                        <a class="action-delete" href="<?php echo $block->getUrl('*/*/paymentinfoDelete', ['_secure' => true, 'id' => $block->getRequest()->getParam('id'), 'form_key' => $block->getFormKey(), 'method' => $card->getMethod(), 'card_id' => $card->getHash()]) ?>"><span><?php echo __('Delete') ?></span></a>
+                        <a class="action-edit" href="<?php echo $block->escapeUrl($block->getUrl('*/*/*', ['_secure' => true, 'id' => $block->getRequest()->getParam('id'), 'form_key' => $block->getFormKey(), 'method' => $card->getMethod(), 'card_id' => $card->getHash()])) ?>"><span><?php echo __('Edit') ?></span></a>
+                        <a class="action-delete" href="<?php echo $block->escapeUrl($block->getUrl('*/*/paymentinfoDelete', ['_secure' => true, 'id' => $block->getRequest()->getParam('id'), 'form_key' => $block->getFormKey(), 'method' => $card->getMethod(), 'card_id' => $card->getHash()])) ?>"><span><?php echo __('Delete') ?></span></a>
                     <?php endif; ?>
                 </div>
                 <address>
-                    <span><?php echo $card->getLabel(); ?></span>
+                    <span><?php echo $block->escapeHtml($card->getLabel()); ?></span>
                     <?php if ($card->getExpires() != ''): ?>
                         <small><?php echo __('(Expires %1)', date('m/Y', strtotime($card->getExpires()))); ?></small>
                     <?php endif; ?><br />

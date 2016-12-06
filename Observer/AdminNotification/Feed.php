@@ -83,12 +83,10 @@ class Feed extends \Magento\AdminNotification\Model\Feed
      */
     public function getFeedUrl()
     {
-        $httpPath       = $this->_backendConfig->isSetFlag(self::XML_USE_HTTPS_PATH) ? 'https://' : 'http://';
-
         $methods        = $this->helper->getAllMethods();
         $methods[]      = 'tokenbase';
 
-        $this->_feedUrl = $httpPath . 'store.paradoxlabs.com/updates.php?key=' . implode(',', $methods)
+        $this->_feedUrl = 'https://store.paradoxlabs.com/updates.php?key=' . implode(',', $methods)
             . '&version=' . (string)$this->moduleResource->getDbVersion('ParadoxLabs_TokenBase');
 
         return $this->_feedUrl;

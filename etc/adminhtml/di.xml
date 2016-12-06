@@ -1,8 +1,14 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-    <type name="ParadoxLabs\TokenBase\Observer\AdminNotificationObserver">
+    <virtualType name="ParadoxLabs\TokenBase\Observer\AdminNotification\FeedFactory" type="Magento\AdminNotification\Model\FeedFactory">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">\ParadoxLabs\TokenBase\Observer\AdminNotification\Feed</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="ParadoxLabs\TokenBase\Observer\AdminNotificationObserver" type="Magento\AdminNotification\Observer\PredispatchAdminActionControllerObserver">
         <arguments>
             <argument name="feedFactory" xsi:type="object">ParadoxLabs\TokenBase\Observer\AdminNotification\FeedFactory</argument>
         </arguments>
-    </type>
+    </virtualType>
 </config>

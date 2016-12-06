@@ -40,6 +40,7 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
      * @param \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator
      * @param \Magento\Framework\Registry $registry
      * @param \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory
+     * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \ParadoxLabs\TokenBase\Helper\Address $addressHelper
      * @param \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory
@@ -52,6 +53,7 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
         \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator,
         \Magento\Framework\Registry $registry,
         \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
+        \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository,
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         \ParadoxLabs\TokenBase\Helper\Address $addressHelper,
         \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory,
@@ -67,6 +69,7 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
             $formKeyValidator,
             $registry,
             $cardFactory,
+            $cardRepository,
             $helper,
             $addressHelper
         );
@@ -95,9 +98,13 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
                  */
 
                 /** @var \ParadoxLabs\TokenBase\Model\Card $card */
-                $card       = $this->cardFactory->create();
-                $card->loadByHash($id);
-                $card->setMethod($card->getMethod() ?: $method);
+                if (!empty($id)) {
+                    $card = $this->cardRepository->getByHash($id);
+                } else {
+                    $card = $this->cardFactory->create();
+                    $card->setMethod($card->getMethod() ?: $method);
+                }
+
                 $card       = $card->getTypeInstance();
                 $customer   = $this->helper->getCurrentCustomer();
 
@@ -105,7 +112,7 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
                     /**
                      * Process address data
                      */
-                    $newAddrId    = intval($this->getRequest()->getParam('billing_address_id'));
+                    $newAddrId    = (int)$this->getRequest()->getParam('billing_address_id');
 
                     if ($newAddrId > 0) {
                         // Existing address
@@ -148,22 +155,23 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
                     $card->setCustomer($customer);
                     $card->setAddress($newAddr);
                     $card->importPaymentInfo($newPayment);
-                    $card->save();
+
+                    $this->cardRepository->save($card);
 
                     $this->session->unsData('tokenbase_form_data');
 
-                    $this->messageManager->addSuccess(__('Payment data saved successfully.'));
+                    $this->messageManager->addSuccessMessage(__('Payment data saved successfully.'));
                 } else {
-                    $this->messageManager->addError(__('Invalid Request.'));
+                    $this->messageManager->addErrorMessage(__('Invalid Request.'));
                 }
             } catch (\Exception $e) {
                 $this->session->setData('tokenbase_form_data', $this->getRequest()->getParams());
 
                 $this->helper->log($method, (string)$e);
-                $this->messageManager->addError(__($e->getMessage()));
+                $this->messageManager->addErrorMessage(__($e->getMessage()));
             }
         } else {
-            $this->messageManager->addError(__('Invalid Request.'));
+            $this->messageManager->addErrorMessage(__('Invalid Request.'));
         }
 
         $resultRedirect->setPath('*/*', ['method' => $method, '_secure' => true]);

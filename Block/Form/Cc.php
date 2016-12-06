@@ -36,12 +36,12 @@ class Cc extends \Magento\Payment\Block\Form\Cc
     protected $cards;
 
     /**
-     * @var \Magento\Customer\Model\Session
+     * @var \Magento\Customer\Model\Session\Proxy
      */
     protected $customerSession;
 
     /**
-     * @var \Magento\Checkout\Model\Session
+     * @var \Magento\Checkout\Model\Session\Proxy
      */
     protected $checkoutSession;
 
@@ -54,16 +54,16 @@ class Cc extends \Magento\Payment\Block\Form\Cc
      * @param \Magento\Framework\View\Element\Template\Context $context
      * @param \Magento\Payment\Model\Config $paymentConfig
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \Magento\Customer\Model\Session $customerSession
-     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Magento\Customer\Model\Session\Proxy $customerSession
+     * @param \Magento\Checkout\Model\Session\Proxy $checkoutSession
      * @param array $data
      */
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
         \Magento\Payment\Model\Config $paymentConfig,
         \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \Magento\Customer\Model\Session $customerSession,
-        \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Customer\Model\Session\Proxy $customerSession,
+        \Magento\Checkout\Model\Session\Proxy $checkoutSession,
         array $data = []
     ) {
         $this->helper = $helper;
@@ -80,7 +80,7 @@ class Cc extends \Magento\Payment\Block\Form\Cc
      */
     public function getStoredCards()
     {
-        if (is_null($this->cards)) {
+        if ($this->cards === null) {
             /**
              * If logged in, fetch the method cards for the current customer.
              * If not, short circuit / return empty array.
@@ -106,7 +106,7 @@ class Cc extends \Magento\Payment\Block\Form\Cc
     {
         $cards = $this->getStoredCards();
 
-        return (count($cards) > 0 ? true : false);
+        return (!empty($cards) ? true : false);
     }
 
     /**

@@ -43,37 +43,14 @@ interface CardInterface
     public function setMethodInstance(\ParadoxLabs\TokenBase\Api\MethodInterface $method);
 
     /**
-     * Get the arbitrary method instance.
-     *
-     * @return \ParadoxLabs\TokenBase\Api\MethodInterface Gateway-specific payment method
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-//    public function getMethodInstance();
-
-    /**
-     * Get the arbitrary type instance for this card.
-     * Response will extend \ParadoxLabs\TokenBase\Model\Card.
-     *
-     * @return \ParadoxLabs\TokenBase\Model\Card|$this
-     */
-//    public function getTypeInstance();
-
-    /**
-     * Get the customer object (if any) for the card.
-     *
-     * @return \Magento\Customer\Model\Customer
-     */
-//    public function getCustomer();
-
-    /**
      * Set the customer account (if any) for the card.
      *
-     * @param \Magento\Customer\Model\Customer $customer
+     * @param \Magento\Customer\Api\Data\CustomerInterface $customer
      * @param \Magento\Payment\Model\InfoInterface|null $payment
      * @return $this
      */
     public function setCustomer(
-        \Magento\Customer\Model\Customer $customer,
+        \Magento\Customer\Api\Data\CustomerInterface $customer,
         \Magento\Payment\Model\InfoInterface $payment = null
     );
 
@@ -113,14 +90,6 @@ interface CardInterface
      * @return $this
      */
     public function queueDeletion();
-
-    /**
-     * Load card by security hash.
-     *
-     * @param $hash
-     * @return $this
-     */
-    public function loadByHash($hash);
 
     /**
      * Get additional card data.
@@ -345,13 +314,6 @@ interface CardInterface
      * @return $this
      */
     public function setExpires($expires);
-
-    /**
-     * Get payment info instance (if any)
-     *
-     * @return \Magento\Payment\Model\InfoInterface|null
-     */
-//    public function getInfoInstance();
 
     /**
      * Set payment info instance

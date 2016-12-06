@@ -42,7 +42,6 @@ class ZeroTotal
      * @return bool
      */
     public function aroundIsApplicable(
-        /** @noinspection PhpUnusedParameterInspection */
         \Magento\Payment\Model\Checks\ZeroTotal $subject,
         \Closure $proceed,
         \Magento\Payment\Model\MethodInterface $paymentMethod,

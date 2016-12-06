@@ -70,11 +70,18 @@ class UpgradeSchema implements \Magento\Framework\Setup\UpgradeSchemaInterface
 
             /**
              * Generate hashes for any existing cards
+             * TODO: Verify this works / runs the expected query.
              */
-            $setup->getConnection()->query(
-                'UPDATE '.$setup->getTable('paradoxlabs_stored_card')
-                . ' SET `hash`=SHA1( CONCAT("tokenbase", customer_id, customer_email, method, profile_id, payment_id) )'
-                . ' WHERE `hash` IS NULL;'
+            $concat = new \Zend_Db_Expr(
+                'SHA1(CONCAT("tokenbase", customer_id, customer_email, method, profile_id, payment_id))'
+            );
+
+            $setup->getConnection()->update(
+                $setup->getTable('paradoxlabs_stored_card'),
+                [
+                    'hash= ? ' => $concat,
+                ],
+                'hash IS NULL'
             );
         }
 

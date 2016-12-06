@@ -16,6 +16,7 @@ namespace ParadoxLabs\TokenBase\Controller;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
+use ParadoxLabs\TokenBase\Api\CardRepositoryInterface;
 
 /**
  * Paymentinfo abstract controller
@@ -43,12 +44,17 @@ abstract class Paymentinfo extends \Magento\Customer\Controller\AbstractAccount
     protected $cardFactory;
 
     /**
+     * @var CardRepositoryInterface
+     */
+    protected $cardRepository;
+
+    /**
      * @var \ParadoxLabs\TokenBase\Helper\Address
      */
     protected $addressHelper;
 
     /**
-     * @var Session
+     * @var Session\Proxy
      */
     protected $session;
 
@@ -59,11 +65,12 @@ abstract class Paymentinfo extends \Magento\Customer\Controller\AbstractAccount
 
     /**
      * @param Context $context
-     * @param Session $customerSession
+     * @param Session\Proxy $customerSession
      * @param PageFactory $resultPageFactory
      * @param \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator
      * @param \Magento\Framework\Registry $registry
      * @param \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory
+     * @param CardRepositoryInterface $cardRepository
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \ParadoxLabs\TokenBase\Helper\Address $addressHelper
      */
@@ -74,6 +81,7 @@ abstract class Paymentinfo extends \Magento\Customer\Controller\AbstractAccount
         \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator,
         \Magento\Framework\Registry $registry,
         \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
+        \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository,
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         \ParadoxLabs\TokenBase\Helper\Address $addressHelper
     ) {
@@ -81,6 +89,7 @@ abstract class Paymentinfo extends \Magento\Customer\Controller\AbstractAccount
         $this->registry = $registry;
         $this->helper = $helper;
         $this->cardFactory = $cardFactory;
+        $this->cardRepository = $cardRepository;
         $this->addressHelper = $addressHelper;
         $this->session = $customerSession;
         $this->resultPageFactory = $resultPageFactory;

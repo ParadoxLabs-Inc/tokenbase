@@ -2,7 +2,7 @@
 /** @var \ParadoxLabs\TokenBase\Block\Form\Cc $block */
 // @codingStandardsIgnoreFile
 
-$code           = $block->getMethodCode();
+$code           = $block->escapeHtml($block->getMethodCode());
 $image          = $block->getBrandingImage();
 $storedCards    = $block->getStoredCards();
 ?>
@@ -10,7 +10,7 @@ $storedCards    = $block->getStoredCards();
           data-mage-init='{"tokenbaseForm":{"code":"<?php echo $code ?>"}}'>
     <?php if ($image): ?>
         <div class="sorter">
-            <img src="<?php echo $image; ?>" />
+            <img src="<?php echo $block->escapeUrl($image); ?>" />
         </div>
     <?php endif; ?>
     <?php if ($block->haveStoredCards()): ?>
@@ -21,8 +21,8 @@ $storedCards    = $block->getStoredCards();
                     <?php /** @var \ParadoxLabs\TokenBase\Model\Card $card */ ?>
                     <?php foreach ($storedCards as $card): ?>
                         <?php $card = $card->getTypeInstance(); ?>
-                        <option value="<?php echo $card->getHash() ?>" <?php if ($card->getId() == $block->getInfoData('tokenbase_id') || count($storedCards) == 1): ?>selected="selected"<?php endif; ?>>
-                            <?php echo $card->getLabel() ?>
+                        <option value="<?php echo $block->escapeHtml($card->getHash()) ?>" <?php if ($card->getId() == $block->getInfoData('tokenbase_id') || count($storedCards) == 1): ?>selected="selected"<?php endif; ?>>
+                            <?php echo $block->escapeHtml($card->getLabel()) ?>
                         </option>
                     <?php endforeach; ?>
                     <option value=''><?php echo __('Add new card') ?></option>
@@ -65,7 +65,7 @@ $storedCards    = $block->getStoredCards();
                    value="<?php echo $block->escapeHtml($block->getInfoData('echeck_account_no')); ?>" maxlength="17"
                    data-validate='{"required-number":true,"validate-length":true}' autocomplete="off" />
             <?php $expln    = __('On the bottom of your checks, you will see three groups of numbers. Usually the first one is your routing number, and the second is your account number.'); ?>
-            <?php $image    = $block->getViewFileUrl('ParadoxLabs_TokenBase::images/ach.png'); ?>
+            <?php $image    = $block->escapeUrl($block->getViewFileUrl('ParadoxLabs_TokenBase::images/ach.png')); ?>
             <?php $alt      = __('Visual reference for locating routing number and account number on a check'); ?>
             <?php $tooltip  = '<p>'.$expln.'</p><img src="'.$image.'" alt="'.$alt.'" />'; ?>
             <div class="note">
@@ -82,10 +82,10 @@ $storedCards    = $block->getStoredCards();
         <?php foreach ($block->getHelper()->getAchAccountTypes() as $k => $v): ?>
             <div class="control">
                 <input type="radio" name="payment[echeck_account_type]"
-                       id="<?php echo $code ?>-echeck-account-type-<?php echo $k; ?>"
-                       value="<?php echo $k; ?>" <?php if ($k == $typeValue): ?>checked="checked"<?php endif ?>
+                       id="<?php echo $code ?>-echeck-account-type-<?php echo $block->escapeHtml($k); ?>"
+                       value="<?php echo $block->escapeHtml($k); ?>" <?php if ($k == $typeValue): ?>checked="checked"<?php endif ?>
                        data-validate='{"validate-one-required-by-name":true}' />
-                <label for="<?php echo $code ?>-echeck-account-type-<?php echo $k; ?>"><?php echo $v; ?></label>
+                <label for="<?php echo $code ?>-echeck-account-type-<?php echo $block->escapeHtml($k); ?>"><?php echo $block->escapeHtml($v); ?></label>
             </div>
         <?php endforeach ?>
     </div>

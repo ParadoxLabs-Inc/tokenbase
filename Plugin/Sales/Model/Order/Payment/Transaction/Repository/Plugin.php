@@ -31,7 +31,6 @@ class Plugin
      * @throws \Zend_Db_Select_Exception
      */
     public function aroundGetList(
-        /** @noinspection PhpUnusedParameterInspection */
         \Magento\Sales\Model\Order\Payment\Transaction\Repository $subject,
         \Closure $proceed,
         \Magento\Framework\Api\SearchCriteria $searchCriteria
@@ -41,7 +40,7 @@ class Plugin
 
         $sort = $collection->getSelect()->getPart(\Zend_Db_Select::ORDER);
 
-        if (count($sort) == 0) {
+        if (empty($sort)) {
             // Add missing sort order(s)
             $sortOrders = $searchCriteria->getSortOrders();
             if ($sortOrders) {

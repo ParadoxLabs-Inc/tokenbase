@@ -43,7 +43,7 @@ class Address extends \Magento\Customer\Controller\Address\FormPost
             $addressErrors = $addressForm->validateData($addressData);
 
             if ($addressErrors !== true) {
-                throw new \Exception(implode(' ', $addressErrors));
+                throw new \Magento\Framework\Exception\LocalizedException(__(implode(' ', $addressErrors)));
             }
         }
         

@@ -62,7 +62,7 @@ class Form extends \Magento\Customer\Block\Address\Edit
      * @param \Magento\Framework\App\Cache\Type\Config $configCacheType
      * @param \Magento\Directory\Model\ResourceModel\Region\CollectionFactory $regionCollectionFactory
      * @param \Magento\Directory\Model\ResourceModel\Country\CollectionFactory $countryCollectionFactory
-     * @param \Magento\Customer\Model\Session $customerSession
+     * @param \Magento\Customer\Model\Session\Proxy $customerSession
      * @param \Magento\Customer\Api\AddressRepositoryInterface $addressRepository
      * @param \Magento\Customer\Api\Data\AddressInterfaceFactory $addressDataFactory
      * @param \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer
@@ -82,7 +82,7 @@ class Form extends \Magento\Customer\Block\Address\Edit
         \Magento\Framework\App\Cache\Type\Config $configCacheType,
         \Magento\Directory\Model\ResourceModel\Region\CollectionFactory $regionCollectionFactory,
         \Magento\Directory\Model\ResourceModel\Country\CollectionFactory $countryCollectionFactory,
-        \Magento\Customer\Model\Session $customerSession,
+        \Magento\Customer\Model\Session\Proxy $customerSession,
         \Magento\Customer\Api\AddressRepositoryInterface $addressRepository,
         \Magento\Customer\Api\Data\AddressInterfaceFactory $addressDataFactory,
         \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer,
@@ -153,7 +153,7 @@ class Form extends \Magento\Customer\Block\Address\Edit
      */
     public function getCard()
     {
-        if (is_null($this->card)) {
+        if ($this->card === null) {
             try {
                 $this->card = $this->helper->getActiveCard($this->getCode());
             } catch (\Exception $e) {
@@ -235,7 +235,7 @@ class Form extends \Magento\Customer\Block\Address\Edit
      */
     public function getCcBlock()
     {
-        if (is_null($this->ccBlock)) {
+        if ($this->ccBlock === null) {
             $this->ccBlock = $this->getLayout()->createBlock('Magento\Payment\Block\Form\Cc');
             $this->ccBlock->setMethod($this->getMethod());
         }

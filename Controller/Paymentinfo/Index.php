@@ -21,7 +21,7 @@ class Index extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
     /**
      * Payment data index page
      *
-     * @return \Magento\Framework\View\Result\Page
+     * @return \Magento\Framework\Controller\ResultInterface
      */
     public function execute()
     {
@@ -31,7 +31,7 @@ class Index extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
         if ($this->methodIsValid() !== true) {
             $methods = $this->helper->getActiveMethods();
 
-            if (count($methods) > 0) {
+            if (!empty($methods)) {
                 sort($methods);
 
                 $this->registry->register('tokenbase_method', $methods[0]);
@@ -39,7 +39,7 @@ class Index extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
                 /** @var \Magento\Framework\Controller\Result\Redirect $resultRedirect */
                 $resultRedirect = $this->resultRedirectFactory->create();
 
-                $this->messageManager->addError(__('No payment methods are currently available.'));
+                $this->messageManager->addErrorMessage(__('No payment methods are currently available.'));
 
                 $resultRedirect->setPath('*/account');
                 return $resultRedirect;
@@ -65,8 +65,7 @@ class Index extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
 
         if (!empty($id)) {
             /** @var \ParadoxLabs\TokenBase\Model\Card $card */
-            $card = $this->cardFactory->create();
-            $card->loadByHash($id);
+            $card = $this->cardRepository->getByHash($id);
             $card = $card->getTypeInstance();
 
             if ($card && $card->getHash() == $id && $card->hasOwner($this->helper->getCurrentCustomer()->getId())) {

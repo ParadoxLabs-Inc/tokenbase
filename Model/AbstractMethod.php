@@ -157,7 +157,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
     protected $gateway;
 
     /**
-     * @var \Magento\Customer\Model\Customer|null
+     * @var \Magento\Customer\Api\Data\CustomerInterface|null
      */
     protected $customer;
 
@@ -182,6 +182,11 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
     protected $transactionRepository;
 
     /**
+     * @var \ParadoxLabs\TokenBase\Api\CardRepositoryInterface
+     */
+    protected $cardRepository;
+
+    /**
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory
@@ -195,6 +200,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \ParadoxLabs\TokenBase\Model\AbstractGateway $gateway
      * @param \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $cardFactory
+     * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
      * @param \ParadoxLabs\TokenBase\Helper\AddressFactory $addressHelperFactory
      * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
@@ -215,6 +221,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         \ParadoxLabs\TokenBase\Model\AbstractGateway $gateway,
         \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $cardFactory,
+        \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository,
         \ParadoxLabs\TokenBase\Helper\AddressFactory $addressHelperFactory,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
@@ -223,6 +230,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
         $this->helper = $helper;
         $this->gateway = $gateway;
         $this->cardFactory = $cardFactory;
+        $this->cardRepository = $cardRepository;
         $this->addressHelperFactory = $addressHelperFactory;
         $this->transactionRepository = $transactionRepository;
         
@@ -267,10 +275,10 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
     /**
      * Set the customer to use for payment/card operations.
      *
-     * @param \Magento\Customer\Model\Customer $customer
+     * @param \Magento\Customer\Api\Data\CustomerInterface $customer
      * @return $this
      */
-    public function setCustomer(\Magento\Customer\Model\Customer $customer)
+    public function setCustomer(\Magento\Customer\Api\Data\CustomerInterface $customer)
     {
         $this->customer = $customer;
 
@@ -280,11 +288,11 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
     /**
      * Get the current customer; fetch from session if necessary.
      *
-     * @return \Magento\Customer\Model\Customer
+     * @return \Magento\Customer\Api\Data\CustomerInterface
      */
     public function getCustomer()
     {
-        if (is_null($this->customer) || $this->customer->getId() < 1) {
+        if ($this->customer === null || $this->customer->getId() < 1) {
             $this->setCustomer($this->helper->getCurrentCustomer());
         }
 
@@ -325,19 +333,16 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
     {
         $this->log(sprintf('loadAndSetCard(%s, %s)', $cardId, var_export($byHash, 1)));
 
-        /** @var Card $card */
-        $card = $this->cardFactory->create();
-        
-        if ($byHash === true) {
-            $card->loadByHash($cardId);
-        } else {
-            $card->load($cardId);
-        }
+        try {
+            $card = $this->cardRepository->getById($cardId);
 
-        if ($card && $card->getId() > 0) {
-            $this->setCard($card);
+            if ($card && $card->getId() > 0 && ($byHash === false || $card->getHash() == $cardId)) {
+                $this->setCard($card);
 
-            return $this->getCard();
+                return $this->getCard();
+            }
+        } catch (\Exception $e) {
+            // Any error is inability to load card -- handle same as auth failure.
         }
 
         /**
@@ -393,10 +398,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
     {
         $this->log(sprintf('assignData(%s)', $data->getData('card_id')));
 
-        if (!$data instanceof \Magento\Framework\DataObject) {
-            $data = new \Magento\Framework\DataObject($data);
-        }
-
         if ($data->hasData('additional_data')) {
             // Shouldn't Magento handle this? Move values from additional_data if needed.
             foreach ($data->getData('additional_data') as $key => $value) {
@@ -434,7 +435,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
                 $info->setData('cc_last_4', $data->getData('cc_last4'));
             }
 
-            if ($data->getData('cc_exp_year') != ''  && $data->getData('cc_exp_month') != '') {
+            if ($data->getData('cc_exp_year') != '' && $data->getData('cc_exp_month') != '') {
                 $info->setData('cc_exp_year', $data->getData('cc_exp_year'))
                      ->setData('cc_exp_month', $data->getData('cc_exp_month'));
             }
@@ -466,7 +467,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
          * If no tokenbase ID, we must have a new card. Make sure all the details look valid.
          */
         if ($info->hasData('tokenbase_id') === false) {
-            return parent::validate();
+            parent::validate();
+
+            return $this;
         } else {
             /**
              * If there is an ID, this might be an edit. Validate there too, as much as we can.
@@ -613,28 +616,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
         /**
          * Grab transaction ID from the invoice in case partial invoicing.
          */
-
-        /** @var \Magento\Sales\Model\Order\Invoice $invoice */
-        $invoice = null;
-
-        if ($payment->hasData('invoice')
-            && $payment->getData('invoice') instanceof \Magento\Sales\Model\Order\Invoice) {
-            $invoice = $payment->getData('invoice');
-        } else {
-            $invoice = $this->_registry->registry('current_invoice');
-        }
-
-        if (!is_null($invoice)) {
-            if ($invoice->getTransactionId() != '') {
-                $this->gateway()->setTransactionId($invoice->getTransactionId());
-            }
-
-            if ($this->getConfigData('send_line_items')) {
-                $this->gateway()->setLineItems($invoice->getAllItems());
-            }
-        } elseif ($this->getConfigData('send_line_items')) {
-            $this->gateway()->setLineItems($payment->getOrder()->getAllVisibleItems());
-        }
+        $this->captureGetInvoiceInfo($payment);
 
         /**
          * Process transaction and results
@@ -654,10 +636,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
             $payment->setIsTransactionPending(true)
                     ->setIsFraudDetected(true)
                     ->setTransactionAdditionalInfo('is_transaction_fraud', true);
-        } elseif ($this->gateway()->getHaveAuthorized() === false) {
-            if ($payment->getOrder()->getStatus() != $this->getConfigData('order_status')) {
-                $payment->getOrder()->setStatus($this->getConfigData('order_status'));
-            }
+        } elseif ($this->gateway()->getHaveAuthorized() === false
+            && $payment->getOrder()->getStatus() != $this->getConfigData('order_status')) {
+            $payment->getOrder()->setStatus($this->getConfigData('order_status'));
         }
 
         // Set transaction id iff different from the last txn id -- use Magento's generated ID otherwise.
@@ -886,6 +867,39 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
     }
 
     /**
+     * Get invoice info on capture.
+     *
+     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @return $this
+     */
+    protected function captureGetInvoiceInfo(\Magento\Payment\Model\InfoInterface $payment)
+    {
+        /** @var \Magento\Sales\Model\Order\Invoice $invoice */
+        $invoice = null;
+
+        if ($payment->hasData('invoice')
+            && $payment->getData('invoice') instanceof \Magento\Sales\Model\Order\Invoice) {
+            $invoice = $payment->getData('invoice');
+        } else {
+            $invoice = $this->_registry->registry('current_invoice');
+        }
+
+        if ($invoice !== null) {
+            if ($invoice->getTransactionId() != '') {
+                $this->gateway()->setTransactionId($invoice->getTransactionId());
+            }
+
+            if ($this->getConfigData('send_line_items')) {
+                $this->gateway()->setLineItems($invoice->getAllItems());
+            }
+        } elseif ($this->getConfigData('send_line_items')) {
+            $this->gateway()->setLineItems($payment->getOrder()->getAllVisibleItems());
+        }
+
+        return $this;
+    }
+
+    /**
      * We can't have two transactions with the same ID. Make sure that doesn't happen.
      *
      * @param \Magento\Payment\Model\InfoInterface $payment
@@ -935,7 +949,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
 
         $this->log(sprintf('loadOrCreateCard(%s %s)', get_class($payment), $payment->getId()));
 
-        if (!is_null($this->getCard())) {
+        if ($this->getCard() !== null) {
             $this->setCard($this->getCard());
 
             return $this->getCard();
@@ -971,7 +985,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
                 );
             }
 
-            $card->save();
+            $this->cardRepository->save($card);
 
             $this->setCard($card);
 
@@ -1091,7 +1105,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\Cc implement
 
     /**
      * @param \Magento\Payment\Model\InfoInterface $payment
-     * @param $amount
+     * @param float $amount
      * @return void
      */
     protected function beforeAuthorize(\Magento\Payment\Model\InfoInterface $payment, $amount)

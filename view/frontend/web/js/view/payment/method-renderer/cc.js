@@ -21,6 +21,7 @@ define(
             defaults: {
                 template: 'ParadoxLabs_TokenBase/payment/cc',
                 isCcFormShown: true,
+                isCcvShown: true,
                 save: config ? config.canSaveCard && config.defaultSaveCard : false,
                 selectedCard: config ? config.selectedCard : '',
                 storedCards: config ? config.storedCards : {},

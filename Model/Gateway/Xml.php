@@ -80,7 +80,7 @@ class Xml
      * @param string $node_name - name of the root node to be converted
      * @param array|string $arr - array to be converterd
      * @return \DOMNode
-     * @throws \Exception
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private static function &convertArrayToXml($node_name, $arr = [])
     {
@@ -92,8 +92,12 @@ class Xml
             if (isset($arr['@attributes'])) {
                 foreach ($arr['@attributes'] as $key => $value) {
                     if (!self::isValidTagName($key)) {
-                        throw new \Exception(
-                            '[Array2XML] Illegal character in attribute name. attribute: '.$key.' in node: '.$node_name
+                        throw new \Magento\Framework\Exception\LocalizedException(
+                            __(
+                                '[Array2XML] Illegal character in attribute name. attribute: %1 in node: %2',
+                                $key,
+                                $node_name
+                            )
                         );
                     }
                     $node->setAttribute($key, self::bool2str($value));
@@ -117,28 +121,7 @@ class Xml
         }
 
         //create subnodes using recursion
-        if (is_array($arr)) {
-            // recurse to get the node for that key
-            foreach ($arr as $key => $value) {
-                if (!self::isValidTagName($key)) {
-                    throw new \Exception(
-                        '[Array2XML] Illegal character in tag name. tag: '.$key.' in node: '.$node_name
-                    );
-                }
-                if (is_array($value) && is_numeric(key($value))) {
-                    // MORE THAN ONE NODE OF ITS KIND;
-                    // if the new array is numeric index, means it is array of nodes of the same kind
-                    // it should follow the parent key name
-                    foreach ($value as $k => $v) {
-                        $node->appendChild(self::convertArrayToXml($key, $v));
-                    }
-                } else {
-                    // ONLY ONE NODE OF ITS KIND
-                    $node->appendChild(self::convertArrayToXml($key, $value));
-                }
-                unset($arr[$key]); //remove the key from the array once done.
-            }
-        }
+        self::convertArraySubnodesToXml($node_name, $arr, $node);
 
         // after we are done with all the keys in the array (if it is one)
         // we check if it has any text value, if yes, append it.
@@ -154,7 +137,7 @@ class Xml
      *
      * @param $input_xml
      * @return array
-     * @throws \Exception
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public static function &createArray($input_xml)
     {
@@ -167,11 +150,15 @@ class Xml
         if (is_string($input_xml)) {
             $parsed = @$xml->loadXML($input_xml);
             if (!$parsed) {
-                throw new \Exception('[XML2Array] Error parsing the XML string.');
+                throw new \Magento\Framework\Exception\LocalizedException(
+                    __('[XML2Array] Error parsing the XML string.')
+                );
             }
         } else {
             if (get_class($input_xml) != 'DOMDocument') {
-                throw new \Exception('[XML2Array] The input XML object should be of type: DOMDocument.');
+                throw new \Magento\Framework\Exception\LocalizedException(
+                    __('[XML2Array] The input XML object should be of type DOMDocument.')
+                );
             }
             $xml = self::$xml = $input_xml;
         }
@@ -194,7 +181,9 @@ class Xml
 
         switch ($node->nodeType) {
             case XML_CDATA_SECTION_NODE:
-                $output['@cdata'] = trim($node->textContent);
+                $output = [
+                    '@cdata' => trim($node->textContent),
+                ];
                 break;
 
             case XML_TEXT_NODE:
@@ -202,50 +191,7 @@ class Xml
                 break;
 
             case XML_ELEMENT_NODE:
-                // for each child node, call the covert function recursively
-                for ($i=0, $m=$node->childNodes->length; $i<$m; $i++) {
-                    $child = $node->childNodes->item($i);
-                    $v = self::convertXmlToArray($child);
-                    if (isset($child->tagName)) {
-                        $t = $child->tagName;
-
-                        // assume more nodes of same kind are coming
-                        if (!isset($output[$t])) {
-                            $output[$t] = [];
-                        }
-                        $output[$t][] = $v;
-                    } else {
-                        //check if it is not an empty text node
-                        if ($v !== '') {
-                            $output = $v;
-                        }
-                    }
-                }
-
-                if (is_array($output)) {
-                    // if only one node of its kind, assign it directly instead if array($value);
-                    foreach ($output as $t => $v) {
-                        if (is_array($v) && count($v)==1) {
-                            $output[$t] = $v[0];
-                        }
-                    }
-                    if (empty($output)) {
-                        $output = '';
-                    }
-                }
-
-                // loop through the attributes and collect them
-                if ($node->attributes->length) {
-                    $a = [];
-                    foreach ($node->attributes as $attrName => $attrNode) {
-                        $a[$attrName] = (string) $attrNode->value;
-                    }
-                    // if its an leaf node, store the value in @value instead of directly storing it.
-                    if (!is_array($output)) {
-                        $output = ['@value' => $output];
-                    }
-                    $output['@attributes'] = $a;
-                }
+                $output = self::convertXmlElementToArray($node);
                 break;
         }
 
@@ -292,5 +238,115 @@ class Xml
         $pattern = '/^[a-z_]+[a-z0-9\:\-\.\_]*[^:]*$/i';
 
         return preg_match($pattern, $tag, $matches) && $matches[0] == $tag;
+    }
+
+    /**
+     * Convert the given array to subnodes of the given node.
+     *
+     * Split from convertArrayToXml to reduce cyclomatic complexity.
+     *
+     * @param string $node_name
+     * @param array|string $arr
+     * @param \DOMNode $node
+     * @return void
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    private static function &convertArraySubnodesToXml($node_name, $arr, $node)
+    {
+        if (is_array($arr)) {
+            // recurse to get the node for that key
+            foreach ($arr as $key => $value) {
+                if (!self::isValidTagName($key)) {
+                    throw new \Magento\Framework\Exception\LocalizedException(
+                        __(
+                            '[Array2XML] Illegal character in tag name. tag: %1 in node: %2',
+                            $key,
+                            $node_name
+                        )
+                    );
+                }
+
+                if (is_array($value) && is_numeric(key($value))) {
+                    // MORE THAN ONE NODE OF ITS KIND;
+                    // if the new array is numeric index, means it is array of nodes of the same kind
+                    // it should follow the parent key name
+                    foreach ($value as $k => $v) {
+                        $node->appendChild(self::convertArrayToXml($key, $v));
+                    }
+                } else {
+                    // ONLY ONE NODE OF ITS KIND
+                    $node->appendChild(self::convertArrayToXml($key, $value));
+                }
+
+                //remove the key from the array once done.
+                unset($arr[$key]);
+            }
+        }
+    }
+
+    /**
+     * @param $node
+     * @return array|mixed|string
+     */
+    private static function convertXmlElementToArray($node)
+    {
+        $output = self::convertXmlElementChildrenToArray($node, []);
+
+        if (is_array($output)) {
+            // if only one node of its kind, assign it directly instead if array($value);
+            foreach ($output as $t => $v) {
+                if (is_array($v) && count($v) == 1) {
+                    $output[$t] = $v[0];
+                }
+            }
+            if (empty($output)) {
+                $output = '';
+            }
+        }
+
+        // loop through the attributes and collect them
+        if ($node->attributes->length) {
+            $a = [];
+            foreach ($node->attributes as $attrName => $attrNode) {
+                $a[$attrName] = (string)$attrNode->value;
+            }
+            // if its an leaf node, store the value in @value instead of directly storing it.
+            if (!is_array($output)) {
+                $output = ['@value' => $output];
+            }
+            $output['@attributes'] = $a;
+        }
+
+        return $output;
+    }
+
+    /**
+     * @param $node
+     * @param $output
+     * @return array
+     */
+    private static function convertXmlElementChildrenToArray($node, $output)
+    {
+        // for each child node, call the convert function recursively
+        for ($i = 0, $m = $node->childNodes->length; $i < $m; $i++) {
+            $child = $node->childNodes->item($i);
+            $v = self::convertXmlToArray($child);
+            if (isset($child->tagName)) {
+                $t = $child->tagName;
+
+                // assume more nodes of same kind are coming
+                if (!isset($output[$t])) {
+                    $output[$t] = [];
+                }
+                $output[$t][] = $v;
+            } else {
+                //check if it is not an empty text node
+                if ($v !== '') {
+                    $output = $v;
+                }
+            }
+        }
+
+        return $output;
     }
 }
