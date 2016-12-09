@@ -63,7 +63,7 @@
                 <div class="nested">
                     <?php $_streetValidationClass = trim(str_replace('required-entry', '', $_streetValidationClass)); ?>
                     <?php for ($_i = 1, $_n = $this->helper('Magento\Customer\Helper\Address')->getStreetLines(); $_i < $_n; $_i++): ?>
-                        <?php $lineNo = (int)($i + 1); ?>
+                        <?php $lineNo = (int)($_i + 1); ?>
                         <div class="admin__field additional">
                             <label class="admin__field-label" for="<?php echo $code; ?>-street_<?php echo $lineNo; ?>">
                                 <span><?php echo __('Street Address %1', $lineNo); ?></span>

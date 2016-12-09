@@ -42,9 +42,9 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
     protected $helper;
 
     /**
-     * @var \Magento\Payment\Helper\Data
+     * @var \ParadoxLabs\TokenBase\Model\Method\Factory
      */
-    protected $paymentHelper;
+    protected $methodFactory;
 
     /**
      * @var \ParadoxLabs\TokenBase\Model\AbstractMethod
@@ -152,7 +152,7 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
         );
 
         $this->helper                   = $cardContext->getHelper();
-        $this->paymentHelper            = $cardContext->getPaymentHelper();
+        $this->methodFactory            = $cardContext->getMethodFactory();
         $this->cardFactory              = $cardContext->getCardFactory();
         $this->customerFactory          = $cardContext->getCustomerFactory();
         $this->customerRepository       = $cardContext->getCustomerRepository();
@@ -200,7 +200,7 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
     {
         if ($this->method === null) {
             if ($this->hasData('method')) {
-                $this->method = $this->paymentHelper->getMethodInstance($this->getData('method'));
+                $this->method = $this->methodFactory->getMethodInstance($this->getData('method'));
             } else {
                 throw new \UnexpectedValueException('Payment method is unknown for the current card.');
             }
@@ -388,9 +388,6 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
                ->addAttributeToFilter('customer_id', $this->getData('customer_id'))
                ->addAttributeToFilter('status', ['like' => 'pending%']);
 
-        /**
-         * TODO: Verify this works as expected for collections
-         */
         if (!empty($orders)) {
             foreach ($orders as $order) {
                 /** @var \Magento\Sales\Model\Order $order */

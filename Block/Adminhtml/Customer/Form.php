@@ -265,7 +265,7 @@ class Form extends \Magento\Customer\Block\Address\Edit
             [
                 '_secure' => true,
                 'id' => $this->getRequest()->getParam('id'),
-                'method' => $this->getMethod(),
+                'method' => $this->getCard()->getMethod(),
                 'form_key' => $this->formKey->getFormKey(),
             ]
         );

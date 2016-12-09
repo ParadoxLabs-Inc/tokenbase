@@ -16,7 +16,7 @@ namespace ParadoxLabs\TokenBase\Model\Cron;
 /**
  * Perform scheduled maintenance actions
  *
- * TODO: Support multi-website configuration
+ * TODO: Support multi-website configuration--determine and set store on method in card->getMethodInstance() if new
  */
 class Clean
 {

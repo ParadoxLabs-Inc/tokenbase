@@ -13,6 +13,13 @@
         <plugin name="tokenbaseAllowPendingStatus" type="ParadoxLabs\TokenBase\Plugin\AllowPendingStatus" sortOrder="100" disabled="false" />
     </type>
 
+    <!-- Logging -->
+    <type name="ParadoxLabs\TokenBase\Helper\Operation">
+        <arguments>
+            <argument name="tokenbaseLogger" xsi:type="object">ParadoxLabs\TokenBase\Model\Logger\Logger</argument>
+        </arguments>
+    </type>
+
     <type name="ParadoxLabs\TokenBase\Model\Logger\Handler">
         <arguments>
             <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
@@ -32,13 +39,15 @@
 
     <virtualType name="ParadoxLabs\TokenBase\Model\Logger\LineFormatter" type="Monolog\Formatter\LineFormatter">
         <arguments>
-            <argument name="format" xsi:type="string">[%datetime%] %message% %context% %extra%\n</argument>
+            <argument name="format" xsi:type="string"><![CDATA[[%datetime%] %message% %context% %extra%
+]]></argument>
             <argument name="dateFormat" xsi:type="null" />
             <argument name="allowInlineLineBreaks" xsi:type="boolean">true</argument>
             <argument name="ignoreEmptyContextAndExtra" xsi:type="boolean">true</argument>
         </arguments>
     </virtualType>
 
+    <!-- Payment interfaces -->
     <preference for="ParadoxLabs\TokenBase\Api\MethodInterface" type="ParadoxLabs\TokenBase\Model\AbstractMethod" />
     <preference for="ParadoxLabs\TokenBase\Api\GatewayInterface" type="ParadoxLabs\TokenBase\Model\AbstractGateway" />
 

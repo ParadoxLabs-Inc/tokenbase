@@ -24,11 +24,6 @@ class Context
     private $helper;
 
     /**
-     * @var \Magento\Payment\Helper\Data
-     */
-    private $paymentHelper;
-
-    /**
      * @var Factory
      */
     private $cardFactory;
@@ -89,11 +84,16 @@ class Context
     private $customerRepository;
 
     /**
+     * @var \ParadoxLabs\TokenBase\Model\Method\Factory
+     */
+    private $methodFactory;
+
+    /**
      * Context constructor.
      *
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \Magento\Payment\Helper\Data $paymentHelper
-     * @param Factory $cardFactory
+     * @param \ParadoxLabs\TokenBase\Model\Method\Factory $methodFactory
+     * @param \ParadoxLabs\TokenBase\Model\Card\Factory $cardFactory
      * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
      * @param \Magento\Customer\Api\Data\CustomerInterfaceFactory $customerFactory
      * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
@@ -108,7 +108,7 @@ class Context
      */
     public function __construct(
         \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \Magento\Payment\Helper\Data $paymentHelper,
+        \ParadoxLabs\TokenBase\Model\Method\Factory $methodFactory,
         \ParadoxLabs\TokenBase\Model\Card\Factory $cardFactory,
         \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory,
         \Magento\Customer\Api\Data\CustomerInterfaceFactory $customerFactory,
@@ -123,7 +123,7 @@ class Context
         \Magento\Framework\Unserialize\Unserialize $unserialize
     ) {
         $this->helper = $helper;
-        $this->paymentHelper = $paymentHelper;
+        $this->methodFactory = $methodFactory;
         $this->cardFactory = $cardFactory;
         $this->cardCollectionFactory = $cardCollectionFactory;
         $this->customerFactory = $customerFactory;
@@ -149,13 +149,13 @@ class Context
     }
 
     /**
-     * Get paymentHelper
+     * Get methodFactory
      *
-     * @return \Magento\Payment\Helper\Data
+     * @return \ParadoxLabs\TokenBase\Model\Method\Factory
      */
-    public function getPaymentHelper()
+    public function getMethodFactory()
     {
-        return $this->paymentHelper;
+        return $this->methodFactory;
     }
 
     /**

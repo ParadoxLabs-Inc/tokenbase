@@ -19,7 +19,7 @@ namespace ParadoxLabs\TokenBase\Helper;
 class Operation extends \Magento\Framework\App\Helper\AbstractHelper
 {
     /**
-     * @var \ParadoxLabs\TokenBase\Model\Logger\Logger
+     * @var \Monolog\Logger
      */
     protected $tokenbaseLogger;
 
@@ -27,11 +27,11 @@ class Operation extends \Magento\Framework\App\Helper\AbstractHelper
      * Data constructor.
      *
      * @param \Magento\Framework\App\Helper\Context $context
-     * @param \ParadoxLabs\TokenBase\Model\Logger\Logger $tokenbaseLogger
+     * @param \Monolog\Logger $tokenbaseLogger
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
-        \ParadoxLabs\TokenBase\Model\Logger\Logger $tokenbaseLogger
+        \Monolog\Logger $tokenbaseLogger
     ) {
         parent::__construct($context);
 

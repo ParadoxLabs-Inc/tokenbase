@@ -251,7 +251,7 @@ class Xml
      * @return void
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    private static function &convertArraySubnodesToXml($node_name, $arr, $node)
+    private static function convertArraySubnodesToXml($node_name, &$arr, &$node)
     {
         if (is_array($arr)) {
             // recurse to get the node for that key

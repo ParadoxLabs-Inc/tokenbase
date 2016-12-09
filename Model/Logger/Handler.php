@@ -42,9 +42,6 @@ class Handler extends \Magento\Framework\Logger\Handler\Base
     ) {
         parent::__construct($filesystem, $filePath);
 
-        /**
-         * TODO: Verify this logger DI change works.
-         */
         $this->setFormatter($lineFormatter);
     }
 }

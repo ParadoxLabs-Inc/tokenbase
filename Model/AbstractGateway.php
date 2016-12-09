@@ -18,7 +18,7 @@ use ParadoxLabs\TokenBase\Api\GatewayInterface;
 /**
  * Common API gateway methods, logging, exceptions, etc.
  */
-abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel implements GatewayInterface
+abstract class AbstractGateway extends \Magento\Framework\DataObject implements GatewayInterface
 {
     /**
      * @var string
@@ -134,25 +134,17 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel im
     /**
      * Constructor, yeah!
      *
-     * @param \Magento\Framework\Model\Context $context
-     * @param \Magento\Framework\Registry $registry
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \ParadoxLabs\TokenBase\Model\Gateway\Xml $xml
      * @param \ParadoxLabs\TokenBase\Model\Gateway\ResponseFactory $responseFactory
      * @param \Magento\Framework\HTTP\ZendClientFactory $httpClientFactory
-     * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
-     * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
      * @param array $data
      */
     public function __construct(
-        \Magento\Framework\Model\Context $context,
-        \Magento\Framework\Registry $registry,
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         \ParadoxLabs\TokenBase\Model\Gateway\Xml $xml,
         \ParadoxLabs\TokenBase\Model\Gateway\ResponseFactory $responseFactory,
         \Magento\Framework\HTTP\ZendClientFactory $httpClientFactory,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         $this->helper           = $helper;
@@ -160,7 +152,7 @@ abstract class AbstractGateway extends \Magento\Framework\Model\AbstractModel im
         $this->xml              = $xml;
         $this->httpClientFactory = $httpClientFactory;
 
-        return parent::__construct($context, $registry, $resource, $resourceCollection, $data);
+        return parent::__construct($data);
     }
 
     /**

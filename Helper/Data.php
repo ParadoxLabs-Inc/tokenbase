@@ -315,6 +315,10 @@ class Data extends \Magento\Payment\Helper\Data
             );
         }
 
+        if (($this->currentCustomer instanceof \Magento\Customer\Api\Data\CustomerInterface) === false) {
+            $this->currentCustomer = $this->customerFactory->create();
+        }
+
         return $this->currentCustomer;
     }
 
@@ -327,17 +331,20 @@ class Data extends \Magento\Payment\Helper\Data
     {
         $customer = $this->customerFactory->create();
 
-        if ($this->registry->registry('current_order') != null) {
-            $customer = $this-$this->customerRepository->getById(
+        if ($this->registry->registry('current_order') != null
+            && $this->registry->registry('current_order')->getCustomerId() > 0) {
+            $customer = $this->customerRepository->getById(
                 $this->registry->registry('current_order')->getCustomerId()
             );
-        } elseif ($this->registry->registry('current_invoice') != null) {
+        } elseif ($this->registry->registry('current_invoice') != null
+            && $this->registry->registry('current_invoice')->getOrder()->getCustomerId() > 0) {
             $customer = $this->customerRepository->getById(
-                $this->registry->registry('current_invoice')->getCustomerId()
+                $this->registry->registry('current_invoice')->getOrder()->getCustomerId()
             );
-        } elseif ($this->registry->registry('current_creditmemo') != null) {
+        } elseif ($this->registry->registry('current_creditmemo') != null
+            && $this->registry->registry('current_creditmemo')->getOrder()->getCustomerId() > 0) {
             $customer = $this->customerRepository->getById(
-                $this->registry->registry('current_creditmemo')->getCustomerId()
+                $this->registry->registry('current_creditmemo')->getOrder()->getCustomerId()
             );
         } elseif ($this->backendSession->hasQuoteId()) {
             if ($this->backendSession->getQuote()->getCustomerId() > 0) {
@@ -457,9 +464,6 @@ class Data extends \Magento\Payment\Helper\Data
                     $tokenbaseId = $this->backendSession->getQuote()->getPayment()->getData('tokenbase_id');
 
                     if ($this->getCurrentCustomer()->getId() > 0) {
-                        /**
-                         * TODO: VERIFY this comes out as expected! WHERE (customer_id=1 AND (id=2 OR active=1))
-                         */
                         $this->cards[ $method ]->addFieldToFilter('customer_id', $this->getCurrentCustomer()->getId());
                         $this->cards[ $method ]->addFieldToFilter(
                             [
@@ -472,7 +476,7 @@ class Data extends \Magento\Payment\Helper\Data
                             ]
                         );
                     } else {
-                        $this->cards[$method]->addFieldToFilter('id', $tokenbaseId);
+                        $this->cards[ $method ]->addFieldToFilter('id', $tokenbaseId);
                     }
                 } elseif ($this->getCurrentCustomer()->getId() > 0) {
                     // Case where we want to show a customer's stored cards (if any)

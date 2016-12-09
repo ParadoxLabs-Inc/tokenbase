@@ -39,10 +39,16 @@ abstract class ApiTest extends \Magento\Config\Block\System\Config\Form\Field
     protected $websiteFactory;
 
     /**
+     * @var \ParadoxLabs\TokenBase\Model\Method\Factory
+     */
+    protected $methodFactory;
+
+    /**
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \Magento\Store\Model\StoreFactory $storeFactory
      * @param \Magento\Store\Model\WebsiteFactory $websiteFactory
+     * @param \ParadoxLabs\TokenBase\Model\Method\Factory $methodFactory
      * @param array $data
      */
     public function __construct(
@@ -50,11 +56,13 @@ abstract class ApiTest extends \Magento\Config\Block\System\Config\Form\Field
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         \Magento\Store\Model\StoreFactory $storeFactory,
         \Magento\Store\Model\WebsiteFactory $websiteFactory,
+        \ParadoxLabs\TokenBase\Model\Method\Factory $methodFactory,
         array $data = []
     ) {
         $this->helper = $helper;
         $this->storeFactory = $storeFactory;
         $this->websiteFactory = $websiteFactory;
+        $this->methodFactory = $methodFactory;
 
         parent::__construct($context, $data);
     }
