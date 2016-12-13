@@ -5,7 +5,7 @@
 <div class="admin__fieldset-wrapper" id="tokenbase-wrapper" data-mage-init='{"tokenbasePaymentinfo":{}}'>
     <div class="admin__fieldset-wrapper-title">
         <strong class="title">
-            <?php echo __('Payment Data'); ?>
+            <?php echo $block->escapeHtml(__('Payment Data')); ?>
         </strong>
     </div>
     <div class="admin__fieldset-wrapper-content">
@@ -26,7 +26,7 @@
             <?php if (!empty($activeMethods)): ?>
                 <?php echo $block->getChildHtml(); ?>
             <?php else: ?>
-                <?php echo __('There are currently no active TokenBase payment methods.'); ?>
+                <?php echo $block->escapeHtml(__('There are currently no active TokenBase payment methods.')); ?>
             <?php endif; ?>
         </div>
     </div>

@@ -412,7 +412,7 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
      */
     public function updateLastUse()
     {
-        $now = $this->dateProcessor->date();
+        $now = $this->dateProcessor->date(null, null, false);
         $this->setData('last_use', $now->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT));
 
         return $this;
@@ -939,7 +939,7 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
         /**
          * Update dates.
          */
-        $now = $this->dateProcessor->date();
+        $now = $this->dateProcessor->date(null, null, false);
 
         if ($this->isObjectNew()) {
             $this->setData('created_at', $now->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT));

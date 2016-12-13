@@ -6,7 +6,7 @@
         </arguments>
     </virtualType>
 
-    <virtualType name="ParadoxLabs\TokenBase\Observer\AdminNotificationObserver" type="Magento\AdminNotification\Observer\PredispatchAdminActionControllerObserver">
+    <virtualType name="ParadoxLabs\TokenBase\Observer\VirtualAdminNotificationObserver" type="Magento\AdminNotification\Observer\PredispatchAdminActionControllerObserver">
         <arguments>
             <argument name="feedFactory" xsi:type="object">ParadoxLabs\TokenBase\Observer\AdminNotification\FeedFactory</argument>
         </arguments>
