@@ -19,7 +19,7 @@ namespace ParadoxLabs\TokenBase\Gateway\Validator\CreditCard;
  * Defines common credit card types and number pattern matching. Not guaranteed to be perfect.
  *
  * See equivalent frontend validator:
- * Magento_Checkout::base/web/js/model/credit-card-validation/credit-card-number-validator/credit-card-type.js
+ * Magento_Payment::base/web/js/model/credit-card-validation/credit-card-number-validator/credit-card-type.js
  */
 class Types
 {

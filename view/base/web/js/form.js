@@ -17,12 +17,12 @@ define([
 
             if (disabled) {
                 fields.hide();
+                fields.find(this.options.toggleFieldInputs).prop('disabled', disabled);
             }
             else {
                 fields.show();
+                fields.find(this.options.toggleFieldInputs).removeProp('disabled');
             }
-
-            fields.find(this.options.toggleFieldInputs).prop('disabled', disabled);
         },
 
         _create: function() {

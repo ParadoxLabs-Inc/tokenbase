@@ -70,7 +70,7 @@ $storedCards    = $block->getStoredCards();
             <?php $tooltip  = '<p>'.$expln.'</p><img src="'.$image.'" alt="'.$alt.'" />'; ?>
             <div class="note">
                 <a href="#" class="action cvv" title="<?php echo $block->escapeQuote(__('What is this?')) ?>"
-                   data-mage-init='{"tooltip": {"content": "<?php echo $tooltip ?>"}}'>
+                   data-mage-init='{"tooltip": {"content": "<?php echo addslashes($tooltip) ?>"}}'>
                     <span><?php echo $block->escapeHtml(__('Where do I find these numbers?')) ?></span>
                 </a>
             </div>

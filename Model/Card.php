@@ -465,7 +465,7 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
 
         $street = $this->getAddress('street');
         if (!is_array($street)) {
-            $street = explode("\n", $street);
+            $street = explode("\n", str_replace("\r", '', $street));
         }
 
         $region->setRegion($this->getAddress('region'));
@@ -876,11 +876,11 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
                 $cardType = $this->helper->translateCardType($this->getAdditional('cc_type'));
             }
 
-            return __(
+            return trim(__(
                 '%1 XXXX-%2',
                 $cardType,
                 $this->getAdditional('cc_last4')
-            );
+            ));
         }
 
         return '';

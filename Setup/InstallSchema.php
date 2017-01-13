@@ -62,14 +62,14 @@ class InstallSchema implements \Magento\Framework\Setup\InstallSchemaInterface
             'Customer IP'
         )->addColumn(
             'profile_id',
-            \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
-            null,
+            \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+            32,
             [],
             'Profile ID'
         )->addColumn(
             'payment_id',
-            \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
-            null,
+            \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+            32,
             [],
             'Payment ID'
         )->addColumn(

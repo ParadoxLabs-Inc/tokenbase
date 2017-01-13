@@ -267,6 +267,7 @@ class Form extends \Magento\Customer\Block\Address\Edit
                 'id' => $this->getRequest()->getParam('id'),
                 'method' => $this->getCard()->getMethod(),
                 'form_key' => $this->formKey->getFormKey(),
+                'cancel' => 1,
             ]
         );
     }

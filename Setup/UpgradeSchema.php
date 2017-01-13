@@ -99,6 +99,36 @@ class UpgradeSchema implements \Magento\Framework\Setup\UpgradeSchemaInterface
             );
         }
 
+        /**
+         * paradoxlabs_stored_card.profile_id int => varchar(32)
+         */
+        if (isset($tableDdl['profile_id']) && $tableDdl['profile_id']['DATA_TYPE'] !== 'varchar') {
+            $tableDdl['profile_id']['COLUMN_NAME'] = 'profile_id';
+            $tableDdl['profile_id']['DATA_TYPE'] = 'varchar';
+            $tableDdl['profile_id']['LENGTH'] = 32;
+
+            $setup->getConnection()->modifyColumnByDdl(
+                $setup->getTable('paradoxlabs_stored_card'),
+                'profile_id',
+                $tableDdl['profile_id']
+            );
+        }
+
+        /**
+         * paradoxlabs_stored_card.payment_id int => varchar(32)
+         */
+        if (isset($tableDdl['payment_id']) && $tableDdl['payment_id']['DATA_TYPE'] !== 'varchar') {
+            $tableDdl['profile_id']['COLUMN_NAME'] = 'payment_id';
+            $tableDdl['payment_id']['DATA_TYPE'] = 'varchar';
+            $tableDdl['payment_id']['LENGTH'] = 32;
+
+            $setup->getConnection()->modifyColumnByDdl(
+                $setup->getTable('paradoxlabs_stored_card'),
+                'payment_id',
+                $tableDdl['payment_id']
+            );
+        }
+
         $setup->endSetup();
     }
 }

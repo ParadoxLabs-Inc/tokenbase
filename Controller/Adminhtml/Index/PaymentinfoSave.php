@@ -39,9 +39,9 @@ class PaymentinfoSave extends Paymentinfo
     protected $paymentFactory;
 
     /**
-     * @var \Magento\Quote\Api\CartRepositoryInterface
+     * @var \Magento\Quote\Api\Data\CartInterfaceFactory
      */
-    protected $quoteRepository;
+    protected $quoteFactory;
 
     /**
      * @var \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory
@@ -79,7 +79,7 @@ class PaymentinfoSave extends Paymentinfo
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \ParadoxLabs\TokenBase\Helper\Address $addressHelper
      * @param \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory
-     * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
+     * @param \Magento\Quote\Api\Data\CartInterfaceFactory $quoteFactory
      * @param \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $cardFactory
      */
     public function __construct(
@@ -112,11 +112,11 @@ class PaymentinfoSave extends Paymentinfo
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         \ParadoxLabs\TokenBase\Helper\Address $addressHelper,
         \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory,
-        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
+        \Magento\Quote\Api\Data\CartInterfaceFactory $quoteFactory,
         \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $cardFactory
     ) {
         $this->paymentFactory = $paymentFactory;
-        $this->quoteRepository = $quoteRepository;
+        $this->quoteFactory = $quoteFactory;
         $this->cardFactory = $cardFactory;
 
         parent::__construct(
@@ -221,7 +221,8 @@ class PaymentinfoSave extends Paymentinfo
                     }
 
                     /** @var \Magento\Quote\Model\Quote $quote */
-                    $quote = $this->quoteRepository->getActiveForCustomer($customer->getId());
+                    $quote = $this->quoteFactory->create();
+                    $quote->setCustomer($customer);
 
                     /** @var \Magento\Quote\Model\Quote\Payment $newPayment */
                     $newPayment = $this->paymentFactory->create();
@@ -240,7 +241,7 @@ class PaymentinfoSave extends Paymentinfo
 
                     $this->cardRepository->save($card);
 
-                    $this->_session->unsData('tokenbase_form_data');
+                    $this->_session->setData('tokenbase_form_data', null);
 
                     $response['success'] = true;
                 } else {

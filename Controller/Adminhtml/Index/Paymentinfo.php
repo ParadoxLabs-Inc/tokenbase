@@ -172,9 +172,15 @@ class Paymentinfo extends \Magento\Customer\Controller\Adminhtml\Index
             $id = null;
 
             if ($this->_session->hasData('tokenbase_form_data')) {
+                if ($this->getRequest()->getParam('cancel') == 1) {
+                    $this->_session->setData('tokenbase_form_data', null);
+                }
+
                 $data = $this->_session->getData('tokenbase_form_data');
 
-                if (isset($data['card_id']) && !empty($data['card_id'])) {
+                if (isset($data['card_id'])
+                    && !empty($data['card_id'])
+                    && $data['method'] == $this->_coreRegistry->registry('tokenbase_method')) {
                     $id = $data['card_id'];
                 }
             }

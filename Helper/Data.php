@@ -74,9 +74,9 @@ class Data extends \Magento\Payment\Helper\Data
     protected $currentCustomer;
 
     /**
-     * @var AddressFactory
+     * @var Address\Proxy
      */
-    protected $addressHelperFactory;
+    protected $addressHelper;
 
     /**
      * @var \Magento\Quote\Model\Quote\PaymentFactory
@@ -151,7 +151,7 @@ class Data extends \Magento\Payment\Helper\Data
      * @param \Magento\Customer\Helper\Session\CurrentCustomer\Proxy $currentCustomerSession
      * @param \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory
      * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
-     * @param \ParadoxLabs\TokenBase\Helper\AddressFactory $addressHelperFactory
+     * @param \ParadoxLabs\TokenBase\Helper\Address\Proxy $addressHelper
      * @param \ParadoxLabs\TokenBase\Helper\Operation $operationHelper
      */
     public function __construct(
@@ -174,7 +174,7 @@ class Data extends \Magento\Payment\Helper\Data
         \Magento\Customer\Helper\Session\CurrentCustomer\Proxy $currentCustomerSession,
         \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
         \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory,
-        \ParadoxLabs\TokenBase\Helper\AddressFactory $addressHelperFactory,
+        \ParadoxLabs\TokenBase\Helper\Address\Proxy $addressHelper,
         \ParadoxLabs\TokenBase\Helper\Operation $operationHelper
     ) {
         $this->appState = $appState;
@@ -185,7 +185,7 @@ class Data extends \Magento\Payment\Helper\Data
         $this->customerRepository = $customerRepository;
         $this->cardFactory = $cardFactory;
         $this->cardCollectionFactory = $cardCollectionFactory;
-        $this->addressHelperFactory = $addressHelperFactory;
+        $this->addressHelper = $addressHelper;
         $this->paymentFactory = $paymentFactory;
         $this->operationHelper = $operationHelper;
         $this->backendSession = $backendSession;
@@ -390,10 +390,7 @@ class Data extends \Magento\Payment\Helper\Data
                     $data = $this->customerSession->getTokenbaseFormData(true);
 
                     if (isset($data['billing']) && !empty($data['billing'])) {
-                        /** @var \ParadoxLabs\TokenBase\Helper\Address $addressHelper */
-                        $addressHelper  = $this->addressHelperFactory->create();
-
-                        $address        = $addressHelper->buildAddressFromInput(
+                        $address        = $this->addressHelper->buildAddressFromInput(
                             $data['billing'],
                             $this->card->getAddress()
                         );

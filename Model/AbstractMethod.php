@@ -51,9 +51,9 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
     protected $card;
 
     /**
-     * @var \ParadoxLabs\TokenBase\Helper\AddressFactory
+     * @var \ParadoxLabs\TokenBase\Helper\Address\Proxy
      */
-    protected $addressHelperFactory;
+    protected $addressHelper;
 
     /**
      * @var \Magento\Sales\Model\Order\Payment\Transaction\Repository
@@ -86,7 +86,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @param \ParadoxLabs\TokenBase\Model\AbstractGateway $gateway
      * @param \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $cardFactory
      * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
-     * @param \ParadoxLabs\TokenBase\Helper\AddressFactory $addressHelperFactory
+     * @param \ParadoxLabs\TokenBase\Helper\Address\Proxy $addressHelper
      * @param \Magento\Payment\Gateway\ConfigInterface $config
      * @param \Magento\Framework\Registry $registry
      * @param string $methodCode
@@ -99,7 +99,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         \ParadoxLabs\TokenBase\Model\AbstractGateway $gateway,
         \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $cardFactory,
         \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository,
-        \ParadoxLabs\TokenBase\Helper\AddressFactory $addressHelperFactory,
+        \ParadoxLabs\TokenBase\Helper\Address\Proxy $addressHelper,
         \Magento\Payment\Gateway\ConfigInterface $config,
         \Magento\Framework\Registry $registry,
         $methodCode = '',
@@ -109,7 +109,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         $this->gateway = $gateway;
         $this->cardFactory = $cardFactory;
         $this->cardRepository = $cardRepository;
-        $this->addressHelperFactory = $addressHelperFactory;
+        $this->addressHelper = $addressHelper;
         $this->transactionRepository = $transactionRepository;
         $this->config = $config;
         $this->registry = $registry;
@@ -245,6 +245,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
             $card = $this->cardRepository->getById($cardId);
 
             if ($card && $card->getId() > 0 && ($byHash === false || $card->getHash() == $cardId)) {
+                $card->setMethodInstance($this);
                 $this->setCard($card);
 
                 return $this->getCard();
@@ -282,6 +283,11 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
     public function setCard(\ParadoxLabs\TokenBase\Api\Data\CardInterface $card)
     {
         $this->log(sprintf('setCard(%s)', $card->getId()));
+
+        /** @var \ParadoxLabs\TokenBase\Model\Card $card */
+        $card = $card->getTypeInstance();
+        $card->setMethodInstance($this);
+        $card->setInfoInstance($this->getInfoInstance());
 
         $this->card = $card;
 
@@ -335,7 +341,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         $payment->setIsTransactionClosed(0);
 
         $this->getCard()->updateLastUse();
-        $this->cardRepository->save($this->getCard());
+        $this->card = $this->cardRepository->save($this->getCard());
 
         $this->log(json_encode($paymentData));
 
@@ -407,7 +413,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
                 ->setIsTransactionClosed(0);
 
         $this->getCard()->updateLastUse();
-        $this->cardRepository->save($this->getCard());
+        $this->card = $this->cardRepository->save($this->getCard());
 
         $this->log(json_encode($response->getData()));
 
@@ -498,7 +504,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         );
 
         $this->getCard()->updateLastUse();
-        $this->cardRepository->save($this->getCard());
+        $this->card = $this->cardRepository->save($this->getCard());
 
         $this->log(json_encode($response->getData()));
 
@@ -590,7 +596,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         }
 
         $this->getCard()->updateLastUse();
-        $this->cardRepository->save($this->getCard());
+        $this->card = $this->cardRepository->save($this->getCard());
 
         $this->log(json_encode($response->getData()));
 
@@ -651,7 +657,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         );
 
         $this->getCard()->updateLastUse();
-        $this->cardRepository->save($this->getCard());
+        $this->card = $this->cardRepository->save($this->getCard());
 
         $this->log(json_encode($response->getData()));
 
@@ -808,8 +814,11 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
             /** @var Card $card */
             $card = $this->cardFactory->create();
             $card->setMethod($this->methodCode)
-                 ->setMethodInstance($this)
-                 ->setCustomer($this->getCustomer(), $payment)
+                 ->setMethodInstance($this);
+
+            $card = $card->getTypeInstance();
+
+            $card->setCustomer($this->getCustomer(), $payment)
                  ->importPaymentInfo($payment);
 
             if ($payment->getOrder()) {
@@ -818,14 +827,10 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
                 $billingAddressData = $billingAddress->getData();
 
                 // AddressInterface requires an array for street
-                $billingAddressData['street'] = explode("\n", $billingAddressData['street']);
-
-                /** @var \ParadoxLabs\TokenBase\Helper\Address $addressHelper */
-                // Instantiated in this way to avoid session instance except when absolutely necessary
-                $addressHelper      = $this->addressHelperFactory->create();
+                $billingAddressData['street'] = explode("\n", str_replace("\r", '', $billingAddressData['street']));
 
                 /** @var \Magento\Customer\Api\Data\AddressInterface $billingAddress */
-                $billingAddress     = $addressHelper->buildAddressFromInput($billingAddressData);
+                $billingAddress     = $this->addressHelper->buildAddressFromInput($billingAddressData);
 
                 $card->setAddress($billingAddress);
             } else {
@@ -887,7 +892,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
             /**
              * Any changes that we can see? Check the payment info and main address fields.
              */
-            if ($this->getCard()->getOrigData('additional') != null
+            if ($this->getCard()->getOrigData('additional') !== null
                 && $this->getCard()->getOrigData('additional') != $this->getCard()->getData('additional')) {
                 $haveChanges = true;
             }
@@ -898,7 +903,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
                 $address = $payment->getData('billing_address');
             }
 
-            if (isset($address) && $address instanceof \Magento\Customer\Model\Address\AbstractAddress) {
+            if (isset($address) && $address instanceof \Magento\Customer\Model\Address\AddressModelInterface) {
                 $fields = [
                     'firstname',
                     'lastname',
@@ -908,12 +913,20 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
                     'country_id',
                     'region',
                     'region_id',
+                    'region_code',
                     'postcode',
+                    'telephone',
+                    'customer_address_id',
+                    'prefix',
+                    'middlename',
+                    'suffix',
                 ];
 
                 foreach ($fields as $field) {
                     if ($this->getCard()->getAddress($field) != $address->getData($field)) {
-                        $this->getCard()->setAddress($address);
+                        $addrData = $address->getData();
+                        $newAddr  = $this->addressHelper->buildAddressFromInput($addrData);
+                        $this->getCard()->setAddress($newAddr);
 
                         $haveChanges = true;
                         break;
@@ -929,7 +942,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
                 $this->getCard()->setMethodInstance($this);
                 $this->getCard()->setInfoInstance($payment);
 
-                $this->cardRepository->save($this->getCard());
+                $this->card = $this->cardRepository->save($this->getCard());
 
                 $this->registry->unregister('tokenbase_ensure_checkout_card_save');
                 $this->registry->register('tokenbase_ensure_checkout_card_save', $this->getCard());
