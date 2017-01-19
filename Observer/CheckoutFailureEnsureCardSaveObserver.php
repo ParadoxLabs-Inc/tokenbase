@@ -63,7 +63,7 @@ class CheckoutFailureEnsureCardSaveObserver implements \Magento\Framework\Event\
             if ($card instanceof \ParadoxLabs\TokenBase\Model\Card && $card->getId() > 0) {
                 $card->setData('no_sync', true);
 
-                $this->cardRepository->save($card);
+                $card = $this->cardRepository->save($card);
             }
         } catch (\Exception $e) {
             // Log and ignore any errors; we don't want to throw them in this context.

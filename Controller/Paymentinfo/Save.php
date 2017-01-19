@@ -156,7 +156,7 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
                     $card->setAddress($newAddr);
                     $card->importPaymentInfo($newPayment);
 
-                    $this->cardRepository->save($card);
+                    $card = $this->cardRepository->save($card);
 
                     $this->session->unsData('tokenbase_form_data');
 

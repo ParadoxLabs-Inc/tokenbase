@@ -51,11 +51,22 @@ class Cc extends \Magento\Payment\Block\Form\Cc
     protected $helper;
 
     /**
+     * @var \ParadoxLabs\TokenBase\Model\Method\Factory
+     */
+    protected $tokenbaseMethodFactory;
+
+    /**
+     * @var \ParadoxLabs\TokenBase\Api\MethodInterface
+     */
+    protected $tokenbaseMethod;
+
+    /**
      * @param \Magento\Framework\View\Element\Template\Context $context
      * @param \Magento\Payment\Model\Config $paymentConfig
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \Magento\Customer\Model\Session\Proxy $customerSession
      * @param \Magento\Checkout\Model\Session\Proxy $checkoutSession
+     * @param \ParadoxLabs\TokenBase\Model\Method\Factory $tokenbaseMethodFactory
      * @param array $data
      */
     public function __construct(
@@ -64,11 +75,13 @@ class Cc extends \Magento\Payment\Block\Form\Cc
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         \Magento\Customer\Model\Session\Proxy $customerSession,
         \Magento\Checkout\Model\Session\Proxy $checkoutSession,
+        \ParadoxLabs\TokenBase\Model\Method\Factory $tokenbaseMethodFactory,
         array $data = []
     ) {
         $this->helper = $helper;
         $this->customerSession = $customerSession;
         $this->checkoutSession = $checkoutSession;
+        $this->tokenbaseMethodFactory = $tokenbaseMethodFactory;
 
         parent::__construct($context, $paymentConfig, $data);
     }
@@ -148,5 +161,21 @@ class Cc extends \Magento\Payment\Block\Form\Cc
     public function getHelper()
     {
         return $this->helper;
+    }
+
+    /**
+     * Get Tokenbase payment method instance.
+     *
+     * @return \ParadoxLabs\TokenBase\Api\MethodInterface
+     */
+    public function getTokenbaseMethod()
+    {
+        if ($this->tokenbaseMethod === null) {
+            $this->tokenbaseMethod = $this->tokenbaseMethodFactory->getMethodInstance(
+                $this->getMethodCode()
+            );
+        }
+
+        return $this->tokenbaseMethod;
     }
 }

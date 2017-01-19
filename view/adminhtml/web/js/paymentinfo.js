@@ -68,7 +68,7 @@ define([
             wrapper.element.find(wrapper.options.formSelector).off().on('submit', function(e) {
                 e.preventDefault();
 
-                wrapper.element.find(wrapper.options.saveSelector).prop('disabled', true);
+                $(wrapper.element).find(wrapper.options.saveSelector).prop('disabled', true);
 
                 spinner.show();
                 $.post(this.action, $(this).serialize(), function(data) {
@@ -86,6 +86,33 @@ define([
                         wrapper._create();
                     }
                 });
+
+                return false;
+            });
+
+            wrapper.element.find(wrapper.options.saveSelector).off().on('click', function(e) {
+                e.preventDefault();
+
+                $(this).prop('disabled', true);
+
+                spinner.show();
+                $.post(this.form.action, $(this.form).serialize(), function(data) {
+                    spinner.hide();
+
+                    if(typeof data === 'object') {
+                        if(typeof data.message != 'undefined') {
+                            alert(data.message);
+
+                            $(wrapper.element).find(wrapper.options.saveSelector).prop('disabled', false);
+                        }
+                    }
+                    else {
+                        wrapper.element.parent().html(data);
+                        wrapper._create();
+                    }
+                });
+
+                return false;
             });
         }
     });

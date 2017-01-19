@@ -839,7 +839,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
                 );
             }
 
-            $this->cardRepository->save($card);
+            $card = $this->cardRepository->save($card);
 
             $this->setCard($card);
 

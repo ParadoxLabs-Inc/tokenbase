@@ -82,7 +82,9 @@ class Factory
                 \Magento\Store\Model\ScopeInterface::SCOPE_STORE
             );
 
-            if (get_class($card) != $cardModel) {
+            $existingClass = str_replace('\\Interceptor', '', get_class($card));
+
+            if ($existingClass !== $cardModel) {
                 // Create and initialize the instance via object man.
                 $typeInstance = $this->create($cardModel);
                 $typeInstance->setData($card->getData());

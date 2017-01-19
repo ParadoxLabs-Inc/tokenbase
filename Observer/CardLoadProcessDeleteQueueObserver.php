@@ -57,7 +57,7 @@ class CardLoadProcessDeleteQueueObserver implements \Magento\Framework\Event\Obs
             $card->queueDeletion()
                  ->setData('no_sync', true);
 
-            $this->cardRepository->save($card);
+            $card = $this->cardRepository->save($card);
         }
     }
 }

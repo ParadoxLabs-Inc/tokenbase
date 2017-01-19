@@ -239,7 +239,7 @@ class PaymentinfoSave extends Paymentinfo
                     $card->setAddress($newAddr);
                     $card->importPaymentInfo($newPayment);
 
-                    $this->cardRepository->save($card);
+                    $card = $this->cardRepository->save($card);
 
                     $this->_session->setData('tokenbase_form_data', null);
 

@@ -86,7 +86,7 @@
                 </div>
             </div>
             <div class="field date required" data-bind="attr: {id: getCode() + '-cc-type-exp-div'}, visible: isCcFormShown">
-                <label data-bind="attr: {for: getCode() + '-expiration'}" class="label">
+                <label data-bind="attr: {for: getCode() + '-cc-exp-month'}" class="label">
                     <span><!-- ko text: $t('Expiration Date')--><!-- /ko --></span>
                 </label>
                 <div class="control">
@@ -94,7 +94,7 @@
                         <div class="field no-label month">
                             <div class="control">
                                 <select  name="payment[cc_exp_month]" class="select month"
-                                         data-bind="attr: {id: getCode() + '-expiration', 'data-container': getCode() + '-cc-month', 'data-validate': JSON.stringify({required:true, 'validate-cc-exp':'#' + getCode() + '-expiration-yr'})},
+                                         data-bind="attr: {id: getCode() + '-cc-exp-month', 'data-container': getCode() + '-cc-month', 'data-validate': JSON.stringify({required:true, 'validate-cc-exp':'#' + getCode() + '-cc-exp-year'})},
                                 enable: true,
                                 options: getCcMonthsValues(),
                                 optionsValue: 'value',
@@ -107,7 +107,7 @@
                         <div class="field no-label year">
                             <div class="control">
                                 <select name="payment[cc_exp_year]" class="select year"
-                                        data-bind="attr: {id: getCode() + '-expiration-yr', 'data-container': getCode() + '-cc-year', 'data-validate': JSON.stringify({required:true})},
+                                        data-bind="attr: {id: getCode() + '-cc-exp-year', 'data-container': getCode() + '-cc-year', 'data-validate': JSON.stringify({required:true})},
                                 enable: true,
                                 options: getCcYearsValues(),
                                 optionsValue: 'value',

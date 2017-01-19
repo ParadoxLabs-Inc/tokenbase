@@ -21,17 +21,17 @@ class CreditCard extends \Magento\Payment\Gateway\Validator\AbstractValidator
     /**
      * @var \Magento\Payment\Gateway\ConfigInterface
      */
-    private $config;
+    protected $config;
 
     /**
      * @var \ParadoxLabs\TokenBase\Gateway\Validator\CreditCard\Types
      */
-    private $ccTypes;
+    protected $ccTypes;
 
     /**
      * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
      */
-    private $dateProcessor;
+    protected $dateProcessor;
 
     /**
      * @param \Magento\Payment\Gateway\Validator\ResultInterfaceFactory $resultFactory

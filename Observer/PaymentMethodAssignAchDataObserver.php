@@ -61,8 +61,6 @@ class PaymentMethodAssignAchDataObserver implements \Magento\Framework\Event\Obs
         /** @var \Magento\Framework\DataObject $data */
         $data = $observer->getData(AbstractDataAssignObserver::DATA_CODE);
 
-        $this->helper->log($payment->getMethod(), sprintf('assignData(%s)', $data->getData('card_id')));
-
         /**
          * Merge together data from additional_data array
          */

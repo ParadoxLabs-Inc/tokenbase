@@ -218,6 +218,8 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
     {
         if ($this->instance === null) {
             $this->instance = $this->cardFactory->getTypeInstance($this);
+        } elseif (get_class($this) === get_class($this->instance)) {
+            return $this;
         }
 
         return $this->instance;

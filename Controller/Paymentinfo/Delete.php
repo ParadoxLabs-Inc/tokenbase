@@ -44,7 +44,7 @@ class Delete extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
                 if ($card && $card->getHash() == $id && $card->hasOwner($this->helper->getCurrentCustomer()->getId())) {
                     $card->queueDeletion();
 
-                    $this->cardRepository->save($card);
+                    $card = $this->cardRepository->save($card);
 
                     $this->messageManager->addSuccessMessage(__('Payment record deleted.'));
                 } else {
