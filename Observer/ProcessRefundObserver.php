@@ -43,11 +43,10 @@ class ProcessRefundObserver implements \Magento\Framework\Event\ObserverInterfac
         $memo    = $observer->getEvent()->getData('creditmemo');
         $methods = $this->helper->getAllMethods();
 
-        if (in_array($memo->getOrder()->getPayment()->getMethod(), $methods)) {
-            if ($memo->getInvoice()
-                && $memo->getInvoice()->getBaseTotalRefunded() < $memo->getInvoice()->getBaseGrandTotal()) {
-                $memo->getInvoice()->setIsUsedForRefund(false);
-            }
+        if (in_array($memo->getOrder()->getPayment()->getMethod(), $methods)
+            && $memo->getInvoice()
+            && $memo->getInvoice()->getBaseTotalRefunded() < $memo->getInvoice()->getBaseGrandTotal()) {
+            $memo->getInvoice()->setIsUsedForRefund(false);
         }
     }
 }

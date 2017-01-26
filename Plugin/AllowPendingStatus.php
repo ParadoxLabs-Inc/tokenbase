@@ -71,16 +71,17 @@ class AllowPendingStatus
          * Note: This will not work for custom new order statuses. Any such will have to be
          * assigned to processing.
          */
-        if (is_array($result) && $state == \Magento\Sales\Model\Order::STATE_PROCESSING) {
-            if (!isset($result['pending']) && !in_array('pending', $result)) {
-                if ($addLabels === true) {
-                    $result['pending'] = __('Pending');
-                } else {
-                    $result[] = 'pending';
-                }
-
-                $result   = array_unique($result);
+        if (is_array($result)
+            && $state == \Magento\Sales\Model\Order::STATE_PROCESSING
+            && !isset($result['pending'])
+            && !in_array('pending', $result)) {
+            if ($addLabels === true) {
+                $result['pending'] = __('Pending');
+            } else {
+                $result[] = 'pending';
             }
+
+            $result   = array_unique($result);
         }
 
         return $result;

@@ -36,7 +36,7 @@ class Xml
     /**
      * @var \DomDocument|null
      */
-    private static $xml      = null;
+    private static $xml;
 
     /**
      * @var string

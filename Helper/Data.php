@@ -385,46 +385,42 @@ class Data extends \Magento\Payment\Helper\Data
             /**
              * Import prior form data from the session, if possible.
              */
-            if ($this->getIsFrontend()) {
-                if ($this->customerSession->hasTokenbaseFormData()) {
-                    $data = $this->customerSession->getTokenbaseFormData(true);
+            if ($this->getIsFrontend() && $this->customerSession->hasTokenbaseFormData()) {
+                $data = $this->customerSession->getTokenbaseFormData(true);
 
-                    if (isset($data['billing']) && !empty($data['billing'])) {
-                        $address        = $this->addressHelper->buildAddressFromInput(
-                            $data['billing'],
-                            $this->card->getAddress()
-                        );
+                if (isset($data['billing']) && !empty($data['billing'])) {
+                    $address        = $this->addressHelper->buildAddressFromInput(
+                        $data['billing'],
+                        $this->card->getAddress()
+                    );
 
-                        $this->card->setAddress($address);
+                    $this->card->setAddress($address);
+                }
+
+                if (isset($data['payment']) && !empty($data['payment'])) {
+                    $cardData = $data['payment'];
+                    $cardData['method']     = $method;
+                    $cardData['card_id']    = $data['id'];
+                    // This bypasses the validation check in importData below. Does not matter otherwise.
+                    $cardData['cc_cid']     = '000';
+
+                    unset($cardData['cc_number'], $cardData['echeck_account_no'], $cardData['echeck_routing_no']);
+
+                    /** @var \Magento\Quote\Model\Quote\Payment $newPayment */
+                    $newPayment = $this->paymentFactory->create();
+                    $newPayment->setQuote($this->checkoutSession->getQuote());
+                    $newPayment->getQuote()->getBillingAddress()->setCountryId(
+                        $this->card->getAddress('country_id')
+                    );
+
+                    try {
+                        $newPayment->importData($cardData);
+                    } catch (\Exception $e) {
+                        // We're only trying to load prior-entered data for the form. Ignore validation errors.
+                        $this->card->getId();
                     }
 
-                    if (isset($data['payment']) && !empty($data['payment'])) {
-                        $cardData = $data['payment'];
-                        $cardData['method']     = $method;
-                        $cardData['card_id']    = $data['id'];
-                        // This bypasses the validation check in importData below. Does not matter otherwise.
-                        $cardData['cc_cid']     = '000';
-
-                        unset($cardData['cc_number']);
-                        unset($cardData['echeck_account_no']);
-                        unset($cardData['echeck_routing_no']);
-
-                        /** @var \Magento\Quote\Model\Quote\Payment $newPayment */
-                        $newPayment = $this->paymentFactory->create();
-                        $newPayment->setQuote($this->checkoutSession->getQuote());
-                        $newPayment->getQuote()->getBillingAddress()->setCountryId(
-                            $this->card->getAddress('country_id')
-                        );
-
-                        try {
-                            $newPayment->importData($cardData);
-                        } catch (\Exception $e) {
-                            // We're only trying to load prior-entered data for the form. Ignore validation errors.
-                            $this->card->getId();
-                        }
-
-                        $this->card->importPaymentInfo($newPayment);
-                    }
+                    $this->card->importPaymentInfo($newPayment);
                 }
             }
         }

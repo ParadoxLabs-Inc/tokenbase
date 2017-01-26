@@ -52,9 +52,6 @@ class PaymentMethodAssignAchDataObserver implements \Magento\Framework\Event\Obs
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
-        /** @var \ParadoxLabs\TokenBase\Model\AbstractMethod $method */
-        $method = $observer->getData(AbstractDataAssignObserver::METHOD_CODE);
-
         /** @var \Magento\Sales\Model\Order\Payment $payment */
         $payment = $observer->getData(AbstractDataAssignObserver::MODEL_CODE);
 

@@ -84,7 +84,7 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
     /**
      * @var array|null
      */
-    protected $lineItems        = null;
+    protected $lineItems;
 
     /**
      * @var string
@@ -152,7 +152,7 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
         $this->xml              = $xml;
         $this->httpClientFactory = $httpClientFactory;
 
-        return parent::__construct($data);
+        parent::__construct($data);
     }
 
     /**
@@ -243,7 +243,7 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
             /**
              * Make sure we know this parameter
              */
-            if (in_array($key, array_keys($this->fields))) {
+            if (array_key_exists($key, $this->fields)) {
                 /**
                  * Run validations
                  */
@@ -333,7 +333,7 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
      */
     public function hasParameter($key)
     {
-        return (isset($this->params[ $key ]) && !empty($this->params[ $key ]) ? true : false);
+        return (isset($this->params[ $key ]) && !empty($this->params[ $key ]));
     }
 
     /**
@@ -380,7 +380,7 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
      */
     public static function formatAmount($amount)
     {
-        return sprintf("%01.2f", (float) $amount);
+        return sprintf('%01.2f', (float) $amount);
     }
 
     /**

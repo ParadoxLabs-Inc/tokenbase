@@ -221,7 +221,7 @@ class Form extends \Magento\Customer\Block\Address\Edit
      */
     public function isEdit()
     {
-        return ($this->getCard()->getId() > 0) ? true : false;
+        return $this->getCard()->getId() > 0;
     }
 
     /**

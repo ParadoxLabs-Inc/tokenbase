@@ -176,7 +176,8 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
     /**
      * Get the given key from payment method configuration.
      *
-     * @param $key
+     * @param string $key
+     * @param int|null $storeId
      * @return mixed
      */
     public function getConfigData($key, $storeId = null)

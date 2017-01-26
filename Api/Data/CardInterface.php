@@ -106,7 +106,7 @@ interface CardInterface
      * Can pass in a key-value pair to set one value,
      * or a single parameter (associative array) to overwrite all data.
      *
-     * @param string $key
+     * @param string|array $key
      * @param string|null $value
      * @return $this
      */

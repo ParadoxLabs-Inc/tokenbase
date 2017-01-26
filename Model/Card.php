@@ -29,12 +29,12 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
     /**
      * @var null|array
      */
-    protected $address      = null;
+    protected $address;
 
     /**
      * @var null|array
      */
-    protected $additional   = null;
+    protected $additional;
 
     /**
      * @var \ParadoxLabs\TokenBase\Helper\Data
@@ -348,7 +348,7 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
 
                 $this->setAdditional('cc_exp_year', $payment->getData('cc_exp_year'))
                     ->setAdditional('cc_exp_month', $payment->getData('cc_exp_month'))
-                    ->setData('expires', sprintf("%s-%s-%s 23:59:59", $yr, $mo, $day));
+                    ->setData('expires', sprintf('%s-%s-%s 23:59:59', $yr, $mo, $day));
             }
 
             $this->setData('info_instance', $payment);
@@ -375,7 +375,7 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
             return false;
         }
 
-        return ($this->getData('customer_id') == $customerId ? true : false);
+        return $this->getData('customer_id') == $customerId;
     }
 
     /**
@@ -521,7 +521,7 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
      * Can pass in a key-value pair to set one value,
      * or a single parameter (associative array) to overwrite all data.
      *
-     * @param string $key
+     * @param string|array $key
      * @param string|null $value
      * @return $this
      */

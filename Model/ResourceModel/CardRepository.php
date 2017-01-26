@@ -253,7 +253,7 @@ class CardRepository implements CardRepositoryInterface
         $conds  = [];
 
         foreach ($filterGroup->getFilters() as $filter) {
-            $condition = $filter->getConditionType() ? $filter->getConditionType() : 'eq';
+            $condition = $filter->getConditionType() ?: 'eq';
             $fields[]  = $filter->getField();
             $conds[]   = [$condition => $filter->getValue()];
         }
