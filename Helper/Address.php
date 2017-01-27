@@ -94,7 +94,7 @@ class Address
      * @return \Magento\Customer\Api\Data\AddressInterface
      * @throws \Exception
      */
-    public function buildAddressFromInput($addressData, $origAddressData = [], $validate = false)
+    public function buildAddressFromInput($addressData, array $origAddressData = [], $validate = false)
     {
         if (!is_array($origAddressData)) {
             $origAddressData = [];

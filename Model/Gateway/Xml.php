@@ -65,7 +65,7 @@ class Xml
      * @param array $arr - aray to be converterd
      * @return \DomDocument
      */
-    public static function &createXML($node_name, $arr = [])
+    public static function &createXML($node_name, array $arr = [])
     {
         $xml = self::getXMLRoot();
         $xml->appendChild(self::convertArrayToXml($node_name, $arr));
@@ -82,7 +82,7 @@ class Xml
      * @return \DOMNode
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    private static function &convertArrayToXml($node_name, $arr = [])
+    private static function &convertArrayToXml($node_name, array $arr = [])
     {
         $xml = self::getXMLRoot();
         $node = $xml->createElement($node_name);

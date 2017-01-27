@@ -52,7 +52,7 @@ class Factory
      * @return \ParadoxLabs\TokenBase\Api\MethodInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function create($className, $data = [])
+    public function create($className, array $data = [])
     {
         $card = $this->objectManager->create($className, $data);
 
