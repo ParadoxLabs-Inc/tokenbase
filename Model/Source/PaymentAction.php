@@ -25,6 +25,8 @@ class PaymentAction implements ArrayInterface
      */
     public function toOptionArray()
     {
+        // Note: Not using AbstractMethod constants because that class is deprecated...
+
         return [
             [
                 'value' => 'order',
@@ -35,7 +37,7 @@ class PaymentAction implements ArrayInterface
                 'label' => __('Authorize'),
             ],
             [
-                'value' => 'capture',
+                'value' => 'authorize_capture',
                 'label' => __('Authorize and Capture'),
             ],
         ];

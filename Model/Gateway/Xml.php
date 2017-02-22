@@ -82,7 +82,7 @@ class Xml
      * @return \DOMNode
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    private static function &convertArrayToXml($node_name, array $arr = [])
+    private static function &convertArrayToXml($node_name, $arr = [])
     {
         $xml = self::getXMLRoot();
         $node = $xml->createElement($node_name);
