@@ -94,16 +94,6 @@ class Cards extends Template
     }
 
     /**
-     * Get session form key.
-     *
-     * @return string
-     */
-    public function getFormKey()
-    {
-        return $this->formKey->getFormKey();
-    }
-
-    /**
      * Get the active payment method title.
      *
      * @return string

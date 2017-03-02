@@ -13,8 +13,6 @@
 
 namespace ParadoxLabs\TokenBase\Observer;
 
-use Magento\Payment\Observer\AbstractDataAssignObserver;
-
 /**
  * PaymentMethodAssignDataObserver Class
  */
@@ -51,13 +49,18 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
         /** @var \Magento\Payment\Model\MethodInterface $method */
-        $method = $observer->getData(AbstractDataAssignObserver::METHOD_CODE);
+        $method = $observer->getData('method');
 
         /** @var \Magento\Sales\Model\Order\Payment $payment */
-        $payment = $observer->getData(AbstractDataAssignObserver::MODEL_CODE);
+        $payment = $observer->getData('payment_model');
+
+        // Magento 2.0 compatibility
+        if ($payment === null) {
+            $payment = $method->getInfoInstance();
+        }
 
         /** @var \Magento\Framework\DataObject $data */
-        $data = $observer->getData(AbstractDataAssignObserver::DATA_CODE);
+        $data = $observer->getData('data');
 
         $this->helper->log($payment->getMethod(), sprintf('assignData(%s)', $data->getData('card_id')));
 
@@ -214,11 +217,11 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
         );
 
         $payment->setData('tokenbase_id', $card->getId())
-             ->setData('cc_type', $card->getAdditional('cc_type'))
-             ->setData('cc_last_4', $card->getAdditional('cc_last4'))
-             ->setData('cc_exp_month', $card->getAdditional('cc_exp_month'))
-             ->setData('cc_exp_year', $card->getAdditional('cc_exp_year'))
-             ->setData('tokenbase_card', $card);
+                ->setData('cc_type', $card->getAdditional('cc_type'))
+                ->setData('cc_last_4', $card->getAdditional('cc_last4'))
+                ->setData('cc_exp_month', $card->getAdditional('cc_exp_month'))
+                ->setData('cc_exp_year', $card->getAdditional('cc_exp_year'))
+                ->setData('tokenbase_card', $card);
 
         return $this;
     }

@@ -16,7 +16,7 @@
         "monolog/monolog": "~1.11"
     },
     "type": "magento2-module",
-    "version": "3.1.0",
+    "version": "3.1.1",
     "license": "proprietary",
     "autoload": {
         "files": [ "registration.php" ],

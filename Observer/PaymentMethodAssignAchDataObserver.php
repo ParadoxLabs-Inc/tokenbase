@@ -13,8 +13,6 @@
 
 namespace ParadoxLabs\TokenBase\Observer;
 
-use Magento\Payment\Observer\AbstractDataAssignObserver;
-
 /**
  * PaymentMethodAssignAchDataObserver Class
  */
@@ -52,11 +50,19 @@ class PaymentMethodAssignAchDataObserver implements \Magento\Framework\Event\Obs
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
+        /** @var \Magento\Payment\Model\MethodInterface $method */
+        $method = $observer->getData('method');
+
         /** @var \Magento\Sales\Model\Order\Payment $payment */
-        $payment = $observer->getData(AbstractDataAssignObserver::MODEL_CODE);
+        $payment = $observer->getData('payment_model');
+
+        // Magento 2.0 compatibility
+        if ($payment === null) {
+            $payment = $method->getInfoInstance();
+        }
 
         /** @var \Magento\Framework\DataObject $data */
-        $data = $observer->getData(AbstractDataAssignObserver::DATA_CODE);
+        $data = $observer->getData('data');
 
         /**
          * Merge together data from additional_data array
@@ -73,7 +79,7 @@ class PaymentMethodAssignAchDataObserver implements \Magento\Framework\Event\Obs
             if ($data->hasData($field) && $data->getData($field) != '') {
                 $payment->setData($field, $data->getData($field));
 
-                if ($field != 'echeck_routing_no' && $field != 'echeck_account_no') {
+                if ($field !== 'echeck_routing_no' && $field !== 'echeck_account_no') {
                     $payment->setAdditionalInformation($field, $data->getData($field));
                 }
             }
