@@ -55,8 +55,14 @@ class CaptureCommand extends \Magento\Sales\Model\Order\Payment\State\CaptureCom
         // If we're setting the order state to default processing on authorize/capture, inject our status.
         if ($status === false && $state == \Magento\Sales\Model\Order::STATE_PROCESSING) {
             $methodCode = $order->getPayment()->getMethod();
+            
+            $paymentAction = $this->scopeConfig->getValue(
+                'payment/' . $methodCode . '/payment_action',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            );
 
-            if (in_array($methodCode, $this->helper->getAllMethods())) {
+            // But only if it's our method, and this is the first payment action.
+            if (in_array($methodCode, $this->helper->getAllMethods()) && $paymentAction === 'authorize_capture') {
                 $status = $this->scopeConfig->getValue(
                     'payment/' . $methodCode . '/order_status',
                     \Magento\Store\Model\ScopeInterface::SCOPE_STORE
