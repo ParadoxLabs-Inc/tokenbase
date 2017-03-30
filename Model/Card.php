@@ -14,10 +14,29 @@
 namespace ParadoxLabs\TokenBase\Model;
 
 /**
+ * Soft dependency: Supporting 2.1 Vault without breaking 2.0 compatibility.
+ * The 2.1+ version implements \Magento\Vault; 2.0 does not.
+ *
+ * If PaymentTokenInterface exists, we want to implement it. If not, skip.
+ */
+if (interface_exists('\Magento\Vault\Api\Data\PaymentTokenInterface')) {
+    class_alias(
+        '\Magento\Vault\Api\Data\PaymentTokenInterface',
+        '\ParadoxLabs\TokenBase\Api\Data\TokenInterface'
+    );
+} else {
+    class_alias(
+        '\ParadoxLabs\TokenBase\Api\Data\FauxTokenInterface',
+        '\ParadoxLabs\TokenBase\Api\Data\TokenInterface'
+    );
+}
+
+/**
  * Payment record storage
  */
-class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implements
-    \ParadoxLabs\TokenBase\Api\Data\CardInterface
+class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
+    \ParadoxLabs\TokenBase\Api\Data\CardInterface,
+    \ParadoxLabs\TokenBase\Api\Data\TokenInterface
 {
     /**
      * Prefix of model events names
@@ -1168,14 +1187,4 @@ class CardImp extends \Magento\Framework\Model\AbstractExtensibleModel implement
     {
         return $this->setActive($isVisible);
     }
-}
-
-/**
- * This is messy. Sorry. Supporting 2.1 Vault without breaking 2.0 compatibility.
- * The 2.1+ version implements \Magento\Vault; 2.0 does not.
- */
-if (interface_exists('\Magento\Vault\Api\Data\PaymentTokenInterface')) {
-    require_once 'Card/Card210.php';
-} else {
-    require_once 'Card/Card200.php';
 }
