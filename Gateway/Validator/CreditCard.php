@@ -173,4 +173,14 @@ class CreditCard extends \Magento\Payment\Gateway\Validator\AbstractValidator
 
         return $sum % 10 === 0;
     }
+
+    /**
+     * Accessor for CC Types object.
+     *
+     * @return \ParadoxLabs\TokenBase\Gateway\Validator\CreditCard\Types
+     */
+    public function getCcTypes()
+    {
+        return $this->ccTypes;
+    }
 }
