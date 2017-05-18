@@ -21,12 +21,12 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
     /**
      * @var \ParadoxLabs\TokenBase\Helper\Data
      */
-    private $helper;
+    protected $helper;
 
     /**
      * @var \ParadoxLabs\TokenBase\Api\CardRepositoryInterface
      */
-    private $cardRepository;
+    protected $cardRepository;
 
     /**
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
@@ -85,7 +85,7 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
      * @param \Magento\Framework\DataObject $data
      * @return void
      */
-    private function assignStandardData(
+    protected function assignStandardData(
         \Magento\Payment\Model\InfoInterface $payment,
         \Magento\Framework\DataObject $data
     ) {
@@ -109,7 +109,7 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
      * @param \Magento\Payment\Model\MethodInterface $method
      * @return void
      */
-    private function assignTokenbaseData(
+    protected function assignTokenbaseData(
         \Magento\Payment\Model\InfoInterface $payment,
         \Magento\Framework\DataObject $data,
         \Magento\Payment\Model\MethodInterface $method
@@ -161,7 +161,7 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
      * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
      * @throws \Magento\Framework\Exception\PaymentException
      */
-    private function loadAndSetCard(
+    protected function loadAndSetCard(
         \Magento\Payment\Model\InfoInterface $payment,
         $cardId,
         $byHash = false
@@ -205,7 +205,7 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
      * @param \ParadoxLabs\TokenBase\Api\Data\CardInterface $card
      * @return $this
      */
-    private function setCardOnPayment(
+    protected function setCardOnPayment(
         \Magento\Payment\Model\InfoInterface $payment,
         \ParadoxLabs\TokenBase\Api\Data\CardInterface $card
     ) {

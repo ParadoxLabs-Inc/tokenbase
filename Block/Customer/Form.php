@@ -215,6 +215,16 @@ class Form extends \Magento\Customer\Block\Address\Edit
     }
 
     /**
+     * Return the Url to go back.
+     *
+     * @return string
+     */
+    public function getBackUrl()
+    {
+        return $this->getUrl('*/*/index', ['_secure' => true, 'method' => $this->getCode()]);
+    }
+
+    /**
      * Return whether or not this is a card edit.
      *
      * @return bool
