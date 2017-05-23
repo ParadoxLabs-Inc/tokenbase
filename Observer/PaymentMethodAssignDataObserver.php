@@ -75,7 +75,7 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
             }
         }
 
-        $this->assignStandardData($payment, $data);
+        $this->assignStandardData($payment, $data, $method);
 
         $this->assignTokenbaseData($payment, $data, $method);
     }
@@ -83,11 +83,13 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
     /**
      * @param \Magento\Payment\Model\InfoInterface $payment
      * @param \Magento\Framework\DataObject $data
+     * @param \Magento\Payment\Model\MethodInterface $method
      * @return void
      */
     protected function assignStandardData(
         \Magento\Payment\Model\InfoInterface $payment,
-        \Magento\Framework\DataObject $data
+        \Magento\Framework\DataObject $data,
+        \Magento\Payment\Model\MethodInterface $method
     ) {
         /** @var \Magento\Sales\Model\Order\Payment $payment */
 
@@ -101,6 +103,10 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
         $payment->setData('cc_ss_issue', $data->getData('cc_ss_issue'));
         $payment->setData('cc_ss_start_month', $data->getData('cc_ss_start_month'));
         $payment->setData('cc_ss_start_year', $data->getData('cc_ss_start_year'));
+
+        if ($method->getConfigData('can_store_bin') == 1) {
+            $payment->setAdditionalInformation('cc_bin', substr($data->getData('cc_number'), 0, 6));
+        }
     }
 
     /**
@@ -137,6 +143,10 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
 
             if ($data->hasData('cc_last4') && $data->getData('cc_last4') != '') {
                 $payment->setData('cc_last_4', $data->getData('cc_last4'));
+            }
+
+            if (!empty($data->getData('cc_bin')) && $method->getConfigData('can_store_bin') == 1) {
+                $payment->setAdditionalInformation('cc_last_4', $data->getData('cc_bin'));
             }
 
             if ($data->getData('cc_exp_year') != '' && $data->getData('cc_exp_month') != '') {
@@ -222,6 +232,10 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
                 ->setData('cc_exp_month', $card->getAdditional('cc_exp_month'))
                 ->setData('cc_exp_year', $card->getAdditional('cc_exp_year'))
                 ->setData('tokenbase_card', $card);
+
+        if (!empty($card->getAdditional('cc_bin'))) {
+            $payment->setAdditionalInformation('cc_bin', $card->getAdditional('cc_bin'));
+        }
 
         return $this;
     }

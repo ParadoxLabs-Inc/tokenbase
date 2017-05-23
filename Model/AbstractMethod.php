@@ -300,6 +300,10 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
                                 ->setData('cc_exp_month', $card->getAdditional('cc_exp_month'))
                                 ->setData('cc_exp_year', $card->getAdditional('cc_exp_year'));
 
+        if ($this->getConfigData('can_store_bin') == 1) {
+            $this->getInfoInstance()->setAdditionalInformation('cc_bin', $card->getAdditional('cc_bin'));
+        }
+
         return $this;
     }
 

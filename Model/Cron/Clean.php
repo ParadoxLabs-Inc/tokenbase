@@ -121,7 +121,7 @@ class Clean
      * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection $cards
      * @return int
      */
-    protected function deleteCards(\ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection $cards)
+    public function deleteCards(\ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection $cards)
     {
         $affectedCount = 0;
 

@@ -218,6 +218,7 @@ class PaymentinfoSave extends Paymentinfo
 
                     if (isset($cardData['cc_number'])) {
                         $cardData['cc_last4'] = substr($cardData['cc_number'], -4);
+                        $cardData['cc_bin']   = substr($cardData['cc_number'], 0, 6);
                     }
 
                     /** @var \Magento\Quote\Model\Quote $quote */

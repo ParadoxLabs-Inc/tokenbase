@@ -66,7 +66,8 @@ class StoredCard extends \Magento\Payment\Gateway\Validator\AbstractValidator
             /**
              * If Require CCV is enabled, enforce it.
              */
-            if ($this->config->getValue('require_ccv') == 1) {
+            if ($this->config->getValue('require_ccv') == 1
+                && $payment->getAdditionalInformation('is_subscription_generated') != 1) {
                 $ccvLength = null;
                 $ccvLabel  = 'CVV';
 
