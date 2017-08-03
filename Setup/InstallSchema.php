@@ -149,7 +149,8 @@ class InstallSchema implements \Magento\Framework\Setup\InstallSchemaInterface
         /**
          * Add payment card ID columns
          */
-        $setup->getConnection()->addColumn(
+        $quoteDb = $setup->getConnection('checkout');
+        $quoteDb->addColumn(
             $setup->getTable('quote_payment'),
             'tokenbase_id',
             [
@@ -159,7 +160,8 @@ class InstallSchema implements \Magento\Framework\Setup\InstallSchemaInterface
             ]
         );
 
-        $setup->getConnection()->addColumn(
+        $salesDb = $setup->getConnection('sales');
+        $salesDb->addColumn(
             $setup->getTable('sales_order_payment'),
             'tokenbase_id',
             [
