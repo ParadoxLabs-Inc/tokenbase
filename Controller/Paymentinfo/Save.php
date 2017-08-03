@@ -170,6 +170,8 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
 
                 $this->helper->log($method, (string)$e);
                 $this->messageManager->addErrorMessage(__($e->getMessage()));
+
+                $this->recordSessionFailure($e);
             }
         } else {
             $this->messageManager->addErrorMessage(__('Invalid Request.'));
@@ -177,5 +179,24 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
 
         $resultRedirect->setPath('*/*', ['method' => $method, '_secure' => true]);
         return $resultRedirect;
+    }
+
+    /**
+     * Record each save failure on their session. If they fail too many times in a given period, block access. This is
+     * to help prevent credit card validation abuse, trying to store CCs until one works.
+     *
+     * @param \Exception $e
+     * @return void
+     */
+    protected function recordSessionFailure(\Exception $e)
+    {
+        $failures = $this->session->getData('tokenbase_failures');
+        if (is_array($failures) === false) {
+            $failures = [];
+        }
+
+        $failures[time()] = $e->getMessage();
+
+        $this->session->setData('tokenbase_failures', $failures);
     }
 }

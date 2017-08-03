@@ -115,6 +115,17 @@ abstract class ApiTest extends \Magento\Config\Block\System\Config\Form\Field
     }
 
     /**
+     * Determine whether the given string contains values outside the standard ASCII charset.
+     *
+     * @param string $string
+     * @return bool
+     */
+    protected function containsInvalidCharacters($string)
+    {
+        return (bool)preg_match('/[^ -~]/i', $string);
+    }
+
+    /**
      * Method to test the API connection. Should return a string indicating success or error.
      *
      * @return mixed
