@@ -54,7 +54,7 @@ abstract class Paymentinfo extends \Magento\Customer\Controller\AbstractAccount
     protected $addressHelper;
 
     /**
-     * @var Session\Proxy
+     * @var Session
      */
     protected $session;
 
@@ -65,7 +65,7 @@ abstract class Paymentinfo extends \Magento\Customer\Controller\AbstractAccount
 
     /**
      * @param Context $context
-     * @param Session\Proxy $customerSession
+     * @param Session $customerSession *Proxy
      * @param PageFactory $resultPageFactory
      * @param \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator
      * @param \Magento\Framework\Registry $registry
@@ -76,7 +76,7 @@ abstract class Paymentinfo extends \Magento\Customer\Controller\AbstractAccount
      */
     public function __construct(
         Context $context,
-        Session\Proxy $customerSession,
+        Session $customerSession,
         PageFactory $resultPageFactory,
         \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator,
         \Magento\Framework\Registry $registry,

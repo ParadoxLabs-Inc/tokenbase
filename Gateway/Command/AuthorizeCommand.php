@@ -14,9 +14,9 @@
 namespace ParadoxLabs\TokenBase\Gateway\Command;
 
 /**
- * Void Class
+ * Authorize Class
  */
-class Void implements \Magento\Payment\Gateway\CommandInterface
+class AuthorizeCommand implements \Magento\Payment\Gateway\CommandInterface
 {
     /**
      * @var \ParadoxLabs\TokenBase\Api\MethodInterface
@@ -33,7 +33,7 @@ class Void implements \Magento\Payment\Gateway\CommandInterface
     }
 
     /**
-     * Run a void transaction on the given subject.
+     * Run an authorization transaction on the given subject.
      *
      * @param array $commandSubject
      * @return null|\Magento\Payment\Gateway\Command\ResultInterface
@@ -41,6 +41,9 @@ class Void implements \Magento\Payment\Gateway\CommandInterface
      */
     public function execute(array $commandSubject)
     {
+        /** @var double $amount */
+        $amount = $commandSubject['amount'];
+
         /** @var \Magento\Payment\Gateway\Data\PaymentDataObjectInterface $paymentDataObject */
         $paymentDataObject = $commandSubject['payment'];
 
@@ -49,7 +52,7 @@ class Void implements \Magento\Payment\Gateway\CommandInterface
 
         $this->method->setInfoInstance($payment);
         $this->method->setStore($paymentDataObject->getOrder()->getStoreId());
-        $this->method->void($payment);
+        $this->method->authorize($payment, $amount);
 
         return null;
     }

@@ -14,9 +14,9 @@
 namespace ParadoxLabs\TokenBase\Gateway\Command;
 
 /**
- * Refund Class
+ * Order Class
  */
-class Refund implements \Magento\Payment\Gateway\CommandInterface
+class OrderCommand implements \Magento\Payment\Gateway\CommandInterface
 {
     /**
      * @var \ParadoxLabs\TokenBase\Api\MethodInterface
@@ -33,7 +33,7 @@ class Refund implements \Magento\Payment\Gateway\CommandInterface
     }
 
     /**
-     * Run a refund transaction on the given subject.
+     * Run an order transaction on the given subject.
      *
      * @param array $commandSubject
      * @return null|\Magento\Payment\Gateway\Command\ResultInterface
@@ -52,7 +52,7 @@ class Refund implements \Magento\Payment\Gateway\CommandInterface
 
         $this->method->setInfoInstance($payment);
         $this->method->setStore($paymentDataObject->getOrder()->getStoreId());
-        $this->method->refund($payment, $amount);
+        $this->method->order($payment, $amount);
 
         return null;
     }

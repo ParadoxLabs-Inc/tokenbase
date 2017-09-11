@@ -14,9 +14,9 @@
 namespace ParadoxLabs\TokenBase\Gateway\Command;
 
 /**
- * Authorize Class
+ * Refund Class
  */
-class Authorize implements \Magento\Payment\Gateway\CommandInterface
+class RefundCommand implements \Magento\Payment\Gateway\CommandInterface
 {
     /**
      * @var \ParadoxLabs\TokenBase\Api\MethodInterface
@@ -33,7 +33,7 @@ class Authorize implements \Magento\Payment\Gateway\CommandInterface
     }
 
     /**
-     * Run an authorization transaction on the given subject.
+     * Run a refund transaction on the given subject.
      *
      * @param array $commandSubject
      * @return null|\Magento\Payment\Gateway\Command\ResultInterface
@@ -52,7 +52,7 @@ class Authorize implements \Magento\Payment\Gateway\CommandInterface
 
         $this->method->setInfoInstance($payment);
         $this->method->setStore($paymentDataObject->getOrder()->getStoreId());
-        $this->method->authorize($payment, $amount);
+        $this->method->refund($payment, $amount);
 
         return null;
     }

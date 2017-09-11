@@ -51,7 +51,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
     protected $card;
 
     /**
-     * @var \ParadoxLabs\TokenBase\Helper\Address\Proxy
+     * @var \ParadoxLabs\TokenBase\Helper\Address
      */
     protected $addressHelper;
 
@@ -86,7 +86,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @param \ParadoxLabs\TokenBase\Model\AbstractGateway $gateway
      * @param \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $cardFactory
      * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
-     * @param \ParadoxLabs\TokenBase\Helper\Address\Proxy $addressHelper
+     * @param \ParadoxLabs\TokenBase\Helper\Address $addressHelper *Proxy
      * @param \Magento\Payment\Gateway\ConfigInterface $config
      * @param \Magento\Framework\Registry $registry
      * @param string $methodCode
@@ -99,7 +99,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         \ParadoxLabs\TokenBase\Model\AbstractGateway $gateway,
         \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $cardFactory,
         \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository,
-        \ParadoxLabs\TokenBase\Helper\Address\Proxy $addressHelper,
+        \ParadoxLabs\TokenBase\Helper\Address $addressHelper,
         \Magento\Payment\Gateway\ConfigInterface $config,
         \Magento\Framework\Registry $registry,
         $methodCode = '',

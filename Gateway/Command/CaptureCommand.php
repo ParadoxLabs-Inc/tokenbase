@@ -14,9 +14,9 @@
 namespace ParadoxLabs\TokenBase\Gateway\Command;
 
 /**
- * Order Class
+ * Capture Class
  */
-class Order implements \Magento\Payment\Gateway\CommandInterface
+class CaptureCommand implements \Magento\Payment\Gateway\CommandInterface
 {
     /**
      * @var \ParadoxLabs\TokenBase\Api\MethodInterface
@@ -33,7 +33,7 @@ class Order implements \Magento\Payment\Gateway\CommandInterface
     }
 
     /**
-     * Run an order transaction on the given subject.
+     * Run a capture transaction on the given subject.
      *
      * @param array $commandSubject
      * @return null|\Magento\Payment\Gateway\Command\ResultInterface
@@ -52,7 +52,7 @@ class Order implements \Magento\Payment\Gateway\CommandInterface
 
         $this->method->setInfoInstance($payment);
         $this->method->setStore($paymentDataObject->getOrder()->getStoreId());
-        $this->method->order($payment, $amount);
+        $this->method->capture($payment, $amount);
 
         return null;
     }

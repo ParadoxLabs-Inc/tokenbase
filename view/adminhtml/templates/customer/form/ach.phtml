@@ -175,13 +175,13 @@
 </form>
 <script type="text/javascript">
     //<![CDATA[
-    <?php // @see Magento\Customer\Block\Adminhtml\Edit\Renderer\Region::render()?>
+    <?php /* @see Magento\Customer\Block\Adminhtml\Edit\Renderer\Region::render() */ ?>
     require(["prototype", "mage/adminhtml/form"], function(){
         jQuery("#<?php echo $code; ?>-region-id").attr("defaultValue", "<?php echo (int)$block->getRegionId() ?>");
         new RegionUpdater("<?php echo $code; ?>-country", "<?php echo $code; ?>-region", "<?php echo $code; ?>-region-id", <?php echo $this->helper('Magento\Directory\Helper\Data')->getRegionJson() ?> );
     });
 
-    <?php // Attempt at form validation. Nonfunctional as of 1/25/2016.?>
+    <?php /* Attempt at form validation. Nonfunctional as of 1/25/2016. */ ?>
     require(["jquery", "jquery/ui", "jquery/validate", "mage/translate"], function($) {
         $('#<?php echo $code; ?>-form-validate').trigger('contentUpdated');
     });

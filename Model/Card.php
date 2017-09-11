@@ -136,11 +136,6 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
     protected $dateProcessor;
 
     /**
-     * @var \Magento\Framework\Unserialize\Unserialize
-     */
-    protected $unserialize;
-
-    /**
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory
@@ -183,7 +178,6 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
         $this->remoteAddress            = $cardContext->getRemoteAddress();
         $this->dataProcessor            = $cardContext->getDataObjectProcessor();
         $this->dateProcessor            = $cardContext->getDateProcessor();
-        $this->unserialize              = $cardContext->getUnserialize();
     }
 
     /**
@@ -465,7 +459,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
     public function getAddress($key = '')
     {
         if ($this->address === null && parent::getData('address')) {
-            $this->address = $this->unserialize->unserialize(parent::getData('address'));
+            $this->address = json_decode(parent::getData('address'), 1);
         }
 
         if ($key !== '') {
@@ -530,7 +524,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
     public function getAdditional($key = null)
     {
         if ($this->additional === null) {
-            $this->additional = $this->unserialize->unserialize(parent::getData('additional'));
+            $this->additional = json_decode(parent::getData('additional'), 1);
         }
 
         if ($key !== null) {
@@ -561,7 +555,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
             $this->additional = $key;
         }
 
-        parent::setData('additional', serialize($this->additional));
+        parent::setData('additional', json_encode($this->additional));
 
         return $this;
     }
@@ -593,7 +587,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
         $this->address = null;
 
         // Store
-        parent::setData('address', serialize($addressData));
+        parent::setData('address', json_encode($addressData));
 
         return $this;
     }
@@ -1000,7 +994,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
     /**
      * Retrieve existing extension attributes object or create a new one.
      *
-     * @return \Magento\Framework\Api\ExtensionAttributesInterface|null
+     * @return \ParadoxLabs\TokenBase\Api\Data\CardExtensionInterface|null
      */
     public function getExtensionAttributes()
     {
@@ -1010,11 +1004,11 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
     /**
      * Set an extension attributes object.
      *
-     * @param \Magento\Framework\Api\ExtensionAttributesInterface $extensionAttributes
+     * @param \ParadoxLabs\TokenBase\Api\Data\CardExtensionInterface $extensionAttributes
      * @return $this
      */
     public function setExtensionAttributes(
-        \Magento\Framework\Api\ExtensionAttributesInterface $extensionAttributes
+        \ParadoxLabs\TokenBase\Api\Data\CardExtensionInterface $extensionAttributes
     ) {
         return $this->_setExtensionAttributes($extensionAttributes);
     }

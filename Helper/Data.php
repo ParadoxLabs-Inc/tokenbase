@@ -74,7 +74,7 @@ class Data extends \Magento\Payment\Helper\Data
     protected $currentCustomer;
 
     /**
-     * @var Address\Proxy
+     * @var Address
      */
     protected $addressHelper;
 
@@ -110,22 +110,22 @@ class Data extends \Magento\Payment\Helper\Data
     ];
 
     /**
-     * @var \Magento\Backend\Model\Session\Quote\Proxy
+     * @var \Magento\Backend\Model\Session\Quote
      */
     protected $backendSession;
 
     /**
-     * @var \Magento\Checkout\Model\Session\Proxy
+     * @var \Magento\Checkout\Model\Session
      */
     protected $checkoutSession;
 
     /**
-     * @var \Magento\Customer\Model\Session\Proxy
+     * @var \Magento\Customer\Model\Session
      */
     protected $customerSession;
 
     /**
-     * @var \Magento\Customer\Helper\Session\CurrentCustomer\Proxy
+     * @var \Magento\Customer\Helper\Session\CurrentCustomer
      */
     protected $currentCustomerSession;
 
@@ -145,13 +145,13 @@ class Data extends \Magento\Payment\Helper\Data
      * @param \Magento\Customer\Api\Data\CustomerInterfaceFactory $customerFactory
      * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
      * @param \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory
-     * @param \Magento\Backend\Model\Session\Quote\Proxy $backendSession
-     * @param \Magento\Checkout\Model\Session\Proxy $checkoutSession
-     * @param \Magento\Customer\Model\Session\Proxy $customerSession
-     * @param \Magento\Customer\Helper\Session\CurrentCustomer\Proxy $currentCustomerSession
+     * @param \Magento\Backend\Model\Session\Quote $backendSession *Proxy
+     * @param \Magento\Checkout\Model\Session $checkoutSession *Proxy
+     * @param \Magento\Customer\Model\Session $customerSession *Proxy
+     * @param \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomerSession *Proxy
      * @param \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory
      * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
-     * @param \ParadoxLabs\TokenBase\Helper\Address\Proxy $addressHelper
+     * @param \ParadoxLabs\TokenBase\Helper\Address $addressHelper *Proxy
      * @param \ParadoxLabs\TokenBase\Helper\Operation $operationHelper
      */
     public function __construct(
@@ -168,13 +168,13 @@ class Data extends \Magento\Payment\Helper\Data
         \Magento\Customer\Api\Data\CustomerInterfaceFactory $customerFactory,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
         \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory,
-        \Magento\Backend\Model\Session\Quote\Proxy $backendSession,
-        \Magento\Checkout\Model\Session\Proxy $checkoutSession,
-        \Magento\Customer\Model\Session\Proxy $customerSession,
-        \Magento\Customer\Helper\Session\CurrentCustomer\Proxy $currentCustomerSession,
+        \Magento\Backend\Model\Session\Quote $backendSession,
+        \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Customer\Model\Session $customerSession,
+        \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomerSession,
         \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
         \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory,
-        \ParadoxLabs\TokenBase\Helper\Address\Proxy $addressHelper,
+        \ParadoxLabs\TokenBase\Helper\Address $addressHelper,
         \ParadoxLabs\TokenBase\Helper\Operation $operationHelper
     ) {
         $this->appState = $appState;

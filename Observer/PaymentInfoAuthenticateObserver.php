@@ -29,7 +29,7 @@ class PaymentInfoAuthenticateObserver implements \Magento\Framework\Event\Observ
     protected $searchCriteriaBuilder;
 
     /**
-     * @var \Magento\Customer\Model\Session\Proxy
+     * @var \Magento\Customer\Model\Session
      */
     protected $customerSession;
 
@@ -58,7 +58,7 @@ class PaymentInfoAuthenticateObserver implements \Magento\Framework\Event\Observ
      *
      * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
      * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
-     * @param \Magento\Customer\Model\Session\Proxy $customerSession
+     * @param \Magento\Customer\Model\Session $customerSession *Proxy
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \Magento\Framework\UrlInterface $urlBuilder
      * @param \Magento\Framework\Message\ManagerInterface $messageManager
@@ -67,7 +67,7 @@ class PaymentInfoAuthenticateObserver implements \Magento\Framework\Event\Observ
     public function __construct(
         \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
         \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
-        \Magento\Customer\Model\Session\Proxy $customerSession,
+        \Magento\Customer\Model\Session $customerSession,
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         \Magento\Framework\UrlInterface $urlBuilder,
         \Magento\Framework\Message\ManagerInterface $messageManager,

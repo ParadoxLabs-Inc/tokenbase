@@ -36,12 +36,12 @@ class Cc extends \Magento\Payment\Block\Form\Cc
     protected $cards;
 
     /**
-     * @var \Magento\Customer\Model\Session\Proxy
+     * @var \Magento\Customer\Model\Session
      */
     protected $customerSession;
 
     /**
-     * @var \Magento\Checkout\Model\Session\Proxy
+     * @var \Magento\Checkout\Model\Session
      */
     protected $checkoutSession;
 
@@ -64,8 +64,8 @@ class Cc extends \Magento\Payment\Block\Form\Cc
      * @param \Magento\Framework\View\Element\Template\Context $context
      * @param \Magento\Payment\Model\Config $paymentConfig
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \Magento\Customer\Model\Session\Proxy $customerSession
-     * @param \Magento\Checkout\Model\Session\Proxy $checkoutSession
+     * @param \Magento\Customer\Model\Session $customerSession *Proxy
+     * @param \Magento\Checkout\Model\Session $checkoutSession *Proxy
      * @param \ParadoxLabs\TokenBase\Model\Method\Factory $tokenbaseMethodFactory
      * @param array $data
      */
@@ -73,8 +73,8 @@ class Cc extends \Magento\Payment\Block\Form\Cc
         \Magento\Framework\View\Element\Template\Context $context,
         \Magento\Payment\Model\Config $paymentConfig,
         \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \Magento\Customer\Model\Session\Proxy $customerSession,
-        \Magento\Checkout\Model\Session\Proxy $checkoutSession,
+        \Magento\Customer\Model\Session $customerSession,
+        \Magento\Checkout\Model\Session $checkoutSession,
         \ParadoxLabs\TokenBase\Model\Method\Factory $tokenbaseMethodFactory,
         array $data = []
     ) {

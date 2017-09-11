@@ -1,13 +1,9 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-    <type name="Magento\Payment\Model\Checks\ZeroTotal">
+    <!-- Plugin disabled per 1800925. If/when this is added, will need to ensure quote is established before allowing. -->
+<!--     <type name="Magento\Payment\Model\Checks\ZeroTotal">
         <plugin name="allowTokenbaseZeroTotal" type="ParadoxLabs\TokenBase\Plugin\ZeroTotal" sortOrder="100" disabled="false" />
-    </type>
-
-    <preference for="Magento\Sales\Model\Order\Payment\State\AuthorizeCommand"
-                type="ParadoxLabs\TokenBase\Model\Override\Magento\Sales\Model\Order\Payment\State\AuthorizeCommand" />
-    <preference for="Magento\Sales\Model\Order\Payment\State\CaptureCommand"
-                type="ParadoxLabs\TokenBase\Model\Override\Magento\Sales\Model\Order\Payment\State\CaptureCommand" />
+    </type> -->
 
     <type name="Magento\Sales\Model\Order\Config">
         <plugin name="tokenbaseAllowPendingStatus" type="ParadoxLabs\TokenBase\Plugin\AllowPendingStatus" sortOrder="100" disabled="false" />
@@ -68,13 +64,85 @@
     <type name="Magento\Sales\Model\Order">
         <plugin name="orderPaymentLoadTokenbaseId" type="ParadoxLabs\TokenBase\Plugin\OrderPaymentLoadTokenbaseId" />
     </type>
-    <type name="Magento\sales\Api\OrderRepositoryInterface">
+    <type name="Magento\Sales\Api\OrderRepositoryInterface">
         <plugin name="orderPaymentSaveTokenbaseId" type="ParadoxLabs\TokenBase\Plugin\OrderPaymentSaveTokenbaseId" />
+    </type>
+
+    <!-- Adding order status override -->
+    <type name="Magento\Sales\Model\Order\Payment\State\AuthorizeCommand">
+        <plugin name="tokenbaseSetAuthorizeOrderStatus" type="ParadoxLabs\TokenBase\Plugin\Sales\Model\Order\Payment\State\AuthorizeCommand\Plugin" />
+    </type>
+    <type name="Magento\Sales\Model\Order\Payment\State\CaptureCommand">
+        <plugin name="tokenbaseSetCaptureOrderStatus" type="ParadoxLabs\TokenBase\Plugin\Sales\Model\Order\Payment\State\CaptureCommand\Plugin" />
     </type>
 
     <!-- Fix a core bug -->
     <type name="Magento\Sales\Model\Order\Payment\Transaction\Repository">
         <plugin name="tokenbaseForceTransactionOrder"
                 type="ParadoxLabs\TokenBase\Plugin\Sales\Model\Order\Payment\Transaction\Repository\Plugin" />
+    </type>
+
+    <!-- Proxies for dependency resolution and efficiency -->
+    <type name="ParadoxLabs\TokenBase\Block\Adminhtml\Customer\Form">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="ParadoxLabs\TokenBase\Block\Customer\Form">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
+            <argument name="currentCustomer" xsi:type="object">Magento\Customer\Helper\Session\CurrentCustomer\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="ParadoxLabs\TokenBase\Block\Form\Cc">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="ParadoxLabs\TokenBase\Controller\Paymentinfo">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="ParadoxLabs\TokenBase\Controller\Paymentinfo\Delete">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="ParadoxLabs\TokenBase\Controller\Paymentinfo\Index">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="ParadoxLabs\TokenBase\Controller\Paymentinfo\Save">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="ParadoxLabs\TokenBase\Helper\Data">
+        <arguments>
+            <argument name="backendSession" xsi:type="object">Magento\Backend\Model\Session\Quote\Proxy</argument>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
+            <argument name="currentCustomerSession" xsi:type="object">Magento\Customer\Helper\Session\CurrentCustomer\Proxy</argument>
+            <argument name="addressHelper" xsi:type="object">ParadoxLabs\TokenBase\Helper\Address\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="ParadoxLabs\TokenBase\Model\AbstractMethod">
+        <arguments>
+            <argument name="addressHelper" xsi:type="object">ParadoxLabs\TokenBase\Helper\Address\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="ParadoxLabs\TokenBase\Model\Card\Context">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="ParadoxLabs\TokenBase\Observer\PaymentInfoAuthenticateObserver">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
+        </arguments>
     </type>
 </config>

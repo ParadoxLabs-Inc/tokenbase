@@ -14,9 +14,9 @@
 namespace ParadoxLabs\TokenBase\Gateway\Command;
 
 /**
- * Capture Class
+ * FetchTransactionInformation Class
  */
-class Capture implements \Magento\Payment\Gateway\CommandInterface
+class FetchTransactionInformationCommand implements \Magento\Payment\Gateway\CommandInterface
 {
     /**
      * @var \ParadoxLabs\TokenBase\Api\MethodInterface
@@ -33,7 +33,7 @@ class Capture implements \Magento\Payment\Gateway\CommandInterface
     }
 
     /**
-     * Run a capture transaction on the given subject.
+     * Run an update transaction on the given subject.
      *
      * @param array $commandSubject
      * @return null|\Magento\Payment\Gateway\Command\ResultInterface
@@ -41,9 +41,6 @@ class Capture implements \Magento\Payment\Gateway\CommandInterface
      */
     public function execute(array $commandSubject)
     {
-        /** @var double $amount */
-        $amount = $commandSubject['amount'];
-
         /** @var \Magento\Payment\Gateway\Data\PaymentDataObjectInterface $paymentDataObject */
         $paymentDataObject = $commandSubject['payment'];
 
@@ -52,7 +49,7 @@ class Capture implements \Magento\Payment\Gateway\CommandInterface
 
         $this->method->setInfoInstance($payment);
         $this->method->setStore($paymentDataObject->getOrder()->getStoreId());
-        $this->method->capture($payment, $amount);
+        $this->method->fetchTransactionInfo($payment, $commandSubject['transactionId']);
 
         return null;
     }

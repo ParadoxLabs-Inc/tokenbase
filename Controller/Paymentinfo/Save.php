@@ -35,7 +35,7 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
 
     /**
      * @param Context $context
-     * @param Session\Proxy $customerSession
+     * @param Session $customerSession *Proxy
      * @param PageFactory $resultPageFactory
      * @param \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator
      * @param \Magento\Framework\Registry $registry
@@ -44,11 +44,11 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \ParadoxLabs\TokenBase\Helper\Address $addressHelper
      * @param \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory
-     * @param \Magento\Checkout\Model\Session\Proxy $checkoutSession
+     * @param \Magento\Checkout\Model\Session $checkoutSession *Proxy
      */
     public function __construct(
         Context $context,
-        Session\Proxy $customerSession,
+        Session $customerSession,
         PageFactory $resultPageFactory,
         \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator,
         \Magento\Framework\Registry $registry,
@@ -57,7 +57,7 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         \ParadoxLabs\TokenBase\Helper\Address $addressHelper,
         \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory,
-        \Magento\Checkout\Model\Session\Proxy $checkoutSession
+        \Magento\Checkout\Model\Session $checkoutSession
     ) {
         $this->paymentFactory   = $paymentFactory;
         $this->checkoutSession  = $checkoutSession;

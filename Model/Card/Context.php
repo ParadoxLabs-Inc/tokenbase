@@ -54,7 +54,7 @@ class Context
     private $orderCollectionFactory;
 
     /**
-     * @var \Magento\Checkout\Model\Session\Proxy
+     * @var \Magento\Checkout\Model\Session
      */
     private $checkoutSession;
 
@@ -72,11 +72,6 @@ class Context
      * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
      */
     private $dateProcessor;
-
-    /**
-     * @var \Magento\Framework\Unserialize\Unserialize
-     */
-    private $unserialize;
 
     /**
      * @var \Magento\Customer\Api\CustomerRepositoryInterface
@@ -100,11 +95,10 @@ class Context
      * @param \Magento\Customer\Api\Data\AddressInterfaceFactory $addressFactory
      * @param \Magento\Customer\Api\Data\RegionInterfaceFactory $addressRegionFactory
      * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
-     * @param \Magento\Checkout\Model\Session\Proxy $checkoutSession
+     * @param \Magento\Checkout\Model\Session $checkoutSession *Proxy
      * @param \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress
      * @param \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor
      * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $dateProcessor
-     * @param \Magento\Framework\Unserialize\Unserialize $unserialize
      */
     public function __construct(
         \ParadoxLabs\TokenBase\Helper\Data $helper,
@@ -116,11 +110,10 @@ class Context
         \Magento\Customer\Api\Data\AddressInterfaceFactory $addressFactory,
         \Magento\Customer\Api\Data\RegionInterfaceFactory $addressRegionFactory,
         \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
-        \Magento\Checkout\Model\Session\Proxy $checkoutSession,
+        \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress,
         \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor,
-        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $dateProcessor,
-        \Magento\Framework\Unserialize\Unserialize $unserialize
+        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $dateProcessor
     ) {
         $this->helper = $helper;
         $this->methodFactory = $methodFactory;
@@ -134,7 +127,6 @@ class Context
         $this->remoteAddress = $remoteAddress;
         $this->dataObjectProcessor = $dataObjectProcessor;
         $this->dateProcessor = $dateProcessor;
-        $this->unserialize = $unserialize;
         $this->customerRepository = $customerRepository;
     }
 
@@ -221,7 +213,7 @@ class Context
     /**
      * Get checkoutSession
      *
-     * @return \Magento\Checkout\Model\Session\Proxy
+     * @return \Magento\Checkout\Model\Session
      */
     public function getCheckoutSession()
     {
@@ -256,16 +248,6 @@ class Context
     public function getDateProcessor()
     {
         return $this->dateProcessor;
-    }
-
-    /**
-     * Get unserialize
-     *
-     * @return \Magento\Framework\Unserialize\Unserialize
-     */
-    public function getUnserialize()
-    {
-        return $this->unserialize;
     }
 
     /**

@@ -17,7 +17,7 @@ namespace ParadoxLabs\TokenBase\Api\Data;
  *
  * @api
  */
-interface CardInterface
+interface CardInterface extends \Magento\Framework\Api\ExtensibleDataInterface
 {
     /**
      * Get ID
@@ -334,17 +334,15 @@ interface CardInterface
     /**
      * Retrieve existing extension attributes object or create a new one.
      *
-     * @return \Magento\Framework\Api\ExtensionAttributesInterface|null
+     * @return \ParadoxLabs\TokenBase\Api\Data\CardExtensionInterface|null
      */
     public function getExtensionAttributes();
 
     /**
      * Set an extension attributes object.
      *
-     * @param \Magento\Framework\Api\ExtensionAttributesInterface $extensionAttributes
+     * @param \ParadoxLabs\TokenBase\Api\Data\CardExtensionInterface $extensionAttributes
      * @return $this
      */
-    public function setExtensionAttributes(
-        \Magento\Framework\Api\ExtensionAttributesInterface $extensionAttributes
-    );
+    public function setExtensionAttributes(\ParadoxLabs\TokenBase\Api\Data\CardExtensionInterface $extensionAttributes);
 }

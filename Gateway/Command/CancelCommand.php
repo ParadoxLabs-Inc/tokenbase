@@ -16,7 +16,7 @@ namespace ParadoxLabs\TokenBase\Gateway\Command;
 /**
  * Cancel Class
  */
-class Cancel implements \Magento\Payment\Gateway\CommandInterface
+class CancelCommand implements \Magento\Payment\Gateway\CommandInterface
 {
     /**
      * @var \ParadoxLabs\TokenBase\Api\MethodInterface

@@ -14,9 +14,9 @@
 namespace ParadoxLabs\TokenBase\Gateway\Command;
 
 /**
- * FetchTransactionInformation Class
+ * Void Class
  */
-class FetchTransactionInformation implements \Magento\Payment\Gateway\CommandInterface
+class VoidCommand implements \Magento\Payment\Gateway\CommandInterface
 {
     /**
      * @var \ParadoxLabs\TokenBase\Api\MethodInterface
@@ -33,7 +33,7 @@ class FetchTransactionInformation implements \Magento\Payment\Gateway\CommandInt
     }
 
     /**
-     * Run an update transaction on the given subject.
+     * Run a void transaction on the given subject.
      *
      * @param array $commandSubject
      * @return null|\Magento\Payment\Gateway\Command\ResultInterface
@@ -49,7 +49,7 @@ class FetchTransactionInformation implements \Magento\Payment\Gateway\CommandInt
 
         $this->method->setInfoInstance($payment);
         $this->method->setStore($paymentDataObject->getOrder()->getStoreId());
-        $this->method->fetchTransactionInfo($payment, $commandSubject['transactionId']);
+        $this->method->void($payment);
 
         return null;
     }

@@ -13,13 +13,15 @@
 
 namespace ParadoxLabs\TokenBase\Helper;
 
+use Magento\Customer\Api\Data\AddressInterface;
 use Magento\Customer\Api\Data\RegionInterface;
+use Magento\Customer\Model\Address\AddressModelInterface;
 use Magento\Directory\Model\ResourceModel\Region;
 
 /**
  * Exposing some helpful methods for processing address submission. Yeah!
  */
-class Address
+class Address extends \Magento\Framework\App\Helper\AbstractHelper
 {
     /**
      * @var \Magento\Customer\Model\Metadata\FormFactory
@@ -57,8 +59,14 @@ class Address
     protected $regionResource;
 
     /**
+     * @var \Magento\Framework\Api\ExtensibleDataObjectConverter
+     */
+    protected $extensibleDataObjectConverter;
+
+    /**
      * Address constructor.
      *
+     * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Customer\Model\Metadata\FormFactory $formFactory
      * @param \Magento\Customer\Api\Data\AddressInterfaceFactory $addressDataFactory
      * @param \Magento\Framework\Api\DataObjectHelper $dataObjectHelper
@@ -66,16 +74,21 @@ class Address
      * @param \Magento\Directory\Model\RegionFactory $regionFactory
      * @param Region $regionResource
      * @param \Magento\Customer\Api\AddressRepositoryInterface $addressRepository
+     * @param \Magento\Framework\Api\ExtensibleDataObjectConverter $extensibleDataObjectConverter
      */
     public function __construct(
+        \Magento\Framework\App\Helper\Context $context,
         \Magento\Customer\Model\Metadata\FormFactory $formFactory,
         \Magento\Customer\Api\Data\AddressInterfaceFactory $addressDataFactory,
         \Magento\Framework\Api\DataObjectHelper $dataObjectHelper,
         \Magento\Customer\Api\Data\RegionInterfaceFactory $regionDataFactory,
         \Magento\Directory\Model\RegionFactory $regionFactory,
         \Magento\Directory\Model\ResourceModel\Region $regionResource,
-        \Magento\Customer\Api\AddressRepositoryInterface $addressRepository
+        \Magento\Customer\Api\AddressRepositoryInterface $addressRepository,
+        \Magento\Framework\Api\ExtensibleDataObjectConverter $extensibleDataObjectConverter
     ) {
+        parent::__construct($context);
+
         $this->formFactory = $formFactory;
         $this->addressDataFactory = $addressDataFactory;
         $this->dataObjectHelper = $dataObjectHelper;
@@ -83,6 +96,7 @@ class Address
         $this->regionFactory = $regionFactory;
         $this->addressRepository = $addressRepository;
         $this->regionResource = $regionResource;
+        $this->extensibleDataObjectConverter = $extensibleDataObjectConverter;
     }
 
     /**
@@ -91,7 +105,7 @@ class Address
      * @param array $addressData
      * @param array $origAddressData
      * @param bool $validate
-     * @return \Magento\Customer\Api\Data\AddressInterface
+     * @return AddressInterface
      * @throws \Exception
      */
     public function buildAddressFromInput($addressData, $origAddressData = [], $validate = false)
@@ -174,5 +188,46 @@ class Address
     public function repository()
     {
         return $this->addressRepository;
+    }
+
+    /**
+     * Check whether the contents of the two addresses match.
+     *
+     * @param AddressModelInterface|AddressInterface $address1
+     * @param AddressModelInterface|AddressInterface $address2
+     * @return bool
+     */
+    public function compareAddresses($address1, $address2)
+    {
+        // Arrayify addresses
+        $addr1Array = $this->addressToArray($address1);
+        $addr2Array = $this->addressToArray($address2);
+
+        // Compare, except for these keys.
+        $excludeKeys = [
+            'id' => null,
+            'default_shipping' => null,
+            'default_billing' => null,
+        ];
+
+        $diff = array_diff_assoc($addr1Array, $addr2Array);
+        $diff = array_diff_key($diff, $excludeKeys);
+
+        return empty($diff);
+    }
+
+    /**
+     * Turn an arbitrary Address object into an array, for reasons.
+     *
+     * @param AddressModelInterface|AddressInterface $address
+     * @return array
+     */
+    public function addressToArray($address)
+    {
+        if ($address instanceof AddressModelInterface) {
+            $address = $address->getDataModel();
+        }
+
+        return $this->extensibleDataObjectConverter->toFlatArray($address);
     }
 }

@@ -3,31 +3,31 @@
     <route url="/V1/tokenbase/:cardId" method="GET">
         <service class="ParadoxLabs\TokenBase\Api\CardRepositoryInterface" method="getById"/>
         <resources>
-            <resource ref="ParadoxLabs_TokenBase::card"/>
+            <resource ref="ParadoxLabs_TokenBase::cards_manage"/>
         </resources>
     </route>
     <route url="/V1/tokenbase/search" method="GET">
         <service class="ParadoxLabs\TokenBase\Api\CardRepositoryInterface" method="getList"/>
         <resources>
-            <resource ref="ParadoxLabs_TokenBase::card"/>
+            <resource ref="ParadoxLabs_TokenBase::cards_manage"/>
         </resources>
     </route>
     <route url="/V1/tokenbase" method="POST">
         <service class="ParadoxLabs\TokenBase\Api\CardRepositoryInterface" method="save"/>
         <resources>
-            <resource ref="ParadoxLabs_TokenBase::card"/>
+            <resource ref="ParadoxLabs_TokenBase::cards_manage"/>
         </resources>
     </route>
     <route url="/V1/tokenbase/:cardId" method="PUT">
         <service class="ParadoxLabs\TokenBase\Api\CardRepositoryInterface" method="save"/>
         <resources>
-            <resource ref="ParadoxLabs_TokenBase::card"/>
+            <resource ref="ParadoxLabs_TokenBase::cards_manage"/>
         </resources>
     </route>
     <route url="/V1/tokenbase/:cardId" method="DELETE">
         <service class="ParadoxLabs\TokenBase\Api\CardRepositoryInterface" method="deleteById"/>
         <resources>
-            <resource ref="ParadoxLabs_TokenBase::card"/>
+            <resource ref="ParadoxLabs_TokenBase::cards_manage"/>
         </resources>
     </route>
 </routes>

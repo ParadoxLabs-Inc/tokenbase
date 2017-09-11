@@ -53,7 +53,8 @@ class PaymentinfoDelete extends Paymentinfo
                  * If we have a valid card, mark it for deletion. That's it.
                  */
                 if ($card && $card->getHash() == $id) {
-                    $this->cardRepository->delete($card);
+                    $card->queueDeletion();
+                    $card = $this->cardRepository->save($card);
 
                     $response['success'] = true;
                     $response['message'] = __('Payment record deleted.');

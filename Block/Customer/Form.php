@@ -62,10 +62,10 @@ class Form extends \Magento\Customer\Block\Address\Edit
      * @param \Magento\Framework\App\Cache\Type\Config $configCacheType
      * @param \Magento\Directory\Model\ResourceModel\Region\CollectionFactory $regionCollectionFactory
      * @param \Magento\Directory\Model\ResourceModel\Country\CollectionFactory $countryCollectionFactory
-     * @param \Magento\Customer\Model\Session\Proxy $customerSession
+     * @param \Magento\Customer\Model\Session $customerSession *Proxy
      * @param \Magento\Customer\Api\AddressRepositoryInterface $addressRepository
      * @param \Magento\Customer\Api\Data\AddressInterfaceFactory $addressDataFactory
-     * @param \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer
+     * @param \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer *Proxy
      * @param \Magento\Framework\Api\DataObjectHelper $dataObjectHelper
      * @param \Magento\Framework\Registry $registry
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
@@ -82,7 +82,7 @@ class Form extends \Magento\Customer\Block\Address\Edit
         \Magento\Framework\App\Cache\Type\Config $configCacheType,
         \Magento\Directory\Model\ResourceModel\Region\CollectionFactory $regionCollectionFactory,
         \Magento\Directory\Model\ResourceModel\Country\CollectionFactory $countryCollectionFactory,
-        \Magento\Customer\Model\Session\Proxy $customerSession,
+        \Magento\Customer\Model\Session $customerSession,
         \Magento\Customer\Api\AddressRepositoryInterface $addressRepository,
         \Magento\Customer\Api\Data\AddressInterfaceFactory $addressDataFactory,
         \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer,
