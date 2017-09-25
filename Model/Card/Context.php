@@ -84,12 +84,23 @@ class Context
     private $methodFactory;
 
     /**
+     * @var \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterfaceFactory
+     */
+    private $cardAdditionalFactory;
+
+    /**
+     * @var \Magento\Framework\Api\DataObjectHelper
+     */
+    private $dataObjectHelper;
+
+    /**
      * Context constructor.
      *
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \ParadoxLabs\TokenBase\Model\Method\Factory $methodFactory
      * @param \ParadoxLabs\TokenBase\Model\Card\Factory $cardFactory
      * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
+     * @param \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterfaceFactory $cardAdditionalFactory
      * @param \Magento\Customer\Api\Data\CustomerInterfaceFactory $customerFactory
      * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
      * @param \Magento\Customer\Api\Data\AddressInterfaceFactory $addressFactory
@@ -99,12 +110,14 @@ class Context
      * @param \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress
      * @param \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor
      * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $dateProcessor
+     * @param \Magento\Framework\Api\DataObjectHelper $dataObjectHelper
      */
     public function __construct(
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         \ParadoxLabs\TokenBase\Model\Method\Factory $methodFactory,
         \ParadoxLabs\TokenBase\Model\Card\Factory $cardFactory,
         \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory,
+        \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterfaceFactory $cardAdditionalFactory,
         \Magento\Customer\Api\Data\CustomerInterfaceFactory $customerFactory,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
         \Magento\Customer\Api\Data\AddressInterfaceFactory $addressFactory,
@@ -113,7 +126,8 @@ class Context
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress,
         \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor,
-        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $dateProcessor
+        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $dateProcessor,
+        \Magento\Framework\Api\DataObjectHelper $dataObjectHelper
     ) {
         $this->helper = $helper;
         $this->methodFactory = $methodFactory;
@@ -128,6 +142,8 @@ class Context
         $this->dataObjectProcessor = $dataObjectProcessor;
         $this->dateProcessor = $dateProcessor;
         $this->customerRepository = $customerRepository;
+        $this->cardAdditionalFactory = $cardAdditionalFactory;
+        $this->dataObjectHelper = $dataObjectHelper;
     }
 
     /**
@@ -258,5 +274,25 @@ class Context
     public function getCustomerRepository()
     {
         return $this->customerRepository;
+    }
+
+    /**
+     * Get cardAdditionalFactory
+     *
+     * @return \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterfaceFactory
+     */
+    public function getCardAdditionalFactory()
+    {
+        return $this->cardAdditionalFactory;
+    }
+
+    /**
+     * Get dataObjectHelper
+     *
+     * @return \Magento\Framework\Api\DataObjectHelper
+     */
+    public function getDataObjectHelper()
+    {
+        return $this->dataObjectHelper;
     }
 }

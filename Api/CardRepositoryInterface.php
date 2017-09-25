@@ -27,7 +27,21 @@ interface CardRepositoryInterface
      * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function save(Data\CardInterface $card);
+    public function save(\ParadoxLabs\TokenBase\Api\Data\CardInterface $card);
+
+    /**
+     * Save card with extended objects.
+     *
+     * @param \ParadoxLabs\TokenBase\Api\Data\CardInterface $card
+     * @param \Magento\Customer\Api\Data\AddressInterface $address
+     * @param \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface $additional
+     * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
+     */
+    public function saveExtended(
+        \ParadoxLabs\TokenBase\Api\Data\CardInterface $card,
+        \Magento\Customer\Api\Data\AddressInterface $address,
+        \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface $additional
+    );
 
     /**
      * Retrieve card. Will accept numeric ID or hash.

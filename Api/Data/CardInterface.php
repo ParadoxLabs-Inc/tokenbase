@@ -104,13 +104,20 @@ interface CardInterface extends \Magento\Framework\Api\ExtensibleDataInterface
     /**
      * Set additional card data.
      * Can pass in a key-value pair to set one value,
-     * or a single parameter (associative array) to overwrite all data.
+     * or a single parameter (associative array or CardAdditional instance) to overwrite all data.
      *
-     * @param string|array $key
+     * @param string|array|\ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface $key
      * @param string|null $value
      * @return $this
      */
     public function setAdditional($key, $value = null);
+
+    /**
+     * Get additional card data, in object form. Used to expose keys to API.
+     *
+     * @return \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface
+     */
+    public function getAdditionalObject();
 
     /**
      * Get billing address or some part thereof.

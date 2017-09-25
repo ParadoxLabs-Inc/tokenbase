@@ -16,8 +16,8 @@
         "monolog/monolog": "^1.11"
     },
     "type": "magento2-module",
-    "version": "4.0.0",
-    "time": "2017-09-11",
+    "version": "4.0.1",
+    "time": "2017-09-20",
     "license": "proprietary",
     "autoload": {
         "files": [ "registration.php" ],

@@ -1,12 +1,16 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Api/etc/extension_attributes.xsd">
     <extension_attributes for="Magento\Quote\Api\Data\PaymentInterface">
-        <attribute code="tokenbase_id" type="string" />
+        <attribute code="tokenbase_id" type="string">
+            <resources>
+                <resource ref="ParadoxLabs_TokenBase::cards_manage" />
+            </resources>
+        </attribute>
     </extension_attributes>
     <extension_attributes for="Magento\Sales\Api\Data\OrderPaymentInterface">
         <attribute code="tokenbase_id" type="string">
             <resources>
-                <resource ref="ParadoxLabs_TokenBase::card" />
+                <resource ref="ParadoxLabs_TokenBase::cards_manage" />
             </resources>
         </attribute>
     </extension_attributes>

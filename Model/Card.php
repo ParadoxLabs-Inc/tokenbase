@@ -8,7 +8,7 @@
  *  http://support.paradoxlabs.com
  *
  * @author        Ryan Hoerr <support@paradoxlabs.com>
- * @license        http://store.paradoxlabs.com/license.html
+ * @license       http://store.paradoxlabs.com/license.html
  */
 
 namespace ParadoxLabs\TokenBase\Model;
@@ -136,6 +136,16 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
     protected $dateProcessor;
 
     /**
+     * @var \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterfaceFactory
+     */
+    protected $cardAdditionalFactory;
+
+    /**
+     * @var \Magento\Framework\Api\DataObjectHelper
+     */
+    protected $dataObjectHelper;
+
+    /**
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory
@@ -168,6 +178,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
         $this->helper                   = $cardContext->getHelper();
         $this->methodFactory            = $cardContext->getMethodFactory();
         $this->cardFactory              = $cardContext->getCardFactory();
+        $this->cardAdditionalFactory    = $cardContext->getCardAdditionalFactory();
         $this->customerFactory          = $cardContext->getCustomerFactory();
         $this->customerRepository       = $cardContext->getCustomerRepository();
         $this->addressFactory           = $cardContext->getAddressFactory();
@@ -178,6 +189,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
         $this->remoteAddress            = $cardContext->getRemoteAddress();
         $this->dataProcessor            = $cardContext->getDataObjectProcessor();
         $this->dateProcessor            = $cardContext->getDateProcessor();
+        $this->dataObjectHelper         = $cardContext->getDataObjectHelper();
     }
 
     /**
@@ -537,22 +549,33 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
     /**
      * Set additional card data.
      * Can pass in a key-value pair to set one value,
-     * or a single parameter (associative array) to overwrite all data.
+     * or a single parameter (associative array or CardAdditional instance) to overwrite all data.
      *
-     * @param string|array $key
+     * @param string|array|\ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface $key
      * @param string|null $value
      * @return $this
      */
     public function setAdditional($key, $value = null)
     {
-        if ($value !== null) {
-            if ($this->additional === null) {
-                $this->getAdditional();
-            }
+        if ($this->additional === null) {
+            $this->getAdditional();
+        }
 
+        if ($value !== null) {
             $this->additional[ $key ] = $value;
         } elseif (is_array($key)) {
             $this->additional = $key;
+        } elseif ($key instanceof \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface) {
+            $values = $this->dataProcessor->buildOutputDataArray(
+                $key,
+                \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface::class
+            );
+
+            foreach ($values as $k => $v) {
+                if ($v !== null) {
+                    $this->additional[ $k ] = $v;
+                }
+            }
         }
 
         parent::setData('additional', json_encode($this->additional));
@@ -571,7 +594,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
         // Convert address to array
         $addressData = $this->dataProcessor->buildOutputDataArray(
             $address,
-            '\Magento\Customer\Api\Data\AddressInterface'
+            \Magento\Customer\Api\Data\AddressInterface::class
         );
 
         $addressData['region_code'] = $address->getRegion()->getRegionCode();
@@ -1185,5 +1208,23 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
     public function setIsVisible($isVisible)
     {
         return $this->setActive($isVisible);
+    }
+
+    /**
+     * Get additional card data, in object form. Used to expose keys to API.
+     *
+     * @return \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface
+     */
+    public function getAdditionalObject()
+    {
+        $additional = $this->cardAdditionalFactory->create();
+
+        $this->dataObjectHelper->populateWithArray(
+            $additional,
+            $this->getAdditional() ?: [],
+            \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface::class
+        );
+
+        return $additional;
     }
 }

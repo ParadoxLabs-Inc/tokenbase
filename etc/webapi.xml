@@ -13,13 +13,13 @@
         </resources>
     </route>
     <route url="/V1/tokenbase" method="POST">
-        <service class="ParadoxLabs\TokenBase\Api\CardRepositoryInterface" method="save"/>
+        <service class="ParadoxLabs\TokenBase\Api\CardRepositoryInterface" method="saveExtended"/>
         <resources>
             <resource ref="ParadoxLabs_TokenBase::cards_manage"/>
         </resources>
     </route>
     <route url="/V1/tokenbase/:cardId" method="PUT">
-        <service class="ParadoxLabs\TokenBase\Api\CardRepositoryInterface" method="save"/>
+        <service class="ParadoxLabs\TokenBase\Api\CardRepositoryInterface" method="saveExtended"/>
         <resources>
             <resource ref="ParadoxLabs_TokenBase::cards_manage"/>
         </resources>

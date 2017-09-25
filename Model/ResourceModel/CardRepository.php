@@ -97,7 +97,7 @@ class CardRepository implements CardRepositoryInterface
      * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
      * @throws CouldNotSaveException
      */
-    public function save(Data\CardInterface $card)
+    public function save(\ParadoxLabs\TokenBase\Api\Data\CardInterface $card)
     {
         try {
             $this->resource->save($card);
@@ -106,6 +106,25 @@ class CardRepository implements CardRepositoryInterface
         }
 
         return $card;
+    }
+
+    /**
+     * Save card with extended objects.
+     *
+     * @param \ParadoxLabs\TokenBase\Api\Data\CardInterface $card
+     * @param \Magento\Customer\Api\Data\AddressInterface $address
+     * @param \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface $additional
+     * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
+     */
+    public function saveExtended(
+        \ParadoxLabs\TokenBase\Api\Data\CardInterface $card,
+        \Magento\Customer\Api\Data\AddressInterface $address,
+        \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface $additional
+    ) {
+        $card->setAddress($address);
+        $card->setAdditional($additional);
+
+        return $this->save($card);
     }
 
     /**

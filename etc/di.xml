@@ -50,6 +50,7 @@
     <!-- Adding tokenbase card repository -->
     <preference for="ParadoxLabs\TokenBase\Api\Data\CardSearchResultsInterface" type="Magento\Framework\Api\SearchResults" />
     <preference for="ParadoxLabs\TokenBase\Api\Data\CardInterface" type="ParadoxLabs\TokenBase\Model\Card" />
+    <preference for="ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface" type="ParadoxLabs\TokenBase\Model\CardAdditional" />
     <preference for="ParadoxLabs\TokenBase\Api\CardRepositoryInterface" type="ParadoxLabs\TokenBase\Model\ResourceModel\CardRepository" />
 
     <!-- Adding tokenbase_id field to quote API calls -->
@@ -66,6 +67,9 @@
     </type>
     <type name="Magento\Sales\Api\OrderRepositoryInterface">
         <plugin name="orderPaymentSaveTokenbaseId" type="ParadoxLabs\TokenBase\Plugin\OrderPaymentSaveTokenbaseId" />
+    </type>
+    <type name="Magento\Sales\Model\ResourceModel\Order\Collection">
+        <plugin name="orderCollectionPaymentLoadTokenbaseId" type="ParadoxLabs\TokenBase\Plugin\OrderCollectionPaymentLoadTokenbaseId" />
     </type>
 
     <!-- Adding order status override -->
