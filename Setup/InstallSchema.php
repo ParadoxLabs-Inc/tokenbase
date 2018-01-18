@@ -31,9 +31,21 @@ class InstallSchema implements \Magento\Framework\Setup\InstallSchemaInterface
     ) {
         $setup->startSetup();
 
-        /**
-         * Create table 'paradoxlabs_stored_card'
-         */
+        $this->createStoredCardTable($setup);
+        $this->addPaymentTokenbaseIdColumns($setup);
+
+        $setup->endSetup();
+    }
+
+    /**
+     * Create table 'paradoxlabs_stored_card'
+     *
+     * @param \Magento\Framework\Setup\SchemaSetupInterface $setup
+     * @return void
+     * @throws \Zend_Db_Exception
+     */
+    protected function createStoredCardTable(\Magento\Framework\Setup\SchemaSetupInterface $setup)
+    {
         $table = $setup->getConnection()->newTable(
             $setup->getTable('paradoxlabs_stored_card')
         )->addColumn(
@@ -126,17 +138,7 @@ class InstallSchema implements \Magento\Framework\Setup\InstallSchemaInterface
             40,
             [],
             'Unique Hash'
-        )->setComment(
-            'Stored Cards for ParadoxLabs payment methods'
-        );
-
-        $setup->getConnection()->createTable($table);
-
-        /**
-         * Add index(es)
-         */
-        $setup->getConnection()->addIndex(
-            $setup->getTable('paradoxlabs_stored_card'),
+        )->addIndex(
             $setup->getIdxName(
                 $setup->getTable('paradoxlabs_stored_card'),
                 ['hash'],
@@ -144,19 +146,35 @@ class InstallSchema implements \Magento\Framework\Setup\InstallSchemaInterface
             ),
             ['hash'],
             \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
+        )->addIndex(
+            $setup->getIdxName(
+                $setup->getTable('paradoxlabs_stored_card'),
+                ['customer_id']
+            ),
+            ['customer_id']
+        )->setComment(
+            'Stored Cards for ParadoxLabs payment methods'
         );
 
-        /**
-         * Add payment card ID columns
-         */
+        $setup->getConnection()->createTable($table);
+    }
+
+    /**
+     * Add payment card ID columns
+     *
+     * @param \Magento\Framework\Setup\SchemaSetupInterface $setup
+     * @return void
+     */
+    protected function addPaymentTokenbaseIdColumns(\Magento\Framework\Setup\SchemaSetupInterface $setup)
+    {
         $quoteDb = $setup->getConnection('checkout');
         $quoteDb->addColumn(
             $setup->getTable('quote_payment'),
             'tokenbase_id',
             [
-                'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
-                'unsigned'  => true,
-                'comment'   => 'ParadoxLabs_TokenBase Card ID',
+                'type' => \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                'unsigned' => true,
+                'comment' => 'ParadoxLabs_TokenBase Card ID',
             ]
         );
 
@@ -165,12 +183,10 @@ class InstallSchema implements \Magento\Framework\Setup\InstallSchemaInterface
             $setup->getTable('sales_order_payment'),
             'tokenbase_id',
             [
-                'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
-                'unsigned'  => true,
-                'comment'   => 'ParadoxLabs_TokenBase Card ID',
+                'type' => \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                'unsigned' => true,
+                'comment' => 'ParadoxLabs_TokenBase Card ID',
             ]
         );
-
-        $setup->endSetup();
     }
 }

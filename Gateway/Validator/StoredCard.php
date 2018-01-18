@@ -91,7 +91,7 @@ class StoredCard extends \Magento\Payment\Gateway\Validator\AbstractValidator
             /**
              * This might be a card edit. Validate this too, as much as we can.
              */
-            if ($payment->getData('cc_number') != '' && substr($payment->getData('cc_number'), 0, 4) != 'XXXX') {
+            if (!empty($payment->getData('cc_number')) && substr($payment->getData('cc_number'), 0, 4) !== 'XXXX') {
                 if (strlen($payment->getData('cc_number')) < 13
                     || !is_numeric($payment->getData('cc_number'))
                     || $this->ccValidator->isCcNumberMod10Valid($payment->getData('cc_number')) === false) {
@@ -103,7 +103,7 @@ class StoredCard extends \Magento\Payment\Gateway\Validator\AbstractValidator
             $year  = $payment->getData('cc_exp_year');
             $month = $payment->getData('cc_exp_month');
 
-            if ($this->ccValidator->isDateExpired($year, $month) === true) {
+            if (!empty($year) && !empty($month) && $this->ccValidator->isDateExpired($year, $month) === true) {
                 $isValid = false;
                 $fails[] = __('Invalid credit card expiration date.');
             }

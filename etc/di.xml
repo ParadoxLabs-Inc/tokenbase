@@ -1,9 +1,8 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-    <!-- Plugin disabled per 1800925. If/when this is added, will need to ensure quote is established before allowing. -->
-<!--     <type name="Magento\Payment\Model\Checks\ZeroTotal">
+    <type name="Magento\Payment\Model\Checks\ZeroTotal">
         <plugin name="allowTokenbaseZeroTotal" type="ParadoxLabs\TokenBase\Plugin\ZeroTotal" sortOrder="100" disabled="false" />
-    </type> -->
+    </type>
 
     <type name="Magento\Sales\Model\Order\Config">
         <plugin name="tokenbaseAllowPendingStatus" type="ParadoxLabs\TokenBase\Plugin\AllowPendingStatus" sortOrder="100" disabled="false" />
@@ -73,11 +72,19 @@
     </type>
 
     <!-- Adding order status override -->
+    <type name="Magento\Sales\Model\Order\Payment\State\OrderCommand">
+        <plugin name="tokenbaseSetOrderOrderStatus" type="ParadoxLabs\TokenBase\Plugin\Sales\Model\Order\Payment\State\OrderCommand\Plugin" />
+    </type>
     <type name="Magento\Sales\Model\Order\Payment\State\AuthorizeCommand">
         <plugin name="tokenbaseSetAuthorizeOrderStatus" type="ParadoxLabs\TokenBase\Plugin\Sales\Model\Order\Payment\State\AuthorizeCommand\Plugin" />
     </type>
     <type name="Magento\Sales\Model\Order\Payment\State\CaptureCommand">
         <plugin name="tokenbaseSetCaptureOrderStatus" type="ParadoxLabs\TokenBase\Plugin\Sales\Model\Order\Payment\State\CaptureCommand\Plugin" />
+    </type>
+
+    <!-- Associate cards on post-checkout register -->
+    <type name="Magento\Sales\Api\OrderCustomerManagementInterface">
+        <plugin name="tokenbaseAssociateCustomerCard" type="ParadoxLabs\TokenBase\Plugin\Sales\Model\Order\CustomerManagement\Plugin" />
     </type>
 
     <!-- Fix a core bug -->

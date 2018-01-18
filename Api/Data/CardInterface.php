@@ -37,10 +37,10 @@ interface CardInterface extends \Magento\Framework\Api\ExtensibleDataInterface
     /**
      * Set the method instance for this card. This is often necessary to route card data properly.
      *
-     * @param \ParadoxLabs\TokenBase\Api\MethodInterface $method
+     * @param \ParadoxLabs\TokenBase\Api\MethodInterface|\Magento\Payment\Model\MethodInterface $method
      * @return $this
      */
-    public function setMethodInstance(\ParadoxLabs\TokenBase\Api\MethodInterface $method);
+    public function setMethodInstance($method);
 
     /**
      * Set the customer account (if any) for the card.

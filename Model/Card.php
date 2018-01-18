@@ -205,10 +205,10 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
     /**
      * Set the method instance for this card. This is often necessary to route card data properly.
      *
-     * @param \ParadoxLabs\TokenBase\Api\MethodInterface $method
+     * @param \ParadoxLabs\TokenBase\Api\MethodInterface|\Magento\Payment\Model\MethodInterface $method
      * @return $this
      */
-    public function setMethodInstance(\ParadoxLabs\TokenBase\Api\MethodInterface $method)
+    public function setMethodInstance($method)
     {
         $this->method = $method;
 
@@ -218,7 +218,8 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
     /**
      * Get the arbitrary method instance.
      *
-     * @return \ParadoxLabs\TokenBase\Api\MethodInterface Gateway-specific payment method
+     * @return \ParadoxLabs\TokenBase\Api\MethodInterface|\Magento\Payment\Model\MethodInterface Gateway-specific
+     * payment method
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getMethodInstance()
@@ -415,12 +416,19 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
      */
     public function isInUse()
     {
-        $orders    = $this->orderCollectionFactory->create();
-        $orders->addAttributeToSelect('*')
-               ->addAttributeToFilter('customer_id', $this->getData('customer_id'))
-               ->addAttributeToFilter('status', ['like' => 'pending%']);
+        $registryKey = 'tokenbase_customer_orders_' . $this->getData('customer_id');
 
-        if (!empty($orders)) {
+        $orders = $this->_registry->registry($registryKey);
+        if ($orders === null) {
+            $orders = $this->orderCollectionFactory->create();
+            $orders->addAttributeToSelect('*')
+                   ->addAttributeToFilter('customer_id', $this->getData('customer_id'))
+                   ->addAttributeToFilter('status', ['like' => 'pending%']);
+
+            $this->_registry->register($registryKey, $orders);
+        }
+
+        if ($orders instanceof \Magento\Sales\Model\ResourceModel\Order\Collection && $orders->getSize() > 0) {
             foreach ($orders as $order) {
                 /** @var \Magento\Sales\Model\Order $order */
                 $payment = $order->getPayment();
@@ -949,6 +957,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
             $collection->addFieldToFilter('method', $this->getData('method'))
                        ->addFieldToFilter('profile_id', $this->getData('profile_id'))
                        ->addFieldToFilter('payment_id', $this->getData('payment_id'))
+                       ->addFieldToFilter('customer_id', $this->getData('customer_id'))
                        ->setPageSize(1)
                        ->setCurPage(1);
             

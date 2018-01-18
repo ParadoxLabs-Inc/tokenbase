@@ -64,6 +64,16 @@ class Address extends \Magento\Framework\App\Helper\AbstractHelper
     protected $extensibleDataObjectConverter;
 
     /**
+     * @var \Magento\Customer\Model\Address\Mapper
+     */
+    protected $addressMapper;
+
+    /**
+     * @var \Magento\Customer\Model\Address\Config
+     */
+    protected $addressConfig;
+
+    /**
      * Address constructor.
      *
      * @param \Magento\Framework\App\Helper\Context $context
@@ -75,6 +85,8 @@ class Address extends \Magento\Framework\App\Helper\AbstractHelper
      * @param Region $regionResource
      * @param \Magento\Customer\Api\AddressRepositoryInterface $addressRepository
      * @param \Magento\Framework\Api\ExtensibleDataObjectConverter $extensibleDataObjectConverter
+     * @param \Magento\Customer\Model\Address\Mapper $addressMapper
+     * @param \Magento\Customer\Model\Address\Config $addressConfig
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
@@ -85,7 +97,9 @@ class Address extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Directory\Model\RegionFactory $regionFactory,
         \Magento\Directory\Model\ResourceModel\Region $regionResource,
         \Magento\Customer\Api\AddressRepositoryInterface $addressRepository,
-        \Magento\Framework\Api\ExtensibleDataObjectConverter $extensibleDataObjectConverter
+        \Magento\Framework\Api\ExtensibleDataObjectConverter $extensibleDataObjectConverter,
+        \Magento\Customer\Model\Address\Mapper $addressMapper,
+        \Magento\Customer\Model\Address\Config $addressConfig
     ) {
         parent::__construct($context);
 
@@ -97,6 +111,8 @@ class Address extends \Magento\Framework\App\Helper\AbstractHelper
         $this->addressRepository = $addressRepository;
         $this->regionResource = $regionResource;
         $this->extensibleDataObjectConverter = $extensibleDataObjectConverter;
+        $this->addressMapper = $addressMapper;
+        $this->addressConfig = $addressConfig;
     }
 
     /**
@@ -208,6 +224,7 @@ class Address extends \Magento\Framework\App\Helper\AbstractHelper
             'id' => null,
             'default_shipping' => null,
             'default_billing' => null,
+            'region_id' => null,
         ];
 
         $diff = array_diff_assoc($addr1Array, $addr2Array);
@@ -229,5 +246,22 @@ class Address extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return $this->extensibleDataObjectConverter->toFlatArray($address);
+    }
+
+    /**
+     * Get HTML-formatted card address. This is silly, but it's how the core says to do it.
+     *
+     * @param \Magento\Customer\Api\Data\AddressInterface $address
+     * @param string $format
+     * @return string
+     * @see \Magento\Customer\Model\Address\AbstractAddress::format()
+     */
+    public function getFormattedAddress(\Magento\Customer\Api\Data\AddressInterface $address, $format = 'html')
+    {
+        /** @var \Magento\Customer\Block\Address\Renderer\RendererInterface $renderer */
+        $renderer    = $this->addressConfig->getFormatByCode($format)->getRenderer();
+        $addressData = $this->addressMapper->toFlatArray($address);
+
+        return $renderer->renderArray($addressData);
     }
 }

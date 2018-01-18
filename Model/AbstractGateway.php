@@ -258,7 +258,7 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
                         '$1',
                         $val
                     );
-                    $val = preg_replace(['/[^0-9a-z \.]/i', '/-+/'], ' ', $val);
+                    $val = preg_replace(['/[^0-9a-z \.\-]/i', '/\s{2,}/'], ' ', $val);
                     $val = trim($val);
                 }
 

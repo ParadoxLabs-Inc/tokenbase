@@ -14,22 +14,38 @@
 namespace ParadoxLabs\TokenBase\Plugin;
 
 /**
- * Allower zero subtotal checkout for TokenBase methods
+ * Allow zero subtotal checkout for TokenBase methods
  */
 class ZeroTotal
 {
+    /**
+     * Payment method codes that don't support $0 checkout whatsoever
+     */
+    const NO_ZERO_SUBTOTAL_SUPPORT_METHODS = [
+        'braintree',
+        'braintree_cc_vault',
+    ];
+
     /**
      * @var \ParadoxLabs\TokenBase\Helper\Data
      */
     protected $helper;
 
     /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    protected $scopeConfig;
+
+    /**
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-        \ParadoxLabs\TokenBase\Helper\Data $helper
+        \ParadoxLabs\TokenBase\Helper\Data $helper,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     ) {
         $this->helper = $helper;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -48,11 +64,49 @@ class ZeroTotal
         \Magento\Quote\Model\Quote $quote
     ) {
         $returnValue = $proceed($paymentMethod, $quote);
-        
-        if ($returnValue !== true && in_array($paymentMethod->getCode(), $this->helper->getActiveMethods())) {
+
+        // This plugin can fire before the quote is actually initialized during admin checkout. We must ensure that
+        // does not occur. Check active methods iff quote has an ID.
+        if ($returnValue !== true && $quote->getId() > 0) {
+            return $this->zeroSubtotalAllowed($paymentMethod->getCode());
+        }
+
+        return $returnValue;
+    }
+
+    /**
+     * If this is a Vault-enabled method, or a TokenBase method, $0 checkout is actually okay.
+     *
+     * @param string $methodCode
+     * @return bool
+     */
+    public function zeroSubtotalAllowed($methodCode)
+    {
+        // Blacklist?
+        if (in_array($methodCode, $this->getNoZeroSubtotalSupportMethodCodes())) {
+            return false;
+        }
+
+        // Unlisted Vault or TokenBase?
+        $vaultMethodActive = (int)$this->scopeConfig->getValue(
+            'payment/' . $methodCode . '_cc_vault/active',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+
+        if ($vaultMethodActive === 1 || in_array($methodCode, $this->helper->getActiveMethods())) {
             return true;
         }
-        
-        return $returnValue;
+
+        return false;
+    }
+
+    /**
+     * Get payment method codes that don't support $0 checkout whatsoever
+     *
+     * @return string[]
+     */
+    public function getNoZeroSubtotalSupportMethodCodes()
+    {
+        return static::NO_ZERO_SUBTOTAL_SUPPORT_METHODS;
     }
 }

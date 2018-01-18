@@ -73,7 +73,8 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
             ->where('additional LIKE ?', 'a:%')
             ->orWhere('address LIKE ?', 'a:%');
 
-        while ($item = $setup->getConnection()->fetchRow($select)) {
+        $items = $setup->getConnection()->fetchAll($select);
+        foreach ($items as $item) {
             // For each result, convert the two columns and update the row.
             $setup->getConnection()->update(
                 $setup->getTable('paradoxlabs_stored_card'),
@@ -99,7 +100,13 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
         // We're using serialize for array storage--all valid data will start with 'a:'.
         // If our string starts with 'a', attempt to decode, otherwise pass through as-is.
         if ($string[0] === 'a') {
-            $array = $this->unserialize->unserialize($string);
+            if (strpos($string, 'O:27:"Mage_Customer_Model_Address"') !== false) {
+                // Sometimes addresses from M1 were legitimately stored with customer object. Codepath unclear.
+                // Can't skip them entirely, can't easily clean, but try to look for it specifically.
+                $array = unserialize($string);
+            } else {
+                $array = $this->unserialize->unserialize($string);
+            }
 
             return json_encode($array);
         }
