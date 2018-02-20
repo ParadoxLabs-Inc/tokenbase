@@ -34,9 +34,6 @@
 
     <virtualType name="ParadoxLabs\TokenBase\Model\Logger\LineFormatter" type="Monolog\Formatter\LineFormatter">
         <arguments>
-            <argument name="format" xsi:type="string"><![CDATA[[%datetime%] %message% %context% %extra%
-]]></argument>
-            <argument name="dateFormat" xsi:type="null" />
             <argument name="allowInlineLineBreaks" xsi:type="boolean">true</argument>
             <argument name="ignoreEmptyContextAndExtra" xsi:type="boolean">true</argument>
         </arguments>
