@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-    <module name="ParadoxLabs_TokenBase" setup_version="4.1.0.20180118">
+    <module name="ParadoxLabs_TokenBase" setup_version="4.1.0.20180322">
         <sequence>
             <module name="Magento_Payment" />
             <module name="Magento_Quote" />

@@ -17,7 +17,7 @@
     },
     "type": "magento2-module",
     "version": "4.1.0",
-    "time": "2018-02-20",
+    "time": "2018-03-22",
     "license": "proprietary",
     "autoload": {
         "files": [ "registration.php" ],
