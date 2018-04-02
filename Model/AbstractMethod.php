@@ -221,7 +221,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
             $this->gateway->init([
                 'login'      => $this->getConfigData('login'),
                 'password'   => $this->getConfigData('trans_key'),
-                'secret_key' => $this->getConfigData('secrey_key'),
+                'secret_key' => $this->getConfigData('secret_key'),
                 'test_mode'  => $this->getConfigData('test'),
                 'verify_ssl' => $this->getConfigData('verify_ssl'),
             ]);

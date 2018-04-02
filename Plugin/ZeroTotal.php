@@ -21,7 +21,7 @@ class ZeroTotal
     /**
      * Payment method codes that don't support $0 checkout whatsoever
      */
-    const NO_ZERO_SUBTOTAL_SUPPORT_METHODS = [
+    protected static $noZeroSubtotalSupportMethods = [
         'braintree',
         'braintree_cc_vault',
     ];
@@ -107,6 +107,6 @@ class ZeroTotal
      */
     public function getNoZeroSubtotalSupportMethodCodes()
     {
-        return static::NO_ZERO_SUBTOTAL_SUPPORT_METHODS;
+        return static::$noZeroSubtotalSupportMethods;
     }
 }
