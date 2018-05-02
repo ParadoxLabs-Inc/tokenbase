@@ -11,7 +11,7 @@
     <!-- Logging -->
     <type name="ParadoxLabs\TokenBase\Helper\Operation">
         <arguments>
-            <argument name="tokenbaseLogger" xsi:type="object">ParadoxLabs\TokenBase\Model\Logger\Logger</argument>
+            <argument name="tokenbaseLogger" xsi:type="object">ParadoxLabs\TokenBase\Model\Logger\LoggerVirtualType</argument>
         </arguments>
     </type>
 
@@ -22,7 +22,7 @@
         </arguments>
     </type>
 
-    <virtualType name="ParadoxLabs\TokenBase\Model\Logger\Logger" type="Monolog\Logger">
+    <virtualType name="ParadoxLabs\TokenBase\Model\Logger\LoggerVirtualType" type="Monolog\Logger">
         <arguments>
             <argument name="name" xsi:type="string">tokenbaseLogger</argument>
             <argument name="handlers" xsi:type="array">

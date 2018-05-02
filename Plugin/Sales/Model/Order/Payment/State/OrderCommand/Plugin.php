@@ -45,7 +45,7 @@ class Plugin
     /**
      * Override order status with payment method status setting in certain circumstances.
      *
-     * @param \Magento\Sales\Model\Order\Payment\State\AuthorizeCommand $subject
+     * @param \Magento\Sales\Model\Order\Payment\State\OrderCommand $subject
      * @param \Closure $proceed
      * @param \Magento\Sales\Api\Data\OrderPaymentInterface $payment
      * @param string|float $amount
@@ -53,7 +53,7 @@ class Plugin
      * @return \Magento\Framework\Phrase
      */
     public function aroundExecute(
-        \Magento\Sales\Model\Order\Payment\State\AuthorizeCommand $subject,
+        \Magento\Sales\Model\Order\Payment\State\OrderCommand $subject,
         \Closure $proceed,
         \Magento\Sales\Api\Data\OrderPaymentInterface $payment,
         $amount,
