@@ -134,6 +134,7 @@ class Clean
                 /**
                  * Delete the card.
                  */
+                $card->queueDeletion();
                 $this->cardRepository->delete($card);
 
                 $affectedCount++;

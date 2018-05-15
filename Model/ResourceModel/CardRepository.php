@@ -229,6 +229,10 @@ class CardRepository implements CardRepositoryInterface
     /**
      * Delete Card
      *
+     * Two-mode operation:
+     * - If the card is active, this will mark it inactive and queue for later removal (typically 120 days later).
+     * - If the card is already inactive, this will delete it entirely.
+     *
      * @param \ParadoxLabs\TokenBase\Api\Data\CardInterface $card
      * @return bool
      * @throws CouldNotDeleteException
@@ -236,7 +240,12 @@ class CardRepository implements CardRepositoryInterface
     public function delete(Data\CardInterface $card)
     {
         try {
-            $this->resource->delete($card);
+            if ((int)$card->getActive() === 0) {
+                $this->resource->delete($card);
+            } else {
+                $card->queueDeletion();
+                $this->resource->save($card);
+            }
         } catch (\Exception $exception) {
             throw new CouldNotDeleteException(__($exception->getMessage()));
         }
