@@ -100,6 +100,11 @@ class CardRepository implements CardRepositoryInterface
     public function save(\ParadoxLabs\TokenBase\Api\Data\CardInterface $card)
     {
         try {
+            if (get_class($card) === \ParadoxLabs\TokenBase\Model\Card::class) {
+                /** @var \ParadoxLabs\TokenBase\Model\Card $card */
+                $card = $card->getTypeInstance();
+            }
+
             $this->resource->save($card);
         } catch (\Exception $exception) {
             throw new CouldNotSaveException(__($exception->getMessage()));
@@ -241,6 +246,11 @@ class CardRepository implements CardRepositoryInterface
     {
         try {
             if ((int)$card->getActive() === 0) {
+                if (get_class($card) === \ParadoxLabs\TokenBase\Model\Card::class) {
+                    /** @var \ParadoxLabs\TokenBase\Model\Card $card */
+                    $card = $card->getTypeInstance();
+                }
+
                 $this->resource->delete($card);
             } else {
                 $card->queueDeletion();

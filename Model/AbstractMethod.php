@@ -448,7 +448,10 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
          * Check for existing auth code.
          */
         $authTxn = $payment->getAuthorizationTransaction();
-        if ($authTxn != false && $authTxn->getIsClosed() == 0) {
+        if ($authTxn instanceof \Magento\Sales\Api\Data\TransactionInterface
+            && $authTxn->getIsClosed() == 0
+            && !empty($authTxn->getTransactionId())
+            && substr($authTxn->getTransactionId(), -5) !== '-auth') {
             $this->gateway()->setHaveAuthorized(true);
 
             $authTxnInfo = $authTxn->getAdditionalInformation(
