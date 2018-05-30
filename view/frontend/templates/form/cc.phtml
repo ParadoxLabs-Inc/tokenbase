@@ -7,7 +7,7 @@ $image          = $block->getBrandingImage();
 $storedCards    = $block->getStoredCards();
 ?>
 <fieldset class="fieldset items <?php echo $code ?>" id="payment_form_<?php echo $code ?>" style="display:none;"
-          data-mage-init='{"tokenbaseForm":{"code":"<?php echo $code ?>"}}'>
+          data-mage-init='{"tokenbaseForm":{"code":"<?php echo $code ?>"},"tokenbaseCardFormatter": {}}'>
     <?php if ($image): ?>
         <div class="sorter">
             <img src="<?php echo $block->escapeUrl($image); ?>" />

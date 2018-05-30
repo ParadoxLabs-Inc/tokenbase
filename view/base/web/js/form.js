@@ -42,6 +42,11 @@ define([
                     }
                 });
             }
+
+            // Disable server-side validation
+            if (typeof window.order != 'undefined' && typeof window.order.addExcludedPaymentMethod == 'function') {
+                window.order.addExcludedPaymentMethod(this.options.code);
+            }
         }
     });
 

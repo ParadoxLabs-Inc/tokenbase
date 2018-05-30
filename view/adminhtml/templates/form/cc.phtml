@@ -7,7 +7,7 @@ $image          = $block->getBrandingImage();
 $storedCards    = $block->getStoredCards();
 ?>
 <div id="payment_form_<?php echo $code ?>" class="admin__page-section-item" style="display:none;"
-     data-mage-init='{"tokenbaseForm":{"code":"<?php echo $code ?>"}}'>
+     data-mage-init='{"tokenbaseForm":{"code":"<?php echo $code ?>"}, "tokenbaseCardFormatter": {}}'>
     <input id="<?php echo $code ?>-payment-method" type="hidden" name="payment[method]" value="<?php echo $code ?>" />
     <fieldset class="admin__fieldset">
         <?php if ($image): ?>
