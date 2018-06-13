@@ -378,7 +378,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         $priorAuth = $payment->getAuthorizationTransaction();
         if ($priorAuth != false) {
             $parentTransactionId = $payment->getParentTransactionId();
-            $payment->setData('parent_transaction_id', $priorAuth->getTransactionId());
+            $payment->setData('parent_transaction_id', $priorAuth->getTxnId());
 
             $this->void($payment);
 
@@ -450,8 +450,8 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         $authTxn = $payment->getAuthorizationTransaction();
         if ($authTxn instanceof \Magento\Sales\Api\Data\TransactionInterface
             && $authTxn->getIsClosed() == 0
-            && !empty($authTxn->getTransactionId())
-            && substr($authTxn->getTransactionId(), -5) !== '-auth') {
+            && !empty($authTxn->getTxnId())
+            && substr($authTxn->getTxnId(), -5) !== '-auth') {
             $this->gateway()->setHaveAuthorized(true);
 
             $authTxnInfo = $authTxn->getAdditionalInformation(
@@ -465,7 +465,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
             if ($payment->getParentTransactionId() != '') {
                 $this->gateway()->setTransactionId($payment->getParentTransactionId());
             } else {
-                $this->gateway()->setTransactionId($authTxn->getTransactionId());
+                $this->gateway()->setTransactionId($authTxn->getTxnId());
             }
         } else {
             $this->gateway()->setHaveAuthorized(false);
