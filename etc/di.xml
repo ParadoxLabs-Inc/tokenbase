@@ -4,10 +4,6 @@
         <plugin name="allowTokenbaseZeroTotal" type="ParadoxLabs\TokenBase\Plugin\ZeroTotal" sortOrder="100" disabled="false" />
     </type>
 
-    <type name="Magento\Sales\Model\Order\Config">
-        <plugin name="tokenbaseAllowPendingStatus" type="ParadoxLabs\TokenBase\Plugin\AllowPendingStatus" sortOrder="100" disabled="false" />
-    </type>
-
     <!-- Logging -->
     <type name="ParadoxLabs\TokenBase\Helper\Operation">
         <arguments>
@@ -66,17 +62,6 @@
     </type>
     <type name="Magento\Sales\Model\ResourceModel\Order\Collection">
         <plugin name="orderCollectionPaymentLoadTokenbaseId" type="ParadoxLabs\TokenBase\Plugin\OrderCollectionPaymentLoadTokenbaseId" />
-    </type>
-
-    <!-- Adding order status override -->
-    <type name="Magento\Sales\Model\Order\Payment\State\OrderCommand">
-        <plugin name="tokenbaseSetOrderOrderStatus" type="ParadoxLabs\TokenBase\Plugin\Sales\Model\Order\Payment\State\OrderCommand\Plugin" />
-    </type>
-    <type name="Magento\Sales\Model\Order\Payment\State\AuthorizeCommand">
-        <plugin name="tokenbaseSetAuthorizeOrderStatus" type="ParadoxLabs\TokenBase\Plugin\Sales\Model\Order\Payment\State\AuthorizeCommand\Plugin" />
-    </type>
-    <type name="Magento\Sales\Model\Order\Payment\State\CaptureCommand">
-        <plugin name="tokenbaseSetCaptureOrderStatus" type="ParadoxLabs\TokenBase\Plugin\Sales\Model\Order\Payment\State\CaptureCommand\Plugin" />
     </type>
 
     <!-- Associate cards on post-checkout register -->

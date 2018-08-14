@@ -7,16 +7,16 @@
  * Need help? Open a ticket in our support system:
  *  http://support.paradoxlabs.com
  *
- * @author      Ryan Hoerr <support@paradoxlabs.com>
+ * @author      Ryan Hoerr <info@paradoxlabs.com>
  * @license     http://store.paradoxlabs.com/license.html
  */
 
-namespace ParadoxLabs\TokenBase\Plugin\Sales\Model\Order\Payment\State\OrderCommand;
+namespace ParadoxLabs\TokenBase\Observer;
 
 /**
- * Plugin Class
+ * SetInitialOrderStatusObserver Class
  */
-class Plugin
+class SetInitialOrderStatusObserver implements \Magento\Framework\Event\ObserverInterface
 {
     /**
      * @var \ParadoxLabs\TokenBase\Helper\Data
@@ -43,25 +43,22 @@ class Plugin
     }
 
     /**
-     * Override order status with payment method status setting in certain circumstances.
+     * On order place, override the order status according to payment method configuration.
      *
-     * @param \Magento\Sales\Model\Order\Payment\State\OrderCommand $subject
-     * @param \Closure $proceed
-     * @param \Magento\Sales\Api\Data\OrderPaymentInterface $payment
-     * @param string|float $amount
-     * @param \Magento\Sales\Api\Data\OrderInterface $order
-     * @return \Magento\Framework\Phrase
+     * All of this just to allow 'pending' and other off-state statuses to be chosen...
+     *
+     * @param \Magento\Framework\Event\Observer $observer
+     * @return void
      */
-    public function aroundExecute(
-        \Magento\Sales\Model\Order\Payment\State\OrderCommand $subject,
-        \Closure $proceed,
-        \Magento\Sales\Api\Data\OrderPaymentInterface $payment,
-        $amount,
-        \Magento\Sales\Api\Data\OrderInterface $order
-    ) {
-        $returnValue = $proceed($payment, $amount, $order);
+    public function execute(\Magento\Framework\Event\Observer $observer)
+    {
+        /** @var \Magento\Sales\Model\Order\Payment $payment */
+        $payment = $observer->getData('payment');
 
-        // If we're setting the order state to default, inject our status.
+        /** @var \Magento\Sales\Model\Order $order */
+        $order = $payment->getOrder();
+
+        // If we're setting the order state to default processing on order placement, inject our status.
         if ($this->canSetOrderStatus($order, $payment)) {
             $status = $this->scopeConfig->getValue(
                 'payment/' . $payment->getMethod() . '/order_status',
@@ -70,8 +67,6 @@ class Plugin
 
             $order->setStatus($status);
         }
-
-        return $returnValue;
     }
 
     /**
