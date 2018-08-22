@@ -11,7 +11,7 @@ define([
     $.widget('mage.tokenbaseCardFormatter', {
         options: {
             ccInputSelector: '[autocomplete="cc-number"]',
-            separator: '-'
+            separator: ' '
         },
 
         _create: function() {

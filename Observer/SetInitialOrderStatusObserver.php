@@ -65,7 +65,7 @@ class SetInitialOrderStatusObserver implements \Magento\Framework\Event\Observer
                 \Magento\Store\Model\ScopeInterface::SCOPE_STORE
             );
 
-            $order->setStatus($status);
+            $order->addStatusHistoryComment('', $status);
         }
     }
 

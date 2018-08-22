@@ -19,8 +19,8 @@ use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Exception\CouldNotDeleteException;
-use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Exception\PaymentException;
 use Magento\Framework\Reflection\DataObjectProcessor;
 
 /**
@@ -95,20 +95,16 @@ class CardRepository implements CardRepositoryInterface
      *
      * @param \ParadoxLabs\TokenBase\Api\Data\CardInterface $card
      * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
-     * @throws CouldNotSaveException
+     * @throws PaymentException
      */
     public function save(\ParadoxLabs\TokenBase\Api\Data\CardInterface $card)
     {
-        try {
-            if (get_class($card) === \ParadoxLabs\TokenBase\Model\Card::class) {
-                /** @var \ParadoxLabs\TokenBase\Model\Card $card */
-                $card = $card->getTypeInstance();
-            }
-
-            $this->resource->save($card);
-        } catch (\Exception $exception) {
-            throw new CouldNotSaveException(__($exception->getMessage()));
+        if (get_class($card) === \ParadoxLabs\TokenBase\Model\Card::class) {
+            /** @var \ParadoxLabs\TokenBase\Model\Card $card */
+            $card = $card->getTypeInstance();
         }
+
+        $this->resource->save($card);
 
         return $card;
     }
