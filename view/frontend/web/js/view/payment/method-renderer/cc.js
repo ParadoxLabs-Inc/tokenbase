@@ -18,6 +18,7 @@ define(
             isActive: function() {
                 return true;
             },
+            placeOrderFailure: ko.observable(false),
             defaults: {
                 template: 'ParadoxLabs_TokenBase/payment/cc',
                 isCcFormShown: true,
@@ -117,6 +118,7 @@ define(
                         this.getPlaceOrderDeferredObject()
                             .fail(
                                 function (response) {
+                                    self.placeOrderFailure(true);
                                     self.isPlaceOrderActionAllowed(true);
 
                                     var error = JSON.parse(response.responseText);
@@ -146,6 +148,7 @@ define(
                         $.when(
                             placeOrderAction(this.getData(), this.redirectAfterPlaceOrder, this.messageContainer)
                         ).fail(function (response) {
+                            self.placeOrderFailure(true);
                             self.isPlaceOrderActionAllowed(true);
 
                             var error = JSON.parse(response.responseText);
