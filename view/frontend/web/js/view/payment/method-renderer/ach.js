@@ -128,7 +128,7 @@ define(
              */
             placeOrder: function (data, event) {
                 var self = this;
-
+                self.placeOrderFailure(false);
                 if (event) {
                     event.preventDefault();
                 }
@@ -139,19 +139,9 @@ define(
                     // This mess for CE 2.0 compatibility, following CE 2.1 interface change. If 2.1+...
                     if( typeof this.getPlaceOrderDeferredObject === 'function' ) {
                         this.getPlaceOrderDeferredObject()
-                            .fail(
-                                function (response) {
-                                    self.placeOrderFailure(true);
-                                    self.isPlaceOrderActionAllowed(true);
-
-                                    var error = JSON.parse(response.responseText);
-                                    if (error && typeof error.message != 'undefined') {
-                                        alert({
-                                            content: error.message
-                                        });
-                                    }
-                                }
-                            ).done(
+                            .fail(function(response){
+                                self.handleFailedOrder(response).bind(this);
+                            }).done(
                                 function () {
                                     self.afterPlaceOrder();
 
@@ -170,18 +160,9 @@ define(
                         // If 2.0...
                         $.when(
                             placeOrderAction(this.getData(), this.redirectAfterPlaceOrder, this.messageContainer)
-                        ).fail(function (response) {
-                            self.placeOrderFailure(true);
-                            self.isPlaceOrderActionAllowed(true);
-
-                            var error = JSON.parse(response.responseText);
-                            if (error && typeof error.message != 'undefined') {
-                                alert({
-                                    content: error.message
-                                });
-                            }
-                        })
-                        .done(this.afterPlaceOrder.bind(this));
+                        ).fail(function(response){
+                            self.handleFailedOrder(response).bind(this);
+                        }).done(this.afterPlaceOrder.bind(this));
                     }
 
                     return true;
@@ -194,6 +175,17 @@ define(
              */
             validate: function () {
                 return true;
+            },
+            handleFailedOrder: function (response) {
+                this.placeOrderFailure(true);
+                this.isPlaceOrderActionAllowed(true);
+
+                var error = JSON.parse(response.responseText);
+                if (error && typeof error.message != 'undefined') {
+                    alert({
+                        content: error.message
+                    });
+                }
             }
         });
     }
