@@ -204,7 +204,7 @@ class Form extends \Magento\Customer\Block\Address\Edit
     {
         /** @var \Magento\Customer\Block\Widget\Name $nameBlock */
         $nameBlock = $this->getLayout()
-                          ->createBlock('Magento\Customer\Block\Widget\Name');
+                          ->createBlock(\Magento\Customer\Block\Widget\Name::class);
 
         $nameBlock->setObject($this->getAddress());
         $nameBlock->setData('field_name_format', 'billing[%s]');
@@ -244,7 +244,7 @@ class Form extends \Magento\Customer\Block\Address\Edit
     public function getCcBlock()
     {
         if ($this->ccBlock === null) {
-            $this->ccBlock = $this->getLayout()->createBlock('Magento\Payment\Block\Form\Cc');
+            $this->ccBlock = $this->getLayout()->createBlock(\Magento\Payment\Block\Form\Cc::class);
             $this->ccBlock->setMethod($this->helper->getMethodInstance($this->getCode()));
         }
 

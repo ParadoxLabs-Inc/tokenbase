@@ -155,7 +155,7 @@ class Address extends \Magento\Framework\App\Helper\AbstractHelper
         $this->dataObjectHelper->populateWithArray(
             $addressDataObject,
             array_merge($origAddressData, $attributeValues),
-            '\Magento\Customer\Api\Data\AddressInterface'
+            AddressInterface::class
         );
 
         return $addressDataObject;
@@ -188,7 +188,7 @@ class Address extends \Magento\Framework\App\Helper\AbstractHelper
         $this->dataObjectHelper->populateWithArray(
             $region,
             $regionData,
-            '\Magento\Customer\Api\Data\RegionInterface'
+            RegionInterface::class
         );
 
         $addressArray['region'] = $region;

@@ -93,10 +93,12 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
     ) {
         /** @var \Magento\Sales\Model\Order\Payment $payment */
 
+        $ccNumber = preg_replace('/[^X\d]/', '', (string)$data->getData('cc_number'));
+
         $payment->setData('cc_type', $data->getData('cc_type'));
         $payment->setData('cc_owner', $data->getData('cc_owner'));
-        $payment->setData('cc_last_4', substr($data->getData('cc_number'), -4));
-        $payment->setData('cc_number', preg_replace('/[^X\d]/', '', (string)$data->getData('cc_number')));
+        $payment->setData('cc_last_4', substr($ccNumber, -4));
+        $payment->setData('cc_number', $ccNumber);
         $payment->setData('cc_cid', preg_replace('/[^\d]/', '', $data->getData('cc_cid')));
         $payment->setData('cc_exp_month', $data->getData('cc_exp_month'));
         $payment->setData('cc_exp_year', $data->getData('cc_exp_year'));
@@ -105,7 +107,7 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
         $payment->setData('cc_ss_start_year', $data->getData('cc_ss_start_year'));
 
         if ($method->getConfigData('can_store_bin') == 1) {
-            $payment->setAdditionalInformation('cc_bin', substr($data->getData('cc_number'), 0, 6));
+            $payment->setAdditionalInformation('cc_bin', substr($ccNumber, 0, 6));
         }
     }
 

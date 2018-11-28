@@ -27,6 +27,9 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
      */
     protected function _construct()
     {
-        $this->_init('ParadoxLabs\TokenBase\Model\Card', 'ParadoxLabs\TokenBase\Model\ResourceModel\Card');
+        $this->_init(
+            \ParadoxLabs\TokenBase\Model\Card::class,
+            \ParadoxLabs\TokenBase\Model\ResourceModel\Card::class
+        );
     }
 }
