@@ -959,20 +959,28 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
                        ->addFieldToFilter('payment_id', $this->getData('payment_id'))
                        ->addFieldToFilter('customer_id', $this->getData('customer_id'))
                        ->setPageSize(1)
-                       ->setCurPage(1);
-            
+                ->setCurPage(1);
+
             if ($this->getId() > 0) {
-                $collection->addFieldToFilter('id', ['neq' => $this->getId()]);
-            }
+                /**
+                 * If too many duplicates exist, remove them all before we continue.
+                 * This will remove any duplicates that we can't simply merge over and just save the new card.
+                 */
+                if ( $collection->getSize() > 1 ) {
+                    $collection->walk('delete');
+                } else {
+                    $collection->addFieldToFilter('id', ['neq' => $this->getId()]);
 
-            /** @var \ParadoxLabs\TokenBase\Model\Card $dupe */
-            $dupe = $collection->getFirstItem();
+                    /** @var \ParadoxLabs\TokenBase\Model\Card $dupe */
+                    $dupe = $collection->getFirstItem();
 
-            /**
-             * If we find a duplicate, switch to that one, but retain the current info otherwise.
-             */
-            if ($dupe && $dupe->getId() > 0 && $dupe->getId() != $this->getId()) {
-                $this->mergeCardOnto($dupe);
+                    /**
+                     * If we find a single duplicate, switch to that one, but retain the current info otherwise.
+                     */
+                    if ($dupe && $dupe->getId() > 0 && $dupe->getId() != $this->getId()) {
+                        $this->mergeCardOnto($dupe);
+                    }
+                }
             }
         }
 
