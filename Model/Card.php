@@ -955,10 +955,10 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
             /** @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection $collection */
             $collection = $this->cardCollectionFactory->create();
             $collection->addFieldToFilter('method', $this->getData('method'))
-                       ->addFieldToFilter('profile_id', $this->getData('profile_id'))
-                       ->addFieldToFilter('payment_id', $this->getData('payment_id'))
-                       ->addFieldToFilter('customer_id', $this->getData('customer_id'))
-                       ->setPageSize(1)
+                ->addFieldToFilter('profile_id', $this->getData('profile_id'))
+                ->addFieldToFilter('payment_id', $this->getData('payment_id'))
+                ->addFieldToFilter('customer_id', $this->getData('customer_id'))
+                ->setPageSize(1)
                 ->setCurPage(1);
 
             if ($this->getId() > 0) {
@@ -967,20 +967,27 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
                  * This will remove any duplicates that we can't simply merge over and just save the new card.
                  */
                 if ( $collection->getSize() > 1 ) {
-                    $collection->walk('delete');
+                    /** @var \ParadoxLabs\TokenBase\Model\Card $card */
+                    foreach ( $collection as $card ) {
+                        $this->helper->log(
+                            $this->getData('method'),
+                            __('Removed duplicate card %1 with profile ID %2', $card->getId(), $card->getProfileId())
+                        );
+                        $this->getResource()->delete($card);
+                    }
                 } else {
                     $collection->addFieldToFilter('id', ['neq' => $this->getId()]);
-
-                    /** @var \ParadoxLabs\TokenBase\Model\Card $dupe */
-                    $dupe = $collection->getFirstItem();
-
-                    /**
-                     * If we find a single duplicate, switch to that one, but retain the current info otherwise.
-                     */
-                    if ($dupe && $dupe->getId() > 0 && $dupe->getId() != $this->getId()) {
-                        $this->mergeCardOnto($dupe);
-                    }
                 }
+            }
+
+            /** @var \ParadoxLabs\TokenBase\Model\Card $dupe */
+            $dupe = $collection->getFirstItem();
+
+            /**
+             * If we find a single duplicate, switch to that one, but retain the current info otherwise.
+             */
+            if ($dupe && $dupe->getId() > 0 && $dupe->getId() != $this->getId()) {
+                $this->mergeCardOnto($dupe);
             }
         }
 
