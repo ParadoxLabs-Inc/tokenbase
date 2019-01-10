@@ -957,9 +957,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
             $collection->addFieldToFilter('method', $this->getData('method'))
                 ->addFieldToFilter('profile_id', $this->getData('profile_id'))
                 ->addFieldToFilter('payment_id', $this->getData('payment_id'))
-                ->addFieldToFilter('customer_id', $this->getData('customer_id'))
-                ->setPageSize(1)
-                ->setCurPage(1);
+                ->addFieldToFilter('customer_id', $this->getData('customer_id'));
 
             if ($this->getId() > 0) {
                 /**
