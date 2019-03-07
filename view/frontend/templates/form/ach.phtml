@@ -6,7 +6,7 @@ $code           = $block->escapeQuote($block->getMethodCode());
 $image          = $block->getBrandingImage();
 $storedCards    = $block->getStoredCards();
 ?>
-<fieldset class="fieldset items <?php echo $code ?>" id="payment_form_<?php echo $code ?>" style="display:none;"
+<fieldset class="fieldset payment items ccard <?php echo $code ?>" id="payment_form_<?php echo $code ?>" style="display:none;"
           data-mage-init='{"tokenbaseForm":{"code":"<?php echo $code ?>"}}'>
     <?php if ($image): ?>
         <div class="sorter">

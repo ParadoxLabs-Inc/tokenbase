@@ -14,7 +14,7 @@
     </h2>
 </div>
 
-<form action="<?php echo $block->escapeUrl($block->getAction()); ?>" method="post" id="form-validate" data-hasrequired="<?php echo $block->escapeQuote(__('* Required Fields')) ?>">
+<form action="<?php echo $block->escapeUrl($block->getAction()); ?>" method="post" id="form-validate" class="checkout-payment-method" data-hasrequired="<?php echo $block->escapeQuote(__('* Required Fields')) ?>">
     <?php echo $block->getBlockHtml('formkey'); ?>
     <input type="hidden" name="id" value="<?php echo $block->getCard()->getId() ? $block->escapeQuote($block->getCard()->getHash()) : ''; ?>" />
     <input type="hidden" name="method" value="<?php echo $code; ?>" />

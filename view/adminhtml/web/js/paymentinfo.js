@@ -11,7 +11,7 @@ define([
             spinnerSelectorOuter: '#tab_block_tokenbase_cards',
             spinnerSelectorInner: '.admin__page-nav-item-message-loader',
             deleteSelector: '.action-delete',
-            editSelector: '.links a, .action-edit, .action-back',
+            editSelector: '.ui-tabs-nav a, .action-edit, .action-back',
             editSelectorInd: '.address-list-item',
             editSelectorIndTarget: '.action-edit:first',
             formSelector: 'form',
@@ -19,101 +19,131 @@ define([
         },
 
         _create: function() {
-            var wrapper = this;
-            var spinner = $(wrapper.options.spinnerSelectorOuter).find(wrapper.options.spinnerSelectorInner);
+            this._initWrapper();
+            this._bind();
+        },
 
+        _initWrapper: function() {
             // Remove silly class on the wrapper
-            wrapper.element.parent().removeClass('admin__scope-old');
+            this.element.parent().removeClass('admin__scope-old');
+        },
 
-            // Catch deletes
-            wrapper.element.find(wrapper.options.deleteSelector).off().on('click', function() {
-                if (confirm($.mage.__("Are you sure you want to delete this?"))) {
-                    var card = this;
+        _bind: function() {
+            // Bind event listeners
+            this.element.parent().on('click', this.options.deleteSelector, this.deleteCard.bind(this));
+            this.element.parent().on('click', this.options.editSelector, this.editCard.bind(this));
+            this.element.parent().on('click', this.options.editSelectorInd, this.editCardIndirect.bind(this));
 
-                    spinner.show();
-                    $.post(this.href, function(data) {
-                        spinner.hide();
+            // Doing this direct A: because we can, B: because we have to remove a jQ validate listener anyway.
+            // It triggers a direct element.submit() that bypasses our preventDefault().
+            this.element.find(this.options.formSelector)
+                .off('submit')
+                .on('submit.tokenbase', this.saveCard.bind(this))
+                .validation();
+        },
 
-                        if(data.success) {
-                            $(card).closest('li').slideUp();
-                        }
-                        else if(typeof data.message != 'undefined') {
-                            alert(data.message);
-                        }
-                    }, 'json');
+        deleteCard: function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (confirm($.mage.__("Are you sure you want to delete this?"))) {
+                this.showSpinner();
+
+                $.post(
+                    $(event.target).closest('a').attr('href'),
+                    this.deleteCardHandleResponse.bind(this),
+                    'json'
+                );
+            }
+        },
+
+        deleteCardHandleResponse: function(data) {
+            this.hideSpinner();
+
+            if(data.success) {
+                $(this).closest('li').slideUp();
+            }
+            else if(typeof data.message != 'undefined') {
+                alert(data.message);
+            }
+        },
+
+        editCard: function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            this.showSpinner();
+            this.element.parent().load(
+                $(event.target).closest('a').attr('href'),
+                function() {
+                    this._create();
+                    this.hideSpinner();
+                }.bind(this)
+            );
+        },
+
+        editCardIndirect: function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            this.element.find(this.options.editSelectorIndTarget).trigger('click');
+        },
+
+        saveCard: function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            var form = this.element.find(this.options.formSelector);
+            if (form.validation('isValid') === false) {
+                return;
+            }
+
+            this.showSpinner();
+            this.element.find(this.options.saveSelector).prop('disabled', true);
+
+            // Kick off an event for tokenizing or other pre-save behavior. Any listeners can set preventSave to
+            // prevent submission.
+            form.data('preventSave', false);
+            form.trigger('tokenbaseSave');
+
+            if (form.data('preventSave') === false) {
+                $.post(
+                    form.attr('action'),
+                    form.serialize(),
+                    this.saveCardHandleResponse.bind(this)
+                );
+            } else {
+                this.hideSpinner();
+            }
+        },
+
+        saveCardHandleResponse: function(data) {
+            this.hideSpinner();
+
+            if(typeof data === 'object') {
+                if(typeof data.message != 'undefined') {
+                    alert(data.message);
+
+                    this.element.find(this.options.saveSelector).removeProp('disabled');
+                    this.element.find(this.options.formSelector).trigger('tokenbaseFailure');
                 }
+            }
+            else {
+                this.element.parent().html(data);
+                this._create();
 
-                return false;
-            });
+                $('html, body').animate({
+                    scrollTop: 0
+                }, 500);
+            }
+        },
 
-            // Catch method changes and card edits
-            wrapper.element.find(wrapper.options.editSelector).off().on('click', function() {
-                spinner.show();
-                wrapper.element.parent().load(this.href, function () {
-                    wrapper._create();
-                    spinner.hide();
-                });
+        showSpinner: function () {
+            $(this.options.spinnerSelectorOuter).find(this.options.spinnerSelectorInner).show();
+        },
 
-                return false;
-            });
-
-            // Catch indirect card edits
-            wrapper.element.find(wrapper.options.editSelectorInd).off().on('click', function(e) {
-                e.preventDefault();
-
-                wrapper.element.find(wrapper.options.editSelectorIndTarget).trigger('click');
-            });
-
-            // Catch saves
-            wrapper.element.find(wrapper.options.formSelector).off().on('submit', function(e) {
-                e.preventDefault();
-
-                $(wrapper.element).find(wrapper.options.saveSelector).prop('disabled', true);
-
-                spinner.show();
-                $.post(this.action, $(this).serialize(), function(data) {
-                    spinner.hide();
-
-                    if(typeof data === 'object') {
-                        if(typeof data.message != 'undefined') {
-                            alert(data.message);
-
-                            wrapper.element.find(wrapper.options.saveSelector).removeProp('disabled');
-                        }
-                    }
-                    else {
-                        wrapper.element.parent().html(data);
-                        wrapper._create();
-                    }
-                });
-
-                return false;
-            });
-
-            wrapper.element.find(wrapper.options.saveSelector).off().on('click', function(e) {
-                e.preventDefault();
-
-                $(this).prop('disabled', true);
-
-                spinner.show();
-                $.post(this.form.action, $(this.form).serialize(), function(data) {
-                    spinner.hide();
-
-                    if(typeof data === 'object') {
-                        if(typeof data.message != 'undefined') {
-                            alert(data.message);
-
-                            $(wrapper.element).find(wrapper.options.saveSelector).prop('disabled', false);
-                        }
-                    }
-                    else {
-                        wrapper.element.parent().html(data);
-                        wrapper._create();
-                    }
-                });
-
-                return false;
-            });
+        hideSpinner: function () {
+            $(this.options.spinnerSelectorOuter).find(this.options.spinnerSelectorInner).hide();
         }
     });
 

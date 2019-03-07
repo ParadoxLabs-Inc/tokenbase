@@ -11,7 +11,7 @@
         <label class="label" data-bind="attr: {'for': getCode()}"><span data-bind="text: getTitle()"></span></label>
     </div>
 
-    <div class="payment-method-content">
+    <form class="payment-method-content" data-bind="mageInit: {'validation': {}}">
         <div class="payment-method-billing-address">
             <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
             <!-- ko template: getTemplate() --><!-- /ko -->
@@ -46,7 +46,7 @@
             </div>
             <div>&nbsp;</div>
             <!-- /ko -->
-            <div class="field name required widget" data-bind="visible: isAchFormShown">
+            <div class="field name required widget" data-bind="visible: isFormShown">
                 <label data-bind="attr: {for: getCode() + '-echeck-account-name'}" class="label">
                     <span><!-- ko text: $t('Name on Account')--><!-- /ko --></span>
                 </label>
@@ -56,7 +56,7 @@
                     enable: true, value: echeckAccountName"/>
                 </div>
             </div>
-            <div class="field name required" data-bind="visible: isAchFormShown">
+            <div class="field name required" data-bind="visible: isFormShown">
                 <label data-bind="attr: {for: getCode() + '-echeck-bank-name'}" class="label">
                     <span><!-- ko text: $t('Bank Name')--><!-- /ko --></span>
                 </label>
@@ -66,7 +66,7 @@
                     enable: true, value: echeckBankName"/>
                 </div>
             </div>
-            <div class="field number required" data-bind="visible: isAchFormShown">
+            <div class="field number required" data-bind="visible: isFormShown">
                 <label data-bind="attr: {for: getCode() + '-echeck-routing-number'}" class="label">
                     <span><!-- ko text: $t('Routing Number')--><!-- /ko --></span>
                 </label>
@@ -76,7 +76,7 @@
                     enable: true, value: echeckRoutingNumber"/>
                 </div>
             </div>
-            <div class="field number required" data-bind="visible: isAchFormShown">
+            <div class="field number required" data-bind="visible: isFormShown">
                 <label data-bind="attr: {for: getCode() + '-echeck-account-number'}" class="label">
                     <span><!-- ko text: $t('Account Number')--><!-- /ko --></span>
                 </label>
@@ -99,7 +99,7 @@
                     </div>
                 </div>
             </div>
-            <div class="field type required" data-bind="visible: isAchFormShown">
+            <div class="field type required" data-bind="visible: isFormShown">
                 <label data-bind="attr: {for: getCode() + '-echeck-account-type'}" class="label">
                     <span><!-- ko text: $t('Account Type') --><!-- /ko --></span>
                 </label>
@@ -115,7 +115,7 @@
                 </div>
             </div>
             <!-- ko if: (canSaveCard)-->
-            <div class="field" data-bind="visible: isAchFormShown">
+            <div class="field" data-bind="visible: isFormShown">
                 <label class="label">
                     <span></span>
                 </label>
@@ -126,7 +126,7 @@
                            value="1"
                            checked="checked"
                            class="checkbox"
-                           data-bind="checked: save, id: getCode() + '-save'"/>
+                           data-bind="attr: {id: getCode() + '-save'}, checked: save"/>
                     <label class="label" data-bind="attr: {for: getCode() + '-save'}">
                         <span><!-- ko text: $t('For your convenience, this data will be stored securely by our payment processor.')--><!-- /ko --></span>
                     </label>
@@ -137,7 +137,7 @@
                            value="1"
                            checked="checked"
                            class="checkbox"
-                           data-bind="checked: save, id: getCode() + '-save'"/>
+                           data-bind="attr: {id: getCode() + '-save'}, checked: save"/>
                     <label class="label" data-bind="attr: {for: getCode() + '-save'}">
                         <span><!-- ko text: $t('Save for next time')--><!-- /ko --></span>
                     </label>
@@ -169,6 +169,6 @@
                 </div>
             </div>
         </div>
-    </div>
+    </form>
 
 </div>

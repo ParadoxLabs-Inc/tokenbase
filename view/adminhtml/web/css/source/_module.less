@@ -1,0 +1,131 @@
+// CC styles are not normally included in the admin. This replicates what's otherwise provided by Magento_Blank.
+// @see vendor/magento/theme-frontend-blank/Magento_Checkout/web/css/source/module/checkout/_payment-options.less
+
+& when (@media-common = true) {
+  .checkout-payment-method {
+    .payment-option-inner {
+      margin: 0 0 @indent__base;
+    }
+
+    .credit-card-types {
+      margin: 0;
+      padding: 0;
+
+      .item {
+        display: inline-block;
+        list-style: none;
+        margin: 0 @indent__xs 0 0;
+        vertical-align: top;
+
+        &._active {
+          font-weight: @font-weight__bold;
+
+          img {
+            -webkit-filter: grayscale(0%);
+          }
+        }
+
+        &._inactive {
+          opacity: .4;
+        }
+
+        span {
+          display: inline-block;
+          padding-top: 6px;
+          vertical-align: top;
+        }
+      }
+
+      img {
+        -webkit-filter: grayscale(100%); // For Webkit browsers
+        -webkit-transition: all .6s ease; // Fade to color for Chrome and Safari
+      }
+    }
+
+    .ccard {
+      .legend {
+        &:extend(.abs-visually-hidden all);
+      }
+
+      .fields {
+        > .year {
+          padding-left: @indent__xs;
+        }
+
+        .select {
+          padding-left: @indent__xs;
+          padding-right: @indent__xs;
+        }
+      }
+
+      .month {
+        .select {
+          width: 140px;
+        }
+      }
+
+      .year {
+        .select {
+          width: 80px;
+        }
+      }
+
+      .number {
+        .input-text {
+          width: 225px;
+        }
+      }
+
+      > .admin__field.cvv {
+        > .control {
+          padding-right: @indent__base;
+          width: auto;
+        }
+      }
+
+      .cvv {
+        .input-text {
+          width: 55px;
+        }
+      }
+
+      &.fieldset {
+        > .field {
+          .fields.group.group-2 {
+            .field {
+              width: auto !important;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  #tokenbase-wrapper {
+    > .admin__fieldset-wrapper-title {
+      padding-bottom: 0;
+      margin-bottom: 1.5rem;
+      border: 0;
+    }
+
+    .block-title h2 {
+      margin-bottom: 1rem;
+    }
+
+    .admin__fieldset {
+      padding-top: 0;
+    }
+
+    .admin__fieldset-wrapper-title {
+      margin-bottom: 1rem;
+    }
+
+    .admin__field-control .nested {
+      margin-top: 1.5rem;
+    }
+
+    .admin__fieldset:not(.ccard) .admin__control-select {
+      width: 100%;
+    }
+  }
+}

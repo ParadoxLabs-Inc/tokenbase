@@ -4,24 +4,22 @@
 ?>
 <div class="admin__fieldset-wrapper" id="tokenbase-wrapper" data-mage-init='{"tokenbasePaymentinfo":{}}'>
     <div class="admin__fieldset-wrapper-title">
-        <strong class="title">
-            <?php echo $block->escapeHtml(__('Payment Data')); ?>
-        </strong>
-    </div>
-    <div class="admin__fieldset-wrapper-content">
         <?php $activeMethods = $block->getActiveMethods(); ?>
         <?php if (count($activeMethods) > 1): ?>
-            <ul class="links">
-                <?php foreach ($activeMethods as $method): ?>
-                    <li <?php if ($block->getCurrentMethod() == $method): ?>class="active"<?php endif; ?>>
-                        <a href="<?php echo $block->escapeUrl($block->getUrl('*/*/paymentinfo', [ 'method' => $method, 'id' => $block->getRequest()->getParam('id'), 'form_key' => $block->getFormKey() ])); ?>">
-                            <?php echo $block->escapeHtml($block->getMethodTitle($method)); ?>
-                        </a>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
+            <div class="ui-tabs ui-widget">
+                <ul class="ui-tabs-nav tabs-horiz">
+                    <?php foreach ($activeMethods as $method): ?>
+                        <li class="ui-state-default <?php if ($block->getCurrentMethod() == $method): ?>ui-state-active<?php endif; ?>">
+                            <a href="<?php echo $block->escapeUrl($block->getUrl('*/*/paymentinfo', [ 'method' => $method, 'id' => $block->getRequest()->getParam('id'), 'form_key' => $block->getFormKey() ])); ?>" class="ui-tabs-anchor">
+                                <?php echo $block->escapeHtml($block->getMethodTitle($method)); ?>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
         <?php endif; ?>
-
+    </div>
+    <div class="admin__fieldset-wrapper-content">
         <div class="manage-payment-method">
             <?php if (!empty($activeMethods)): ?>
                 <?php echo $block->getChildHtml(); ?>

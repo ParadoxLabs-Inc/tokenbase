@@ -182,8 +182,8 @@
         new RegionUpdater("<?php echo $code; ?>-country", "<?php echo $code; ?>-region", "<?php echo $code; ?>-region-id", <?php echo $this->helper(\Magento\Directory\Helper\Data::class)->getRegionJson() ?> );
     });
 
-    <?php /* Attempt at form validation. Nonfunctional as of 1/25/2016. */ ?>
-    require(["jquery", "jquery/ui", "jquery/validate", "mage/translate"], function($) {
+    require(["jquery"], function($) {
+        <?php /** This is necessary for parsing of mage-data-init elements in the AJAX requests */ ?>
         $('#<?php echo $code; ?>-form-validate').trigger('contentUpdated');
     });
     //]]>
