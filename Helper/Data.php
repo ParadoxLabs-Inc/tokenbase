@@ -515,7 +515,7 @@ class Data extends \Magento\Payment\Helper\Data
     {
         // The REST API has to be considered part of the frontend, as standard checkout uses it.
         if ($this->appState->getAreaCode() == \Magento\Framework\App\Area::AREA_FRONTEND
-            || $this->appState->getAreaCode() == 'webapi_rest') {
+            || $this->appState->getAreaCode() == \Magento\Framework\App\Area::AREA_WEBAPI_REST) {
             return true;
         }
 
