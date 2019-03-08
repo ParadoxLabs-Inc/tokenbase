@@ -146,7 +146,7 @@ class CustomerCardRepository implements \ParadoxLabs\TokenBase\Api\CustomerCardR
     }
 
     /**
-     * Do not allow guests to fetch or modify cards belonging to non-guests.
+     * Do not allow customers to fetch or modify cards belonging to others.
      *
      * @param int $customerId
      * @param \ParadoxLabs\TokenBase\Api\Data\CardInterface $card

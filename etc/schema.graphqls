@@ -1,0 +1,35 @@
+type Query {
+    tokenbaseCards: [TokenbaseCard] @resolver(class: "ParadoxLabs\\TokenBase\\Model\\Api\\Resolver\\Card")
+}
+
+type TokenbaseCard @doc(description: "TokenbaseCard is a stored payment account/credit card.") {
+    id: Int
+    address: CustomerAddress
+    customer_email: String
+    customer_id: Int
+    customer_ip: String
+    profile_id: String
+    payment_id: String
+    method: String
+    hash: String
+    active: Boolean
+    created_at: String
+    updated_at: String
+    last_use: String
+    expires: String
+    label: String
+    additional: TokenbaseCardAdditional
+}
+
+type TokenbaseCardAdditional @doc(description: "TokenbaseCardAdditional contains metadata for a stored CC/ACH.") {
+    cc_type: String
+    cc_first6: String
+    cc_last4: String
+    cc_exp_year: String
+    cc_exp_month: String
+    echeck_account_name: String
+    echeck_bank_name: String
+    echeck_account_type: String
+    echeck_routing_number_last4: String
+    echeck_account_number_last4: String
+}
