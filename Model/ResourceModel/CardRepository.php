@@ -166,7 +166,7 @@ class CardRepository implements CardRepositoryInterface
         $this->resource->load($card, $cardHash, 'hash');
 
         if (!$card->getId()) {
-            throw new NoSuchEntityException(__('Card with id "%1" does not exist.', $cardHash));
+            throw new NoSuchEntityException(__('Card with hash "%1" does not exist.', $cardHash));
         }
 
         return $card;

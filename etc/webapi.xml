@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <!-- Authenticated/integration card management -->
     <route url="/V1/tokenbase/:cardId" method="GET">
         <service class="ParadoxLabs\TokenBase\Api\CardRepositoryInterface" method="getById"/>
         <resources>
@@ -28,6 +29,67 @@
         <service class="ParadoxLabs\TokenBase\Api\CardRepositoryInterface" method="deleteById"/>
         <resources>
             <resource ref="ParadoxLabs_TokenBase::cards_manage"/>
+        </resources>
+    </route>
+
+    <!-- Customer card management -->
+    <route url="/V1/tokenbase/mine/:cardHash" method="GET">
+        <service class="ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface" method="getByHash"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/tokenbase/mine/search" method="GET">
+        <service class="ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/tokenbase/mine" method="POST">
+        <service class="ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface" method="saveExtended"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/tokenbase/mine/:cardHash" method="PUT">
+        <service class="ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface" method="saveExtended"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/tokenbase/mine/:cardHash" method="DELETE">
+        <service class="ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface" method="deleteByHash"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <!-- Guest card management -->
+    <route url="/V1/tokenbase/guest/:cardHash" method="GET">
+        <service class="ParadoxLabs\TokenBase\Api\GuestCardRepositoryInterface" method="getByHash"/>
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+    <route url="/V1/tokenbase/guest" method="POST">
+        <service class="ParadoxLabs\TokenBase\Api\GuestCardRepositoryInterface" method="saveExtended"/>
+        <resources>
+            <resource ref="anonymous" />
         </resources>
     </route>
 </routes>
