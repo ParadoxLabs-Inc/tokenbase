@@ -9,6 +9,11 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment><![CDATA[All cards (including for guests and 'do not save') are always stored internally. If yes, those records will be permanently removed 120 days after their last use (the maximum refund period). We strongly recommend this.]]></comment>
                 </field>
+                <field id="enable_public_api" translate="label" type="select" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable public API</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[If 'Yes', Magento's REST and GraphQL APIs will allow customer card management. Only enable this if you use them.]]></comment>
+                </field>
             </group>
         </section>
     </system>

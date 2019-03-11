@@ -11,7 +11,7 @@
  * @license     http://store.paradoxlabs.com/license.html
  */
 
-namespace ParadoxLabs\TokenBase\Model\ResourceModel;
+namespace ParadoxLabs\TokenBase\Model\Api;
 
 /**
  * CustomerCardRepository Class
@@ -34,20 +34,28 @@ class CustomerCardRepository implements \ParadoxLabs\TokenBase\Api\CustomerCardR
     protected $filterBuilder;
 
     /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    protected $scopeConfig;
+
+    /**
      * GuestCardRepository constructor.
      *
      * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
      * @param \Magento\Framework\Api\Search\FilterGroupBuilder $filterGroupBuilder
      * @param \Magento\Framework\Api\FilterBuilder $filterBuilder
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      */
     public function __construct(
         \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository,
         \Magento\Framework\Api\Search\FilterGroupBuilder $filterGroupBuilder,
-        \Magento\Framework\Api\FilterBuilder $filterBuilder
+        \Magento\Framework\Api\FilterBuilder $filterBuilder,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     ) {
         $this->cardRepository = $cardRepository;
         $this->filterGroupBuilder = $filterGroupBuilder;
         $this->filterBuilder = $filterBuilder;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -67,6 +75,8 @@ class CustomerCardRepository implements \ParadoxLabs\TokenBase\Api\CustomerCardR
         \Magento\Customer\Api\Data\AddressInterface $address,
         \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface $additional
     ) {
+        $this->validateEnabled();
+
         // Validate original record so it can't be overwritten maliciously
         if ($card->getHash()) {
             $originalCard = $this->getByHash($customerId, $card->getHash());
@@ -92,6 +102,8 @@ class CustomerCardRepository implements \ParadoxLabs\TokenBase\Api\CustomerCardR
      */
     public function getByHash($customerId, $cardHash)
     {
+        $this->validateEnabled();
+
         $card = $this->cardRepository->getByHash($cardHash);
 
         $this->validateCustomerCard($customerId, $card);
@@ -109,6 +121,8 @@ class CustomerCardRepository implements \ParadoxLabs\TokenBase\Api\CustomerCardR
      */
     public function getList($customerId, \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria)
     {
+        $this->validateEnabled();
+
         // Add mandatory filters to limit results to active cards belonging to the current user
         $customerFilter = $this->filterBuilder->setField('customer_id')
                                               ->setValue($customerId)
@@ -140,6 +154,8 @@ class CustomerCardRepository implements \ParadoxLabs\TokenBase\Api\CustomerCardR
      */
     public function deleteByHash($customerId, $cardHash)
     {
+        $this->validateEnabled();
+
         $card = $this->getByHash($customerId, $cardHash);
 
         return $this->cardRepository->delete($card);
@@ -158,6 +174,26 @@ class CustomerCardRepository implements \ParadoxLabs\TokenBase\Api\CustomerCardR
         if ((int)$card->getCustomerId() !== (int)$customerId
             || (int)$card->getActive() === 0) {
             throw new \Magento\Framework\Exception\InputException(__('You do not have permission for this action.'));
+        }
+    }
+
+    /**
+     * Verify that the public API is enabled.
+     *
+     * @return void
+     * @throws \Magento\Framework\Exception\AuthorizationException
+     */
+    protected function validateEnabled()
+    {
+        $isEnabled = (bool)$this->scopeConfig->getValue(
+            'checkout/tokenbase/enable_public_api',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+
+        if ($isEnabled !== true) {
+            throw new \Magento\Framework\Exception\AuthorizationException(
+                __('The public TokenBase API is not enabled.')
+            );
         }
     }
 }

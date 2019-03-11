@@ -7,6 +7,7 @@
                 <failure_limit>5</failure_limit>
                 <failure_window>86400</failure_window>
                 <paymentinfo_require_order>1</paymentinfo_require_order>
+                <enable_public_api>0</enable_public_api>
             </tokenbase>
         </checkout>
     </default>

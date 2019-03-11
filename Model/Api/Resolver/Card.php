@@ -36,17 +36,25 @@ class Card implements \Magento\Framework\GraphQl\Query\ResolverInterface
     private $searchCriteriaBuilder;
 
     /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    private $scopeConfig;
+
+    /**
      * Card constructor.
      *
      * @param \ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface $customerCardRepository
      * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      */
     public function __construct(
         \ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface $customerCardRepository,
-        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
+        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     ) {
         $this->customerCardRepository = $customerCardRepository;
         $this->searchCriteriaBuilder  = $searchCriteriaBuilder;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -82,12 +90,24 @@ class Card implements \Magento\Framework\GraphQl\Query\ResolverInterface
     }
 
     /**
+     * Verify the requester is authorized to request data.
+     *
      * @param $context
      * @return void
      * @throws \Magento\Framework\GraphQl\Exception\GraphQlAuthorizationException
      */
     private function authenticate($context)
     {
+        $isEnabled = (bool)$this->scopeConfig->getValue(
+            'checkout/tokenbase/enable_public_api',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+        if ($isEnabled !== true) {
+            throw new GraphQlAuthorizationException(
+                __('The TokenbaseCard API is not enabled.')
+            );
+        }
+
         /** @var ContextInterface $context */
         if ((!$context->getUserId()) || $context->getUserType() === UserContextInterface::USER_TYPE_GUEST) {
             throw new GraphQlAuthorizationException(
@@ -100,6 +120,8 @@ class Card implements \Magento\Framework\GraphQl\Query\ResolverInterface
     }
 
     /**
+     * Convert the given card into an array format suitable for GraphQL.
+     *
      * @param \ParadoxLabs\TokenBase\Api\Data\CardInterface $card
      * @return array
      */

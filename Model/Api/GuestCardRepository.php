@@ -11,7 +11,7 @@
  * @license     http://store.paradoxlabs.com/license.html
  */
 
-namespace ParadoxLabs\TokenBase\Model\ResourceModel;
+namespace ParadoxLabs\TokenBase\Model\Api;
 
 /**
  * GuestCardRepository Class
@@ -24,14 +24,22 @@ class GuestCardRepository implements \ParadoxLabs\TokenBase\Api\GuestCardReposit
     protected $cardRepository;
 
     /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    protected $scopeConfig;
+
+    /**
      * GuestCardRepository constructor.
      *
      * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-        \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
+        \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     ) {
         $this->cardRepository = $cardRepository;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -49,6 +57,8 @@ class GuestCardRepository implements \ParadoxLabs\TokenBase\Api\GuestCardReposit
         \Magento\Customer\Api\Data\AddressInterface $address,
         \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface $additional
     ) {
+        $this->validateEnabled();
+
         // Validate original record so it can't be overwritten maliciously
         if ($card->getHash()) {
             $originalCard = $this->getByHash($card->getHash());
@@ -76,6 +86,8 @@ class GuestCardRepository implements \ParadoxLabs\TokenBase\Api\GuestCardReposit
      */
     public function getByHash($cardHash)
     {
+        $this->validateEnabled();
+
         $card = $this->cardRepository->getByHash($cardHash);
 
         $this->validateGuestCard($card);
@@ -94,6 +106,26 @@ class GuestCardRepository implements \ParadoxLabs\TokenBase\Api\GuestCardReposit
     {
         if ((int)$card->getCustomerId() > 0) {
             throw new \Magento\Framework\Exception\InputException(__('You do not have permission for this action.'));
+        }
+    }
+
+    /**
+     * Verify that the public API is enabled.
+     *
+     * @return void
+     * @throws \Magento\Framework\Exception\AuthorizationException
+     */
+    protected function validateEnabled()
+    {
+        $isEnabled = (bool)$this->scopeConfig->getValue(
+            'checkout/tokenbase/enable_public_api',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+
+        if ($isEnabled !== true) {
+            throw new \Magento\Framework\Exception\AuthorizationException(
+                __('The public TokenBase API is not enabled.')
+            );
         }
     }
 }
