@@ -44,8 +44,8 @@
     <preference for="ParadoxLabs\TokenBase\Api\Data\CardInterface" type="ParadoxLabs\TokenBase\Model\Card" />
     <preference for="ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface" type="ParadoxLabs\TokenBase\Model\CardAdditional" />
     <preference for="ParadoxLabs\TokenBase\Api\CardRepositoryInterface" type="ParadoxLabs\TokenBase\Model\ResourceModel\CardRepository" />
-    <preference for="ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface" type="ParadoxLabs\TokenBase\Model\ResourceModel\CustomerCardRepository" />
-    <preference for="ParadoxLabs\TokenBase\Api\GuestCardRepositoryInterface" type="ParadoxLabs\TokenBase\Model\ResourceModel\GuestCardRepository" />
+    <preference for="ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface" type="ParadoxLabs\TokenBase\Model\Api\CustomerCardRepository" />
+    <preference for="ParadoxLabs\TokenBase\Api\GuestCardRepositoryInterface" type="ParadoxLabs\TokenBase\Model\Api\GuestCardRepository" />
 
     <!-- Adding tokenbase_id field to quote API calls -->
     <type name="Magento\Quote\Model\Quote">
