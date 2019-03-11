@@ -980,6 +980,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      */
     protected function beforeAuthorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
+        $this->handleShippingAddress($payment);
     }
 
     /**
@@ -993,6 +994,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         $amount,
         \ParadoxLabs\TokenBase\Model\Gateway\Response $response
     ) {
+        $this->storeTransactionStatuses($payment, $response);
     }
 
     /**
@@ -1002,6 +1004,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      */
     protected function beforeCapture(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
+        $this->handleShippingAddress($payment);
     }
 
     /**
@@ -1015,6 +1018,77 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         $amount,
         \ParadoxLabs\TokenBase\Model\Gateway\Response $response
     ) {
+        /** @var \Magento\Sales\Model\Order\Payment $payment */
+
+        /**
+         * If this is a pre-auth capture for less than the total value of the order,
+         * try to reauthorize any remaining balance.
+         */
+        $outstanding = round($payment->getOrder()->getBaseTotalDue() - $amount, 4);
+        if ($outstanding > 0) {
+            $wasTransId   = $payment->getTransactionId();
+            $wasParentId  = $payment->getParentTransactionId();
+            $authResponse = null;
+            $message      = false;
+
+            if ((int)$this->getConfigData('reauthorize_partial_invoice') === 1) {
+                try {
+                    $this->log(sprintf('afterCapture(): Reauthorizing for %s', $outstanding));
+
+                    $this->gateway()->clearParameters();
+                    $this->gateway()->setCard($this->gateway()->getCard());
+                    $this->handleShippingAddress($payment);
+                    $this->gateway()->setHaveAuthorized(true);
+
+                    $authResponse    = $this->gateway()->authorize($payment, $outstanding);
+                } catch (\Exception $e) {
+                    // Reauth failed: Take no action
+                    $this->log('afterCapture(): Reauthorization not successful. Continuing with original transaction.');
+                }
+            }
+
+            /**
+             * Even if the auth didn't go through, we need to create a new 'transaction'
+             * so we can still do an online capture for the remainder.
+             */
+            if ($authResponse !== null) {
+                $payment->setTransactionId(
+                    $this->getValidTransactionId($payment, $authResponse->getTransactionId())
+                );
+
+                $payment->setTransactionAdditionalInfo(
+                    \Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS,
+                    $authResponse->getData()
+                );
+
+                $message = __(
+                    'Reauthorized outstanding amount of %1.',
+                    $payment->formatPrice($outstanding)
+                );
+            } else {
+                $payment->setTransactionId(
+                    $this->getValidTransactionId($payment, $response->getTransactionId() . '-auth')
+                );
+            }
+
+            $payment->setData('parent_transaction_id', null);
+            $payment->setIsTransactionClosed(0);
+
+            $transaction = $payment->addTransaction(
+                \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH,
+                $payment->getOrder(),
+                false
+            );
+
+            if ($message !== null) {
+                $payment->addTransactionCommentsToOrder($transaction, $message);
+            }
+
+            $payment->setTransactionId($wasTransId);
+            $payment->setData('parent_transaction_id', $wasParentId);
+        }
+
+        $this->storeTransactionStatuses($payment, $response);
     }
 
     /**
@@ -1078,5 +1152,30 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         $transactionId,
         \ParadoxLabs\TokenBase\Model\Gateway\Response $response
     ) {
+    }
+
+    /**
+     * Set shipping address on the gateway before running the transaction.
+     *
+     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @return $this
+     */
+    protected function handleShippingAddress(\Magento\Payment\Model\InfoInterface $payment)
+    {
+        return $this;
+    }
+
+    /**
+     * Store response statuses persistently.
+     *
+     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param \ParadoxLabs\TokenBase\Model\Gateway\Response $response
+     * @return \Magento\Payment\Model\InfoInterface
+     */
+    protected function storeTransactionStatuses(
+        \Magento\Payment\Model\InfoInterface $payment,
+        \ParadoxLabs\TokenBase\Model\Gateway\Response $response
+    ) {
+        return $payment;
     }
 }
