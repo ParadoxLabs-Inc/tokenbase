@@ -1,5 +1,12 @@
 type Query {
-    tokenbaseCards: [TokenbaseCard] @resolver(class: "ParadoxLabs\\TokenBase\\Model\\Api\\Resolver\\Card")
+    tokenbaseCards(hash: String): [TokenbaseCard] @resolver(class: "ParadoxLabs\\TokenBase\\Model\\Api\\GraphQL\\GetCards")
+    tokenbaseCheckoutConfig(method: String!): TokenbaseCheckoutConfig @resolver(class: "ParadoxLabs\\TokenBase\\Model\\Api\\GraphQL\\GetCheckoutConfig")
+}
+
+type Mutation {
+    deleteTokenbaseCard(hash: String!): Boolean @resolver(class: "ParadoxLabs\\TokenBase\\Model\\Api\\GraphQL\\DeleteCard")
+    updateTokenbaseCard(input: TokenbaseCardUpdateInput!): TokenbaseCard @resolver(class: "ParadoxLabs\\TokenBase\\Model\\Api\\GraphQL\\UpdateCard")
+    createTokenbaseCard(input: TokenbaseCardCreateInput!): TokenbaseCard @resolver(class: "ParadoxLabs\\TokenBase\\Model\\Api\\GraphQL\\UpdateCard")
 }
 
 type TokenbaseCard @doc(description: "TokenbaseCard is a stored payment account/credit card.") {
@@ -23,8 +30,69 @@ type TokenbaseCard @doc(description: "TokenbaseCard is a stored payment account/
 
 type TokenbaseCardAdditional @doc(description: "TokenbaseCardAdditional contains metadata for a stored CC/ACH.") {
     cc_type: String
+    cc_owner: String
     cc_first6: String
     cc_last4: String
+    cc_exp_year: String
+    cc_exp_month: String
+    echeck_account_name: String
+    echeck_bank_name: String
+    echeck_account_type: String
+    echeck_routing_number_last4: String
+    echeck_account_number_last4: String
+}
+
+type TokenbaseCheckoutConfig @doc(description: "Get checkout configuration for the given TokenBase payment method.") {
+    method: String
+    useVault: Boolean
+    canSaveCard: Boolean
+    forceSaveCard: Boolean
+    defaultSaveCard: Boolean
+    isCcDetectionEnabled: Boolean
+    logoImage: String
+    requireCcv: Boolean
+    sandbox: Boolean
+    canStoreBin: Boolean
+    availableTypes: [TokenbaseKeyValue]
+    months: [TokenbaseKeyValue]
+    years: [TokenbaseKeyValue]
+    hasVerification: Boolean
+    cvvImageUrl: String
+}
+
+type TokenbaseKeyValue {
+    key: String
+    value: String
+}
+
+input TokenbaseCardUpdateInput {
+    hash: String!
+    address: CustomerAddressInput
+    customer_email: String
+    customer_ip: String
+    method: String
+    active: Boolean
+    expires: String
+    additional: TokenbaseCardPaymentInput
+}
+
+input TokenbaseCardCreateInput {
+    address: CustomerAddressInput
+    customer_email: String
+    customer_ip: String
+    method: String!
+    active: Boolean
+    expires: String
+    additional: TokenbaseCardPaymentInput
+}
+
+input TokenbaseCardPaymentInput {
+    cc_type: String
+    cc_owner: String
+    cc_first6: String
+    cc_last4: String
+    cc_number: String
+    cc_cid: String
     cc_exp_year: String
     cc_exp_month: String
     echeck_account_name: String

@@ -61,8 +61,12 @@ class GuestCardRepository implements \ParadoxLabs\TokenBase\Api\GuestCardReposit
 
         // Validate original record so it can't be overwritten maliciously
         if ($card->getHash()) {
-            $originalCard = $this->getByHash($card->getHash());
-            $this->validateGuestCard($originalCard);
+            try {
+                $originalCard = $this->getByHash($card->getHash());
+                $this->validateGuestCard($originalCard);
+            } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
+                // No-op: Ignore card hash does not exist
+            }
         } elseif ($card->getId()) {
             $originalCard = $this->cardRepository->getById($card->getId());
             $this->validateGuestCard($originalCard);

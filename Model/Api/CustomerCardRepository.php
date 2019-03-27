@@ -79,8 +79,12 @@ class CustomerCardRepository implements \ParadoxLabs\TokenBase\Api\CustomerCardR
 
         // Validate original record so it can't be overwritten maliciously
         if ($card->getHash()) {
-            $originalCard = $this->getByHash($customerId, $card->getHash());
-            $this->validateCustomerCard($customerId, $originalCard);
+            try {
+                $originalCard = $this->getByHash($customerId, $card->getHash());
+                $this->validateCustomerCard($customerId, $originalCard);
+            } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
+                // No-op: Ignore card hash does not exist
+            }
         } elseif ($card->getId()) {
             $originalCard = $this->cardRepository->getById($card->getId());
             $this->validateCustomerCard($customerId, $originalCard);

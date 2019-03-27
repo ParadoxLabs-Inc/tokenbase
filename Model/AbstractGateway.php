@@ -339,7 +339,7 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
     /**
      * Get the last response value.
      *
-     * @return string
+     * @return string|array
      */
     public function getLastResponse()
     {
