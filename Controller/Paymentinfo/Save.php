@@ -34,6 +34,11 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
     protected $checkoutSession;
 
     /**
+     * @var \Magento\Payment\Helper\Data
+     */
+    protected $paymentHelper;
+
+    /**
      * @param Context $context
      * @param Session $customerSession *Proxy
      * @param PageFactory $resultPageFactory
@@ -45,6 +50,7 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
      * @param \ParadoxLabs\TokenBase\Helper\Address $addressHelper
      * @param \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory
      * @param \Magento\Checkout\Model\Session $checkoutSession *Proxy
+     * @param \Magento\Payment\Helper\Data $paymentHelper
      */
     public function __construct(
         Context $context,
@@ -57,10 +63,12 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         \ParadoxLabs\TokenBase\Helper\Address $addressHelper,
         \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory,
-        \Magento\Checkout\Model\Session $checkoutSession
+        \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Payment\Helper\Data $paymentHelper
     ) {
         $this->paymentFactory   = $paymentFactory;
         $this->checkoutSession  = $checkoutSession;
+        $this->paymentHelper = $paymentHelper;
 
         parent::__construct(
             $context,
@@ -147,6 +155,10 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
                     $newPayment->setQuote($this->checkoutSession->getQuote());
                     $newPayment->getQuote()->getBillingAddress()->setCountryId($newAddr->getCountryId());
                     $newPayment->importData($cardData);
+
+                    $paymentMethod = $this->paymentHelper->getMethodInstance($card->getMethod());
+                    $paymentMethod->setInfoInstance($newPayment);
+                    $paymentMethod->validate();
 
                     /**
                      * Save payment data

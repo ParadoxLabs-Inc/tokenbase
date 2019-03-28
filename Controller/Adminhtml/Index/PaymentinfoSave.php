@@ -49,7 +49,13 @@ class PaymentinfoSave extends Paymentinfo
     protected $cardFactory;
 
     /**
+     * @var \Magento\Payment\Helper\Data
+     */
+    protected $paymentHelper;
+
+    /**
      * PaymentinfoDelete constructor.
+     *
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\Registry $coreRegistry
      * @param \Magento\Framework\App\Response\Http\FileFactory $fileFactory
@@ -81,6 +87,7 @@ class PaymentinfoSave extends Paymentinfo
      * @param \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory
      * @param \Magento\Quote\Api\Data\CartInterfaceFactory $quoteFactory
      * @param \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $cardFactory
+     * @param \Magento\Payment\Helper\Data $paymentHelper
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
@@ -113,11 +120,13 @@ class PaymentinfoSave extends Paymentinfo
         \ParadoxLabs\TokenBase\Helper\Address $addressHelper,
         \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory,
         \Magento\Quote\Api\Data\CartInterfaceFactory $quoteFactory,
-        \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $cardFactory
+        \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $cardFactory,
+        \Magento\Payment\Helper\Data $paymentHelper
     ) {
         $this->paymentFactory = $paymentFactory;
         $this->quoteFactory = $quoteFactory;
         $this->cardFactory = $cardFactory;
+        $this->paymentHelper = $paymentHelper;
 
         parent::__construct(
             $context,
@@ -230,6 +239,10 @@ class PaymentinfoSave extends Paymentinfo
                     $newPayment->setQuote($quote);
                     $newPayment->getQuote()->getBillingAddress()->setCountryId($newAddr->getCountryId());
                     $newPayment->importData($cardData);
+
+                    $paymentMethod = $this->paymentHelper->getMethodInstance($card->getMethod());
+                    $paymentMethod->setInfoInstance($newPayment);
+                    $paymentMethod->validate();
 
                     /**
                      * Save payment data

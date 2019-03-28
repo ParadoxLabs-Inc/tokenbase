@@ -1,103 +1,108 @@
 type Query {
-    tokenbaseCards(hash: String): [TokenbaseCard] @resolver(class: "ParadoxLabs\\TokenBase\\Model\\Api\\GraphQL\\GetCards")
-    tokenbaseCheckoutConfig(method: String!): TokenbaseCheckoutConfig @resolver(class: "ParadoxLabs\\TokenBase\\Model\\Api\\GraphQL\\GetCheckoutConfig")
+    tokenBaseCards(hash: String): [TokenBaseCard] @resolver(class: "ParadoxLabs\\TokenBase\\Model\\Api\\GraphQL\\GetCards") @doc(description: "Get the current customer's stored card(s), if any. Takes optional hash for a specific card.")
+    tokenBaseCheckoutConfig(method: String!): TokenBaseCheckoutConfig @resolver(class: "ParadoxLabs\\TokenBase\\Model\\Api\\GraphQL\\GetCheckoutConfig") @doc(description: "Get checkout configuration for the given TokenBase payment method.")
 }
 
 type Mutation {
-    deleteTokenbaseCard(hash: String!): Boolean @resolver(class: "ParadoxLabs\\TokenBase\\Model\\Api\\GraphQL\\DeleteCard")
-    updateTokenbaseCard(input: TokenbaseCardUpdateInput!): TokenbaseCard @resolver(class: "ParadoxLabs\\TokenBase\\Model\\Api\\GraphQL\\UpdateCard")
-    createTokenbaseCard(input: TokenbaseCardCreateInput!): TokenbaseCard @resolver(class: "ParadoxLabs\\TokenBase\\Model\\Api\\GraphQL\\UpdateCard")
+    createTokenBaseCard(input: TokenBaseCardCreateInput!): TokenBaseCard @resolver(class: "ParadoxLabs\\TokenBase\\Model\\Api\\GraphQL\\UpdateCard") @doc(description: "Create a new stored card")
+    deleteTokenBaseCard(hash: String!): Boolean @resolver(class: "ParadoxLabs\\TokenBase\\Model\\Api\\GraphQL\\DeleteCard") @doc(description: "Delete a stored card")
+    updateTokenBaseCard(input: TokenBaseCardUpdateInput!): TokenBaseCard @resolver(class: "ParadoxLabs\\TokenBase\\Model\\Api\\GraphQL\\UpdateCard") @doc(description: "Update an existing stored card")
 }
 
-type TokenbaseCard @doc(description: "TokenbaseCard is a stored payment account/credit card.") {
-    id: Int
-    address: CustomerAddress
-    customer_email: String
-    customer_id: Int
-    customer_ip: String
-    profile_id: String
-    payment_id: String
-    method: String
-    hash: String
-    active: Boolean
-    created_at: String
-    updated_at: String
-    last_use: String
-    expires: String
-    label: String
-    additional: TokenbaseCardAdditional
+type TokenBaseCard @doc(description: "A stored payment account/credit card.") {
+    hash: String @doc(description: "Card identifier hash")
+    address: CustomerAddress @doc(description: "Card billing address")
+    customer_email: String @doc(description: "Customer email")
+    customer_id: Int @doc(description: "Customer ID")
+    customer_ip: String @doc(description: "Created-by IP")
+    profile_id: String @doc(description: "Card gateway profile ID")
+    payment_id: String @doc(description: "Card gateway payment ID")
+    method: String @doc(description: "Payment method code")
+    active: Boolean @doc(description: "Is card active")
+    created_at: String @doc(description: "Created-at date")
+    updated_at: String @doc(description: "Last updated date")
+    last_use: String @doc(description: "Last used date")
+    expires: String @doc(description: "Expiration date")
+    label: String @doc(description: "Card label")
+    additional: TokenBaseCardAdditional @doc(description: "Card payment data")
 }
 
-type TokenbaseCardAdditional @doc(description: "TokenbaseCardAdditional contains metadata for a stored CC/ACH.") {
-    cc_type: String
-    cc_owner: String
-    cc_first6: String
-    cc_last4: String
-    cc_exp_year: String
-    cc_exp_month: String
-    echeck_account_name: String
-    echeck_bank_name: String
-    echeck_account_type: String
-    echeck_routing_number_last4: String
-    echeck_account_number_last4: String
+type TokenBaseCardAdditional @doc(description: "Details and metadata for a stored CC/ACH.") {
+    cc_type: String @doc(description: "CC Type")
+    cc_owner: String @doc(description: "CC Owner")
+    cc_bin: String @doc(description: "CC Bin (First-6)")
+    cc_last4: String @doc(description: "CC Last-4")
+    cc_exp_year: String @doc(description: "CC Expiration Year")
+    cc_exp_month: String @doc(description: "CC Expiration Month")
+    echeck_account_name: String @doc(description: "ACH Account Name")
+    echeck_bank_name: String @doc(description: "ACH Bank Name")
+    echeck_account_type: TokenBaseEcheckAccountType @doc(description: "ACH Account type")
+    echeck_routing_number_last4: String @doc(description: "ACH Routing Number Last-4")
+    echeck_account_number_last4: String @doc(description: "ACH Account Number Last-4")
 }
 
-type TokenbaseCheckoutConfig @doc(description: "Get checkout configuration for the given TokenBase payment method.") {
-    method: String
-    useVault: Boolean
-    canSaveCard: Boolean
-    forceSaveCard: Boolean
-    defaultSaveCard: Boolean
-    isCcDetectionEnabled: Boolean
-    logoImage: String
-    requireCcv: Boolean
-    sandbox: Boolean
-    canStoreBin: Boolean
-    availableTypes: [TokenbaseKeyValue]
-    months: [TokenbaseKeyValue]
-    years: [TokenbaseKeyValue]
-    hasVerification: Boolean
-    cvvImageUrl: String
+type TokenBaseCheckoutConfig @doc(description: "Checkout configuration for a TokenBase payment method.") {
+    method: String @doc(description: "Payment method code")
+    useVault: Boolean @doc(description: "Are stored cards enabled?")
+    canSaveCard: Boolean @doc(description: "Can cards be saved?")
+    forceSaveCard: Boolean @doc(description: "Is card saving forced?")
+    defaultSaveCard: Boolean @doc(description: "Hash of the default card to select")
+    isCcDetectionEnabled: Boolean @doc(description: "Is CC type detection enabled?")
+    logoImage: String @doc(description: "Payment logo image URL (if enabled)")
+    requireCcv: Boolean @doc(description: "Is CVV required for stored cards?")
+    sandbox: Boolean @doc(description: "Is the payment gateway in sandbox mode?")
+    canStoreBin: Boolean @doc(description: "Is CC BIN (first6) storage enabled?")
+    availableTypes: [TokenBaseKeyValue] @doc(description: "Available CC types")
+    months: [TokenBaseKeyValue] @doc(description: "Available CC Exp Months")
+    years: [TokenBaseKeyValue] @doc(description: "Available CC Exp Years")
+    hasVerification: Boolean @doc(description: "Is CVV enabled?")
+    cvvImageUrl: String @doc(description: "CVV helper image URL")
 }
 
-type TokenbaseKeyValue {
-    key: String
-    value: String
+type TokenBaseKeyValue @doc(description: "Container for generic key/value data.") {
+    key: String @doc(description: "Generic key")
+    value: String @doc(description: "Generic value")
 }
 
-input TokenbaseCardUpdateInput {
-    hash: String!
-    address: CustomerAddressInput
-    customer_email: String
-    customer_ip: String
-    method: String
-    active: Boolean
-    expires: String
-    additional: TokenbaseCardPaymentInput
+input TokenBaseCardUpdateInput @doc(description: "Input for updating a stored card.") {
+    hash: String! @doc(description: "Card identifier hash to update (required)")
+    address: CustomerAddressInput @doc(description: "Card billing address")
+    customer_email: String @doc(description: "Customer email")
+    customer_ip: String @doc(description: "Created-by IP")
+    method: String @doc(description: "Payment method code")
+    active: Boolean @doc(description: "Is card active")
+    expires: String @doc(description: "Card expiration date (YYYY-MM-DD 23:59:59)")
+    additional: TokenBaseCardPaymentInput @doc(description: "Card payment data")
 }
 
-input TokenbaseCardCreateInput {
-    address: CustomerAddressInput
-    customer_email: String
-    customer_ip: String
-    method: String!
-    active: Boolean
-    expires: String
-    additional: TokenbaseCardPaymentInput
+input TokenBaseCardCreateInput @doc(description: "Input for creating a stored card.") {
+    address: CustomerAddressInput @doc(description: "Card billing address")
+    customer_email: String! @doc(description: "Customer email (required)")
+    customer_ip: String @doc(description: "Created-by IP")
+    method: String! @doc(description: "Payment method code (required)")
+    active: Boolean @doc(description: "Is card active")
+    expires: String @doc(description: "Card expiration date (YYYY-MM-DD 23:59:59)")
+    additional: TokenBaseCardPaymentInput @doc(description: "Card payment data")
 }
 
-input TokenbaseCardPaymentInput {
-    cc_type: String
-    cc_owner: String
-    cc_first6: String
-    cc_last4: String
-    cc_number: String
-    cc_cid: String
-    cc_exp_year: String
-    cc_exp_month: String
-    echeck_account_name: String
-    echeck_bank_name: String
-    echeck_account_type: String
-    echeck_routing_number_last4: String
-    echeck_account_number_last4: String
+input TokenBaseCardPaymentInput @doc(description: "Payment data for a stored card. Note, the specific fields that are relevant depend on the payment method.") {
+    cc_type: String @doc(description: "CC Type")
+    cc_owner: String @doc(description: "CC Owner")
+    cc_bin: String @doc(description: "CC Bin (First-6)")
+    cc_last4: String @doc(description: "CC Last-4")
+    cc_number: String @doc(description: "CC Number")
+    cc_cid: String @doc(description: "CC CVV")
+    cc_exp_year: String @doc(description: "CC Expiration Year")
+    cc_exp_month: String @doc(description: "CC Expiration Month")
+    echeck_account_name: String @doc(description: "ACH Account Name")
+    echeck_bank_name: String @doc(description: "ACH Bank Name")
+    echeck_account_type: TokenBaseEcheckAccountType @doc(description: "ACH Account Type")
+    echeck_routing_number: String @doc(description: "ACH Routing Number")
+    echeck_account_number: String @doc(description: "ACH Account Number")
+}
+
+enum TokenBaseEcheckAccountType {
+    checking
+    savings
+    businessChecking
 }

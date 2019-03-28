@@ -68,7 +68,7 @@
                            class="input-text"
                            value=""
                            data-bind="attr: {id: getCode() + '-cc-type', 'data-container': getCode() + '-cc-type'},
-                       value: creditCardType
+                       textInput: creditCardType
                        ">
                 </div>
             </div>
@@ -79,7 +79,7 @@
                 <div class="control">
                     <input type="text" name="payment[cc_number]" class="input-text" value="" autocomplete="cc-number"
                            data-bind="attr: {id: getCode() + '-cc-number', title: $t('Credit Card Number'), 'data-container': getCode() + '-cc-number', 'data-validate': JSON.stringify({'required':true, 'validate-cc-number':'#' + getCode() + '-cc-type', 'validate-cc-type':'#' + getCode() + '-cc-type'})},
-                    enable: true, value: creditCardNumber"/>
+                    enable: true, textInput: creditCardNumberFormatted"/>
                 </div>
             </div>
             <div class="field date required" data-bind="attr: {id: getCode() + '-cc-type-exp-div'}, visible: isFormShown">
@@ -133,7 +133,7 @@
                        'data-container': getCode() + '-cc-cvv',
                        'data-validate': JSON.stringify({'required-number':true, 'validate-cc-cvn':'#' + getCode() + '-cc-type'})},
                        enable: true,
-                       value: creditCardVerificationNumber" />
+                       textInput: creditCardVerificationNumber" />
                     <div class="field-tooltip toggle">
                         <span class="field-tooltip-action action-cvv"
                               tabindex="0"

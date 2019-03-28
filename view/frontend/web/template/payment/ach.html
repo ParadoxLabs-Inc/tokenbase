@@ -53,7 +53,7 @@
                 <div class="control">
                     <input type="text" name="payment[echeck_account_name]" class="input-text" value="" maxlength="22"
                            data-bind="attr: {id: getCode() + '-echeck-account-name', title: $t('Name on Account'), 'data-container': getCode() + '-echeck-account-name', 'data-validate': JSON.stringify({'required':true})},
-                    enable: true, value: echeckAccountName"/>
+                    enable: true, textInput: echeckAccountName"/>
                 </div>
             </div>
             <div class="field name required" data-bind="visible: isFormShown">
@@ -63,7 +63,7 @@
                 <div class="control">
                     <input type="text" name="payment[echeck_bank_name]" class="input-text" value="" maxlength="50"
                            data-bind="attr: {id: getCode() + '-echeck-bank-name', title: $t('Bank Name'), 'data-container': getCode() + '-echeck-bank-name', 'data-validate': JSON.stringify({'required':true})},
-                    enable: true, value: echeckBankName"/>
+                    enable: true, textInput: echeckBankName"/>
                 </div>
             </div>
             <div class="field number required" data-bind="visible: isFormShown">
@@ -73,7 +73,7 @@
                 <div class="control">
                     <input type="number" name="payment[echeck_routing_no]" class="input-text minimum-length-9" value="" maxlength="9"
                            data-bind="attr: {id: getCode() + '-echeck-routing-number', title: $t('Routing Number'), 'data-container': getCode() + '-echeck-routing-number', 'data-validate': JSON.stringify({'required-number':true,'validate-length':true})},
-                    enable: true, value: echeckRoutingNumber"/>
+                    enable: true, textInput: echeckRoutingNumber"/>
                 </div>
             </div>
             <div class="field number required" data-bind="visible: isFormShown">
@@ -83,7 +83,7 @@
                 <div class="control">
                     <input type="number" name="payment[echeck_account_no]" class="input-text minimum-length-5 maximum-length-17" value="" maxlength="9"
                            data-bind="attr: {id: getCode() + '-echeck-account-number', title: $t('Account Number'), 'data-container': getCode() + '-echeck-account-number', 'data-validate': JSON.stringify({'required-number':true,'validate-length':true})},
-                    enable: true, value: echeckAccountNumber"/>
+                    enable: true, textInput: echeckAccountNumber"/>
                     <div class="field-tooltip toggle">
                         <span class="field-tooltip-action action-ach"
                               tabindex="0"

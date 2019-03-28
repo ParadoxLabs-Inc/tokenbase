@@ -955,9 +955,13 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
             /** @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection $collection */
             $collection = $this->cardCollectionFactory->create();
             $collection->addFieldToFilter('method', $this->getData('method'))
-                ->addFieldToFilter('profile_id', $this->getData('profile_id'))
                 ->addFieldToFilter('payment_id', $this->getData('payment_id'))
                 ->addFieldToFilter('customer_id', $this->getData('customer_id'));
+
+            if (!empty($this->getData('profile_id'))) {
+                // If profile_id is null/empty (gateway doesn't use), filtering by it would miss duplicates.
+                $collection->addFieldToFilter('profile_id', $this->getData('profile_id'));
+            }
 
             if ($this->getId() > 0) {
                 /**

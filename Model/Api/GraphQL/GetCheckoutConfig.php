@@ -42,7 +42,7 @@ class GetCheckoutConfig /*implements \Magento\Framework\GraphQl\Query\ResolverIn
      */
     public function __construct(
         \ParadoxLabs\TokenBase\Model\Api\GraphQL $graphQL,
-        $configProviders = []
+        array $configProviders = []
     ) {
         $this->configProviders = $configProviders;
         $this->graphQL = $graphQL;

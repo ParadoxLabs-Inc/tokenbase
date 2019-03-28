@@ -7,9 +7,10 @@ define(
         'mage/translate',
         'Magento_Checkout/js/action/place-order',
         'Magento_Checkout/js/model/payment/additional-validators',
-        'Magento_Ui/js/modal/alert'
+        'Magento_Ui/js/modal/alert',
+        'Magento_Checkout/js/model/quote'
     ],
-    function (ko, $, _, Component, $t, placeOrderAction, additionalValidators, alert) {
+    function (ko, $, _, Component, $t, placeOrderAction, additionalValidators, alert, quote) {
         'use strict';
         var config=null;
         return Component.extend({
@@ -29,14 +30,14 @@ define(
              */
             initObservable: function () {
                 this.initVars();
-                this._super()
-                    .observe([
+                this.observe([
                         'echeckAccountName',
                         'echeckBankName',
                         'echeckRoutingNumber',
                         'echeckAccountNumber',
                         'echeckAccountType'
-                    ]);
+                    ])
+                this._super();
 
                 return this;
             },

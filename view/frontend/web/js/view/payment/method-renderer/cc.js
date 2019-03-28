@@ -1,3 +1,17 @@
+/**
+ * Paradox Labs, Inc.
+ * http://www.paradoxlabs.com
+ * 717-431-3330
+ *
+ * Need help? Open a ticket in our support system:
+ *  http://support.paradoxlabs.com
+ *
+ * @category    ParadoxLabs
+ * @package     TokenBase
+ * @author      Ryan Hoerr <support@paradoxlabs.com>
+ * @license     http://store.paradoxlabs.com/license.html
+ */
+
 define(
     [
         'ko',
@@ -21,7 +35,6 @@ define(
                 save: config ? config.canSaveCard && config.defaultSaveCard : false,
                 selectedCard: config ? config.selectedCard : '',
                 storedCards: config ? config.storedCards : {},
-                availableCardTypes: config ? config.availableCardTypes : {},
                 creditCardExpMonth: config ? config.creditCardExpMonth : null,
                 creditCardExpYear: config ? config.creditCardExpYear : null,
                 logoImage: config ? config.logoImage : false
@@ -52,7 +65,8 @@ define(
                         'selectedCard',
                         'save',
                         'storedCards',
-                        'requireCcv'
+                        'requireCcv',
+                        'creditCardNumberFormatted'
                     ]);
 
                 this.placeOrderFailure = ko.observable(false);
@@ -70,15 +84,20 @@ define(
                         || this.selectedCard() === '';
                 }, this);
 
-                this.readyToPlaceOrder = ko.computed(this.checkPlaceOrderAllowed, this);
-                this.readyToPlaceOrder.subscribe(function (readyFlag) {
-                    this.isPlaceOrderActionAllowed(readyFlag);
+                this.isPlaceOrderActionAllowed = ko.computed({
+                    read: this.checkPlaceOrderAllowed,
+                    write: function() {},
+                    owner: this
+                });
+
+                this.creditCardNumberFormatted.subscribe(function(value) {
+                    this.creditCardNumber(value.replace(/\D/g,''));
                 }.bind(this));
 
                 return this;
             },
 
-            checkPlaceOrderAllowed: function (value) {
+            checkPlaceOrderAllowed: function () {
                 if (quote.billingAddress() === null) {
                     return false;
                 }
@@ -167,7 +186,6 @@ define(
 
             handleFailedOrder: function (response) {
                 this.placeOrderFailure(true);
-                this.isPlaceOrderActionAllowed(this.checkPlaceOrderAllowed());
 
                 var error = JSON.parse(response.responseText);
                 if (error && typeof error.message !== 'undefined') {

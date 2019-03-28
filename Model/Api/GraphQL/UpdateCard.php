@@ -142,7 +142,7 @@ class UpdateCard
          * Set/update card data
          */
         $this->updateCardData($context, $card, $cardData);
-        $this->updatePaymentInfo($cardData, $card);
+        $this->updatePaymentInfo($card, $cardData);
 
         /** @var \Magento\Customer\Model\Data\Address $address */
         $address    = $this->updateAddressData($card, $cardData);
@@ -172,7 +172,7 @@ class UpdateCard
      * @throws \Magento\Framework\Exception\InputException
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getCard(\Magento\Framework\GraphQl\Query\Resolver\ContextInterface $context, $cardData)
+    public function getCard(\Magento\Framework\GraphQl\Query\Resolver\ContextInterface $context, array $cardData)
     {
         /** @var \ParadoxLabs\TokenBase\Model\Card $card */
         if (isset($cardData['hash'])) {
@@ -204,7 +204,7 @@ class UpdateCard
     public function updateCardData(
         \Magento\Framework\GraphQl\Query\Resolver\ContextInterface $context,
         \ParadoxLabs\TokenBase\Model\Card $card,
-        $cardData
+        array $cardData
     ) {
         // Associate customer
         $customerId = $context->getUserId();
@@ -238,7 +238,7 @@ class UpdateCard
      * @param array $cardData
      * @return \Magento\Customer\Api\Data\AddressInterface
      */
-    public function updateAddressData(\ParadoxLabs\TokenBase\Model\Card $card, $cardData)
+    public function updateAddressData(\ParadoxLabs\TokenBase\Model\Card $card, array $cardData)
     {
         $address = $card->getAddressObject();
         if (isset($cardData['address'])) {
@@ -259,12 +259,12 @@ class UpdateCard
     /**
      * Process payment data
      *
-     * @param array $cardData
      * @param \ParadoxLabs\TokenBase\Model\Card $card
+     * @param array $cardData
      * @return void
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    protected function updatePaymentInfo($cardData, \ParadoxLabs\TokenBase\Model\Card $card)
+    protected function updatePaymentInfo(\ParadoxLabs\TokenBase\Model\Card $card, array $cardData)
     {
         if (!isset($cardData['additional']) || empty($cardData['additional'])) {
             return;
