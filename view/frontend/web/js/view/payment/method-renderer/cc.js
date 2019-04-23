@@ -109,7 +109,7 @@ define(
                 if (this.creditCardNumber()
                     && this.creditCardExpYear()
                     && this.creditCardExpMonth()
-                    && this.creditCardType()
+                    && this.selectedCardType()
                     && (this.isCcvShown() === false || this.creditCardVerificationNumber())
                     && this.validate()
                     && additionalValidators.validate()) {
