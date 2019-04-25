@@ -6,18 +6,21 @@
     <div class="block-title">
         <h2><?php echo $block->escapeHtml($block->getPaymentMethodTitle()); ?></h2>
     </div>
-    <div class="block-content items addresses">
+    <div class="block-content items addresses checkout-payment-method">
         <?php $cards = $block->getCards(); ?>
         <?php if (!empty($cards)): ?>
             <?php /** @var \ParadoxLabs\TokenBase\Model\Card $card */ ?>
             <?php foreach ($cards as $card): ?>
                 <?php $card = $card->getTypeInstance(); ?>
-                <fieldset class="box-address-billing fieldset<?php if ($card->getExpires() != '' && strtotime($card->getExpires()) < time()): ?> expired<?php endif; ?>">
+                <fieldset class="box-address-billing payment-method-title fieldset<?php if ($card->getExpires() != '' && strtotime($card->getExpires()) < time()): ?> expired<?php endif; ?>">
                     <legend class="box-title legend">
-                        <strong>
-                        <span>
-                            <?php echo $block->escapeHtml($card->getLabel()); ?>
-                        </span>
+                        <?php if (!empty($card->getType())): ?>
+                            <img class="credit-card-type payment-icon" src="<?php echo $block->getViewFileUrl('Magento_Payment::images/cc/' . strtolower($card->getType()) . '.png'); ?>" alt="<?php echo $block->escapeQuote($block->getCcTypeLabel($card)); ?>" />
+                        <?php endif; ?>
+                        <strong class="payment-icon">
+                            <span>
+                                <?php echo $block->escapeHtml($card->getLabel(empty($card->getType()))); ?>
+                            </span>
                         </strong>
                         <?php if ($card->getExpires() != ''): ?>
                             <small><?php echo $block->escapeHtml(__('(Expires %1)', date('m/Y', strtotime($card->getExpires())))); ?></small>

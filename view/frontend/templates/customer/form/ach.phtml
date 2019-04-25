@@ -131,7 +131,7 @@
                 <?php $tooltip  = '<p>'.$expln.'</p><img src="'.$image.'" alt="'.$alt.'" />'; ?>
                 <div class="note">
                     <a href="#" class="action cvv" title="<?php echo $block->escapeQuote(__('Where do I find these numbers?')) ?>"
-                       data-mage-init='{"tooltip": {"content": "<?php echo $block->escapeQuote($tooltip) ?>"}}'>
+                       data-mage-init='{"tooltip": {"content": "<?php echo $block->escapeQuote($tooltip, true) ?>"}}'>
                         <span><?php echo $block->escapeHtml(__('Where do I find these numbers?')) ?></span>
                     </a>
                 </div>

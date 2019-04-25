@@ -91,14 +91,7 @@ class Data extends \Magento\Payment\Helper\Data
     /**
      * @var array
      */
-    protected $cardTypeTranslationMap = [
-        'AE'    => 'American Express',
-        'DI'    => 'Discover',
-        'DC'    => 'Diners Club',
-        'JCB'   => 'JCB',
-        'MC'    => 'MasterCard',
-        'VI'    => 'Visa',
-    ];
+    protected $cardTypeTranslationMap;
 
     /**
      * @var array
@@ -548,6 +541,10 @@ class Data extends \Magento\Payment\Helper\Data
      */
     public function translateCardType($type)
     {
+        if ($this->cardTypeTranslationMap === null) {
+            $this->cardTypeTranslationMap = $this->_paymentConfig->getCcTypes();
+        }
+
         if (isset($this->cardTypeTranslationMap[ $type ])) {
             return __($this->cardTypeTranslationMap[ $type ]);
         }

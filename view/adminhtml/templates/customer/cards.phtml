@@ -2,7 +2,7 @@
 /** @var \ParadoxLabs\TokenBase\Block\Adminhtml\Customer\Cards $block */
 // @codingStandardsIgnoreFile
 ?>
-<ul class="address-list ui-tabs-nav">
+<ul class="address-list ui-tabs-nav order-billing-method">
     <?php $cards = $block->getCards(); ?>
     <?php if (!empty($cards)): ?>
         <?php /** @var \ParadoxLabs\TokenBase\Model\Card $card */ ?>
@@ -19,7 +19,10 @@
                     <?php endif; ?>
                 </div>
                 <address>
-                    <span><?php echo $block->escapeHtml($card->getLabel()); ?></span>
+                    <?php if (!empty($card->getType())): ?>
+                        <img class="credit-card-type payment-icon" src="<?php echo $block->getViewFileUrl('Magento_Payment::images/cc/' . strtolower($card->getType()) . '.png'); ?>" alt="<?php echo $block->escapeQuote($block->getCcTypeLabel($card)); ?>" />
+                    <?php endif; ?>
+                    <span><?php echo $block->escapeHtml($card->getLabel(empty($card->getType()))); ?></span>
                     <?php if ($card->getExpires() != ''): ?>
                         <small><?php echo $block->escapeHtml(__('(Expires %1)', date('m/Y', strtotime($card->getExpires())))); ?></small>
                     <?php endif; ?><br />

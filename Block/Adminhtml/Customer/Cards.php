@@ -118,4 +118,15 @@ class Cards extends Template
 
         return $renderer->renderArray($addressData);
     }
+
+    /**
+     * Get CC type label (if applicable).
+     *
+     * @param \ParadoxLabs\TokenBase\Model\Card $card
+     * @return \Magento\Framework\Phrase|null
+     */
+    public function getCcTypeLabel(\ParadoxLabs\TokenBase\Model\Card $card)
+    {
+        return $card->getType() ? $this->helper->translateCardType($card->getType()) : null;
+    }
 }
