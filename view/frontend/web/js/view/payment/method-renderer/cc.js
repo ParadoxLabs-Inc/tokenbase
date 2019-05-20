@@ -78,10 +78,11 @@ define(
                 }, this);
 
                 this.isCcvShown = ko.computed(function () {
-                    return this.requireCcv()
-                        || !this.useVault()
-                        || this.selectedCard() === undefined
-                        || this.selectedCard() === '';
+                    return this.hasVerification()
+                        && (this.requireCcv()
+                            || !this.useVault()
+                            || this.selectedCard() === undefined
+                            || this.selectedCard() === '');
                 }, this);
 
                 this.isPlaceOrderActionAllowed = ko.computed({
