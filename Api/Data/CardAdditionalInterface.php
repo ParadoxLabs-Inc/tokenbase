@@ -33,6 +33,28 @@ interface CardAdditionalInterface extends \Magento\Framework\Api\ExtensibleDataI
     /**
      * @return mixed
      */
+    public function getCcCid();
+
+    /**
+     * @param mixed $ccCid
+     * @return mixed
+     */
+    public function setCcCid($ccCid);
+
+    /**
+     * @return mixed
+     */
+    public function getCcNumber();
+
+    /**
+     * @param mixed $ccNumber
+     * @return mixed
+     */
+    public function setCcNumber($ccNumber);
+
+    /**
+     * @return mixed
+     */
     public function getCcLast4();
 
     /**
@@ -84,6 +106,39 @@ interface CardAdditionalInterface extends \Magento\Framework\Api\ExtensibleDataI
      * @return mixed
      */
     public function setCcCountry($ccCountry);
+
+    /**
+     * @return mixed
+     */
+    public function getAcceptjsKey();
+
+    /**
+     * @param mixed $acceptjsKey
+     * @return mixed
+     */
+    public function setAcceptjsKey($acceptjsKey);
+
+    /**
+     * @return mixed
+     */
+    public function getAcceptjsValue();
+
+    /**
+     * @param mixed $acceptjsValue
+     * @return mixed
+     */
+    public function setAcceptjsValue($acceptjsValue);
+
+    /**
+     * @return mixed
+     */
+    public function getToken();
+
+    /**
+     * @param mixed $token
+     * @return mixed
+     */
+    public function setToken($token);
 
     /**
      * @return mixed

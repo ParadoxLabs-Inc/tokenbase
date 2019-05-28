@@ -13,6 +13,8 @@
 
 namespace ParadoxLabs\TokenBase\Model;
 
+use Magento\Payment\Model\InfoInterface;
+
 /**
  * Soft dependency: Supporting 2.1 Vault without breaking 2.0 compatibility.
  * The 2.1+ version implements \Magento\Vault; 2.0 does not.
@@ -38,6 +40,14 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
     \ParadoxLabs\TokenBase\Api\Data\CardInterface,
     \ParadoxLabs\TokenBase\Api\Data\TokenInterface
 {
+    const PROTECTED_ADDITIONAL_KEYS = [
+        'acceptjs_key',
+        'acceptjs_value',
+        'cc_cid',
+        'cc_number',
+        'token',
+    ];
+
     /**
      * Prefix of model events names
      *
@@ -260,7 +270,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
      */
     public function setCustomer(
         \Magento\Customer\Api\Data\CustomerInterface $customer,
-        \Magento\Payment\Model\InfoInterface $payment = null
+        InfoInterface $payment = null
     ) {
         if ($customer->getEmail() != '') {
             $this->setCustomerEmail($customer->getEmail());
@@ -346,9 +356,9 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
      * @param \Magento\Payment\Model\InfoInterface $payment
      * @return $this
      */
-    public function importPaymentInfo(\Magento\Payment\Model\InfoInterface $payment)
+    public function importPaymentInfo(InfoInterface $payment)
     {
-        if ($payment instanceof \Magento\Payment\Model\InfoInterface) {
+        if ($payment instanceof InfoInterface) {
             /** @var \Magento\Payment\Model\Info $payment */
             if ($payment->getAdditionalInformation('save') === 0) {
                 $this->setData('active', 0);
@@ -384,7 +394,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
 
             $this->setData('info_instance', $payment);
 
-            if ($this->getMethodInstance()->hasData('info_instance') !== true) {
+            if ($this->getMethodInstance()->getInfoInstance() instanceof InfoInterface === false) {
                 $this->getMethodInstance()->setInfoInstance($payment);
             }
         }
@@ -907,7 +917,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
      * @param \Magento\Payment\Model\InfoInterface $payment
      * @return $this
      */
-    public function setInfoInstance(\Magento\Payment\Model\InfoInterface $payment)
+    public function setInfoInstance(InfoInterface $payment)
     {
         return $this->setData('info_instance', $payment);
     }
@@ -947,6 +957,11 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
     public function beforeSave()
     {
         parent::beforeSave();
+
+        /**
+         * Clean any confidential info from additional data
+         */
+        $this->cleanAdditionalData();
 
         /**
          * If the payment ID has changed, look for any duplicate payment records that might be stored.
@@ -1252,5 +1267,22 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
         );
 
         return $additional;
+    }
+
+    /**
+     * On save, remove any protected keys from the card additional data.
+     *
+     * @return $this
+     */
+    protected function cleanAdditionalData()
+    {
+        $this->setAdditional(
+            array_diff_key(
+                $this->getAdditional(),
+                array_flip(static::PROTECTED_ADDITIONAL_KEYS)
+            )
+        );
+
+        return $this;
     }
 }

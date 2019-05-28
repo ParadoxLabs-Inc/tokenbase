@@ -288,7 +288,12 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         /** @var \ParadoxLabs\TokenBase\Model\Card $card */
         $card = $card->getTypeInstance();
         $card->setMethodInstance($this);
-        $card->setInfoInstance($this->getInfoInstance());
+
+        if ($this->getInfoInstance() instanceof \Magento\Payment\Model\InfoInterface) {
+            $card->setInfoInstance($this->getInfoInstance());
+        } else {
+            $this->setInfoInstance($card->getInfoInstance());
+        }
 
         $this->card = $card;
 

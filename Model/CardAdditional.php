@@ -75,6 +75,40 @@ class CardAdditional extends \Magento\Framework\Model\AbstractExtensibleModel im
     /**
      * @return mixed
      */
+    public function getCcCid()
+    {
+        return $this->getData('cc_cid');
+    }
+
+    /**
+     * @param mixed $ccCid
+     * @return mixed
+     */
+    public function setCcCid($ccCid)
+    {
+        return $this->setData('cc_cid', $ccCid);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCcNumber()
+    {
+        return $this->getData('cc_number');
+    }
+
+    /**
+     * @param mixed $ccNumber
+     * @return mixed
+     */
+    public function setCcNumber($ccNumber)
+    {
+        return $this->setData('cc_number', $ccNumber);
+    }
+
+    /**
+     * @return mixed
+     */
     public function getCcLast4()
     {
         return $this->getData('cc_last4');
@@ -274,6 +308,57 @@ class CardAdditional extends \Magento\Framework\Model\AbstractExtensibleModel im
     public function setFingerprint($fingerprint)
     {
         return $this->setData('fingerprint', $fingerprint);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAcceptjsKey()
+    {
+        return $this->getData('acceptjs_key');
+    }
+
+    /**
+     * @param mixed $acceptjsKey
+     * @return mixed
+     */
+    public function setAcceptjsKey($acceptjsKey)
+    {
+        return $this->setData('acceptjs_key', $acceptjsKey);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAcceptjsValue()
+    {
+        return $this->getData('acceptjs_value');
+    }
+
+    /**
+     * @param mixed $acceptjsValue
+     * @return mixed
+     */
+    public function setAcceptjsValue($acceptjsValue)
+    {
+        return $this->setData('acceptjs_key', $acceptjsValue);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getToken()
+    {
+        return $this->getData('token');
+    }
+
+    /**
+     * @param mixed $token
+     * @return mixed
+     */
+    public function setToken($token)
+    {
+        return $this->setData('token', $token);
     }
 
     /**

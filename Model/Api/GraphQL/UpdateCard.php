@@ -57,21 +57,6 @@ class UpdateCard
     protected $cardFactory;
 
     /**
-     * @var \Magento\Quote\Model\Quote\PaymentFactory
-     */
-    protected $paymentFactory;
-
-    /**
-     * @var \Magento\Quote\Api\Data\CartInterfaceFactory
-     */
-    protected $quoteFactory;
-
-    /**
-     * @var \Magento\Payment\Helper\Data
-     */
-    protected $paymentHelper;
-
-    /**
      * Card constructor.
      *
      * @param \ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface $customerCardRepository
@@ -80,9 +65,6 @@ class UpdateCard
      * @param \Magento\Framework\Api\DataObjectHelper $dataObjectHelper
      * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
      * @param \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $cardFactory
-     * @param \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory
-     * @param \Magento\Quote\Api\Data\CartInterfaceFactory $quoteFactory
-     * @param \Magento\Payment\Helper\Data $paymentHelper
      */
     public function __construct(
         \ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface $customerCardRepository,
@@ -90,10 +72,7 @@ class UpdateCard
         \ParadoxLabs\TokenBase\Model\Api\GraphQL $graphQL,
         \Magento\Framework\Api\DataObjectHelper $dataObjectHelper,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
-        \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $cardFactory,
-        \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory,
-        \Magento\Quote\Api\Data\CartInterfaceFactory $quoteFactory,
-        \Magento\Payment\Helper\Data $paymentHelper
+        \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $cardFactory
     ) {
         $this->customerCardRepository = $customerCardRepository;
         $this->guestCardRepository = $guestCardRepository;
@@ -101,9 +80,6 @@ class UpdateCard
         $this->dataObjectHelper = $dataObjectHelper;
         $this->customerRepository = $customerRepository;
         $this->cardFactory = $cardFactory;
-        $this->paymentFactory = $paymentFactory;
-        $this->quoteFactory = $quoteFactory;
-        $this->paymentHelper = $paymentHelper;
     }
 
     /**
@@ -185,8 +161,6 @@ class UpdateCard
             $card = $this->cardFactory->create();
             $card->setMethod($cardData['method']);
         }
-
-        $card = $card->getTypeInstance();
 
         return $card;
     }
@@ -270,28 +244,6 @@ class UpdateCard
             return;
         }
 
-        $paymentData            = $cardData['additional'];
-        $paymentData['method']  = $card->getMethod();
-        $paymentData['card_id'] = $card->getId() > 0 ? $card->getHash() : '';
-
-        if (isset($paymentData['cc_number'])) {
-            $paymentData['cc_last4'] = substr($paymentData['cc_number'], -4);
-            $paymentData['cc_bin']   = substr($paymentData['cc_number'], 0, 6);
-        }
-
-        /** @var \Magento\Quote\Model\Quote $quote */
-        $quote = $this->quoteFactory->create();
-
-        /** @var \Magento\Quote\Model\Quote\Payment $payment */
-        $payment = $this->paymentFactory->create();
-        $payment->setQuote($quote);
-        $payment->getQuote()->getBillingAddress()->setCountryId($card->getAddress('country_id'));
-        $payment->importData($paymentData);
-
-        $paymentMethod = $this->paymentHelper->getMethodInstance($card->getMethod());
-        $paymentMethod->setInfoInstance($payment);
-        $paymentMethod->validate();
-
-        $card->importPaymentInfo($payment);
+        $card->setAdditional($cardData['additional']);
     }
 }
