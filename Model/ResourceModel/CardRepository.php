@@ -327,7 +327,6 @@ class CardRepository implements CardRepositoryInterface
      * Process payment data before save. This allows new payment data to sync to the gateway.
      *
      * @param \ParadoxLabs\TokenBase\Model\Card $card
-     * @param array $cardData
      * @return void
      * @throws \Magento\Framework\Exception\LocalizedException
      */

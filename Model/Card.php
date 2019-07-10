@@ -209,7 +209,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
      */
     protected function _construct()
     {
-        $this->_init('ParadoxLabs\TokenBase\Model\ResourceModel\Card');
+        $this->_init(\ParadoxLabs\TokenBase\Model\ResourceModel\Card::class);
     }
 
     /**
@@ -983,9 +983,9 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
                  * If too many duplicates exist, remove them all before we continue.
                  * This will remove any duplicates that we can't simply merge over and just save the new card.
                  */
-                if ( $collection->getSize() > 1 ) {
+                if ($collection->getSize() > 1) {
                     /** @var \ParadoxLabs\TokenBase\Model\Card $card */
-                    foreach ( $collection as $card ) {
+                    foreach ($collection as $card) {
                         $this->helper->log(
                             $this->getData('method'),
                             __('Removed duplicate card %1 with profile ID %2', $card->getId(), $card->getProfileId())

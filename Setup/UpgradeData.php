@@ -103,7 +103,7 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
             if (strpos($string, 'O:27:"Mage_Customer_Model_Address"') !== false) {
                 // Sometimes addresses from M1 were legitimately stored with customer object. Codepath unclear.
                 // Can't skip them entirely, can't easily clean, but try to look for it specifically.
-                $array = unserialize($string);
+                $array = [];
             } else {
                 $array = $this->unserialize->unserialize($string);
             }

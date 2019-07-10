@@ -148,7 +148,7 @@ class Xml
 
         $xml = self::getXMLRoot();
         if (is_string($input_xml)) {
-            $parsed = @$xml->loadXML($input_xml);
+            $parsed = $xml->loadXML($input_xml);
             if (!$parsed) {
                 throw new \Magento\Framework\Exception\LocalizedException(
                     __('[XML2Array] Error parsing the XML string.')
