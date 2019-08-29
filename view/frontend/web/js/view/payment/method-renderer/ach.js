@@ -43,6 +43,11 @@ define(
             },
 
             /**
+             * Note: We're explicitly skipping AdditionalValidators.validate() here due to issues caused with
+             * third-party checkouts and incidental effects those validators can cause (AJAX requests, submitting
+             * forms ... ???). This means the submit button won't respect all validators, but those will still be
+             * checked upon submit and stop processing--so that's okay.
+             *
              * @override
              */
             checkPlaceOrderAllowed: function (value) {
@@ -59,8 +64,7 @@ define(
                     && this.echeckRoutingNumber()
                     && this.echeckAccountNumber()
                     && this.echeckAccountType()
-                    && this.validate()
-                    && additionalValidators.validate()) {
+                    && this.validate()) {
                     return true;
                 }
 

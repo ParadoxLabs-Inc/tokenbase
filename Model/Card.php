@@ -477,6 +477,13 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
     {
         $this->setData('active', 0);
 
+        $this->_eventManager->dispatch(
+            $this->_eventPrefix . '_queue_delete',
+            [
+                $this->_eventObject => $this,
+            ]
+        );
+
         return $this;
     }
 

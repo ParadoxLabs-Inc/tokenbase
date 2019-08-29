@@ -59,7 +59,7 @@ $storedCards    = $block->getStoredCards();
     </div>
     <div class="field number required hide-if-card-selected">
         <label for="<?php echo $code ?>-echeck-account-number" class="label"><span><?php echo $block->escapeHtml(__('Account Number')) ?></span></label>
-        <div class="control">
+        <div class="control _with-tooltip">
             <input type="number" id="<?php echo $code ?>-echeck-account-number" name="payment[echeck_account_no]"
                    title="<?php echo $block->escapeQuote(__('Account Number')) ?>" class="input-text minimum-length-5 maximum-length-17"
                    value="<?php echo $block->escapeQuote($block->getInfoData('echeck_account_no')); ?>" maxlength="17"

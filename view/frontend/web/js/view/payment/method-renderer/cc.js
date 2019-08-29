@@ -95,25 +95,38 @@ define(
                     this.creditCardNumber(value.replace(/\D/g,''));
                 }.bind(this));
 
+                // Trigger form validation periodically for clean UX.
+                setInterval(
+                    function() {
+                        this.selectedCard.notifySubscribers();
+                    }.bind(this),
+                    100
+                );
+
                 return this;
             },
 
+            /**
+             * Note: We're explicitly skipping AdditionalValidators.validate() here due to issues caused with
+             * third-party checkouts and incidental effects those validators can cause (AJAX requests, submitting
+             * forms ... ???). This means the submit button won't respect all validators, but those will still be
+             * checked upon submit and stop processing--so that's okay.
+             */
             checkPlaceOrderAllowed: function () {
                 if (quote.billingAddress() === null) {
                     return false;
                 }
 
-                if (this.selectedCard() && (this.isCcvShown() === false || this.creditCardVerificationNumber())) {
+                if (this.selectedCard()
+                    && (this.isCcvShown() === false || this.creditCardVerificationNumber())) {
                     return true;
                 }
 
                 if (this.creditCardNumber()
                     && this.creditCardExpYear()
                     && this.creditCardExpMonth()
-                    && this.selectedCardType()
                     && (this.isCcvShown() === false || this.creditCardVerificationNumber())
-                    && this.validate()
-                    && additionalValidators.validate()) {
+                    && this.validate()) {
                     return true;
                 }
 
