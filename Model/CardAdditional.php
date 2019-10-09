@@ -341,7 +341,7 @@ class CardAdditional extends \Magento\Framework\Model\AbstractExtensibleModel im
      */
     public function setAcceptjsValue($acceptjsValue)
     {
-        return $this->setData('acceptjs_key', $acceptjsValue);
+        return $this->setData('acceptjs_value', $acceptjsValue);
     }
 
     /**

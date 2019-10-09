@@ -337,6 +337,14 @@ class CardRepository implements CardRepositoryInterface
         $paymentData['method']  = $card->getMethod();
         $paymentData['card_id'] = $card->getId() > 0 ? $card->getHash() : '';
 
+        // Skip validation and import if we're given an existing card ID and no new payment info.
+        if (!empty($card->getPaymentId())
+            && empty($paymentData['cc_number'])
+            && empty($paymentData['token'])
+            && empty($paymentData['acceptjs_value'])) {
+            return;
+        }
+
         if (isset($paymentData['cc_number'])) {
             $paymentData['cc_last4'] = substr($paymentData['cc_number'], -4);
             $paymentData['cc_bin']   = substr($paymentData['cc_number'], 0, 6);
