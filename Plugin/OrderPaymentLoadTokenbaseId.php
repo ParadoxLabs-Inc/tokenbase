@@ -43,25 +43,18 @@ class OrderPaymentLoadTokenbaseId
     }
 
     /**
-     * @param \Magento\Sales\Api\Data\OrderInterface $subject
-     * @param \Closure $proceed
-     * @param int $modelId
-     * @param null $field
-     * @return \Magento\Sales\Api\Data\OrderInterface
+     * @param \Magento\Sales\Model\Order $subject
+     * @param \Magento\Sales\Model\Order $result
+     * @return \Magento\Sales\Model\Order
      */
-    public function aroundLoad(
-        \Magento\Sales\Api\Data\OrderInterface $subject,
-        \Closure $proceed,
-        $modelId,
-        $field = null
+    public function afterLoad(
+        \Magento\Sales\Model\Order $subject,
+        \Magento\Sales\Model\Order $result
     ) {
-        /** @var \Magento\Sales\Api\Data\OrderInterface $cart */
-        $order = $proceed($modelId, $field);
-
-        $payment = $order->getPayment();
+        $payment = $result->getPayment();
         if (!($payment instanceof \Magento\Sales\Api\Data\OrderPaymentInterface)
             || !in_array($payment->getMethod(), $this->helper->getAllMethods())) {
-            return $order;
+            return $result;
         }
 
         $paymentExtension = $payment->getExtensionAttributes();
@@ -72,6 +65,6 @@ class OrderPaymentLoadTokenbaseId
 
         $payment->setExtensionAttributes($paymentExtension);
 
-        return $order;
+        return $result;
     }
 }

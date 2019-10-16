@@ -43,25 +43,15 @@ class QuotePaymentLoadTokenbaseId
     }
 
     /**
-     * @param \Magento\Quote\Api\Data\CartInterface $subject
-     * @param \Closure $proceed
-     * @param int $modelId
-     * @param null $field
-     * @return \Magento\Quote\Api\Data\CartInterface
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param \Magento\Quote\Model\Quote $quote
+     * @return void
      */
-    public function aroundLoad(
-        \Magento\Quote\Api\Data\CartInterface $subject,
-        \Closure $proceed,
-        $modelId,
-        $field = null
-    ) {
-        $quote = $proceed($modelId, $field);
-
+    private function setExtensionAttributeValue(\Magento\Quote\Model\Quote $quote)
+    {
         $payment = $quote->getPayment();
         if (!($payment instanceof \Magento\Quote\Api\Data\PaymentInterface)
             || !in_array($payment->getMethod(), $this->helper->getAllMethods())) {
-            return $quote;
+            return;
         }
 
         $paymentExtension = $payment->getExtensionAttributes();
@@ -71,7 +61,61 @@ class QuotePaymentLoadTokenbaseId
         $paymentExtension->setTokenbaseId($payment->getData('tokenbase_id'));
 
         $payment->setExtensionAttributes($paymentExtension);
+    }
 
-        return $quote;
+    /**
+     * @param \Magento\Quote\Model\Quote $subject
+     * @param \Magento\Quote\Model\Quote $result
+     * @return \Magento\Quote\Model\Quote
+     */
+    public function afterLoad(
+        \Magento\Quote\Model\Quote $subject,
+        \Magento\Quote\Model\Quote $result
+    ) {
+        $this->setExtensionAttributeValue($result);
+
+        return $result;
+    }
+
+    /**
+     * @param \Magento\Quote\Model\Quote $subject
+     * @param \Magento\Quote\Model\Quote $result
+     * @return \Magento\Quote\Model\Quote
+     */
+    public function afterLoadActive(
+        \Magento\Quote\Model\Quote $subject,
+        \Magento\Quote\Model\Quote $result
+    ) {
+        $this->setExtensionAttributeValue($result);
+
+        return $result;
+    }
+
+    /**
+     * @param \Magento\Quote\Model\Quote $subject
+     * @param \Magento\Quote\Model\Quote $result
+     * @return \Magento\Quote\Model\Quote
+     */
+    public function afterLoadByCustomer(
+        \Magento\Quote\Model\Quote $subject,
+        \Magento\Quote\Model\Quote $result
+    ) {
+        $this->setExtensionAttributeValue($result);
+
+        return $result;
+    }
+
+    /**
+     * @param \Magento\Quote\Model\Quote $subject
+     * @param \Magento\Quote\Model\Quote $result
+     * @return \Magento\Quote\Model\Quote
+     */
+    public function afterLoadByIdWithoutStore(
+        \Magento\Quote\Model\Quote $subject,
+        \Magento\Quote\Model\Quote $result
+    ) {
+        $this->setExtensionAttributeValue($result);
+
+        return $result;
     }
 }
