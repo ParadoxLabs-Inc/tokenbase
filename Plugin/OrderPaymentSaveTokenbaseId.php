@@ -44,6 +44,7 @@ class OrderPaymentSaveTokenbaseId
         \Magento\Sales\Api\OrderRepositoryInterface $subject,
         \Magento\Sales\Api\Data\OrderInterface $order
     ) {
+        /** @var \Magento\Sales\Model\Order\Payment $payment */
         $payment = $order->getPayment();
         if (!($payment instanceof \Magento\Sales\Api\Data\OrderPaymentInterface)
             || !in_array($payment->getMethod(), $this->helper->getAllMethods())) {
