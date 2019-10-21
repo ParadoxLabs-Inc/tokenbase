@@ -35,6 +35,8 @@ define([
         _create: function() {
             this._initWrapper();
             this._bind();
+
+            this.element.trigger('contentUpdated');
         },
 
         _initWrapper: function() {
@@ -44,38 +46,42 @@ define([
 
         _bind: function() {
             // Bind event listeners
-            this.element.parent().on('click', this.options.deleteSelector, this.deleteCard.bind(this));
-            this.element.parent().on('click', this.options.editSelector, this.editCard.bind(this));
-            this.element.parent().on('click', this.options.editSelectorInd, this.editCardIndirect.bind(this));
+            this.element.off('click', this.options.deleteSelector, this.deleteCard.bind(this))
+                        .on('click', this.options.deleteSelector, this.deleteCard.bind(this));
+            this.element.off('click', this.options.editSelector, this.editCard.bind(this))
+                        .on('click', this.options.editSelector, this.editCard.bind(this));
+            this.element.off('click', this.options.editSelectorInd, this.editCardIndirect.bind(this))
+                        .on('click', this.options.editSelectorInd, this.editCardIndirect.bind(this));
 
             // Doing this direct A: because we can, B: because we have to remove a jQ validate listener anyway.
             // It triggers a direct element.submit() that bypasses our preventDefault().
             this.element.find(this.options.formSelector)
                 .off('submit')
-                .on('submit.tokenbase', this.saveCard.bind(this))
+                .on('submit', this.saveCard.bind(this))
                 .validation();
         },
 
         deleteCard: function(event) {
             event.preventDefault();
             event.stopPropagation();
+            event.stopImmediatePropagation();
 
             if (confirm($.mage.__("Are you sure you want to delete this?"))) {
                 this.showSpinner();
 
                 $.post(
                     $(event.target).closest('a').attr('href'),
-                    this.deleteCardHandleResponse.bind(this),
+                    this.deleteCardHandleResponse.bind(this, event),
                     'json'
                 );
             }
         },
 
-        deleteCardHandleResponse: function(data) {
+        deleteCardHandleResponse: function(event, data) {
             this.hideSpinner();
 
             if(data.success) {
-                $(this).closest('li').slideUp();
+                $(event.target).closest('li').slideUp();
             }
             else if(typeof data.message != 'undefined') {
                 alert(data.message);
@@ -85,20 +91,28 @@ define([
         editCard: function(event) {
             event.preventDefault();
             event.stopPropagation();
+            event.stopImmediatePropagation();
 
             this.showSpinner();
-            this.element.parent().load(
-                $(event.target).closest('a').attr('href'),
-                function() {
+            $.get({
+                url: $(event.target).closest('a').attr('href'),
+                success: function(data) {
+                    this.element.html(
+                        $(
+                            $.parseHTML(data, document, true)
+                        ).html()
+                    );
+
                     this._create();
                     this.hideSpinner();
                 }.bind(this)
-            );
+            })
         },
 
         editCardIndirect: function(event) {
             event.preventDefault();
             event.stopPropagation();
+            event.stopImmediatePropagation();
 
             this.element.find(this.options.editSelectorIndTarget).trigger('click');
         },
@@ -106,8 +120,10 @@ define([
         saveCard: function(event) {
             event.preventDefault();
             event.stopPropagation();
+            event.stopImmediatePropagation();
 
             var form = this.element.find(this.options.formSelector);
+            form.data("validator").settings.submitHandler = null;
             if (form.validation('isValid') === false) {
                 return;
             }
@@ -143,7 +159,11 @@ define([
                 }
             }
             else {
-                this.element.parent().html(data);
+                this.element.html(
+                    $(
+                        $.parseHTML(data, document, true)
+                    ).html()
+                );
                 this._create();
 
                 $('html, body').animate({
