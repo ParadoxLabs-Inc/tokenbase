@@ -43,18 +43,15 @@ class OrderPaymentLoadTokenbaseId
     }
 
     /**
-     * @param \Magento\Sales\Model\Order $subject
-     * @param \Magento\Sales\Model\Order $result
-     * @return \Magento\Sales\Model\Order
+     * @param \Magento\Sales\Model\Order $order
+     * @return void
      */
-    public function afterLoad(
-        \Magento\Sales\Model\Order $subject,
-        \Magento\Sales\Model\Order $result
-    ) {
-        $payment = $result->getPayment();
+    private function setExtensionAttributeValue(\Magento\Sales\Model\Order $order)
+    {
+        $payment = $order->getPayment();
         if (!($payment instanceof \Magento\Sales\Api\Data\OrderPaymentInterface)
             || !in_array($payment->getMethod(), $this->helper->getAllMethods())) {
-            return $result;
+            return;
         }
 
         $paymentExtension = $payment->getExtensionAttributes();
@@ -64,7 +61,29 @@ class OrderPaymentLoadTokenbaseId
         $paymentExtension->setTokenbaseId($payment->getData('tokenbase_id'));
 
         $payment->setExtensionAttributes($paymentExtension);
+    }
+
+    /**
+     * @param \Magento\Sales\Model\Order $subject
+     * @param \Magento\Sales\Model\Order $result
+     * @return \Magento\Sales\Model\Order
+     */
+    public function afterLoad(
+        \Magento\Sales\Model\Order $subject,
+        \Magento\Sales\Model\Order $result
+    ) {
+        $this->setExtensionAttributeValue($result);
 
         return $result;
+    }
+
+    /**
+     * @param \Magento\Sales\Model\Order $subject
+     * @return void
+     */
+    public function beforePlace(
+        \Magento\Sales\Model\Order $subject
+    ) {
+        $this->setExtensionAttributeValue($subject);
     }
 }

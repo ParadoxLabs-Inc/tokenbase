@@ -36,31 +36,25 @@ class QuotePaymentSaveTokenbaseId
 
     /**
      * @param \Magento\Quote\Api\CartRepositoryInterface $subject
-     * @param \Closure $proceed
      * @param \Magento\Quote\Api\Data\CartInterface $quote
-     * @param bool $saveOptions
-     * @return \Magento\Quote\Api\Data\CartInterface
+     * @return array
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      */
-    public function aroundSave(
+    public function beforeSave(
         \Magento\Quote\Api\CartRepositoryInterface $subject,
-        \Closure $proceed,
-        \Magento\Quote\Api\Data\CartInterface $quote,
-        $saveOptions = false
+        \Magento\Quote\Api\Data\CartInterface $quote
     ) {
-        /** @var \Magento\Quote\Api\Data\CartInterface $result */
-        $result = $proceed($quote, $saveOptions);
-
+        /** @var \Magento\Quote\Model\Quote\Payment $payment */
         $payment = $quote->getPayment();
         if (!($payment instanceof \Magento\Quote\Api\Data\PaymentInterface)
             || !in_array($payment->getMethod(), $this->helper->getAllMethods())) {
-            return $result;
+            return [$quote];
         }
 
         /** @var \Magento\Quote\Api\Data\PaymentExtensionInterface $extendedAttributes */
         $extendedAttributes = $payment->getExtensionAttributes();
         if ($extendedAttributes === null) {
-            return $result;
+            return [$quote];
         }
 
         $tokenbaseId = $extendedAttributes->getTokenbaseId();
@@ -71,6 +65,6 @@ class QuotePaymentSaveTokenbaseId
             $payment->setData('tokenbase_id', $tokenbaseId);
         }
 
-        return $result;
+        return [$quote];
     }
 }

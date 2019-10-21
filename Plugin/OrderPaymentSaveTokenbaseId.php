@@ -36,31 +36,24 @@ class OrderPaymentSaveTokenbaseId
 
     /**
      * @param \Magento\Sales\Api\OrderRepositoryInterface $subject
-     * @param \Closure $proceed
      * @param \Magento\Sales\Api\Data\OrderInterface $order
-     * @param bool $saveOptions
-     * @return \Magento\Sales\Api\Data\OrderInterface
+     * @return array
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      */
-    public function aroundSave(
+    public function beforeSave(
         \Magento\Sales\Api\OrderRepositoryInterface $subject,
-        \Closure $proceed,
-        \Magento\Sales\Api\Data\OrderInterface $order,
-        $saveOptions = false
+        \Magento\Sales\Api\Data\OrderInterface $order
     ) {
-        /** @var \Magento\Sales\Api\Data\OrderInterface $result */
-        $result = $proceed($order, $saveOptions);
-
         $payment = $order->getPayment();
         if (!($payment instanceof \Magento\Sales\Api\Data\OrderPaymentInterface)
             || !in_array($payment->getMethod(), $this->helper->getAllMethods())) {
-            return $result;
+            return [$order];
         }
 
         /** @var \Magento\Sales\Api\Data\OrderPaymentExtensionInterface $extendedAttributes */
         $extendedAttributes = $payment->getExtensionAttributes();
         if ($extendedAttributes === null) {
-            return $result;
+            return [$order];
         }
 
         $tokenbaseId = $extendedAttributes->getTokenbaseId();
@@ -71,6 +64,6 @@ class OrderPaymentSaveTokenbaseId
             $payment->setData('tokenbase_id', $tokenbaseId);
         }
 
-        return $result;
+        return [$order];
     }
 }
