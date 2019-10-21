@@ -101,6 +101,22 @@ input TokenBaseCardPaymentInput @doc(description: "Payment data for a stored car
     echeck_account_number: String @doc(description: "ACH Account Number")
 }
 
+input PaymentMethodInput {
+    card_id: String @doc(description: "TokenBase Card Hash")
+    cc_owner: String @doc(description: "CC Owner")
+    cc_bin: String @doc(description: "CC Bin (First-6)")
+    cc_last4: String @doc(description: "CC Last-4")
+    cc_number: String @doc(description: "CC Number")
+    cc_cid: String @doc(description: "CC CVV")
+    cc_exp_year: String @doc(description: "CC Expiration Year")
+    cc_exp_month: String @doc(description: "CC Expiration Month")
+    echeck_account_name: String @doc(description: "ACH Account Name")
+    echeck_bank_name: String @doc(description: "ACH Bank Name")
+    echeck_account_type: TokenBaseEcheckAccountType @doc(description: "ACH Account Type")
+    echeck_routing_number: String @doc(description: "ACH Routing Number")
+    echeck_account_number: String @doc(description: "ACH Account Number")
+}
+
 enum TokenBaseEcheckAccountType {
     checking
     savings
