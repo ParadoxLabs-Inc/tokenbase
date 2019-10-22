@@ -77,7 +77,7 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
     protected $lastRequest;
 
     /**
-     * @var string
+     * @var string|array
      */
     protected $lastResponse;
 
@@ -234,8 +234,8 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
      * @param string $key
      * @param mixed $val
      * @return $this
-     * @throws \Exception
      * @throws \Magento\Framework\Exception\PaymentException
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function setParameter($key, $val)
     {
