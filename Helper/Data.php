@@ -294,6 +294,19 @@ class Data extends \Magento\Payment\Helper\Data
     }
 
     /**
+     * Return the current store object based on available info.
+     *
+     * @return \Magento\Store\Api\Data\StoreInterface
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getCurrentStore()
+    {
+        return $this->storeManager->getStore(
+            $this->getCurrentStoreId()
+        );
+    }
+
+    /**
      * Return current customer based on the available info. Caches value per-request.
      *
      * @return \Magento\Customer\Api\Data\CustomerInterface
