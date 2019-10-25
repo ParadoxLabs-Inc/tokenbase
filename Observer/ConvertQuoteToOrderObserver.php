@@ -19,7 +19,31 @@ namespace ParadoxLabs\TokenBase\Observer;
 class ConvertQuoteToOrderObserver extends ConvertAbstract implements \Magento\Framework\Event\ObserverInterface
 {
     /**
-     * Copy fields from quote payment to order payment
+     * @var \ParadoxLabs\TokenBase\Helper\Data
+     */
+    protected $helper;
+
+    /**
+     * @var \Magento\Framework\App\ResourceConnection
+     */
+    protected $resource;
+
+    /**
+     * ConvertQuoteToOrderObserver constructor.
+     *
+     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
+     * @param \Magento\Framework\App\ResourceConnection $resource
+     */
+    public function __construct(
+        \ParadoxLabs\TokenBase\Helper\Data $helper,
+        \Magento\Framework\App\ResourceConnection $resource
+    ) {
+        $this->helper = $helper;
+        $this->resource = $resource;
+    }
+
+    /**
+     * Perform pre-order-placement actions.
      *
      * @param \Magento\Framework\Event\Observer $observer
      * @return void
@@ -32,10 +56,35 @@ class ConvertQuoteToOrderObserver extends ConvertAbstract implements \Magento\Fr
         /** @var \Magento\Sales\Model\Order $order */
         $order  = $observer->getEvent()->getData('order');
 
-        // Do the magic. Yeah, this is it.
+        if (in_array($order->getPayment()->getMethod(), $this->helper->getAllMethods(), true) !== true) {
+            return;
+        }
+
+        /**
+         * Copy fields from quote payment to order payment
+         */
         $this->copyData(
             $quote->getPayment(),
             $order->getPayment()
         );
+
+        /**
+         * Persist increment_id -- if it's changed, it's new
+         */
+        if ($quote->getId()
+            && empty($quote->getOrigData('reserved_order_id'))
+            && !empty($quote->getReservedOrderId())) {
+            // Save quote.reserved_order_id directly to the DB with no other interaction -- only efficient option.
+            $connection = $this->resource->getConnection('checkout');
+            $connection->update(
+                $connection->getTableName('quote'),
+                [
+                    'reserved_order_id' => $quote->getReservedOrderId(),
+                ],
+                [
+                    'entity_id=?' => $quote->getId(),
+                ]
+            );
+        }
     }
 }
