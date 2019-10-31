@@ -77,7 +77,7 @@ class ConvertQuoteToOrderObserver extends ConvertAbstract implements \Magento\Fr
             // Save quote.reserved_order_id directly to the DB with no other interaction -- only efficient option.
             $connection = $this->resource->getConnection('checkout');
             $connection->update(
-                $connection->getTableName('quote'),
+                $this->resource->getTableName('quote'),
                 [
                     'reserved_order_id' => $quote->getReservedOrderId(),
                 ],
