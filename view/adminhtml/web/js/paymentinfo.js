@@ -99,7 +99,7 @@ define([
                 success: function(data) {
                     this.element.html(
                         $(
-                            $.parseHTML(data, document, true)
+                            $.parseHTML(data.trim(), document, true)
                         ).html()
                     );
 
@@ -161,7 +161,7 @@ define([
             else {
                 this.element.html(
                     $(
-                        $.parseHTML(data, document, true)
+                        $.parseHTML(data.trim(), document, true)
                     ).html()
                 );
                 this._create();
