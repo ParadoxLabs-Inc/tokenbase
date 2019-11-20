@@ -34,10 +34,12 @@ type TokenBaseCardAdditional @doc(description: "Details and metadata for a store
     cc_last4: String @doc(description: "CC Last-4")
     cc_exp_year: String @doc(description: "CC Expiration Year")
     cc_exp_month: String @doc(description: "CC Expiration Month")
-    echeck_account_name: String @doc(description: "ACH Account Name")
     echeck_bank_name: String @doc(description: "ACH Bank Name")
-    echeck_account_type: TokenBaseEcheckAccountType @doc(description: "ACH Account type")
+    echeck_routing_no: String @doc(description: "ACH Routing Number")
     echeck_routing_number_last4: String @doc(description: "ACH Routing Number Last-4")
+    echeck_account_name: String @doc(description: "ACH Account Name")
+    echeck_account_type: TokenBaseEcheckAccountType @doc(description: "ACH Account type")
+    echeck_account_no: String @doc(description: "ACH Account Number")
     echeck_account_number_last4: String @doc(description: "ACH Account Number Last-4")
 }
 
