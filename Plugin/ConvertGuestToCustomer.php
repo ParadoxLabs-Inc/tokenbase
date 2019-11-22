@@ -37,7 +37,7 @@ class ConvertGuestToCustomer
     /**
      * @var \Magento\Customer\Model\Session
      */
-    protected $_customerSession;
+    protected $customerSession;
 
     /**
      * Plugin constructor.
@@ -56,7 +56,7 @@ class ConvertGuestToCustomer
         $this->cardCollectionFactory = $cardCollectionFactory;
         $this->cardRepository = $cardRepository;
         $this->scopeConfig = $scopeConfig;
-        $this->_customerSession = $customerSession;
+        $this->customerSession = $customerSession;
     }
 
     /**
@@ -65,18 +65,18 @@ class ConvertGuestToCustomer
      *
      * @param \Magento\Customer\Controller\Account\CreatePost $subject
      * @param $result
-     * @return void
+     * @return mixed
      */
     public function afterExecute(\Magento\Customer\Controller\Account\CreatePost $subject, $result)
     {
-        if ($this->_customerSession->getCustomerData()) {
+        if ($this->customerSession->getCustomerData()) {
             /**
              * Look for a guest card used by this email within the last day, and blindly attach it if we get a match.
              * This isn't flawless, but loading the order to get any tokenbase_id would be much slower.
              */
             $cardCollection = $this->cardCollectionFactory->create();
             $cardCollection->addFieldToFilter('customer_id', '0');
-            $cardCollection->addFieldToFilter('customer_email', $this->_customerSession->getCustomerData()->getEmail());
+            $cardCollection->addFieldToFilter('customer_email', $this->customerSession->getCustomerData()->getEmail());
             $cardCollection->addFieldToFilter(
                 'last_use',
                 [
@@ -90,7 +90,7 @@ class ConvertGuestToCustomer
             if ($cardCollection->getSize() > 0) {
                 /** @var \ParadoxLabs\TokenBase\Api\Data\CardInterface $card */
                 foreach ($cardCollection as $card) {
-                    $card->setCustomerId($this->_customerSession->getId());
+                    $card->setCustomerId($this->customerSession->getId());
 
                     // Activate the card by default if config is opt-out.
                     $activate = (int)$this->scopeConfig->getValue(
