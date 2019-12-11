@@ -54,10 +54,10 @@ class OrderPaymentSaveTokenbaseId
         /** @var \Magento\Sales\Api\Data\OrderPaymentExtensionInterface $extendedAttributes */
         $extendedAttributes = $payment->getExtensionAttributes();
         if ($extendedAttributes === null) {
-            return [$order];
+            $tokenbaseId = $payment->getData('tokenbase_id');
+        } else {
+            $tokenbaseId = $extendedAttributes->getTokenbaseId();
         }
-
-        $tokenbaseId = $extendedAttributes->getTokenbaseId();
 
         if ($tokenbaseId !== null
             && $tokenbaseId != $payment->getOrigData('tokenbase_id')
