@@ -54,10 +54,10 @@ class QuotePaymentSaveTokenbaseId
         /** @var \Magento\Quote\Api\Data\PaymentExtensionInterface $extendedAttributes */
         $extendedAttributes = $payment->getExtensionAttributes();
         if ($extendedAttributes === null) {
-            return [$quote];
+            $tokenbaseId = $payment->getData('tokenbase_id');
+        } else {
+            $tokenbaseId = $extendedAttributes->getTokenbaseId();
         }
-
-        $tokenbaseId = $extendedAttributes->getTokenbaseId();
 
         if ($tokenbaseId !== null
             && $tokenbaseId != $payment->getOrigData('tokenbase_id')
