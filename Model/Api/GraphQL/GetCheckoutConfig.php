@@ -18,11 +18,27 @@ use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Query\Resolver\ContextInterface;
 
 /**
- * CheckoutConfig Class
- *
- * NB: NOT implementing ResolverInterface because it's not enforced (as of 2.3.1), and it breaks 2.1/2.2 compat.
+ * Soft dependency: Supporting 2.3 GraphQL without breaking <2.3 compatibility.
+ * 2.3+ implements \Magento\Framework\GraphQL; lower does not.
  */
-class GetCheckoutConfig /*implements \Magento\Framework\GraphQl\Query\ResolverInterface*/
+if (!interface_exists('\ParadoxLabs\TokenBase\Model\Api\GraphQL\ResolverInterface')) {
+    if (interface_exists('\Magento\Framework\GraphQl\Query\ResolverInterface')) {
+        class_alias(
+            '\Magento\Framework\GraphQl\Query\ResolverInterface',
+            '\ParadoxLabs\TokenBase\Model\Api\GraphQL\ResolverInterface'
+        );
+    } else {
+        class_alias(
+            '\ParadoxLabs\TokenBase\Model\Api\GraphQL\FauxResolverInterface',
+            '\ParadoxLabs\TokenBase\Model\Api\GraphQL\ResolverInterface'
+        );
+    }
+}
+
+/**
+ * CheckoutConfig Class
+ */
+class GetCheckoutConfig implements \ParadoxLabs\TokenBase\Model\Api\GraphQL\ResolverInterface
 {
     /**
      * @var \Magento\Payment\Model\CcGenericConfigProvider[]
@@ -61,7 +77,7 @@ class GetCheckoutConfig /*implements \Magento\Framework\GraphQl\Query\ResolverIn
      */
     public function resolve(
         \Magento\Framework\GraphQl\Config\Element\Field $field,
-        \Magento\Framework\GraphQl\Query\Resolver\ContextInterface $context,
+        $context,
         \Magento\Framework\GraphQl\Schema\Type\ResolveInfo $info,
         array $value = null,
         array $args = null
