@@ -122,7 +122,7 @@
                 <label data-bind="attr: {for: getCode() + '-cc-cid'}" class="label">
                     <span><!-- ko text: $t('Card Verification Number')--><!-- /ko --></span>
                 </label>
-                <div class="control _with-tooltip">
+                <div class="control">
                     <input type="text"
                            class="input-text cvv"
                            name="payment[cc_cid]"
@@ -195,8 +195,7 @@
                             data-bind="
                         click: placeOrder,
                         attr: {title: $t('Place Order')},
-                        enable: (getCode() == isChecked() && isPlaceOrderActionAllowed()),
-                        css: {disabled: !isPlaceOrderActionAllowed()}
+                        enable: (getCode() == isChecked() && isPlaceOrderActionAllowed())
                         "
                             disabled>
                         <span data-bind="text: $t('Place Order')"></span>

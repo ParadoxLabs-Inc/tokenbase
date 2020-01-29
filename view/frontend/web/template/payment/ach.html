@@ -160,8 +160,7 @@
                             data-bind="
                         click: placeOrder,
                         attr: {title: $t('Place Order')},
-                        enable: (getCode() == isChecked() && isPlaceOrderActionAllowed()),
-                        css: {disabled: !isPlaceOrderActionAllowed()}
+                        enable: (getCode() == isChecked() && isPlaceOrderActionAllowed())
                         "
                             disabled>
                         <span data-bind="text: $t('Place Order')"></span>
