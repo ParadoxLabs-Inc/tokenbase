@@ -258,10 +258,14 @@ class Address extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getFormattedAddress(\Magento\Customer\Api\Data\AddressInterface $address, $format = 'html')
     {
-        /** @var \Magento\Customer\Block\Address\Renderer\RendererInterface $renderer */
-        $renderer    = $this->addressConfig->getFormatByCode($format)->getRenderer();
-        $addressData = $this->addressMapper->toFlatArray($address);
+        try {
+            /** @var \Magento\Customer\Block\Address\Renderer\RendererInterface $renderer */
+            $renderer    = $this->addressConfig->getFormatByCode('html')->getRenderer();
+            $addressData = $this->addressMapper->toFlatArray($address);
 
-        return $renderer->renderArray($addressData);
+            return $renderer->renderArray($addressData);
+        } catch (\Exception $exception) {
+            return '';
+        }
     }
 }

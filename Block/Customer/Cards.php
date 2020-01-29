@@ -120,11 +120,15 @@ class Cards extends \Magento\Framework\View\Element\Template
      */
     public function getFormattedCardAddress(\Magento\Customer\Api\Data\AddressInterface $address)
     {
-        /** @var \Magento\Customer\Block\Address\Renderer\RendererInterface $renderer */
-        $renderer    = $this->addressConfig->getFormatByCode('html')->getRenderer();
-        $addressData = $this->addressMapper->toFlatArray($address);
+        try {
+            /** @var \Magento\Customer\Block\Address\Renderer\RendererInterface $renderer */
+            $renderer    = $this->addressConfig->getFormatByCode('html')->getRenderer();
+            $addressData = $this->addressMapper->toFlatArray($address);
 
-        return $renderer->renderArray($addressData);
+            return $renderer->renderArray($addressData);
+        } catch (\Exception $exception) {
+            return '';
+        }
     }
 
     /**
