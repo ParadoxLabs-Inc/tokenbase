@@ -128,6 +128,10 @@ class CardRepository implements CardRepositoryInterface
             $card = $card->getTypeInstance();
         }
 
+        if ($card->getId() === 0 || $card->getId() === '0') {
+            $card->setId(null);
+        }
+
         $this->resource->save($card);
 
         return $card;
