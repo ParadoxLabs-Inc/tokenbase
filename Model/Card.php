@@ -993,11 +993,29 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
                 if ($collection->getSize() > 1) {
                     /** @var \ParadoxLabs\TokenBase\Model\Card $card */
                     foreach ($collection as $card) {
-                        $this->helper->log(
-                            $this->getData('method'),
-                            __('Removed duplicate card %1 with profile ID %2', $card->getId(), $card->getProfileId())
-                        );
-                        $this->getResource()->delete($card);
+                        /**
+                         * Don't delete the card we're using, just its duplicates.
+                         */
+                        if ($this->getId() !== $card->getId()) {
+                            /**
+                             * Update deleted card values for orders and quotes to point to the new card.
+                             */
+                            $this->getResource()->getConnection()->update(
+                                $this->getResource()->getTable('sales_order_payment'),
+                                ['tokenbase_id' => $this->getId()],
+                                ['tokenbase_id=?' => $card->getId()]
+                            );
+                            $this->getResource()->getConnection()->update(
+                                $this->getResource()->getTable('quote_payment'),
+                                ['tokenbase_id' => $this->getId()],
+                                ['tokenbase_id=?' => $card->getId()]
+                            );
+                            $this->helper->log(
+                                $this->getData('method'),
+                                __('Removed duplicate card %1 with profile ID %2', $card->getId(), $card->getProfileId())
+                            );
+                            $this->getResource()->delete($card);
+                        }
                     }
                 } else {
                     $collection->addFieldToFilter('id', ['neq' => $this->getId()]);
