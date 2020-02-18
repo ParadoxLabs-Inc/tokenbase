@@ -81,7 +81,7 @@
                     <span><!-- ko text: $t('Account Number')--><!-- /ko --></span>
                 </label>
                 <div class="control">
-                    <input type="number" name="payment[echeck_account_no]" class="input-text minimum-length-5 maximum-length-17" value="" maxlength="9"
+                    <input type="number" name="payment[echeck_account_no]" class="input-text minimum-length-5 maximum-length-17" value="" maxlength="17"
                            data-bind="attr: {id: getCode() + '-echeck-account-number', title: $t('Account Number'), 'data-container': getCode() + '-echeck-account-number', 'data-validate': JSON.stringify({'required-number':true,'validate-length':true})},
                     enable: true, textInput: echeckAccountNumber"/>
                     <div class="field-tooltip toggle">
