@@ -193,8 +193,11 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
 
                 return $card;
             }
+        } catch (\Magento\Framework\Exception\StateException $e) {
+            $this->helper->log($payment->getMethod(), $e->getMessage());
+            throw $e;
         } catch (\Exception $e) {
-            // Any error is inability to load card, or insufficient permissions. Err.
+            // Any error is inability to load card -- handle same as auth failure.
         }
 
         /**

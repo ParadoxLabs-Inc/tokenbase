@@ -251,6 +251,9 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
 
                 return $this->getCard();
             }
+        } catch (\Magento\Framework\Exception\StateException $e) {
+            $this->log($e->getMessage());
+            throw $e;
         } catch (\Exception $e) {
             // Any error is inability to load card -- handle same as auth failure.
         }

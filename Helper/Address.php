@@ -169,12 +169,23 @@ class Address extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function processRegionData($addressArray)
     {
+        if (!empty($addressArray['region']) && strlen($addressArray['region']) == 2) {
+            $addressArray['region_code'] = $addressArray['region'];
+        }
+
         if (!empty($addressArray['region_id'])) {
             /** @var \Magento\Directory\Model\Region $newRegion */
             $newRegion = $this->regionFactory->create();
             $this->regionResource->load($newRegion, $addressArray['region_id']);
 
             $addressArray['region_code'] = $newRegion->getCode();
+            $addressArray['region'] = $newRegion->getDefaultName();
+        } elseif (!empty($addressArray['region_code'])) {
+            /** @var \Magento\Directory\Model\Region $newRegion */
+            $newRegion = $this->regionFactory->create();
+            $this->regionResource->loadByCode($newRegion, $addressArray['region_code'], $addressArray['country_id']);
+
+            $addressArray['region_id'] = $newRegion->getId();
             $addressArray['region'] = $newRegion->getDefaultName();
         }
 
