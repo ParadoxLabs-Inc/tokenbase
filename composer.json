@@ -17,8 +17,8 @@
         "ext-json": "*"
     },
     "type": "magento2-module",
-    "version": "4.2.5",
-    "time": "2020-01-30",
+    "version": "4.2.6",
+    "time": "2020-02-19",
     "license": "proprietary",
     "autoload": {
         "files": [ "registration.php" ],
