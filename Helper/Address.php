@@ -271,7 +271,7 @@ class Address extends \Magento\Framework\App\Helper\AbstractHelper
     {
         try {
             /** @var \Magento\Customer\Block\Address\Renderer\RendererInterface $renderer */
-            $renderer    = $this->addressConfig->getFormatByCode('html')->getRenderer();
+            $renderer    = $this->addressConfig->getFormatByCode($format)->getRenderer();
             $addressData = $this->addressMapper->toFlatArray($address);
 
             return $renderer->renderArray($addressData);
