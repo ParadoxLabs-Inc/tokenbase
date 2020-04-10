@@ -3,4 +3,7 @@
     <event name="controller_action_predispatch">
         <observer name="tokenbase_admin_notification" instance="ParadoxLabs\TokenBase\Observer\VirtualAdminNotificationObserver" />
     </event>
+    <event name="adminhtml_sales_order_create_process_data_before">
+        <observer name="assign_registered_guest" instance="ParadoxLabs\TokenBase\Observer\FixAdminEmailAlreadyExistsObserver" />
+    </event>
 </config>
