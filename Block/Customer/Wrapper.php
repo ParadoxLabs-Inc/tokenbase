@@ -13,8 +13,6 @@
 
 namespace ParadoxLabs\TokenBase\Block\Customer;
 
-use Magento\Framework\View\Element\Template;
-
 /**
  * Wrapper Class
  */

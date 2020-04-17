@@ -15,7 +15,6 @@ namespace ParadoxLabs\TokenBase\Model\Api;
 
 use Magento\Authorization\Model\UserContextInterface;
 use Magento\Framework\GraphQl\Exception\GraphQlAuthorizationException;
-use Magento\Framework\GraphQl\Query\Resolver\ContextInterface;
 
 /**
  * GraphQL Class

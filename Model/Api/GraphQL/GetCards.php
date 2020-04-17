@@ -13,10 +13,6 @@
 
 namespace ParadoxLabs\TokenBase\Model\Api\GraphQL;
 
-use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
-use Magento\Framework\GraphQl\Config\Element\Field;
-use Magento\Framework\GraphQl\Query\Resolver\ContextInterface;
-
 /**
  * Soft dependency: Supporting 2.3 GraphQL without breaking <2.3 compatibility.
  * 2.3+ implements \Magento\Framework\GraphQL; lower does not.
