@@ -21,17 +21,25 @@ class FixAdminEmailAlreadyExistsObserver implements \Magento\Framework\Event\Obs
     /**
      * @var \Magento\Customer\Api\CustomerRepositoryInterface
      */
-    private $customerRepository;
+    protected $customerRepository;
+
+    /**
+     * @var \Magento\Store\Api\StoreRepositoryInterface
+     */
+    protected $storeRepository;
 
     /**
      * FixAdminEmailAlreadyExistsObserver constructor.
      *
      * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
+     * @param \Magento\Store\Api\StoreRepositoryInterface $storeRepository
      */
     public function __construct(
-        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
+        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
+        \Magento\Store\Api\StoreRepositoryInterface $storeRepository
     ) {
         $this->customerRepository = $customerRepository;
+        $this->storeRepository = $storeRepository;
     }
 
     /**
@@ -55,8 +63,14 @@ class FixAdminEmailAlreadyExistsObserver implements \Magento\Framework\Event\Obs
         if (empty($session->getCustomerId())
             && !empty($params['order']['account']['email'])) {
             try {
+                $websiteId = null;
+                if (!empty($session->getStoreId())) {
+                    $store = $this->storeRepository->getById($session->getStoreId());
+                    $websiteId = $store->getWebsiteId();
+                }
+
                 // Check if a customer with that email exists
-                $customer = $this->customerRepository->get($params['order']['account']['email']);
+                $customer = $this->customerRepository->get($params['order']['account']['email'], $websiteId);
 
                 // And if so, assign it to the quote.
                 $session->setCustomerId((int)$customer->getId());
