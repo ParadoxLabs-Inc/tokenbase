@@ -1303,7 +1303,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
     {
         $this->setAdditional(
             array_diff_key(
-                $this->getAdditional(),
+                (array)$this->getAdditional(),
                 array_flip(static::PROTECTED_ADDITIONAL_KEYS)
             )
         );
