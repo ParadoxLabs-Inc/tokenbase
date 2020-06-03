@@ -22,9 +22,10 @@ define(
         'Magento_Checkout/js/model/payment/additional-validators',
         'Magento_Ui/js/modal/alert',
         'Magento_Checkout/js/model/quote',
+        'Magento_Checkout/js/model/full-screen-loader',
         'mage/validation'
     ],
-    function (ko, $, Component, placeOrderAction, cardNumberValidator, additionalValidators, alert, quote) {
+    function (ko, $, Component, placeOrderAction, cardNumberValidator, additionalValidators, alert, quote, fullScreenLoader) {
         'use strict';
         var config=null;
         return Component.extend({
@@ -71,6 +72,9 @@ define(
 
                 this.placeOrderFailure = ko.observable(false);
 
+                this.isTokenizing = ko.observable(false);
+                this.isTokenizing.subscribe(this.spinner.bind(this));
+
                 this.isFormShown = ko.computed(function () {
                     return !this.useVault()
                         || this.selectedCard() === undefined
@@ -113,7 +117,7 @@ define(
              * checked upon submit and stop processing--so that's okay.
              */
             checkPlaceOrderAllowed: function () {
-                if (quote.billingAddress() === null) {
+                if (quote.billingAddress() === null || this.isTokenizing() === true) {
                     return false;
                 }
 
@@ -207,6 +211,14 @@ define(
                         title: $.mage.__('Unable to place order'),
                         content: error.message
                     });
+                }
+            },
+
+            spinner: function(isTokenizing) {
+                if (isTokenizing === true) {
+                    fullScreenLoader.startLoader();
+                } else {
+                    fullScreenLoader.stopLoader();
                 }
             }
         });
