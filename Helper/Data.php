@@ -128,6 +128,11 @@ class Data extends \Magento\Payment\Helper\Data
     protected $methods;
 
     /**
+     * @var array
+     */
+    protected $methodInstances = [];
+
+    /**
      * Construct
      *
      * @param \Magento\Framework\App\Helper\Context $context
@@ -239,7 +244,7 @@ class Data extends \Magento\Payment\Helper\Data
             $this->methods = [];
 
             foreach ($this->getPaymentMethods() as $code => $data) {
-                if (isset($data['group']) && $data['group'] == 'tokenbase') {
+                if (isset($data['group']) && $data['group'] === 'tokenbase') {
                     $this->methods[] = $code;
                 }
             }
@@ -248,6 +253,26 @@ class Data extends \Magento\Payment\Helper\Data
         }
 
         return $this->methods;
+    }
+
+    /**
+     * Get payment method instance
+     *
+     * @param string $code
+     * @return \Magento\Payment\Model\MethodInterface
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getMethodInstance($code)
+    {
+        /**
+         * Persist instances to reduce object instantiation -- ONLY FOR THIS OBJECT. \Magento\Payment\Helper\Data will
+         * still create at each call, as will MethodFactory. @see \ParadoxLabs\TokenBase\Model\Method\Factory
+         */
+        if (!isset($this->methodInstances[$code])) {
+            $this->methodInstances[$code] = parent::getMethodInstance($code);
+        }
+
+        return $this->methodInstances[$code];
     }
 
     /**
