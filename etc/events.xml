@@ -14,6 +14,7 @@
     </event>
     <event name="checkout_type_multishipping_create_orders_single">
         <observer name="tokenbase_allow_multishipping_zerototal_checkout" instance="ParadoxLabs\TokenBase\Observer\MultishippingAllowZeroTotalCheckoutObserver" />
+        <observer name="tokenbase_multishipping_assign_ach_data" instance="ParadoxLabs\TokenBase\Observer\MultishippingAssignACHDataObserver" />
         <observer name="tokenbase_convert_quote_to_order" instance="ParadoxLabs\TokenBase\Observer\ConvertQuoteToOrderObserver" />
     </event>
     <event name="sales_convert_order_to_quote">

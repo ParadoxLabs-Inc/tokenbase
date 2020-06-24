@@ -25,7 +25,7 @@ abstract class ConvertAbstract
         'tokenbase_id',
         'echeck_account_name',
         'echeck_bank_name',
-        'echec_account_type',
+        'echeck_account_type',
         'echeck_routing_number',
         'echeck_routing_no',
         'echeck_account_no',

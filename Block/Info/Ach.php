@@ -49,4 +49,31 @@ class Ach extends Cc
 
         return $transport;
     }
+
+    /**
+     * Before rendering html, but after trying to load cache
+     *
+     * @return $this
+     */
+    protected function _beforeToHtml()
+    {
+        if (!empty($this->getRequest()->getParam('payment'))) {
+            // On multishipping checkout, persist ACH payment values (if any) onto the review step for final submit.
+            // We have to do this because we don't want to save them to the DB or session, but can't lose them entirely.
+            /** @var \Magento\Framework\View\Element\Template $childBlock */
+            $childBlock = $this->getLayout()->createBlock(
+                \Magento\Framework\View\Element\Template::class,
+                $this->getNameInLayout() . '.multiship'
+            );
+            $childBlock->setTemplate('ParadoxLabs_TokenBase::info/ach.phtml');
+            $childBlock->setData('method', $this->getMethod());
+
+            $this->setChild(
+                $childBlock->getNameInLayout(),
+                $childBlock
+            );
+        }
+
+        return parent::_beforeToHtml();
+    }
 }

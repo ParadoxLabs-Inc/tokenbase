@@ -1,0 +1,22 @@
+<?php /** @var \Magento\Framework\View\Element\Template $block */ ?>
+<?php /** @var \Magento\Payment\Model\MethodInterface $method */ ?>
+<?php $method = $block->getData('method'); ?>
+<?php $post = $block->getRequest()->getParam('payment'); ?>
+<?php $fields = [
+    'echeck_account_name',
+    'echeck_bank_name',
+    'echeck_routing_no',
+    'echeck_account_no',
+    'echeck_account_type',
+    'save',
+]; ?>
+
+<?php if (isset($post['method'])
+    && $method instanceof \Magento\Payment\Model\MethodInterface
+    && $post['method'] === $method->getCode()): ?>
+    <?php foreach ($fields as $key): ?>
+        <?php if (!empty($post[$key])): ?>
+            <input type="hidden" name="payment[<?= $block->escapeQuote($key) ?>]" value="<?= $block->escapeQuote($post[$key]) ?>" />
+        <?php endif; ?>
+    <?php endforeach; ?>
+<?php endif; ?>
