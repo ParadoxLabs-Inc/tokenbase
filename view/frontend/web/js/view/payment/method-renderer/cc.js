@@ -75,6 +75,8 @@ define(
                 this.isTokenizing = ko.observable(false);
                 this.isTokenizing.subscribe(this.spinner.bind(this));
 
+                this.selectedCard.subscribe(this.handleSelectedCardType.bind(this));
+
                 this.isFormShown = ko.computed(function () {
                     return !this.useVault()
                         || this.selectedCard() === undefined
@@ -211,6 +213,19 @@ define(
                         title: $.mage.__('Unable to place order'),
                         content: error.message
                     });
+                }
+            },
+
+            handleSelectedCardType: function () {
+                var cardId = this.selectedCard();
+                if (cardId === null || cardId === undefined) {
+                    return;
+                }
+
+                for (var card of this.storedCards()) {
+                    if (card.id === cardId) {
+                        this.creditCardType(card.type);
+                    }
                 }
             },
 

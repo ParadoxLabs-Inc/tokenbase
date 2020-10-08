@@ -10,6 +10,7 @@ define([
             toggleFieldsSelector: '.hide-if-card-selected',
             toggleFieldInputs: 'input, select',
             cardSelectInput: '[name="payment[card_id]"]',
+            cardTypeInput: '[name="payment[cc_type]"]',
             pollInterval: 1000
         },
 
@@ -67,6 +68,12 @@ define([
                 this.toggleFields(true);
             } else {
                 this.toggleFields(false);
+            }
+
+            if (cardSelect.find(':selected').length > 0) {
+                this.element.find(this.options.cardTypeInput).val(
+                    cardSelect.find(':selected').data('type')
+                );
             }
         }
     });

@@ -612,6 +612,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         }
 
         $this->getCard()->updateLastUse();
+        $this->getCard()->setData('no_sync', true);
         $this->card = $this->cardRepository->save($this->getCard());
 
         $this->log(json_encode($response->getData()));
