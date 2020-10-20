@@ -657,26 +657,30 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         /**
          * Process transaction and results
          */
-        $this->beforeVoid($payment);
-        $response = $this->gateway()->void($payment);
-        $this->afterVoid($payment, $response);
+        try {
+            $this->beforeVoid($payment);
+            $response = $this->gateway()->void($payment);
+            $this->afterVoid($payment, $response);
 
-        $payment->setAdditionalInformation(
-            array_replace_recursive($payment->getAdditionalInformation(), $response->getData())
-        );
+            $payment->setAdditionalInformation(
+                array_replace_recursive($payment->getAdditionalInformation(), $response->getData())
+            );
+
+            $payment->setTransactionAdditionalInfo(
+                \Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS,
+                $response->getData()
+            );
+
+            $this->log(json_encode($response->getData()));
+        } catch (\Exception $exception) {
+            // Ignore void errors, let Magento proceed like it happened. Most likely the auth already expired.
+        }
 
         $payment->setShouldCloseParentTransaction(1)
-                ->setIsTransactionClosed(1);
-
-        $payment->setTransactionAdditionalInfo(
-            \Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS,
-            $response->getData()
-        );
+            ->setIsTransactionClosed(1);
 
         $this->getCard()->updateLastUse();
         $this->card = $this->cardRepository->save($this->getCard());
-
-        $this->log(json_encode($response->getData()));
 
         return $this;
     }

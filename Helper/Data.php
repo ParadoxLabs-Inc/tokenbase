@@ -553,9 +553,10 @@ class Data extends \Magento\Payment\Helper\Data
      */
     public function getIsFrontend()
     {
-        // The REST API has to be considered part of the frontend, as standard checkout uses it.
+        // The REST and GraphQL APIs have to be considered part of the frontend.
         if ($this->appState->getAreaCode() === \Magento\Framework\App\Area::AREA_FRONTEND
-            || $this->appState->getAreaCode() === \Magento\Framework\App\Area::AREA_WEBAPI_REST) {
+            || $this->appState->getAreaCode() === \Magento\Framework\App\Area::AREA_WEBAPI_REST
+            || $this->appState->getAreaCode() === \Magento\Framework\App\Area::AREA_GRAPHQL) {
             return true;
         }
 
