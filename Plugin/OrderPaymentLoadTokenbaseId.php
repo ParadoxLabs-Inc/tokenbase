@@ -49,8 +49,7 @@ class OrderPaymentLoadTokenbaseId
     private function setExtensionAttributeValue(\Magento\Sales\Model\Order $order)
     {
         $payment = $order->getPayment();
-        if (!($payment instanceof \Magento\Sales\Api\Data\OrderPaymentInterface)
-            || !in_array($payment->getMethod(), $this->helper->getAllMethods())) {
+        if ($payment instanceof \Magento\Sales\Api\Data\OrderPaymentInterface === false) {
             return;
         }
 

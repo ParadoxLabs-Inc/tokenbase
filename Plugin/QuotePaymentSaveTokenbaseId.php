@@ -46,8 +46,7 @@ class QuotePaymentSaveTokenbaseId
     ) {
         /** @var \Magento\Quote\Model\Quote\Payment $payment */
         $payment = $quote->getPayment();
-        if (!($payment instanceof \Magento\Quote\Api\Data\PaymentInterface)
-            || !in_array($payment->getMethod(), $this->helper->getAllMethods())) {
+        if ($payment instanceof \Magento\Quote\Api\Data\PaymentInterface === false) {
             return [$quote];
         }
 

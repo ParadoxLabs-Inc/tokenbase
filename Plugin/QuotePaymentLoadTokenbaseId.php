@@ -49,8 +49,7 @@ class QuotePaymentLoadTokenbaseId
     private function setExtensionAttributeValue(\Magento\Quote\Model\Quote $quote)
     {
         $payment = $quote->getPayment();
-        if (!($payment instanceof \Magento\Quote\Api\Data\PaymentInterface)
-            || !in_array($payment->getMethod(), $this->helper->getAllMethods())) {
+        if ($payment instanceof \Magento\Quote\Api\Data\PaymentInterface === false) {
             return;
         }
 
