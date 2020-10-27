@@ -70,9 +70,10 @@ define([
                 this.toggleFields(false);
             }
 
-            if (cardSelect.find(':selected').length > 0) {
+            var selectedCard = cardSelect.find(':selected');
+            if (selectedCard.length > 0 && selectedCard.data('type')) {
                 this.element.find(this.options.cardTypeInput).val(
-                    cardSelect.find(':selected').data('type')
+                    selectedCard.data('type')
                 );
             }
         }
