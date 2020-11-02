@@ -17,7 +17,7 @@
         "ext-json": "*"
     },
     "type": "magento2-module",
-    "version": "4.3.3",
+    "version": "4.3.3-p1",
     "time": "2020-10-27",
     "license": "proprietary",
     "autoload": {
