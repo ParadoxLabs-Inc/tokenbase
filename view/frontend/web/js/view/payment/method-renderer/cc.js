@@ -222,9 +222,10 @@ define(
                     return;
                 }
 
-                for (var card of this.storedCards()) {
-                    if (card.id === cardId) {
-                        this.creditCardType(card.type);
+                var cards = this.storedCards();
+                for (var key in cards) {
+                    if (cards[key].id === cardId) {
+                        this.creditCardType(cards[key].type);
                     }
                 }
             },
