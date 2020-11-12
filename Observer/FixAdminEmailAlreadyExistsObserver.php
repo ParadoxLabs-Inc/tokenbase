@@ -59,25 +59,65 @@ class FixAdminEmailAlreadyExistsObserver implements \Magento\Framework\Event\Obs
 
         $params = $request->getParams();
 
-        // If the request/session does not have a customer ID, but does have an email...
-        if (empty($session->getCustomerId())
-            && !empty($params['order']['account']['email'])) {
-            try {
-                $websiteId = null;
-                if (!empty($session->getStoreId())) {
-                    $store = $this->storeRepository->getById($session->getStoreId());
-                    $websiteId = $store->getWebsiteId();
-                }
-
-                // Check if a customer with that email exists
-                $customer = $this->customerRepository->get($params['order']['account']['email'], $websiteId);
-
-                // And if so, assign it to the quote.
-                $session->setCustomerId((int)$customer->getId());
-                $orderCreateModel->getQuote()->setCustomer($customer);
-            } catch (\Magento\Framework\Exception\NoSuchEntityException $exception) {
-                // Ignore nonexistent emails, let Magento process that normally.
-            }
+        if (empty($params['order']['account']['email'])
+            || $params['order']['account']['email'] === $orderCreateModel->getQuote()->getCustomerEmail()) {
+            return;
         }
+
+        // If the request/session does not have a customer ID, but does have an email...
+        try {
+            $websiteId = null;
+            if (!empty($session->getStoreId())) {
+                $store = $this->storeRepository->getById($session->getStoreId());
+                $websiteId = $store->getWebsiteId();
+            }
+
+            // Check if a customer with that email exists
+            $customer = $this->customerRepository->get($params['order']['account']['email'], $websiteId);
+        } catch (\Magento\Framework\Exception\NoSuchEntityException $exception) {
+            // Ignore nonexistent emails, let Magento process that normally.
+            $this->resetCustomer($session, $orderCreateModel);
+            return;
+        }
+
+        if (empty($session->getCustomerId()) || $session->getCustomerId() != $customer->getId()) {
+            // If the session has no customer and the email is registered, assign that customer.
+            // If it does have a customer ID, make sure it matches the email, which may have been changed.
+            $this->assignCustomer($session, $orderCreateModel, $customer);
+        }
+    }
+
+    /**
+     * @param \Magento\Backend\Model\Session\Quote $session
+     * @param \Magento\Sales\Model\AdminOrder\Create $orderCreateModel
+     * @return void
+     */
+    protected function resetCustomer(
+        \Magento\Backend\Model\Session\Quote $session,
+        \Magento\Sales\Model\AdminOrder\Create $orderCreateModel
+    ) {
+        $session->setCustomerId(null);
+
+        $quote = $orderCreateModel->getQuote();
+        $quote->setCustomerId(null);
+        $quote->getBillingAddress()->setCustomerId(null);
+        $quote->getBillingAddress()->setCustomerAddressId(null);
+        $quote->getShippingAddress()->setCustomerId(null);
+        $quote->getShippingAddress()->setCustomerAddressId(null);
+    }
+
+    /**
+     * @param \Magento\Backend\Model\Session\Quote $session
+     * @param \Magento\Sales\Model\AdminOrder\Create $orderCreateModel
+     * @param \Magento\Customer\Api\Data\CustomerInterface $customer
+     * @return void
+     */
+    protected function assignCustomer(
+        \Magento\Backend\Model\Session\Quote $session,
+        \Magento\Sales\Model\AdminOrder\Create $orderCreateModel,
+        \Magento\Customer\Api\Data\CustomerInterface $customer
+    ) {
+        $session->setCustomerId((int)$customer->getId());
+        $orderCreateModel->getQuote()->setCustomer($customer);
     }
 }

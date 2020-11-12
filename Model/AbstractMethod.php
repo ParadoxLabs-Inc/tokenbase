@@ -201,7 +201,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
     }
 
     /**
-     * @return \Magento\Payment\Model\Info
+     * @return \Magento\Payment\Model\InfoInterface
      */
     public function getInfoInstance()
     {
@@ -245,7 +245,15 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         try {
             $card = $this->cardRepository->getById($cardId);
 
-            if ($card && $card->getId() > 0 && ($byHash === false || $card->getHash() == $cardId)) {
+            $isOrder = $this->getInfoInstance() instanceof \Magento\Sales\Model\Order\Payment;
+            $isQuote = $this->getInfoInstance() instanceof \Magento\Quote\Model\Quote\Payment;
+
+            if ($card
+                && $card->getId() > 0
+                && ($byHash === false || $card->getHash() == $cardId)
+                && (($isOrder && $card->getCustomerId() == $this->getInfoInstance()->getOrder()->getCustomerId())
+                    || ($isQuote && $card->getCustomerId() == $this->getInfoInstance()->getQuote()->getCustomerId())
+                    || ($isOrder === false && $isQuote === false))) {
                 $card->setMethodInstance($this);
                 $this->setCard($card);
 
