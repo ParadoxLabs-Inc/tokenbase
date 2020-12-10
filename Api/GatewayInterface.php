@@ -55,7 +55,7 @@ interface GatewayInterface
      * @param mixed $val
      * @return $this
      * @throws \Exception
-     * @throws \Magento\Framework\Exception\PaymentException
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function setParameter($key, $val);
 

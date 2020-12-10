@@ -13,7 +13,7 @@
 
 namespace ParadoxLabs\TokenBase\Block\Adminhtml\Customer;
 
-use \Magento\Backend\Block\Template;
+use Magento\Backend\Block\Template;
 
 /**
  * Cards Class

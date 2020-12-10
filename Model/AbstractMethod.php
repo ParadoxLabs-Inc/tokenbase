@@ -236,7 +236,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @param int|string $cardId
      * @param bool $byHash
      * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
-     * @throws \Magento\Framework\Exception\PaymentException
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function loadAndSetCard($cardId, $byHash = false)
     {
@@ -271,7 +271,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
          */
         $this->log(sprintf('Unable to load payment data. Please check the form and try again.'));
 
-        throw new \Magento\Framework\Exception\PaymentException(
+        throw new \Magento\Framework\Exception\LocalizedException(
             __('Unable to load payment data. Please check the form and try again.')
         );
     }
@@ -821,7 +821,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      *
      * @param \Magento\Payment\Model\InfoInterface $payment
      * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
-     * @throws \Magento\Framework\Exception\PaymentException
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function loadOrCreateCard(\Magento\Payment\Model\InfoInterface $payment)
     {
@@ -863,7 +863,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
 
                 $card->setAddress($billingAddress);
             } else {
-                throw new \Magento\Framework\Exception\PaymentException(
+                throw new \Magento\Framework\Exception\LocalizedException(
                     __('Could not find billing address.')
                 );
             }
@@ -880,7 +880,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
          */
         $this->log(sprintf('Invalid payment data provided. Please check the form and try again.'));
 
-        throw new \Magento\Framework\Exception\PaymentException(
+        throw new \Magento\Framework\Exception\LocalizedException(
             __('Invalid payment data provided. Please check the form and try again.')
         );
     }

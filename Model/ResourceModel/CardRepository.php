@@ -13,15 +13,15 @@
 
 namespace ParadoxLabs\TokenBase\Model\ResourceModel;
 
-use ParadoxLabs\TokenBase\Api\Data;
-use ParadoxLabs\TokenBase\Api\CardRepositoryInterface;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Exception\CouldNotDeleteException;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Exception\PaymentException;
 use Magento\Framework\Reflection\DataObjectProcessor;
+use ParadoxLabs\TokenBase\Api\CardRepositoryInterface;
+use ParadoxLabs\TokenBase\Api\Data;
 
 /**
  * Class CardRepository
@@ -119,7 +119,7 @@ class CardRepository implements CardRepositoryInterface
      *
      * @param \ParadoxLabs\TokenBase\Api\Data\CardInterface $card
      * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
-     * @throws PaymentException
+     * @throws LocalizedException
      */
     public function save(\ParadoxLabs\TokenBase\Api\Data\CardInterface $card)
     {

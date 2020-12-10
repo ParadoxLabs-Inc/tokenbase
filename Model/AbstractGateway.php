@@ -234,7 +234,7 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
      * @param string $key
      * @param mixed $val
      * @return $this
-     * @throws \Magento\Framework\Exception\PaymentException
+     * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function setParameter($key, $val)
@@ -281,7 +281,7 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
                     if (in_array($val, $this->fields[ $key ]['enum'])) {
                         $this->params[ $key ] = $val;
                     } else {
-                        throw new \Magento\Framework\Exception\PaymentException(
+                        throw new \Magento\Framework\Exception\LocalizedException(
                             __(sprintf("Payment Gateway: Invalid value for '%s': '%s'", $key, $val))
                         );
                     }

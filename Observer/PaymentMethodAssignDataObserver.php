@@ -171,7 +171,7 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
      * @param int|string $cardId
      * @param bool $byHash
      * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
-     * @throws \Magento\Framework\Exception\PaymentException
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function loadAndSetCard(
         \Magento\Payment\Model\InfoInterface $payment,
@@ -208,7 +208,7 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
             sprintf('Unable to load payment data. Please check the form and try again.')
         );
 
-        throw new \Magento\Framework\Exception\PaymentException(
+        throw new \Magento\Framework\Exception\LocalizedException(
             __('Unable to load payment data. Please check the form and try again.')
         );
     }
