@@ -66,6 +66,11 @@
         <plugin name="orderCollectionPaymentLoadTokenbaseId" type="ParadoxLabs\TokenBase\Plugin\OrderCollectionPaymentLoadTokenbaseId" />
     </type>
 
+    <!-- Add CC data to GraphQL quote payment response -->
+    <type name="Magento\QuoteGraphQl\Model\Resolver\SelectedPaymentMethod">
+        <plugin name="tokenbaseAddCcData" type="ParadoxLabs\TokenBase\Plugin\QuoteGraphQl\Model\Resolver\SelectedPaymentMethod" />
+    </type>
+
     <!-- Associate cards on post-checkout register -->
     <type name="Magento\Sales\Api\OrderCustomerManagementInterface">
         <plugin name="tokenbaseAssociateCustomerCard" type="ParadoxLabs\TokenBase\Plugin\Sales\Model\Order\CustomerManagement\Plugin" />

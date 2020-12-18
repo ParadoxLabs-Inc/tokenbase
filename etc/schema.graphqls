@@ -66,6 +66,12 @@ type TokenBaseKeyValue @doc(description: "Container for generic key/value data."
     value: String @doc(description: "Generic value")
 }
 
+type SelectedPaymentMethod {
+    tokenbase_data: TokenBaseCardAdditional @doc(description: "Payment info (TokenBase methods only)")
+    tokenbase_save: Boolean @doc(description: "Card is being saved for future use (TokenBase methods only)")
+    tokenbase_card_id: String @doc(description: "Selected card ID (TokenBase methods only)")
+}
+
 input TokenBaseCardUpdateInput @doc(description: "Input for updating a stored card.") {
     hash: String! @doc(description: "Card identifier hash to update (required)")
     address: CustomerAddressInput @doc(description: "Card billing address")
