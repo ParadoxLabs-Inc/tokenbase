@@ -247,12 +247,15 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
 
             $isOrder = $this->getInfoInstance() instanceof \Magento\Sales\Model\Order\Payment;
             $isQuote = $this->getInfoInstance() instanceof \Magento\Quote\Model\Quote\Payment;
+            $orderMatches = $isOrder && $card->getCustomerId() == $this->getInfoInstance()->getOrder()->getCustomerId();
+            $quoteMatches = $isQuote && $card->getCustomerId() == $this->getInfoInstance()->getQuote()->getCustomerId();
 
             if ($card
                 && $card->getId() > 0
                 && ($byHash === false || $card->getHash() == $cardId)
-                && (($isOrder && $card->getCustomerId() == $this->getInfoInstance()->getOrder()->getCustomerId())
-                    || ($isQuote && $card->getCustomerId() == $this->getInfoInstance()->getQuote()->getCustomerId())
+                && (empty($card->getCustomerId())
+                    || $orderMatches
+                    || $quoteMatches
                     || ($isOrder === false && $isQuote === false))) {
                 $card->setMethodInstance($this);
                 $this->setCard($card);
