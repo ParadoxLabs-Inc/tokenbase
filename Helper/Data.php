@@ -556,7 +556,8 @@ class Data extends \Magento\Payment\Helper\Data
         // The REST and GraphQL APIs have to be considered part of the frontend.
         if ($this->appState->getAreaCode() === \Magento\Framework\App\Area::AREA_FRONTEND
             || $this->appState->getAreaCode() === \Magento\Framework\App\Area::AREA_WEBAPI_REST
-            || $this->appState->getAreaCode() === \Magento\Framework\App\Area::AREA_GRAPHQL) {
+            || (defined('\Magento\Framework\App\Area::AREA_GRAPHQL')
+                && $this->appState->getAreaCode() === \Magento\Framework\App\Area::AREA_GRAPHQL)) {
             return true;
         }
 
