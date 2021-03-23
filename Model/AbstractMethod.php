@@ -314,7 +314,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         $this->gateway()->setCard($card);
 
         $this->getInfoInstance()->setData('tokenbase_id', $card->getId())
-                                ->setData('cc_type', $card->getAdditional('cc_type'))
+                                ->setData('cc_type', $card->getType())
                                 ->setData('cc_last_4', $card->getAdditional('cc_last4'))
                                 ->setData('cc_exp_month', $card->getAdditional('cc_exp_month'))
                                 ->setData('cc_exp_year', $card->getAdditional('cc_exp_year'));

@@ -940,8 +940,8 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
         if ($this->getAdditional('cc_last4')) {
             $cardType = '';
 
-            if ($includeType === true && $this->getAdditional('cc_type')) {
-                $cardType = $this->helper->translateCardType($this->getAdditional('cc_type'));
+            if ($includeType === true && $this->getType()) {
+                $cardType = $this->helper->translateCardType($this->getType());
             }
 
             return trim(__(
