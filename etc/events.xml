@@ -27,4 +27,7 @@
     <event name="sales_order_payment_place_end">
         <observer name="tokenbase_set_initial_order_status" instance="ParadoxLabs\TokenBase\Observer\SetInitialOrderStatusObserver" />
     </event>
+    <event name="sales_order_place_before">
+        <observer name="tokenbase_validate_payment" instance="ParadoxLabs\TokenBase\Observer\ValidatePaymentObserver" />
+    </event>
 </config>

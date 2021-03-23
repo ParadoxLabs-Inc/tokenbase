@@ -82,6 +82,27 @@
                 type="ParadoxLabs\TokenBase\Plugin\Sales\Model\Order\Payment\Transaction\Repository\Plugin" />
     </type>
 
+    <!-- Payment validation (because core borked it 2.3.5-2.4.2+) -->
+    <type name="ParadoxLabs\TokenBase\Api\Data\CardInterface">
+        <plugin name="tokenbase_validate_payment" type="ParadoxLabs\TokenBase\Plugin\ValidateCardSave" />
+    </type>
+    <type name="ParadoxLabs\TokenBase\Plugin\ValidateCardSave">
+        <arguments>
+            <argument name="validatorPool" xsi:type="object">ParadoxLabs\TokenBase\Gateway\VirtualValidatorPool</argument>
+        </arguments>
+    </type>
+    <type name="ParadoxLabs\TokenBase\Observer\ValidatePaymentObserver">
+        <arguments>
+            <argument name="validatorPool" xsi:type="object">ParadoxLabs\TokenBase\Gateway\VirtualValidatorPool</argument>
+        </arguments>
+    </type>
+    <virtualType name="ParadoxLabs\TokenBase\Gateway\VirtualValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <!-- Each payment method should add its validation to this array -->
+            <argument name="validators" xsi:type="array" />
+        </arguments>
+    </virtualType>
+
     <!-- Proxies for dependency resolution and efficiency -->
     <type name="ParadoxLabs\TokenBase\Block\Adminhtml\Customer\Form">
         <arguments>
