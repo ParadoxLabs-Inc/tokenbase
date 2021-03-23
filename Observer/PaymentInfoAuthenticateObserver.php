@@ -99,13 +99,13 @@ class PaymentInfoAuthenticateObserver implements \Magento\Framework\Event\Observ
                 $preventAccess = true;
 
                 $this->messageManager->addErrorMessage(
-                    __('%1 will be available after you\'ve placed an order.', __('My Payment Data'))
+                    __('%1 will be available after you\'ve placed an order.', __('My Payment Options'))
                 );
             } elseif ($this->customerHasTooManyFailures() === true) {
                 $preventAccess = true;
 
                 $this->messageManager->addErrorMessage(
-                    __('%1 is currently unavailable. Please try again later.', __('My Payment Data'))
+                    __('%1 is currently unavailable. Please try again later.', __('My Payment Options'))
                 );
             }
 

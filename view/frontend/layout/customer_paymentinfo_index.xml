@@ -4,7 +4,7 @@
     <body>
         <referenceBlock name="page.main.title">
             <action method="setPageTitle">
-                <argument translate="true" name="title" xsi:type="string">My Payment Data</argument>
+                <argument translate="true" name="title" xsi:type="string">My Payment Options</argument>
             </action>
         </referenceBlock>
 
