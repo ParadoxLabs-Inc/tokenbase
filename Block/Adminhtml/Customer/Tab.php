@@ -81,7 +81,7 @@ class Tab extends TabWrapper
      */
     public function getTabLabel()
     {
-        return __('Payment Data');
+        return __('Payment Options');
     }
 
     /**

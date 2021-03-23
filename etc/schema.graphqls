@@ -88,6 +88,8 @@ input TokenBaseCardCreateInput @doc(description: "Input for creating a stored ca
     customer_email: String! @doc(description: "Customer email (required)")
     customer_ip: String @doc(description: "Created-by IP")
     method: String! @doc(description: "Payment method code (required)")
+    profile_id: String @doc(description: "Card gateway profile ID")
+    payment_id: String @doc(description: "Card gateway payment ID")
     active: Boolean @doc(description: "Is card active")
     expires: String @doc(description: "Card expiration date (YYYY-MM-DD 23:59:59)")
     additional: TokenBaseCardPaymentInput @doc(description: "Card payment data")

@@ -4,7 +4,7 @@
         <referenceBlock name="customer_account_navigation">
             <block class="ParadoxLabs\TokenBase\Block\Customer\Link" name="customer-account-navigation-payment-data-link">
                 <arguments>
-                    <argument name="label" xsi:type="string">My Payment Data</argument>
+                    <argument name="label" xsi:type="string">My Payment Options</argument>
                     <argument name="path" xsi:type="string">customer/paymentinfo</argument>
                 </arguments>
             </block>

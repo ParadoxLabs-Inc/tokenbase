@@ -643,32 +643,32 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
 
         $this->log(sprintf('void(%s %s)', get_class($payment), $payment->getId()));
 
-        $this->loadOrCreateCard($payment);
-
-        /**
-         * Short-circuit if we don't have a real transaction ID. That means reauth not working or failed.
-         * Not doing this can result in voiding a valid (potentially already-captured) transaction. Bad.
-         */
-        if (strpos($payment->getParentTransactionId(), '-auth') !== false) {
-            $this->log(
-                sprintf(
-                    'Skipping void; do not have a valid auth transaction ID. (%s)',
-                    $payment->getParentTransactionId()
-                )
-            );
-
-            return $this;
-        }
-
-        /**
-         * Grab transaction ID from the order
-         */
-        $this->gateway()->setTransactionId($payment->getParentTransactionId());
-
-        /**
-         * Process transaction and results
-         */
         try {
+            $this->loadOrCreateCard($payment);
+
+            /**
+             * Short-circuit if we don't have a real transaction ID. That means reauth not working or failed.
+             * Not doing this can result in voiding a valid (potentially already-captured) transaction. Bad.
+             */
+            if (strpos($payment->getParentTransactionId(), '-auth') !== false) {
+                $this->log(
+                    sprintf(
+                        'Skipping void; do not have a valid auth transaction ID. (%s)',
+                        $payment->getParentTransactionId()
+                    )
+                );
+
+                return $this;
+            }
+
+            /**
+             * Grab transaction ID from the order
+             */
+            $this->gateway()->setTransactionId($payment->getParentTransactionId());
+
+            /**
+             * Process transaction and results
+             */
             $this->beforeVoid($payment);
             $response = $this->gateway()->void($payment);
             $this->afterVoid($payment, $response);
@@ -684,14 +684,17 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
 
             $this->log(json_encode($response->getData()));
         } catch (\Exception $exception) {
+            $this->log($exception->getMessage());
             // Ignore void errors, let Magento proceed like it happened. Most likely the auth already expired.
         }
 
         $payment->setShouldCloseParentTransaction(1)
             ->setIsTransactionClosed(1);
 
-        $this->getCard()->updateLastUse();
-        $this->card = $this->cardRepository->save($this->getCard());
+        if ($this->getCard() instanceof \ParadoxLabs\TokenBase\Api\Data\CardInterface) {
+            $this->getCard()->updateLastUse();
+            $this->card = $this->cardRepository->save($this->getCard());
+        }
 
         return $this;
     }

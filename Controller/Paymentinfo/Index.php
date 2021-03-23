@@ -76,7 +76,7 @@ class Index extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
         /** @var \Magento\Framework\View\Result\Page $resultPage */
         $resultPage = $this->resultPageFactory->create();
         $resultPage->addHandle('customer_paymentinfo_index_' . $this->registry->registry('tokenbase_method'));
-        $resultPage->getConfig()->getTitle()->set(__('My Payment Data'));
+        $resultPage->getConfig()->getTitle()->set(__('My Payment Options'));
 
         return $resultPage;
     }
