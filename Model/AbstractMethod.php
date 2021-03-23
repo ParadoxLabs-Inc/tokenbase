@@ -91,7 +91,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @param \Magento\Framework\Registry $registry
      * @param string $methodCode
      * @param array $data
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Payment\Gateway\Command\CommandException
      */
     public function __construct(
         \Magento\Sales\Model\Order\Payment\Transaction\Repository $transactionRepository,
@@ -116,7 +116,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         $this->methodCode = $methodCode;
 
         if (empty($methodCode)) {
-            throw new \Magento\Framework\Exception\LocalizedException(__("Missing argument 'methodCode'"));
+            throw new \Magento\Payment\Gateway\Command\CommandException(__("Missing argument 'methodCode'"));
         }
 
         $this->setStore($this->helper->getCurrentStoreId());
@@ -236,7 +236,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @param int|string $cardId
      * @param bool $byHash
      * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Payment\Gateway\Command\CommandException
      */
     public function loadAndSetCard($cardId, $byHash = false)
     {
@@ -274,7 +274,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
          */
         $this->log(sprintf('Unable to load payment data. Please check the form and try again.'));
 
-        throw new \Magento\Framework\Exception\LocalizedException(
+        throw new \Magento\Payment\Gateway\Command\CommandException(
             __('Unable to load payment data. Please check the form and try again.')
         );
     }
@@ -824,7 +824,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      *
      * @param \Magento\Payment\Model\InfoInterface $payment
      * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Payment\Gateway\Command\CommandException
      */
     protected function loadOrCreateCard(\Magento\Payment\Model\InfoInterface $payment)
     {
@@ -866,7 +866,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
 
                 $card->setAddress($billingAddress);
             } else {
-                throw new \Magento\Framework\Exception\LocalizedException(
+                throw new \Magento\Payment\Gateway\Command\CommandException(
                     __('Could not find billing address.')
                 );
             }
@@ -883,7 +883,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
          */
         $this->log(sprintf('Invalid payment data provided. Please check the form and try again.'));
 
-        throw new \Magento\Framework\Exception\LocalizedException(
+        throw new \Magento\Payment\Gateway\Command\CommandException(
             __('Invalid payment data provided. Please check the form and try again.')
         );
     }

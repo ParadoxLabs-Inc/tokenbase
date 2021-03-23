@@ -230,7 +230,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
      *
      * @return \ParadoxLabs\TokenBase\Api\MethodInterface|\Magento\Payment\Model\MethodInterface Gateway-specific
      * payment method
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Payment\Gateway\Command\CommandException
      */
     public function getMethodInstance()
     {
