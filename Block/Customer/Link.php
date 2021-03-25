@@ -13,10 +13,12 @@
 
 namespace ParadoxLabs\TokenBase\Block\Customer;
 
+use Magento\Customer\Block\Account\SortLinkInterface;
+
 /**
  * Add 'payment data' link to the customer account.
  */
-class Link extends \Magento\Framework\View\Element\Html\Link\Current
+class Link extends \Magento\Framework\View\Element\Html\Link\Current implements SortLinkInterface
 {
     /**
      * @var \ParadoxLabs\TokenBase\Helper\Data
@@ -66,5 +68,16 @@ class Link extends \Magento\Framework\View\Element\Html\Link\Current
         }
 
         return '';
+    }
+
+    /**
+     * Get sort order for block.
+     *
+     * @return int
+     * @since 101.0.0
+     */
+    public function getSortOrder()
+    {
+        return $this->getData(SortLinkInterface::SORT_ORDER);
     }
 }
