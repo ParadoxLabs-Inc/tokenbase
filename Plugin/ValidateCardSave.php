@@ -73,7 +73,7 @@ class ValidateCardSave
             ]);
 
             if (!$result->isValid()) {
-                throw new \Magento\Framework\Exception\LocalizedException(
+                throw new \Magento\Payment\Gateway\Command\CommandException(
                     __(implode("\n", $result->getFailsDescription()))
                 );
             }

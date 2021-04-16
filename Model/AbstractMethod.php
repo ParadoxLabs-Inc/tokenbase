@@ -437,6 +437,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
                 ->setIsTransactionClosed(0);
 
         $this->getCard()->updateLastUse();
+        $this->getCard()->setData('no_sync', true);
         $this->card = $this->cardRepository->save($this->getCard());
 
         $this->log(json_encode($response->getData()));
@@ -531,6 +532,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         );
 
         $this->getCard()->updateLastUse();
+        $this->getCard()->setData('no_sync', true);
         $this->card = $this->cardRepository->save($this->getCard());
 
         $this->log(json_encode($response->getData()));
@@ -693,6 +695,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
 
         if ($this->getCard() instanceof \ParadoxLabs\TokenBase\Api\Data\CardInterface) {
             $this->getCard()->updateLastUse();
+            $this->getCard()->setData('no_sync', true);
             $this->card = $this->cardRepository->save($this->getCard());
         }
 
