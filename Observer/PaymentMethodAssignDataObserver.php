@@ -62,8 +62,6 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
         /** @var \Magento\Framework\DataObject $data */
         $data = $observer->getData('data');
 
-        $this->helper->log($payment->getMethod(), sprintf('assignData(%s)', $data->getData('card_id')));
-
         /**
          * Merge together data from additional_data array
          */
@@ -74,6 +72,8 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
                 }
             }
         }
+
+        $this->helper->log($payment->getMethod(), sprintf('assignData(%s)', $data->getData('card_id')));
 
         $this->assignStandardData($payment, $data, $method);
 
