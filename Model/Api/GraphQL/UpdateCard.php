@@ -136,6 +136,7 @@ class UpdateCard implements \ParadoxLabs\TokenBase\Model\Api\GraphQL\ResolverInt
         /** @var \Magento\Customer\Model\Data\Address $address */
         $address    = $this->updateAddressData($card, $cardData);
         $additional = $card->getAdditionalObject();
+        $card = $card->getTypeInstance();
 
         /**
          * Save changes
