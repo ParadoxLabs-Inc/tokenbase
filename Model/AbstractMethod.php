@@ -402,6 +402,8 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
             $this->void($payment);
 
             $payment->setData('parent_transaction_id', $parentTransactionId);
+
+            $this->getCard()->setData('no_validate', true);
         }
 
         /**
@@ -487,6 +489,8 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
             } else {
                 $this->gateway()->setTransactionId($authTxn->getTxnId());
             }
+
+            $this->getCard()->setData('no_validate', true);
         } else {
             $this->gateway()->setHaveAuthorized(false);
         }

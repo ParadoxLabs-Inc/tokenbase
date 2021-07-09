@@ -57,12 +57,10 @@ class ValidateCardSave
     ) {
         if ($subject instanceof \Magento\Framework\DataObject === false
             || $subject->hasData('info_instance') === false
-            || $subject->getData('no_sync') === true) {
+            || $subject->getData('no_sync') === true
+            || $subject->getData('no_validate') === true) {
             return;
         }
-
-        /** @var \Magento\Payment\Model\InfoInterface $payment */
-        $payment = $subject->getData('info_instance');
 
         try {
             // Get payment method validation by method code (intended for tokenbase, but will work for any that use it).
