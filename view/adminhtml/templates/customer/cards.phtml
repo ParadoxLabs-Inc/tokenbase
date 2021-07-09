@@ -12,7 +12,7 @@
             <li class="address-list-item<?php if ($card->getExpires() != '' && strtotime($card->getExpires()) < time()): ?> expired<?php endif; ?><?php if ($card->getId() == $currentCardId): ?> ui-state-active<?php endif; ?>">
                 <div class="address-list-item-actions">
                     <?php if ($card->isInUse()): ?>
-                        <abbr title="<?php echo $block->escapeQuote(__('This payment record cannot be modified while associated with pending orders.')); ?>"><?php echo $block->escapeHtml(__('Card In Use')); ?></abbr>
+                        <abbr title="<?php echo $block->escapeHtmlAttr(__('This payment record cannot be modified while associated with pending orders.')); ?>"><?php echo $block->escapeHtml(__('Card In Use')); ?></abbr>
                     <?php else: ?>
                         <a class="action-edit" href="<?php echo $block->escapeUrl($block->getUrl('*/*/*', ['_secure' => true, 'id' => $block->getRequest()->getParam('id'), 'form_key' => $block->getFormKey(), 'method' => $card->getMethod(), 'card_id' => $card->getHash()])) ?>"><span><?php echo $block->escapeHtml(__('Edit')) ?></span></a>
                         <a class="action-delete" href="<?php echo $block->escapeUrl($block->getUrl('*/*/paymentinfoDelete', ['_secure' => true, 'id' => $block->getRequest()->getParam('id'), 'form_key' => $block->getFormKey(), 'method' => $card->getMethod(), 'card_id' => $card->getHash()])) ?>"><span><?php echo $block->escapeHtml(__('Delete')) ?></span></a>
@@ -20,7 +20,7 @@
                 </div>
                 <address>
                     <?php if (!empty($card->getType())): ?>
-                        <img class="credit-card-type payment-icon" src="<?php echo $block->getViewFileUrl('Magento_Payment::images/cc/' . strtolower($card->getType()) . '.png'); ?>" alt="<?php echo $block->escapeQuote($block->getCcTypeLabel($card)); ?>" />
+                        <img class="credit-card-type payment-icon" src="<?php echo $block->getViewFileUrl('Magento_Payment::images/cc/' . strtolower($card->getType()) . '.png'); ?>" alt="<?php echo $block->escapeHtmlAttr($block->getCcTypeLabel($card)); ?>" />
                     <?php endif; ?>
                     <span><?php echo $block->escapeHtml($card->getLabel(empty($card->getType()))); ?></span>
                     <?php if ($card->getExpires() != ''): ?>

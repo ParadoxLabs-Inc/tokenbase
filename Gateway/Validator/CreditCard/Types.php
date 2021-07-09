@@ -29,7 +29,7 @@ class Types
             'type'    => 'VI',
             'pattern' => '^4\d*$',
             'gaps'    => [4, 8, 12],
-            'lengths' => [16],
+            'lengths' => [13, 16, 18, 19],
             'luhn'    => true,
             'code'    => [
                 'name' => 'CVV',

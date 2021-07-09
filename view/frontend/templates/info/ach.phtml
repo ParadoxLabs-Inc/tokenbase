@@ -16,7 +16,7 @@
     && $post['method'] === $method->getCode()): ?>
     <?php foreach ($fields as $key): ?>
         <?php if (!empty($post[$key])): ?>
-            <input type="hidden" name="payment[<?= $block->escapeQuote($key) ?>]" value="<?= $block->escapeQuote($post[$key]) ?>" />
+            <input type="hidden" name="payment[<?= $block->escapeHtmlAttr($key) ?>]" value="<?= $block->escapeHtmlAttr($post[$key]) ?>" />
         <?php endif; ?>
     <?php endforeach; ?>
 <?php endif; ?>
