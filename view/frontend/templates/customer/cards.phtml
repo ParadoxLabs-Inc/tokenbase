@@ -22,7 +22,7 @@
                                 <?php echo $block->escapeHtml($card->getLabel(empty($card->getType()))); ?>
                             </span>
                         </strong>
-                        <?php if ($card->getExpires() != ''): ?>
+                        <?php if (strtotime($card->getExpires()) > time()): ?>
                             <small><?php echo $block->escapeHtml(__('(Expires %1)', date('m/Y', strtotime($card->getExpires())))); ?></small>
                         <?php endif; ?>
                     </legend>

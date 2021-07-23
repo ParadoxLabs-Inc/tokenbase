@@ -23,7 +23,7 @@
                         <img class="credit-card-type payment-icon" src="<?php echo $block->getViewFileUrl('Magento_Payment::images/cc/' . strtolower($card->getType()) . '.png'); ?>" alt="<?php echo $block->escapeHtmlAttr($block->getCcTypeLabel($card)); ?>" />
                     <?php endif; ?>
                     <span><?php echo $block->escapeHtml($card->getLabel(empty($card->getType()))); ?></span>
-                    <?php if ($card->getExpires() != ''): ?>
+                    <?php if (strtotime($card->getExpires()) > time()): ?>
                         <small><?php echo $block->escapeHtml(__('(Expires %1)', date('m/Y', strtotime($card->getExpires())))); ?></small>
                     <?php endif; ?><br />
 

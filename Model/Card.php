@@ -944,11 +944,18 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
                 $cardType = $this->helper->translateCardType($this->getType());
             }
 
-            return trim(__(
+            $label = trim(__(
                 '%1 XXXX-%2',
                 $cardType,
                 $this->getAdditional('cc_last4')
             ));
+
+            $expires = strtotime($this->getExpires());
+            if ($expires > 0 && $expires < time()) {
+                $label .= __(' (Expired %1)', date('m/Y', $expires));
+            }
+
+            return $label;
         }
 
         return '';
