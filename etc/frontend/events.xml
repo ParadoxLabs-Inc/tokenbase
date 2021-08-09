@@ -16,4 +16,7 @@
     <event name="sales_order_place_before">
         <observer name="tokenbase_checkout_authenticate" instance="ParadoxLabs\TokenBase\Observer\CheckoutCheckFailuresObserver" />
     </event>
+    <event name="customer_save_after_data_object">
+        <observer name="tokenbase_assign_cards_on_registration" instance="ParadoxLabs\TokenBase\Observer\ConvertGuestToCustomerObserver" />
+    </event>
 </config>

@@ -10,14 +10,12 @@
  * @author <support@paradoxlabs.com>
  */
 
-namespace ParadoxLabs\TokenBase\Plugin;
-
-use Magento\Framework\Exception\LocalizedException;
+namespace ParadoxLabs\TokenBase\Observer;
 
 /**
- * Class ConvertGuestToCustomer
+ * ConvertGuestToCustomerObserver Class
  */
-class ConvertGuestToCustomer
+class ConvertGuestToCustomerObserver implements \Magento\Framework\Event\ObserverInterface
 {
     /**
      * @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory
@@ -35,48 +33,41 @@ class ConvertGuestToCustomer
     protected $scopeConfig;
 
     /**
-     * @var \Magento\Customer\Model\Session
-     */
-    protected $customerSession;
-
-    /**
-     * Plugin constructor.
+     * ConvertGuestToCustomerObserver constructor.
      *
      * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
      * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \Magento\Customer\Model\Session $customerSession
      */
     public function __construct(
         \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory,
         \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Customer\Model\Session $customerSession
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     ) {
         $this->cardCollectionFactory = $cardCollectionFactory;
         $this->cardRepository = $cardRepository;
         $this->scopeConfig = $scopeConfig;
-        $this->customerSession = $customerSession;
     }
 
     /**
-     * Associate customer cards after post-checkout register.
-     * Subsequently, for any registration done within the time span.
-     *
-     * @param \Magento\Customer\Controller\Account\CreatePost $subject
-     * @param $result
-     * @return mixed
+     * @param \Magento\Framework\Event\Observer $observer
      */
-    public function afterExecute(\Magento\Customer\Controller\Account\CreatePost $subject, $result)
+    public function execute(\Magento\Framework\Event\Observer $observer)
     {
-        if ($this->customerSession->getCustomerData()) {
+        /** @var \Magento\Customer\Api\Data\CustomerInterface $customer */
+        $customer = $observer->getData('customer_data_object');
+        /** @var array $delegateData */
+        $delegateData = $observer->getData('delegate_data');
+
+        if (isset($delegateData['__sales_assign_order_id'])
+            && $customer instanceof \Magento\Customer\Api\Data\CustomerInterface) {
             /**
              * Look for a guest card used by this email within the last day, and blindly attach it if we get a match.
              * This isn't flawless, but loading the order to get any tokenbase_id would be much slower.
              */
             $cardCollection = $this->cardCollectionFactory->create();
             $cardCollection->addFieldToFilter('customer_id', '0');
-            $cardCollection->addFieldToFilter('customer_email', $this->customerSession->getCustomerData()->getEmail());
+            $cardCollection->addFieldToFilter('customer_email', $customer->getEmail());
             $cardCollection->addFieldToFilter(
                 'last_use',
                 [
@@ -90,7 +81,7 @@ class ConvertGuestToCustomer
             if ($cardCollection->getSize() > 0) {
                 /** @var \ParadoxLabs\TokenBase\Api\Data\CardInterface $card */
                 foreach ($cardCollection as $card) {
-                    $card->setCustomerId($this->customerSession->getId());
+                    $card->setCustomerId($customer->getId());
 
                     // Activate the card by default if config is opt-out.
                     $activate = (int)$this->scopeConfig->getValue(
@@ -103,13 +94,11 @@ class ConvertGuestToCustomer
 
                     try {
                         $this->cardRepository->save($card);
-                    } catch (LocalizedException $e) {
+                    } catch (\Magento\Framework\Exception\LocalizedException $e) {
                         // No-op: gracefully skip a card save if it fails.
                     }
                 }
             }
         }
-
-        return $result;
     }
 }
