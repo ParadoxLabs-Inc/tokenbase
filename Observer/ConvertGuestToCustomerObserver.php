@@ -28,6 +28,11 @@ class ConvertGuestToCustomerObserver implements \Magento\Framework\Event\Observe
     protected $cardRepository;
 
     /**
+     * @var \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress
+     */
+    protected $remoteAddress;
+
+    /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
     protected $scopeConfig;
@@ -37,15 +42,18 @@ class ConvertGuestToCustomerObserver implements \Magento\Framework\Event\Observe
      *
      * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
      * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
+     * @param \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      */
     public function __construct(
         \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory,
         \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository,
+        \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     ) {
         $this->cardCollectionFactory = $cardCollectionFactory;
         $this->cardRepository = $cardRepository;
+        $this->remoteAddress = $remoteAddress;
         $this->scopeConfig = $scopeConfig;
     }
 
@@ -68,10 +76,11 @@ class ConvertGuestToCustomerObserver implements \Magento\Framework\Event\Observe
             $cardCollection = $this->cardCollectionFactory->create();
             $cardCollection->addFieldToFilter('customer_id', '0');
             $cardCollection->addFieldToFilter('customer_email', $customer->getEmail());
+            $cardCollection->addFieldToFilter('customer_ip', $this->remoteAddress->getRemoteAddress());
             $cardCollection->addFieldToFilter(
                 'last_use',
                 [
-                    'gt' => date('c', strtotime('-12 hours')),
+                    'gt' => date('c', strtotime('-8 hours')),
                     'date' => true,
                 ]
             );
