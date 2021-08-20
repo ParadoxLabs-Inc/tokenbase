@@ -18,14 +18,19 @@ namespace ParadoxLabs\TokenBase\Observer;
 class ConvertGuestToCustomerObserver implements \Magento\Framework\Event\ObserverInterface
 {
     /**
-     * @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory
-     */
-    protected $cardCollectionFactory;
-
-    /**
      * @var \ParadoxLabs\TokenBase\Api\CardRepositoryInterface
      */
     protected $cardRepository;
+
+    /**
+     * @var \Magento\Sales\Model\Order\PaymentFactory
+     */
+    protected $paymentFactory;
+
+    /**
+     * @var \Magento\Sales\Model\ResourceModel\Order\Payment
+     */
+    protected $paymentResource;
 
     /**
      * @var \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress
@@ -40,19 +45,22 @@ class ConvertGuestToCustomerObserver implements \Magento\Framework\Event\Observe
     /**
      * ConvertGuestToCustomerObserver constructor.
      *
-     * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
      * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
+     * @param \Magento\Sales\Model\Order\PaymentFactory $paymentFactory
+     * @param \Magento\Sales\Model\ResourceModel\Order\Payment $paymentResource
      * @param \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-        \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory,
         \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository,
+        \Magento\Sales\Model\Order\PaymentFactory $paymentFactory,
+        \Magento\Sales\Model\ResourceModel\Order\Payment $paymentResource,
         \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     ) {
-        $this->cardCollectionFactory = $cardCollectionFactory;
         $this->cardRepository = $cardRepository;
+        $this->paymentFactory = $paymentFactory;
+        $this->paymentResource = $paymentResource;
         $this->remoteAddress = $remoteAddress;
         $this->scopeConfig = $scopeConfig;
     }
@@ -69,44 +77,26 @@ class ConvertGuestToCustomerObserver implements \Magento\Framework\Event\Observe
 
         if (isset($delegateData['__sales_assign_order_id'])
             && $customer instanceof \Magento\Customer\Api\Data\CustomerInterface) {
-            /**
-             * Look for a guest card used by this email within the last day, and blindly attach it if we get a match.
-             * This isn't flawless, but loading the order to get any tokenbase_id would be much slower.
-             */
-            $cardCollection = $this->cardCollectionFactory->create();
-            $cardCollection->addFieldToFilter('customer_id', '0');
-            $cardCollection->addFieldToFilter('customer_email', $customer->getEmail());
-            $cardCollection->addFieldToFilter('customer_ip', $this->remoteAddress->getRemoteAddress());
-            $cardCollection->addFieldToFilter(
-                'last_use',
-                [
-                    'gt' => date('c', strtotime('-8 hours')),
-                    'date' => true,
-                ]
-            );
-            $cardCollection->setOrder('id', 'desc');
-            $cardCollection->setPageSize(1);
+            /** @var \Magento\Sales\Model\Order\Payment $payment */
+            $payment = $this->paymentFactory->create();
+            $this->paymentResource->load($payment, $delegateData['__sales_assign_order_id'], 'parent_id');
+            try {
+                // The given card must match the order, which must match the customer.
+                $card = $this->cardRepository->load($payment->getData('tokenbase_id'));
+                $card->setCustomerId($customer->getId());
 
-            if ($cardCollection->getSize() > 0) {
-                /** @var \ParadoxLabs\TokenBase\Api\Data\CardInterface $card */
-                foreach ($cardCollection as $card) {
-                    $card->setCustomerId($customer->getId());
-
-                    // Activate the card by default if config is opt-out.
-                    $activate = (int)$this->scopeConfig->getValue(
-                        'payment/' . $card->getMethod() . '/savecard_opt_out',
-                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-                    );
-                    if ($activate === 1) {
-                        $card->setActive(1);
-                    }
-
-                    try {
-                        $this->cardRepository->save($card);
-                    } catch (\Magento\Framework\Exception\LocalizedException $e) {
-                        // No-op: gracefully skip a card save if it fails.
-                    }
+                // Activate the card by default if config is opt-out.
+                $activate = (int)$this->scopeConfig->getValue(
+                    'payment/' . $card->getMethod() . '/savecard_opt_out',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                );
+                if ($activate === 1) {
+                    $card->setActive(1);
                 }
+
+                $this->cardRepository->save($card);
+            } catch (\Magento\Framework\Exception\LocalizedException $e) {
+                // No-op: gracefully skip a card save if it fails.
             }
         }
     }
