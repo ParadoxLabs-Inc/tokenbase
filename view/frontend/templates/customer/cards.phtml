@@ -2,11 +2,11 @@
 /** @var \ParadoxLabs\TokenBase\Block\Customer\Cards $block */
 // @codingStandardsIgnoreFile
 ?>
-<div class="block block-addresses-list">
+<div class="block block-cards-list">
     <div class="block-title">
         <h2><?php echo $block->escapeHtml($block->getPaymentMethodTitle()); ?></h2>
     </div>
-    <div class="block-content items addresses checkout-payment-method">
+    <div class="block-content items checkout-payment-method">
         <?php $cards = $block->getCards(); ?>
         <?php if (!empty($cards)): ?>
             <?php /** @var \ParadoxLabs\TokenBase\Model\Card $card */ ?>
@@ -30,7 +30,7 @@
                         <address>
                             <?php echo $block->getFormattedCardAddress($card->getAddressObject()); ?>
                         </address>
-                        <div class="item actions">
+                        <div class="item actions box-actions">
                             <?php if ($card->isInUse()): ?>
                                 <abbr title="<?php echo $block->escapeHtmlAttr(__('This payment record cannot be modified while associated with pending orders.')); ?>"><?php echo $block->escapeHtml(__('Card In Use')); ?></abbr>
                             <?php else: ?>
