@@ -83,7 +83,7 @@ class Cc extends \Magento\Payment\Block\Info\Cc
             );
         } else {
             $ccType = $this->getCcTypeName();
-            if (!empty($ccType) && $ccType != 'N/A') {
+            if (!empty($ccType) && $ccType !== 'N/A') {
                 $data[(string)__('Credit Card Type')] = $ccType;
             }
 
@@ -117,5 +117,22 @@ class Cc extends \Magento\Payment\Block\Info\Cc
     protected function isEcheck()
     {
         return $this->isEcheck;
+    }
+
+    /**
+     * Check whether payment information should show up in secure mode
+     * true => only "public" payment information may be shown
+     * false => full information may be shown
+     *
+     * @return bool
+     * @SuppressWarnings(PHPMD.BooleanGetMethodName)
+     */
+    public function getIsSecureMode()
+    {
+        if ($this->hasIsSecureMode()) {
+            return (bool)(int)$this->_getData('is_secure_mode');
+        }
+
+        return $this->_appState->getAreaCode() !== \Magento\Framework\App\Area::AREA_ADMINHTML;
     }
 }
