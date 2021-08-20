@@ -10,8 +10,8 @@
                 <ul class="ui-tabs-nav tabs-horiz">
                     <?php foreach ($activeMethods as $method): ?>
                         <li class="ui-state-default <?php if ($block->getCurrentMethod() == $method): ?>ui-state-active<?php endif; ?>">
-                            <a href="<?php echo $block->escapeUrl($block->getUrl('*/*/paymentinfo', [ 'method' => $method, 'id' => $block->getRequest()->getParam('id'), 'form_key' => $block->getFormKey() ])); ?>" class="ui-tabs-anchor">
-                                <?php echo $block->escapeHtml($block->getMethodTitle($method)); ?>
+                            <a href="<?= $block->escapeUrl($block->getUrl('*/*/paymentinfo', [ 'method' => $method, 'id' => $block->getRequest()->getParam('id'), 'form_key' => $block->getFormKey() ])); ?>" class="ui-tabs-anchor">
+                                <?= $block->escapeHtml($block->getMethodTitle($method)); ?>
                             </a>
                         </li>
                     <?php endforeach; ?>
@@ -22,9 +22,9 @@
     <div class="admin__fieldset-wrapper-content">
         <div class="manage-payment-method">
             <?php if (!empty($activeMethods)): ?>
-                <?php echo $block->getChildHtml(); ?>
+                <?= $block->getChildHtml(); ?>
             <?php else: ?>
-                <?php echo $block->escapeHtml(__('There are currently no active TokenBase payment methods.')); ?>
+                <?= $block->escapeHtml(__('There are currently no active TokenBase payment methods.')); ?>
             <?php endif; ?>
         </div>
     </div>
