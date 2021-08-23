@@ -88,6 +88,8 @@ class Factory
                 // Create and initialize the instance via object man.
                 $typeInstance = $this->create($cardModel);
                 $typeInstance->setData($card->getData());
+                // Copy all origData to the new instance.
+                $typeInstance->setOrigData(null, $card->getOrigData());
                 $card = $typeInstance;
             }
         }
