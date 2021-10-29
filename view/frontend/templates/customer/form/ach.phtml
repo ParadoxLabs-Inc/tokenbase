@@ -7,17 +7,17 @@
 <div class="block-title">
     <h2>
         <?php if ($block->isEdit()): ?>
-            <?= $block->escapeHtml(__('Editing %1', $block->getCard()->getLabel())); ?>
+            <?= $block->escapeHtml(__('Editing %1', $block->getCard()->getLabel())) ?>
         <?php else: ?>
-            <?= $block->escapeHtml(__('Add A Bank Account (eCheck)')); ?>
+            <?= $block->escapeHtml(__('Add A Bank Account (eCheck)')) ?>
         <?php endif; ?>
     </h2>
 </div>
 
-<form action="<?= $block->escapeUrl($block->getAction()); ?>" method="post" id="form-validate" class="checkout-payment-method" data-hasrequired="<?= $block->escapeHtmlAttr(__('* Required Fields')) ?>">
-    <?= $block->getBlockHtml('formkey'); ?>
-    <input type="hidden" name="id" value="<?= $block->getCard()->getId() ? $block->escapeHtmlAttr($block->getCard()->getHash()) : ''; ?>" />
-    <input type="hidden" name="method" value="<?= $code; ?>" />
+<form action="<?= $block->escapeUrl($block->getAction()) ?>" method="post" id="form-validate" class="checkout-payment-method" data-hasrequired="<?= $block->escapeHtmlAttr(__('* Required Fields')) ?>">
+    <?= $block->getBlockHtml('formkey') ?>
+    <input type="hidden" name="id" value="<?= $block->getCard()->getId() ? $block->escapeHtmlAttr($block->getCard()->getHash()) : '' ?>" />
+    <input type="hidden" name="method" value="<?= $code ?>" />
     <fieldset class="fieldset">
         <legend class="legend"><span><?= $block->escapeHtml(__('Cardholder Information')) ?></span></legend><br>
 
@@ -96,7 +96,7 @@
             <div class="control">
                 <input type="text" id="<?= $code ?>-echeck-account-name" name="payment[echeck_account_name]"
                        title="<?= $block->escapeHtmlAttr(__('Name on Account')) ?>" class="input-text" maxlength="22"
-                       value="<?= $block->escapeHtmlAttr($block->getCard()->getAdditional('echeck_account_name')); ?>"
+                       value="<?= $block->escapeHtmlAttr($block->getCard()->getAdditional('echeck_account_name')) ?>"
                        data-validate='{required:true}' />
             </div>
         </div>
@@ -105,7 +105,7 @@
             <div class="control">
                 <input type="text" id="<?= $code ?>-echeck-bank-name" name="payment[echeck_bank_name]"
                        title="<?= $block->escapeHtmlAttr(__('Bank Name')) ?>" class="input-text" maxlength="50" autocomplete="off"
-                       value="<?= $block->escapeHtmlAttr($block->getCard()->getAdditional('echeck_bank_name')); ?>"
+                       value="<?= $block->escapeHtmlAttr($block->getCard()->getAdditional('echeck_bank_name')) ?>"
                        data-validate='{required:true}' />
             </div>
         </div>
@@ -114,7 +114,7 @@
             <div class="control">
                 <input type="text" id="<?= $code ?>-echeck-routing-number" name="payment[echeck_routing_no]"
                        title="<?= $block->escapeHtmlAttr(__('Routing Number')) ?>" class="input-text minimum-length-9" maxlength="9"
-                       value="<?php if ($block->getCard()->getId() && $block->getCard()->getAdditional('echeck_routing_number_last4') != ''): ?>XXXX<?= $block->escapeHtmlAttr($block->getCard()->getAdditional('echeck_routing_number_last4')); ?><?php endif; ?>" autocomplete="off"
+                       value="<?php if ($block->getCard()->getId() && $block->getCard()->getAdditional('echeck_routing_number_last4') != ''): ?>XXXX<?= $block->escapeHtmlAttr($block->getCard()->getAdditional('echeck_routing_number_last4')) ?><?php endif; ?>" autocomplete="off"
                        data-validate='{"required-number":true,"validate-length":true}' />
             </div>
         </div>
@@ -123,15 +123,15 @@
             <div class="control">
                 <input type="text" id="<?= $code ?>-echeck-account-number" name="payment[echeck_account_no]"
                        title="<?= $block->escapeHtmlAttr(__('Account Number')) ?>" class="input-text minimum-length-5 maximum-length-17"
-                       value="<?php if ($block->getCard()->getId() && $block->getCard()->getAdditional('echeck_account_number_last4') != ''): ?>XXXX<?= $block->escapeHtmlAttr($block->getCard()->getAdditional('echeck_account_number_last4')); ?><?php endif; ?>" maxlength="17"
+                       value="<?php if ($block->getCard()->getId() && $block->getCard()->getAdditional('echeck_account_number_last4') != ''): ?>XXXX<?= $block->escapeHtmlAttr($block->getCard()->getAdditional('echeck_account_number_last4')) ?><?php endif; ?>" maxlength="17"
                        data-validate='{"required-number":true,"validate-length":true}' autocomplete="off" />
                 <?php $expln    = __('On the bottom of your checks, you will see three groups of numbers. Usually the first one is your routing number, and the second is your account number.'); ?>
                 <?php $image    = $block->escapeUrl($block->getViewFileUrl('ParadoxLabs_TokenBase::images/ach.png')); ?>
                 <?php $alt      = $block->escapeHtmlAttr(__('Visual reference for locating routing number and account number on a check')); ?>
                 <?php $tooltip  = '<p>'.$expln.'</p><img src="'.$image.'" alt="'.$alt.'" />'; ?>
                 <div class="note">
-                    <a href="#" class="action cvv" title="<?= $block->escapeHtmlAttr(__('Where do I find these numbers?')) ?>"
-                       data-mage-init='{"tooltip": {"content": "<?= $block->escapeHtmlAttr($tooltip, true) ?>"}}'>
+                    <a href="#" class="action cvv" title="<?= $block->escapeHtmlAttr(__('What is this?')) ?>"
+                       data-mage-init='{"tooltip": {"content": "<?= addslashes($tooltip) ?>"}}'>
                         <span><?= $block->escapeHtml(__('Where do I find these numbers?')) ?></span>
                     </a>
                 </div>
@@ -144,10 +144,10 @@
                 <?php foreach ($block->getHelper()->getAchAccountTypes() as $k => $v): ?>
                     <div>
                         <input type="radio" name="payment[echeck_account_type]"
-                               id="<?= $code ?>-echeck-account-type-<?= $block->escapeHtmlAttr($k); ?>"
-                               value="<?= $block->escapeHtmlAttr($k); ?>" <?php if ($k == $typeValue): ?>checked="checked"<?php endif ?>
+                               id="<?= $code ?>-echeck-account-type-<?= $block->escapeHtmlAttr($k) ?>"
+                               value="<?= $block->escapeHtmlAttr($k) ?>" <?php if ($k == $typeValue): ?>checked="checked"<?php endif ?>
                                data-validate='{"validate-one-required-by-name":true}' />
-                        <label for="<?= $code ?>-echeck-account-type-<?= $block->escapeHtmlAttr($k); ?>"><?= $block->escapeHtml($v); ?></label>
+                        <label for="<?= $code ?>-echeck-account-type-<?= $block->escapeHtmlAttr($k) ?>"><?= $block->escapeHtml($v) ?></label>
                     </div>
                 <?php endforeach ?>
             </div>
