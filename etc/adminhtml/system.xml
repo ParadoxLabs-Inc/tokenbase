@@ -4,15 +4,33 @@
         <section id="checkout">
             <group id="tokenbase" translate="label" type="text" sortOrder="500" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>ParadoxLabs Payment Module Settings</label>
-                <field id="clean_old_cards" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="0">
-                    <label>Erase archived cards after 120 days</label>
+                <field id="clean_old_cards" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="1">
+                    <label>Prune archived cards after 120 days</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment><![CDATA[All cards (including for guests and 'do not save') are always stored internally. If yes, those records will be permanently removed 120 days after their last use (the maximum refund period). We strongly recommend this.]]></comment>
                 </field>
-                <field id="enable_public_api" translate="label" type="select" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="heading_security" translate="label" sortOrder="175" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Security Settings</label>
+                    <frontend_model>Magento\Config\Block\System\Config\Form\Field\Heading</frontend_model>
+                    <attribute type="shared">1</attribute>
+                </field>
+                <field id="enable_public_api" translate="label" type="select" sortOrder="200" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="1">
                     <label>Enable public API</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment><![CDATA[If 'Yes', Magento's REST and GraphQL APIs will allow customer card management. Only enable this if you use them.]]></comment>
+                </field>
+                <field id="paymentinfo_require_order" translate="label" type="select" sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Require an order to access My Payment Options</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[If 'Yes', customers will only be able to add/edit payment options on their account after placing an order. We strongly recommend this.]]></comment>
+                </field>
+                <field id="failure_limit" translate="label" type="text" sortOrder="400" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Max checkout errors per session</label>
+                    <comment><![CDATA[Block a customer from checkout after they fail to submit an order this many times within the time below. This is to help block card testing attacks. Default is 5.]]></comment>
+                </field>
+                <field id="failure_window" translate="label" type="text" sortOrder="500" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Max checkout errors timeframe (sec)</label>
+                    <comment><![CDATA[The amount of time to record and block for checkout errors (for the setting above), in seconds. Default is 86400, one day.]]></comment>
                 </field>
             </group>
         </section>
