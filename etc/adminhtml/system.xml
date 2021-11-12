@@ -9,6 +9,17 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment><![CDATA[All cards (including for guests and 'do not save') are always stored internally. If yes, those records will be permanently removed 120 days after their last use (the maximum refund period). We strongly recommend this.]]></comment>
                 </field>
+                <field id="save_order_after_payment" translate="label" type="select" sortOrder="150" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="1">
+                    <label>Save new order immediately after payment</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[
+                        By default, Magento does not save an order during checkout until after all processing has completed successfully.
+                        However, this allows poorly coded integrations to prevent the order going through, even after payment has been processed.
+                        Enabling this setting will save the order immediately after payment processes successfully, ensuring you have the order even if post-processing fails.
+                        NOTE: Allowing orders to go through without successful post-processing can have major and negative ramifications on integrations.
+                        Do not enable this unless you are confident it's worth the risk.
+                    ]]></comment>
+                </field>
                 <field id="heading_security" translate="label" sortOrder="175" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Security Settings</label>
                     <frontend_model>Magento\Config\Block\System\Config\Form\Field\Heading</frontend_model>
