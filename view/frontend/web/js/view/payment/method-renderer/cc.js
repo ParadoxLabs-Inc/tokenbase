@@ -208,6 +208,18 @@ define(
                 this.placeOrderFailure(true);
 
                 var error = JSON.parse(response.responseText);
+                if (error.parameters) {
+                    for (var parameter in error.parameters) {
+                        if (!error.parameters.hasOwnProperty(parameter)) {
+                            continue;
+                        }
+                        error.message = error.message.replace(
+                            new RegExp('%' + parameter, 'g'),
+                            error.parameters[parameter]
+                        );
+                    }
+                }
+
                 if (error && typeof error.message !== 'undefined') {
                     alert({
                         title: $.mage.__('Unable to place order'),
