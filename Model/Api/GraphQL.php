@@ -14,13 +14,23 @@
 namespace ParadoxLabs\TokenBase\Model\Api;
 
 use Magento\Authorization\Model\UserContextInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\GraphQl\Exception\GraphQlAuthorizationException;
+use Magento\Framework\GraphQl\Exception\GraphQlNoSuchEntityException;
 
 /**
  * GraphQL Class
  */
 class GraphQL
 {
+    /**
+     * @var \Magento\Quote\Api\CartRepositoryInterface
+     */
+    protected $cartRepository;
+    /**
+     * @var \Magento\Quote\Model\MaskedQuoteIdToQuoteIdInterface
+     */
+    protected $maskedQuoteIdToQuoteId;
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
@@ -30,11 +40,17 @@ class GraphQL
      * GraphQL constructor.
      *
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
+     * @param \Magento\Quote\Model\MaskedQuoteIdToQuoteIdInterface $maskedQuoteIdToQuoteId
      */
     public function __construct(
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
+        \Magento\Quote\Model\MaskedQuoteIdToQuoteIdInterface $maskedQuoteIdToQuoteId
     ) {
         $this->scopeConfig = $scopeConfig;
+        $this->cartRepository = $cartRepository;
+        $this->maskedQuoteIdToQuoteId = $maskedQuoteIdToQuoteId; // TODO: 2.3+ ONLY
     }
 
     /**
@@ -113,5 +129,38 @@ class GraphQL
         }
 
         return $output;
+    }
+
+    /**
+     * @param int $customerId
+     * @param string $quoteHash
+     * @return \Magento\Quote\Api\Data\CartInterface
+     * @throws \Magento\Framework\GraphQl\Exception\GraphQlAuthorizationException
+     */
+    public function getQuote($customerId, $quoteHash)
+    {
+        try {
+            $quoteId = $this->maskedQuoteIdToQuoteId->execute($quoteHash);
+            $quote   = $this->cartRepository->get($quoteId);
+        } catch (NoSuchEntityException $e) {
+            throw new GraphQlNoSuchEntityException(
+                __('Could not find a cart with ID "%masked_cart_id"', ['masked_cart_id' => $quoteHash])
+            );
+        }
+
+        if ((bool)$quote->getIsActive() === false) {
+            throw new GraphQlNoSuchEntityException(__('The cart isn\'t active.'));
+        }
+
+        if ((int)$quote->getCustomerId() !== $customerId) {
+            throw new GraphQlAuthorizationException(
+                __(
+                    'The current user cannot perform operations on cart "%masked_cart_id"',
+                    ['masked_cart_id' => $quoteHash]
+                )
+            );
+        }
+
+        return $quote;
     }
 }
