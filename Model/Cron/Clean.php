@@ -77,18 +77,22 @@ class Clean
         /**
          * Prune inactive cards older than 120 days (beyond auth and refund periods)
          */
+        $cutoff = $this->scopeConfig->getValue(
+            'checkout/tokenbase/clean_old_cards_after',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        ) ?: '120 days';
 
         /** @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection $cards */
         $cards = $this->cardCollectionFactory->create();
         $cards->addFieldToFilter('active', '0')
-              ->addFieldToFilter('updated_at', [ 'lt' => date('c', strtotime('-120 days')), 'date' => true ])
+              ->addFieldToFilter('updated_at', [ 'lt' => date('c', strtotime('-' . $cutoff)), 'date' => true ])
               ->addFieldToFilter(
                   [
                       'last_use',
                       'last_use',
                   ],
                   [
-                      ['lt' => date('c', strtotime('-120 days')), 'date' => true],
+                      ['lt' => date('c', strtotime('-' . $cutoff)), 'date' => true],
                       ['null' => true],
                   ]
               );
