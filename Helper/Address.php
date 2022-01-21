@@ -133,7 +133,7 @@ class Address extends \Magento\Framework\App\Helper\AbstractHelper
         /** @var \Magento\Customer\Model\Metadata\Form $addressForm */
         $addressForm     = $this->formFactory->create('customer_address', 'customer_address_edit', $origAddressData);
 
-        if (is_string($addressData['street'])) {
+        if (isset($addressData['street']) && is_string($addressData['street'])) {
             $addressData['street'] = explode("\n", str_replace("\r", '', $addressData['street']));
         }
 
