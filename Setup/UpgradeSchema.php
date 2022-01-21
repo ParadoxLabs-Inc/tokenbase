@@ -38,6 +38,7 @@ class UpgradeSchema implements \Magento\Framework\Setup\UpgradeSchemaInterface
 
         $this->addHashToCards($setup);
         $this->addCustomerIndexToCards($setup);
+        $this->addPaymentIndexToCards($setup);
 
         $tableDdl = $setup->getConnection()->describeTable($setup->getTable('paradoxlabs_stored_card'));
 
@@ -67,6 +68,29 @@ class UpgradeSchema implements \Magento\Framework\Setup\UpgradeSchemaInterface
                 $setup->getTable('paradoxlabs_stored_card'),
                 $cardIdxKey,
                 ['customer_id']
+            );
+        }
+    }
+
+    /**
+     * paradoxlabs_stored_card.payment_id index
+     *
+     * @param \Magento\Framework\Setup\SchemaSetupInterface $setup
+     * @return void
+     */
+    protected function addPaymentIndexToCards(\Magento\Framework\Setup\SchemaSetupInterface $setup)
+    {
+        $cardIndexes = $setup->getConnection()->getIndexList($setup->getTable('paradoxlabs_stored_card'));
+        $cardIdxKey  = $setup->getIdxName(
+            $setup->getTable('paradoxlabs_stored_card'),
+            ['payment_id']
+        );
+
+        if (!isset($cardIndexes[ $cardIdxKey ])) {
+            $setup->getConnection()->addIndex(
+                $setup->getTable('paradoxlabs_stored_card'),
+                $cardIdxKey,
+                ['payment_id']
             );
         }
     }

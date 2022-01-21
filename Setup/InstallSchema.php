@@ -152,6 +152,12 @@ class InstallSchema implements \Magento\Framework\Setup\InstallSchemaInterface
                 ['customer_id']
             ),
             ['customer_id']
+        )->addIndex(
+            $setup->getIdxName(
+                $setup->getTable('paradoxlabs_stored_card'),
+                ['payment_id']
+            ),
+            ['payment_id']
         )->setComment(
             'Stored Cards for ParadoxLabs payment methods'
         );
