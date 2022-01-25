@@ -418,7 +418,7 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
     {
         try {
             return $this->xml->createArray($xml);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->helper->log($this->code, $e->getMessage() . "\n" . $this->sanitizeLog($xml));
 
             throw $e;
