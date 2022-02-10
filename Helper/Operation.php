@@ -69,7 +69,7 @@ class Operation extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getArrayValue($data, $path, $default = '')
     {
-        $keys = explode('/', $path);
+        $keys = explode('/', (string)$path);
         $val =& $data;
 
         foreach ($keys as $key) {
@@ -106,7 +106,7 @@ class Operation extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         if (is_array($message)) {
-            $message = print_r($message, 1);
+            $message = print_r($message, true);
         }
 
         if ($debug === true) {

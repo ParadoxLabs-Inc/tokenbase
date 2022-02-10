@@ -165,7 +165,7 @@ class Types
     public function getTypeForCard($ccNumber)
     {
         foreach ($this->types as $type) {
-            if (preg_match('/' . $type['pattern'] . '/', $ccNumber) === 1) {
+            if (preg_match('/' . $type['pattern'] . '/', (string)$ccNumber) === 1) {
                 return $type;
             }
         }

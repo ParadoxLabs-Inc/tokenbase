@@ -122,7 +122,7 @@ abstract class ApiTest extends \Magento\Config\Block\System\Config\Form\Field
      */
     protected function containsInvalidCharacters($string)
     {
-        return (bool)preg_match('/[^ -~]/i', $string);
+        return (bool)preg_match('/[^ -~]/i', (string)$string);
     }
 
     /**

@@ -81,8 +81,8 @@ class StoredCard extends \Magento\Payment\Gateway\Validator\AbstractValidator
                 }
 
                 if (!is_numeric($payment->getData('cc_cid'))
-                    || ($ccvLength !== null && strlen($payment->getData('cc_cid')) != $ccvLength)
-                    || strlen($payment->getData('cc_cid')) < 3) {
+                    || ($ccvLength !== null && strlen((string)$payment->getData('cc_cid')) != $ccvLength)
+                    || strlen((string)$payment->getData('cc_cid')) < 3) {
                     $isValid = false;
                     $fails[] = __('Please enter your credit card %1.', $ccvLabel);
                 }
@@ -91,8 +91,8 @@ class StoredCard extends \Magento\Payment\Gateway\Validator\AbstractValidator
             /**
              * This might be a card edit. Validate this too, as much as we can.
              */
-            if (!empty($payment->getData('cc_number')) && substr($payment->getData('cc_number'), 0, 4) !== 'XXXX') {
-                if (strlen($payment->getData('cc_number')) < 13
+            if (!empty($payment->getData('cc_number')) && substr((string)$payment->getData('cc_number'), 0, 4) !== 'XXXX') {
+                if (strlen((string)$payment->getData('cc_number')) < 13
                     || !is_numeric($payment->getData('cc_number'))
                     || $this->ccValidator->isCcNumberMod10Valid($payment->getData('cc_number')) === false) {
                     $isValid = false;

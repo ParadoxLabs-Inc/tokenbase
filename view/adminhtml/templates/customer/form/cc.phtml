@@ -48,7 +48,7 @@
             </div>
         </div>
         <?php $phoneValidation = $this->helper(\Magento\Customer\Helper\Address::class)->getAttributeValidationClass('telephone'); ?>
-        <div class="admin__field telephone<?php if (strpos($phoneValidation, 'required') !== false): ?> _required<?php endif; ?>">
+        <div class="admin__field telephone<?php if (strpos((string)$phoneValidation, 'required') !== false): ?> _required<?php endif; ?>">
             <label class="admin__field-label" for="<?= $code; ?>-telephone"><span><?= $block->escapeHtml(__('Phone Number')) ?></span></label>
             <div class="admin__field-control">
                 <input type="text" name="billing[telephone]" value="<?= $block->escapeHtmlAttr($block->getAddress()->getTelephone()) ?>" title="<?= $block->escapeHtmlAttr(__('Phone Number')) ?>" class="admin__control-text input-text <?= $block->escapeHtmlAttr($phoneValidation) ?>" id="<?= $code; ?>-telephone" data-validate='{required:true}'>
@@ -122,7 +122,7 @@
                 <ul class="credit-card-types">
                     <?php foreach ($block->getCcBlock()->getCcAvailableTypes() as $_typeCode => $_typeName): ?>
                         <li class="item<?php if ($_typeCode == $_ccType): ?> _active<?php endif; ?>" data-type="<?= $block->escapeHtmlAttr($_typeCode); ?>">
-                            <img src="<?= $block->getViewFileUrl('Magento_Payment::images/cc/' . strtolower($_typeCode) . '.png'); ?>" alt="<?= $block->escapeHtmlAttr($_typeName); ?>" />
+                            <img src="<?= $block->getViewFileUrl('Magento_Payment::images/cc/' . strtolower((string)$_typeCode) . '.png'); ?>" alt="<?= $block->escapeHtmlAttr($_typeName); ?>" />
                         </li>
                     <?php endforeach; ?>
                 </ul>

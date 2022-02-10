@@ -112,7 +112,7 @@ class Feed extends \Magento\AdminNotification\Model\Feed
             $this->moduleDir->getDir($module) . '/composer.json'
         );
 
-        $composer = json_decode($composerFile, 1);
+        $composer = json_decode((string)$composerFile, true);
 
         return isset($composer['version']) ? $composer['version'] : '';
     }

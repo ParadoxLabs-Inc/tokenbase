@@ -71,7 +71,7 @@ class Plugin
         $cardCollection->addFieldToFilter(
             'last_use',
             [
-                'gt' => date('c', strtotime('-1 day')),
+                'gt' => date('c', (int)strtotime('-1 day')),
                 'date' => true,
             ]
         );

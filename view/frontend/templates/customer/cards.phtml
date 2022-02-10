@@ -12,18 +12,18 @@
             <?php /** @var \ParadoxLabs\TokenBase\Model\Card $card */ ?>
             <?php foreach ($cards as $card): ?>
                 <?php $card = $card->getTypeInstance(); ?>
-                <fieldset class="box-address-billing payment-method-title fieldset<?php if ($card->getExpires() != '' && strtotime($card->getExpires()) < time()): ?> expired<?php endif; ?>">
+                <fieldset class="box-address-billing payment-method-title fieldset<?php if ($card->getExpires() != '' && strtotime((string)$card->getExpires()) < time()): ?> expired<?php endif; ?>">
                     <legend class="box-title legend">
                         <?php if (!empty($card->getType())): ?>
-                            <img class="credit-card-type payment-icon" src="<?= $block->getViewFileUrl('Magento_Payment::images/cc/' . strtolower($card->getType()) . '.png'); ?>" alt="<?= $block->escapeHtmlAttr($block->getCcTypeLabel($card)); ?>" />
+                            <img class="credit-card-type payment-icon" src="<?= $block->getViewFileUrl('Magento_Payment::images/cc/' . strtolower((string)$card->getType()) . '.png'); ?>" alt="<?= $block->escapeHtmlAttr($block->getCcTypeLabel($card)); ?>" />
                         <?php endif; ?>
                         <strong class="payment-icon">
                             <span>
                                 <?= $block->escapeHtml($card->getLabel(empty($card->getType()))); ?>
                             </span>
                         </strong>
-                        <?php if (strtotime($card->getExpires()) > time()): ?>
-                            <small><?= $block->escapeHtml(__('(Expires %1)', date('m/Y', strtotime($card->getExpires())))); ?></small>
+                        <?php if (strtotime((string)$card->getExpires()) > time()): ?>
+                            <small><?= $block->escapeHtml(__('(Expires %1)', date('m/Y', (int)strtotime((string)$card->getExpires())))); ?></small>
                         <?php endif; ?>
                     </legend>
                     <div class="box-content">

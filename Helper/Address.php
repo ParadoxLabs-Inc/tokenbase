@@ -169,7 +169,7 @@ class Address extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function processRegionData($addressArray)
     {
-        if (!empty($addressArray['region']) && strlen($addressArray['region']) == 2) {
+        if (!empty($addressArray['region']) && strlen((string)$addressArray['region']) == 2) {
             $addressArray['region_code'] = $addressArray['region'];
         }
 

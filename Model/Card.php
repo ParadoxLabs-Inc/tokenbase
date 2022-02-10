@@ -385,7 +385,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
                 || ($payment->getData('cc_exp_year') == date('Y') && $payment->getData('cc_exp_month') >= date('n'))) {
                 $yr  = $payment->getData('cc_exp_year');
                 $mo  = $payment->getData('cc_exp_month');
-                $day = date('t', strtotime($payment->getData('cc_exp_year') . '-' . $payment->getData('cc_exp_month')));
+                $day = date('t', (int)strtotime($payment->getData('cc_exp_year') . '-' . $payment->getData('cc_exp_month')));
 
                 $this->setAdditional('cc_exp_year', $payment->getData('cc_exp_year'))
                     ->setAdditional('cc_exp_month', $payment->getData('cc_exp_month'))
@@ -496,7 +496,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
     public function getAddress($key = '')
     {
         if ($this->address === null && parent::getData('address')) {
-            $this->address = json_decode(parent::getData('address'), 1);
+            $this->address = json_decode((string)parent::getData('address'), true);
         }
 
         if ($key !== '') {
@@ -522,7 +522,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
 
         $street = $this->getAddress('street');
         if (!is_array($street)) {
-            $street = explode("\n", str_replace("\r", '', $street));
+            $street = explode("\n", str_replace("\r", '', (string)$street));
         }
 
         $region->setRegion($this->getAddress('region'));
@@ -561,7 +561,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
     public function getAdditional($key = null)
     {
         if ($this->additional === null) {
-            $this->additional = json_decode(parent::getData('additional'), 1);
+            $this->additional = json_decode((string)parent::getData('additional'), true);
         }
 
         if ($key !== null) {
@@ -944,13 +944,13 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
                 $cardType = $this->helper->translateCardType($this->getType());
             }
 
-            $label = trim(__(
+            $label = trim((string)__(
                 '%1 XXXX-%2',
                 $cardType,
                 $this->getAdditional('cc_last4')
             ));
 
-            $expires = strtotime($this->getExpires());
+            $expires = (int)strtotime((string)$this->getExpires());
             if ($expires > 0 && $expires < time()) {
                 $label .= __(' (Expired %1)', date('m/Y', $expires));
             }

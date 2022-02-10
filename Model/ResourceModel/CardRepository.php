@@ -350,8 +350,8 @@ class CardRepository implements CardRepositoryInterface
         }
 
         if (isset($paymentData['cc_number'])) {
-            $paymentData['cc_last4'] = substr($paymentData['cc_number'], -4);
-            $paymentData['cc_bin']   = substr($paymentData['cc_number'], 0, 6);
+            $paymentData['cc_last4'] = substr((string)$paymentData['cc_number'], -4);
+            $paymentData['cc_bin']   = substr((string)$paymentData['cc_number'], 0, 6);
         }
 
         /** @var \Magento\Quote\Model\Quote $quote */

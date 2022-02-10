@@ -251,7 +251,7 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
                     /**
                      * Convert special characters to simple ascii equivalent
                      */
-                    $val = htmlentities($val, ENT_QUOTES, 'UTF-8');
+                    $val = htmlentities((string)$val, ENT_QUOTES, 'UTF-8');
                     $val = preg_replace(
                         '/&([a-z]{1,2})(acute|cedil|circ|grave|lig|orn|ring|slash|th|tilde|uml);/i',
                         '$1',
@@ -265,14 +265,14 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
                     /**
                      * Apply a regex character filter to the input.
                      */
-                    $val = preg_replace('/[^' . $this->fields[ $key ]['charMask'] . ']/', '', $val);
+                    $val = preg_replace('/[^' . $this->fields[ $key ]['charMask'] . ']/', '', (string)$val);
                 }
 
                 if (isset($this->fields[ $key ]['maxLength']) && $this->fields[ $key ]['maxLength'] > 0) {
                     /**
                      * Truncate if the value is too long
                      */
-                    $this->params[ $key ] = substr($val, 0, $this->fields[ $key ]['maxLength']);
+                    $this->params[ $key ] = substr((string)$val, 0, $this->fields[ $key ]['maxLength']);
                 } elseif (isset($this->fields[ $key ]['enum'])) {
                     /**
                      * Error if value is not on the allowed list

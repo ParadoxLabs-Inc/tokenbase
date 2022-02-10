@@ -240,7 +240,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      */
     public function loadAndSetCard($cardId, $byHash = false)
     {
-        $this->log(sprintf('loadAndSetCard(%s, %s)', $cardId, var_export($byHash, 1)));
+        $this->log(sprintf('loadAndSetCard(%s, %s)', $cardId, var_export($byHash, true)));
 
         try {
             $card = $this->cardRepository->getById($cardId);
@@ -473,7 +473,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         if ($authTxn instanceof \Magento\Sales\Api\Data\TransactionInterface
             && $authTxn->getIsClosed() == 0
             && !empty($authTxn->getTxnId())
-            && substr($authTxn->getTxnId(), -5) !== '-auth') {
+            && substr((string)$authTxn->getTxnId(), -5) !== '-auth') {
             $this->gateway()->setHaveAuthorized(true);
 
             $authTxnInfo = $authTxn->getAdditionalInformation(
@@ -571,9 +571,9 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
          */
         if ($payment->getParentTransactionId() != '') {
             $transactionId = substr(
-                $payment->getParentTransactionId(),
+                (string)$payment->getParentTransactionId(),
                 0,
-                strcspn($payment->getParentTransactionId(), '-')
+                strcspn((string)$payment->getParentTransactionId(), '-')
             );
         } else {
             if ($creditmemo && $creditmemo->getInvoice()->getTransactionId() != '') {
@@ -656,7 +656,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
              * Short-circuit if we don't have a real transaction ID. That means reauth not working or failed.
              * Not doing this can result in voiding a valid (potentially already-captured) transaction. Bad.
              */
-            if (strpos($payment->getParentTransactionId(), '-auth') !== false) {
+            if (strpos((string)$payment->getParentTransactionId(), '-auth') !== false) {
                 $this->log(
                     sprintf(
                         'Skipping void; do not have a valid auth transaction ID. (%s)',
@@ -869,7 +869,10 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
                 $billingAddressData = $billingAddress->getData();
 
                 // AddressInterface requires an array for street
-                $billingAddressData['street'] = explode("\n", str_replace("\r", '', $billingAddressData['street']));
+                $billingAddressData['street'] = explode(
+                    "\n",
+                    str_replace("\r", '', (string)$billingAddressData['street'])
+                );
 
                 /** @var \Magento\Customer\Api\Data\AddressInterface $billingAddress */
                 $billingAddress     = $this->addressHelper->buildAddressFromInput($billingAddressData);

@@ -86,11 +86,11 @@ class PaymentMethodAssignAchDataObserver implements \Magento\Framework\Event\Obs
         }
 
         if ($data->getData('echeck_routing_no') != '') {
-            $payment->setData('echeck_routing_number', substr($data->getData('echeck_routing_no'), -4));
+            $payment->setData('echeck_routing_number', substr((string)$data->getData('echeck_routing_no'), -4));
         }
 
         if ($data->getData('echeck_account_no') != '') {
-            $last4 = substr($data->getData('echeck_account_no'), -4);
+            $last4 = substr((string)$data->getData('echeck_account_no'), -4);
 
             $payment->setData('cc_last_4', $last4);
             $payment->setAdditionalInformation('echeck_account_number_last4', $last4);

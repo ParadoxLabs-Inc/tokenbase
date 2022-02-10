@@ -36,15 +36,15 @@ class StoredAch extends \Magento\Payment\Gateway\Validator\AbstractValidator
          */
         if ($payment->hasData('tokenbase_id') !== false) {
             if ($payment->getData('echeck_account_name') != ''
-                && strlen($payment->getData('echeck_account_name')) > 22) {
+                && strlen((string)$payment->getData('echeck_account_name')) > 22) {
                 $fails[] = __('Please limit your account name to 22 characters.');
             }
 
             if ($payment->getData('echeck_routing_no') != ''
-                && substr($payment->getData('echeck_routing_no'), 0, 4) != 'XXXX'
+                && substr((string)$payment->getData('echeck_routing_no'), 0, 4) != 'XXXX'
             ) {
                 // If not masked and not 9 digits, or not numeric...
-                if (strlen($payment->getData('echeck_routing_no')) != 9
+                if (strlen((string)$payment->getData('echeck_routing_no')) != 9
                     || !is_numeric($payment->getData('echeck_routing_no'))
                 ) {
                     $fails[] = __('Your routing number must be 9 digits long. Please recheck the value you entered.');
@@ -52,11 +52,11 @@ class StoredAch extends \Magento\Payment\Gateway\Validator\AbstractValidator
             }
 
             if ($payment->getData('echeck_account_no') != ''
-                && substr($payment->getData('echeck_account_no'), 0, 4) != 'XXXX'
+                && substr((string)$payment->getData('echeck_account_no'), 0, 4) != 'XXXX'
             ) {
                 // If not masked and not 5-17 digits, or not numeric...
-                if (strlen($payment->getData('echeck_account_no')) < 5
-                    || strlen($payment->getData('echeck_account_no')) > 17
+                if (strlen((string)$payment->getData('echeck_account_no')) < 5
+                    || strlen((string)$payment->getData('echeck_account_no')) > 17
                     || !is_numeric($payment->getData('echeck_account_no'))
                 ) {
                     $fails[] = __(

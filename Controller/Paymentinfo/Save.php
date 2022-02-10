@@ -146,8 +146,8 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
                     $cardData['card_id']    = $card->getId() > 0 ? $card->getHash() : '';
 
                     if (isset($cardData['cc_number'])) {
-                        $cardData['cc_last4'] = substr($cardData['cc_number'], -4);
-                        $cardData['cc_bin']   = substr($cardData['cc_number'], 0, 6);
+                        $cardData['cc_last4'] = substr((string)$cardData['cc_number'], -4);
+                        $cardData['cc_bin']   = substr((string)$cardData['cc_number'], 0, 6);
                     }
 
                     /** @var \Magento\Quote\Model\Quote\Payment $newPayment */

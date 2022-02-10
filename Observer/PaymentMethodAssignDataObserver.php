@@ -99,7 +99,7 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
         $payment->setData('cc_owner', $data->getData('cc_owner'));
         $payment->setData('cc_last_4', substr($ccNumber, -4));
         $payment->setData('cc_number', $ccNumber);
-        $payment->setData('cc_cid', preg_replace('/[^\d]/', '', $data->getData('cc_cid')));
+        $payment->setData('cc_cid', preg_replace('/[^\d]/', '', (string)$data->getData('cc_cid')));
         $payment->setData('cc_exp_month', $data->getData('cc_exp_month'));
         $payment->setData('cc_exp_year', $data->getData('cc_exp_year'));
         $payment->setData('cc_ss_issue', $data->getData('cc_ss_issue'));
@@ -183,7 +183,7 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
 
         $this->helper->log(
             $payment->getMethod(),
-            sprintf('observer::loadAndSetCard(%s, %s)', $cardId, var_export($byHash, 1))
+            sprintf('observer::loadAndSetCard(%s, %s)', $cardId, var_export($byHash, true))
         );
 
         try {

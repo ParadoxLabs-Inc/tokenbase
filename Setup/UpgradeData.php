@@ -97,6 +97,8 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
      */
     private function jsonify($string)
     {
+        $string = (string)$string;
+
         // We're using serialize for array storage--all valid data will start with 'a:'.
         // If our string starts with 'a', attempt to decode, otherwise pass through as-is.
         if ($string[0] === 'a') {

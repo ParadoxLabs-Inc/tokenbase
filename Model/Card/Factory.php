@@ -54,7 +54,7 @@ class Factory
      */
     public function create($className, array $data = [])
     {
-        $card = $this->objectManager->create($className, $data);
+        $card = $this->objectManager->create((string)$className, $data);
 
         if (!$card instanceof \ParadoxLabs\TokenBase\Api\Data\CardInterface) {
             throw new \Magento\Framework\Exception\LocalizedException(
@@ -82,9 +82,9 @@ class Factory
                 \Magento\Store\Model\ScopeInterface::SCOPE_STORE
             );
 
-            $existingClass = str_replace('\\Interceptor', '', get_class($card));
+            $existingClass = str_replace('\\Interceptor', '', (string)get_class($card));
 
-            if ($existingClass !== $cardModel) {
+            if ($existingClass !== $cardModel && !empty($cardModel)) {
                 // Create and initialize the instance via object man.
                 $typeInstance = $this->create($cardModel);
                 $typeInstance->setData($card->getData());

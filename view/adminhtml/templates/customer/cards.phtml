@@ -9,7 +9,7 @@
         <?php $currentCardId = $block->getCurrentCard() ? $block->getCurrentCard()->getId() : null; ?>
         <?php foreach ($cards as $card): ?>
             <?php $card = $card->getTypeInstance(); ?>
-            <li class="address-list-item<?php if ($card->getExpires() != '' && strtotime($card->getExpires()) < time()): ?> expired<?php endif; ?><?php if ($card->getId() == $currentCardId): ?> ui-state-active<?php endif; ?>">
+            <li class="address-list-item<?php if ($card->getExpires() != '' && strtotime((string)$card->getExpires()) < time()): ?> expired<?php endif; ?><?php if ($card->getId() == $currentCardId): ?> ui-state-active<?php endif; ?>">
                 <div class="address-list-item-actions">
                     <?php if ($card->isInUse()): ?>
                         <abbr title="<?= $block->escapeHtmlAttr(__('This payment record cannot be modified while associated with pending orders.')); ?>"><?= $block->escapeHtml(__('Card In Use')); ?></abbr>
@@ -20,11 +20,11 @@
                 </div>
                 <address>
                     <?php if (!empty($card->getType())): ?>
-                        <img class="credit-card-type payment-icon" src="<?= $block->getViewFileUrl('Magento_Payment::images/cc/' . strtolower($card->getType()) . '.png'); ?>" alt="<?= $block->escapeHtmlAttr($block->getCcTypeLabel($card)); ?>" />
+                        <img class="credit-card-type payment-icon" src="<?= $block->getViewFileUrl('Magento_Payment::images/cc/' . strtolower((string)$card->getType()) . '.png'); ?>" alt="<?= $block->escapeHtmlAttr($block->getCcTypeLabel($card)); ?>" />
                     <?php endif; ?>
                     <span><?= $block->escapeHtml($card->getLabel(empty($card->getType()))); ?></span>
-                    <?php if (strtotime($card->getExpires()) > time()): ?>
-                        <small><?= $block->escapeHtml(__('(Expires %1)', date('m/Y', strtotime($card->getExpires())))); ?></small>
+                    <?php if (strtotime((string)$card->getExpires()) > time()): ?>
+                        <small><?= $block->escapeHtml(__('(Expires %1)', date('m/Y', (int)strtotime((string)$card->getExpires())))); ?></small>
                     <?php endif; ?><br />
 
                     <?= $block->getFormattedCardAddress($card->getAddressObject()); ?>

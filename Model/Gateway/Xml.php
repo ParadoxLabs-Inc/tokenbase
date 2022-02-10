@@ -141,13 +141,13 @@ class Xml
      */
     public static function &createArray($input_xml)
     {
-        // Strip out any characters proceeding starting XML tag, flexibility measure
-        if ($input_xml[0] != '<') {
-            $input_xml = substr($input_xml, strcspn($input_xml, '<'));
-        }
-
         $xml = self::getXMLRoot();
         if (is_string($input_xml)) {
+            // Strip out any characters proceeding starting XML tag, flexibility measure
+            if ($input_xml[0] !== '<') {
+                $input_xml = substr($input_xml, strcspn($input_xml, '<'));
+            }
+
             $parsed = $xml->loadXML($input_xml);
             if (!$parsed) {
                 throw new \Magento\Framework\Exception\LocalizedException(
@@ -182,12 +182,12 @@ class Xml
         switch ($node->nodeType) {
             case XML_CDATA_SECTION_NODE:
                 $output = [
-                    '@cdata' => trim($node->textContent),
+                    '@cdata' => trim((string)$node->textContent),
                 ];
                 break;
 
             case XML_TEXT_NODE:
-                $output = trim($node->textContent);
+                $output = trim((string)$node->textContent);
                 break;
 
             case XML_ELEMENT_NODE:
@@ -237,7 +237,7 @@ class Xml
     {
         $pattern = '/^[a-z_]+[a-z0-9\:\-\.\_]*[^:]*$/i';
 
-        return preg_match($pattern, $tag, $matches) && $matches[0] == $tag;
+        return preg_match($pattern, (string)$tag, $matches) && $matches[0] == $tag;
     }
 
     /**

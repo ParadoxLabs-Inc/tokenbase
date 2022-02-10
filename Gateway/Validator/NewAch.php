@@ -57,7 +57,7 @@ class NewAch extends \Magento\Payment\Gateway\Validator\AbstractValidator
         if ($payment->hasData('tokenbase_id') === false) {
             // Fields all present?
             foreach ($this->achFields as $field) {
-                $value = trim($payment->getData($field));
+                $value = trim((string)$payment->getData($field));
 
                 if (empty($value)) {
                     $fails[] = __('Please complete all required fields.');
@@ -66,12 +66,12 @@ class NewAch extends \Magento\Payment\Gateway\Validator\AbstractValidator
             }
 
             // Field lengths?
-            if (strlen($payment->getData('echeck_account_name')) > 22) {
+            if (strlen((string)$payment->getData('echeck_account_name')) > 22) {
                 $fails[] = __('Please limit your account name to 22 characters.');
-            } elseif (strlen($payment->getData('echeck_routing_no')) != 9) {
+            } elseif (strlen((string)$payment->getData('echeck_routing_no')) != 9) {
                 $fails[] = __('Your routing number must be 9 digits long. Please recheck the value you entered.');
-            } elseif (strlen($payment->getData('echeck_account_no')) < 5
-                || strlen($payment->getData('echeck_account_no')) > 17) {
+            } elseif (strlen((string)$payment->getData('echeck_account_no')) < 5
+                || strlen((string)$payment->getData('echeck_account_no')) > 17) {
                 $fails[] = __(
                     'Your account number must be between 5 and 17 digits. Please recheck the value you entered.'
                 );

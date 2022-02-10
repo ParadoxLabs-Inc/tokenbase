@@ -68,9 +68,9 @@ class CreditCard extends \Magento\Payment\Gateway\Validator\AbstractValidator
 
         $tokenbaseId = $payment->getData('tokenbase_id');
         if (empty($tokenbaseId)) {
-            $availableTypes = explode(',', $this->config->getValue('cctypes'));
+            $availableTypes = explode(',', (string)$this->config->getValue('cctypes'));
 
-            $ccNumber = preg_replace('/[\-\s]+/', '', $payment->getData('cc_number'));
+            $ccNumber = preg_replace('/[\-\s]+/', '', (string)$payment->getData('cc_number'));
             $payment->setData('cc_number', $ccNumber);
 
             $typeInfo = $this->ccTypes->getTypeForCard($ccNumber);
@@ -93,7 +93,7 @@ class CreditCard extends \Magento\Payment\Gateway\Validator\AbstractValidator
                 // Validate CVV
                 if ($this->config->getValue('useccv') == 1) {
                     if (!is_numeric($payment->getData('cc_cid'))
-                        || strlen($payment->getData('cc_cid')) != $typeInfo['code']['size']) {
+                        || strlen((string)$payment->getData('cc_cid')) != $typeInfo['code']['size']) {
                         $isValid = false;
                         $fails[] = __('Please enter a valid %1.', $typeInfo['code']['name']);
                     }
@@ -161,7 +161,7 @@ class CreditCard extends \Magento\Payment\Gateway\Validator\AbstractValidator
             [0,2,4,6,8,1,3,5,7,9]
         ];
 
-        $length = strlen($number);
+        $length = strlen((string)$number);
         $sum    = 0;
         $flip   = 1;
 
@@ -169,7 +169,7 @@ class CreditCard extends \Magento\Payment\Gateway\Validator\AbstractValidator
             $sum += $sumTable[$flip++ & 0x1][$number[$i]];
         }
 
-        $sum += substr($number, -1);
+        $sum += (int)substr((string)$number, -1);
 
         return $sum % 10 === 0;
     }

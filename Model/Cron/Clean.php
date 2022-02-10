@@ -85,14 +85,14 @@ class Clean
         /** @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection $cards */
         $cards = $this->cardCollectionFactory->create();
         $cards->addFieldToFilter('active', '0')
-              ->addFieldToFilter('updated_at', [ 'lt' => date('c', strtotime('-' . $cutoff)), 'date' => true ])
+              ->addFieldToFilter('updated_at', [ 'lt' => date('c', (int)strtotime('-' . $cutoff)), 'date' => true ])
               ->addFieldToFilter(
                   [
                       'last_use',
                       'last_use',
                   ],
                   [
-                      ['lt' => date('c', strtotime('-' . $cutoff)), 'date' => true],
+                      ['lt' => date('c', (int)strtotime('-' . $cutoff)), 'date' => true],
                       ['null' => true],
                   ]
               );
@@ -110,7 +110,7 @@ class Clean
         $cards = $this->cardCollectionFactory->create();
         $cards->addFieldToFilter('profile_id', ['null' => true])
               ->addFieldToFilter('payment_id', ['null' => true])
-              ->addFieldToFilter('updated_at', ['lt' => date('c', strtotime('-7 days')), 'date' => true]);
+              ->addFieldToFilter('updated_at', ['lt' => date('c', (int)strtotime('-7 days')), 'date' => true]);
 
         $affectedCount   += $this->deleteCards($cards);
 
