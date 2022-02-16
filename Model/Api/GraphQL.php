@@ -27,30 +27,35 @@ class GraphQL
      * @var \Magento\Quote\Api\CartRepositoryInterface
      */
     protected $cartRepository;
+
     /**
      * @var \Magento\Quote\Model\MaskedQuoteIdToQuoteIdInterface
      */
     protected $maskedQuoteIdToQuoteId;
+
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
-    private $scopeConfig;
+    protected $scopeConfig;
 
     /**
      * GraphQL constructor.
      *
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
-     * @param \Magento\Quote\Model\MaskedQuoteIdToQuoteIdInterface $maskedQuoteIdToQuoteId
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
-        \Magento\Quote\Model\MaskedQuoteIdToQuoteIdInterface $maskedQuoteIdToQuoteId
+        \Magento\Quote\Api\CartRepositoryInterface $cartRepository
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->cartRepository = $cartRepository;
-        $this->maskedQuoteIdToQuoteId = $maskedQuoteIdToQuoteId; // TODO: 2.3+ ONLY
+
+        if (interface_exists(\Magento\Quote\Model\MaskedQuoteIdToQuoteIdInterface::class)) {
+            // Loading as such because this class does not exist until Magento 2.3
+            $om = \Magento\Framework\App\ObjectManager::getInstance();
+            $this->maskedQuoteIdToQuoteId = $om->get(\Magento\Quote\Model\MaskedQuoteIdToQuoteIdInterface::class);
+        }
     }
 
     /**
