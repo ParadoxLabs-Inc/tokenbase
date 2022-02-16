@@ -5,6 +5,7 @@
             <tokenbase>
                 <clean_old_cards>1</clean_old_cards>
                 <clean_old_cards_after>120 days</clean_old_cards_after>
+                <save_order_after_payment>0</save_order_after_payment>
                 <failure_limit>5</failure_limit>
                 <failure_window>86400</failure_window>
                 <paymentinfo_require_order>1</paymentinfo_require_order>

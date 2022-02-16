@@ -103,6 +103,14 @@
         </arguments>
     </virtualType>
 
+    <!-- Order save forcing / silent exceptions -->
+    <type name="Magento\Checkout\Api\PaymentInformationManagementInterface">
+        <plugin name="tokenbaseSilenceCheckoutPostProcessExceptions" type="ParadoxLabs\TokenBase\Plugin\Checkout\Model\PaymentInformationManagement\Plugin" />
+    </type>
+    <type name="Magento\Checkout\Api\GuestPaymentInformationManagementInterface">
+        <plugin name="tokenbaseSilenceGuestCheckoutPostProcessExceptions" type="ParadoxLabs\TokenBase\Plugin\Checkout\Model\GuestPaymentInformationManagement\Plugin" />
+    </type>
+
     <!-- Proxies for dependency resolution and efficiency -->
     <type name="ParadoxLabs\TokenBase\Block\Adminhtml\Customer\Form">
         <arguments>
@@ -174,6 +182,21 @@
     <type name="ParadoxLabs\TokenBase\Observer\PaymentInfoAuthenticateObserver">
         <arguments>
             <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="ParadoxLabs\TokenBase\Observer\SaveOrderAfterPaymentObserver">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="ParadoxLabs\TokenBase\Plugin\Checkout\Model\PaymentInformationManagement\Plugin">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="ParadoxLabs\TokenBase\Plugin\Checkout\Model\GuestPaymentInformationManagement\Plugin">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
         </arguments>
     </type>
 </config>

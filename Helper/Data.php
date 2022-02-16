@@ -219,10 +219,10 @@ class Data extends \Magento\Payment\Helper\Data
         $storeId = $this->getCurrentStoreId();
 
         foreach ($this->getPaymentMethods() as $code => $data) {
-            if (isset($data['group']) && $data['group'] == 'tokenbase') {
+            if (isset($data['group']) && $data['group'] === 'tokenbase') {
                 $method = $this->getMethodInstance($code);
 
-                if ($method->getConfigData('active', $storeId) == 1) {
+                if ((bool)$method->getConfigData('active', $storeId) === true) {
                     $methods[] = $code;
                 }
             }
