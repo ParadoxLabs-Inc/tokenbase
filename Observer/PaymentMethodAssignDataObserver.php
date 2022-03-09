@@ -95,10 +95,13 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
 
         $ccNumber = preg_replace('/[^X\d]/', '', (string)$data->getData('cc_number'));
 
+        if (!empty($ccNumber)) {
+            $payment->setData('cc_last_4', substr($ccNumber, -4));
+            $payment->setData('cc_number', $ccNumber);
+        }
+
         $payment->setData('cc_type', $data->getData('cc_type'));
         $payment->setData('cc_owner', $data->getData('cc_owner'));
-        $payment->setData('cc_last_4', substr($ccNumber, -4));
-        $payment->setData('cc_number', $ccNumber);
         $payment->setData('cc_cid', preg_replace('/[^\d]/', '', (string)$data->getData('cc_cid')));
         $payment->setData('cc_exp_month', $data->getData('cc_exp_month'));
         $payment->setData('cc_exp_year', $data->getData('cc_exp_year'));
