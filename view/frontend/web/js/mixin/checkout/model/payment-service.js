@@ -19,7 +19,11 @@ define([
                 var freeMethod = _.find(methods, function (paymentMethod) {
                     return paymentMethod.method === 'free';
                 });
-                var filteredMethods = _.without(methods, freeMethod);
+                if (freeMethod && filteredMethods && filteredMethods.length > 1) {
+                    var filteredMethods = methods.filter(function(method) {
+                        return method.title !== freeMethod.title
+                    });
+                }
             }
 
             this._super(filteredMethods);
