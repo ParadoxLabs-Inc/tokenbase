@@ -80,7 +80,7 @@ class Clean
         $cutoff = $this->scopeConfig->getValue(
             'checkout/tokenbase/clean_old_cards_after',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        ) ?: '120 days';
+        ) ?: '180 days';
 
         /** @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection $cards */
         $cards = $this->cardCollectionFactory->create();

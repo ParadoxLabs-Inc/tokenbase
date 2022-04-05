@@ -11,7 +11,7 @@
                 </field>
                 <field id="clean_old_cards_after" translate="label" type="text" sortOrder="105" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="1">
                     <label>Prune archived cards after</label>
-                    <comment><![CDATA[Amount of time to remove archived cards after. Default is 120 days, the maximum linked refund period.]]></comment>
+                    <comment><![CDATA[Amount of time to remove archived cards after. Default is 180 days, the maximum linked refund period.]]></comment>
                 </field>
                 <field id="save_order_after_payment" translate="label" type="select" sortOrder="150" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="1">
                     <label>Save new order immediately after payment</label>
