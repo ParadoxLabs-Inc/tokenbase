@@ -15,8 +15,6 @@ namespace ParadoxLabs\TokenBase\Api;
 
 /**
  * Interface GuestCardRepositoryInterface
- *
- * @package ParadoxLabs\TokenBase\Api
  */
 interface GuestCardRepositoryInterface
 {

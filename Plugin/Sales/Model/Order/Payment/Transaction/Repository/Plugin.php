@@ -38,7 +38,7 @@ class Plugin
         /** @var \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\Collection $collection */
         $collection = $proceed($searchCriteria);
 
-        $sort = $collection->getSelect()->getPart(\Zend_Db_Select::ORDER);
+        $sort = $collection->getSelect()->getPart(\Magento\Framework\DB\Select::ORDER);
 
         if (empty($sort)) {
             // Add missing sort order(s)

@@ -367,7 +367,10 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
                 || ($payment->getData('cc_exp_year') == date('Y') && $payment->getData('cc_exp_month') >= date('n'))) {
                 $yr  = $payment->getData('cc_exp_year');
                 $mo  = $payment->getData('cc_exp_month');
-                $day = date('t', (int)strtotime($payment->getData('cc_exp_year') . '-' . $payment->getData('cc_exp_month')));
+                $day = date(
+                    't',
+                    (int)strtotime($payment->getData('cc_exp_year') . '-' . $payment->getData('cc_exp_month'))
+                );
 
                 $this->setAdditional('cc_exp_year', $payment->getData('cc_exp_year'))
                     ->setAdditional('cc_exp_month', $payment->getData('cc_exp_month'))
@@ -989,21 +992,25 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
                             /**
                              * Update deleted card values for orders and quotes to point to the new card.
                              */
-                            $this->getResource()->getConnection()->update(
-                                $this->getResource()->getTable('sales_order_payment'),
+                            $this->_resource->getConnection()->update(
+                                $this->_resource->getTable('sales_order_payment'),
                                 ['tokenbase_id' => $this->getId()],
                                 ['tokenbase_id=?' => $card->getId()]
                             );
-                            $this->getResource()->getConnection()->update(
-                                $this->getResource()->getTable('quote_payment'),
+                            $this->_resource->getConnection()->update(
+                                $this->_resource->getTable('quote_payment'),
                                 ['tokenbase_id' => $this->getId()],
                                 ['tokenbase_id=?' => $card->getId()]
                             );
                             $this->helper->log(
                                 $this->getData('method'),
-                                __('Removed duplicate card %1 with profile ID %2', $card->getId(), $card->getProfileId())
+                                __(
+                                    'Removed duplicate card %1 with profile ID %2',
+                                    $card->getId(),
+                                    $card->getProfileId()
+                                )
                             );
-                            $this->getResource()->delete($card);
+                            $this->_resource->delete($card);
                         }
                     }
                 } else {

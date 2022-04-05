@@ -15,8 +15,6 @@ namespace ParadoxLabs\TokenBase\Api;
 
 /**
  * Interface CustomerCardRepositoryInterface
- *
- * @package ParadoxLabs\TokenBase\Api
  */
 interface CustomerCardRepositoryInterface
 {
