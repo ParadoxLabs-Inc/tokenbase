@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Paradox Labs, Inc.
  * http://www.paradoxlabs.com
@@ -11,15 +11,13 @@
  * @license     http://store.paradoxlabs.com/license.html
  */
 
-namespace ParadoxLabs\TokenBase\Setup;
+namespace ParadoxLabs\TokenBase\Setup\Patch\Data;
 
-use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
+use Magento\Framework\Setup\Patch\DataPatchInterface;
+use Magento\Framework\Setup\Patch\PatchVersionInterface;
 
-/**
- * UpgradeData Class
- */
-class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
+class ConvertSerializedData implements DataPatchInterface, PatchVersionInterface
 {
     /**
      * @var \Magento\Framework\Unserialize\Unserialize
@@ -27,51 +25,85 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
     private $unserialize;
 
     /**
-     * UpgradeData constructor.
-     *
+     * @var ModuleDataSetupInterface
+     */
+    private $moduleDataSetup;
+
+    /**
+     * @param ModuleDataSetupInterface $moduleDataSetup
      * @param \Magento\Framework\Unserialize\Unserialize $unserialize
      */
     public function __construct(
+        ModuleDataSetupInterface $moduleDataSetup,
         \Magento\Framework\Unserialize\Unserialize $unserialize
     ) {
+        $this->moduleDataSetup = $moduleDataSetup;
         $this->unserialize = $unserialize;
     }
 
     /**
-     * Data upgrade
+     * Run patch
      *
-     * @param ModuleDataSetupInterface $setup
-     * @param ModuleContextInterface $context
-     * @return void
+     * Convert serialized data to JSON. Magento did this across the core in 2.2.
+     *
+     * @return $this
      */
-    public function upgrade(
-        ModuleDataSetupInterface $setup,
-        ModuleContextInterface $context
-    ) {
-        if (version_compare($context->getVersion(), '4.0.0', '<')) {
-            $this->convertSerializedColsToJson($setup, $context);
-        }
+    public function apply()
+    {
+        $this->moduleDataSetup->startSetup();
+        $this->convertSerializedColsToJson();
+        $this->moduleDataSetup->endSetup();
+
+        return $this;
+    }
+
+    /**
+     * Get array of patches that have to be executed prior to this.
+     *
+     * @return string[]
+     */
+    public static function getDependencies()
+    {
+        return [];
+    }
+
+    /**
+     * Get aliases (previous names) for the patch.
+     *
+     * @return string[]
+     */
+    public function getAliases()
+    {
+        return [];
+    }
+
+    /**
+     * This version associates the patch with Magento setup version.
+     *
+     * @return string
+     */
+    public static function getVersion()
+    {
+        return '4.0.0';
     }
 
     /**
      * Convert serialized data to JSON. Magento did this across the core in 2.2.
      *
-     * @param ModuleDataSetupInterface $setup
-     * @param ModuleContextInterface $context
      * @return $this
      */
-    public function convertSerializedColsToJson(
-        ModuleDataSetupInterface $setup,
-        ModuleContextInterface $context
-    ) {
+    public function convertSerializedColsToJson()
+    {
+        $setup = $this->moduleDataSetup;
+
         /**
          * Fix paradoxlabs_stored_card.address and paradoxlabs_stored_card.additional
          */
         $select = $setup->getConnection()->select()
-            ->from($setup->getTable('paradoxlabs_stored_card'), 'id')
-            ->columns(['address', 'additional'])
-            ->where('additional LIKE ?', 'a:%')
-            ->orWhere('address LIKE ?', 'a:%');
+                        ->from($setup->getTable('paradoxlabs_stored_card'), 'id')
+                        ->columns(['address', 'additional'])
+                        ->where('additional LIKE ?', 'a:%')
+                        ->orWhere('address LIKE ?', 'a:%');
 
         $items = $setup->getConnection()->fetchAll($select);
         foreach ($items as $item) {

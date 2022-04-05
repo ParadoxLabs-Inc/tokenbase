@@ -54,11 +54,6 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
         /** @var \Magento\Sales\Model\Order\Payment $payment */
         $payment = $observer->getData('payment_model');
 
-        // Magento 2.0 compatibility
-        if ($payment === null) {
-            $payment = $method->getInfoInstance();
-        }
-
         /** @var \Magento\Framework\DataObject $data */
         $data = $observer->getData('data');
 

@@ -16,29 +16,11 @@ namespace ParadoxLabs\TokenBase\Model;
 use Magento\Payment\Model\InfoInterface;
 
 /**
- * Soft dependency: Supporting 2.1 Vault without breaking 2.0 compatibility.
- * The 2.1+ version implements \Magento\Vault; 2.0 does not.
- *
- * If PaymentTokenInterface exists, we want to implement it. If not, skip.
- */
-if (interface_exists('\Magento\Vault\Api\Data\PaymentTokenInterface')) {
-    class_alias(
-        '\Magento\Vault\Api\Data\PaymentTokenInterface',
-        '\ParadoxLabs\TokenBase\Api\Data\TokenInterface'
-    );
-} else {
-    class_alias(
-        '\ParadoxLabs\TokenBase\Api\Data\FauxTokenInterface',
-        '\ParadoxLabs\TokenBase\Api\Data\TokenInterface'
-    );
-}
-
-/**
  * Payment record storage
  */
 class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
     \ParadoxLabs\TokenBase\Api\Data\CardInterface,
-    \ParadoxLabs\TokenBase\Api\Data\TokenInterface
+    \Magento\Vault\Api\Data\PaymentTokenInterface
 {
     const PROTECTED_ADDITIONAL_KEYS = [
         'acceptjs_key',

@@ -1,0 +1,39 @@
+{
+    "paradoxlabs_stored_card": {
+        "column": {
+            "id": true,
+            "customer_id": true,
+            "customer_email": true,
+            "customer_ip": true,
+            "profile_id": true,
+            "payment_id": true,
+            "method": true,
+            "active": true,
+            "created_at": true,
+            "updated_at": true,
+            "last_use": true,
+            "expires": true,
+            "address": true,
+            "additional": true,
+            "hash": true
+        },
+        "index": {
+            "PARADOXLABS_STORED_CARD_CUSTOMER_ID": true,
+            "PARADOXLABS_STORED_CARD_PAYMENT_ID": true,
+            "PARADOXLABS_STORED_CARD_HASH": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "quote_payment": {
+        "column": {
+            "tokenbase_id": true
+        }
+    },
+    "sales_order_payment": {
+        "column": {
+            "tokenbase_id": true
+        }
+    }
+}
