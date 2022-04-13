@@ -13,12 +13,12 @@
         "magento/module-quote": "^100.0||^101.0",
         "magento/module-sales": "^100.0||^101.0||^102.0||^103.0",
         "magento/module-store": "^100.0||^101.0",
-        "monolog/monolog": "^1.11",
+        "monolog/monolog": "^1.11||^2.0",
         "ext-json": "*"
     },
     "type": "magento2-module",
-    "version": "4.5.0",
-    "time": "2022-04-05",
+    "version": "4.5.1",
+    "time": "2022-04-13",
     "license": "proprietary",
     "autoload": {
         "files": [ "registration.php" ],
