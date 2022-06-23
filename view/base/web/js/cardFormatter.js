@@ -33,12 +33,12 @@ define([
             var ccInput = this.element.find(this.options.ccInputSelector);
 
             if (ccInput.length > 0) {
-                ccInput.bind('keydown', this.handleKeydown.bind(this))
-                       .bind('input paste', this.formatCc.bind(this));
+                ccInput.on('keydown', this.handleKeydown.bind(this))
+                       .on('input paste', this.formatCc.bind(this));
             }
 
             if (this.options.ccTypeSelector !== '' && this.options.ccTypeContainer !== '') {
-                ccInput.bind('input change keyup paste', this.detectCcType.bind(this));
+                ccInput.on('input change keyup paste', this.detectCcType.bind(this));
             }
         },
 

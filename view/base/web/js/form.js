@@ -25,13 +25,7 @@ define([
                 if (el.is(':hidden') !== disabled) {
                     el.toggle(!disabled);
                 }
-                if (el.prop('disabled') !== disabled) {
-                    if (disabled) {
-                        el.prop('disabled', disabled);
-                    } else {
-                        el.removeProp('disabled');
-                    }
-                }
+                el.prop('disabled', disabled);
             });
         },
 

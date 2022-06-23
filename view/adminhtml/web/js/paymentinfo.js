@@ -152,7 +152,7 @@ define([
                 if(typeof data.message != 'undefined') {
                     alert(data.message);
 
-                    this.element.find(this.options.saveSelector).removeProp('disabled');
+                    this.element.find(this.options.saveSelector).prop('disabled', false);
                     this.element.find(this.options.formSelector).trigger('tokenbaseFailure');
                 }
             }
