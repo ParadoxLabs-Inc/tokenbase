@@ -12,7 +12,7 @@ var config = {
                 'ParadoxLabs_TokenBase/js/mixin/multishipping/payment': true
             },
             'Magento_Checkout/js/model/payment-service': {
-                'ParadoxLabs_TokenBase/js/mixin/checkout/model/payment-service': true
+                'ParadoxLabs_TokenBase/js/mixin/checkout/model/payment-service': false
             }
         }
     }
