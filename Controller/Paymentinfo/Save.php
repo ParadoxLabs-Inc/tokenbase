@@ -154,6 +154,7 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
                     $newPayment = $this->paymentFactory->create();
                     $newPayment->setQuote($this->checkoutSession->getQuote());
                     $newPayment->getQuote()->getBillingAddress()->setCountryId($newAddr->getCountryId());
+                    $newPayment->setData('tokenbase_source', 'paymentinfo');
                     $newPayment->importData($cardData);
 
                     $paymentMethod = $this->paymentHelper->getMethodInstance($card->getMethod());

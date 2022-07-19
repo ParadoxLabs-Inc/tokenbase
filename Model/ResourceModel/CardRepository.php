@@ -361,6 +361,7 @@ class CardRepository implements CardRepositoryInterface
         $payment = $this->paymentFactory->create();
         $payment->setQuote($quote);
         $payment->getQuote()->getBillingAddress()->setCountryId($card->getAddress('country_id'));
+        $payment->setData('tokenbase_source', 'paymentinfo');
         $payment->importData($paymentData);
 
         $paymentMethod = $this->paymentHelper->getMethodInstance($card->getMethod());
