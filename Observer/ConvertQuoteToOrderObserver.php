@@ -61,10 +61,18 @@ class ConvertQuoteToOrderObserver extends ConvertAbstract implements \Magento\Fr
         }
 
         /**
-         * Copy fields from quote payment to order payment
+         * Copy fields from quote payment to order payment. If using GraphQL, set tokenbase_id.
          */
+        $payment = $quote->getPayment();
+        if (!$payment->getData('tokenbase_id')) {
+            $paymentAttr = $payment->getExtensionAttributes();
+            if ($paymentAttr) {
+                $payment->setData('tokenbase_id', $paymentAttr->getTokenbaseId());
+            }
+        }
+
         $this->copyData(
-            $quote->getPayment(),
+            $payment,
             $order->getPayment()
         );
 
