@@ -93,6 +93,7 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
         if (!empty($ccNumber)) {
             $payment->setData('cc_last_4', substr($ccNumber, -4));
             $payment->setData('cc_number', $ccNumber);
+            $payment->setData('tokenbase_id', null);
         }
 
         $payment->setData('cc_type', $data->getData('cc_type'));
@@ -153,6 +154,8 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
                 $payment->setData('cc_exp_year', $data->getData('cc_exp_year'));
                 $payment->setData('cc_exp_month', $data->getData('cc_exp_month'));
             }
+        } elseif (!empty($payment->getData('tokenbase_id'))) {
+            $this->loadAndSetCard($payment, $payment->getData('tokenbase_id'));
         } elseif ($payment->hasData('tokenbase_card') === false
             || $payment->getData('tokenbase_card')->getId() !== $payment->getData('tokenbase_id')) {
             $payment->setData('tokenbase_id', null);

@@ -89,6 +89,10 @@ class PaymentMethodAssignAchDataObserver implements \Magento\Framework\Event\Obs
 
             $payment->setData('cc_last_4', $last4);
             $payment->setAdditionalInformation('echeck_account_number_last4', $last4);
+
+            if (empty($data->getData('card_id'))) {
+                $payment->setData('tokenbase_id', null);
+            }
         }
     }
 }
