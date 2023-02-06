@@ -129,4 +129,53 @@ class Response extends \Magento\Framework\DataObject
     {
         return $this->getData('response_reason_text');
     }
+
+    /**
+     * Object data getter
+     *
+     * @param string $key
+     * @param string|int $index
+     * @return mixed
+     */
+    public function getData($key = '', $index = null)
+    {
+        $data = parent::getData(
+            $key,
+            $index
+        );
+
+        if (empty($key)) {
+            return $this->flattenArray($data);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Turn multi-dimensional array into 1D, concatenating keys
+     *
+     * We do this transformation for sales_order_payment.additional_information, and particularly the admin txn
+     * details view page, which only supports a single level associative array.
+     *
+     * @param mixed $array
+     * @param string|null $prefix
+     * @return array
+     * @see http://stackoverflow.com/a/9546215/2336164
+     */
+    protected function flattenArray($array, $prefix = null)
+    {
+        $result = [];
+
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $result += $this->flattenArray($value, $prefix . $key . '.');
+            } elseif (is_bool($value)) {
+                $result[$prefix . $key] = $value ? '1' : '0';
+            } else {
+                $result[$prefix . $key] = $value;
+            }
+        }
+
+        return $result;
+    }
 }
