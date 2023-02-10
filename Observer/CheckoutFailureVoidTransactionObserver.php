@@ -13,11 +13,18 @@
 
 namespace ParadoxLabs\TokenBase\Observer;
 
+use Magento\Sales\Model\Order;
+
 /**
  * CheckoutFailureVoidTransactionObserver Observer
  */
 class CheckoutFailureVoidTransactionObserver implements \Magento\Framework\Event\ObserverInterface
 {
+    protected const FAILED_ORDER_STATES = [
+        Order::STATE_CANCELED,
+        Order::STATE_CLOSED,
+    ];
+
     /**
      * @var \ParadoxLabs\TokenBase\Helper\Data
      */
@@ -50,11 +57,17 @@ class CheckoutFailureVoidTransactionObserver implements \Magento\Framework\Event
     {
         $order = $observer->getData('order');
 
-        if ($order instanceof \Magento\Sales\Model\Order === false
+        if ($order instanceof Order === false
             || $order->getPayment() instanceof \Magento\Sales\Model\Order\Payment === false
             || empty($order->getPayment()->getLastTransId())
             || in_array($order->getPayment()->getMethod(), $this->helper->getAllMethods(), true) === false
             || $order->getData('_tokenbase_saved_order') === true) {
+            return;
+        }
+
+        // If the order has an ID and a valid state (saved successfully), don't void.
+        if ($order->getId() > 0
+            && in_array($order->getState(), static::FAILED_ORDER_STATES, true) === false) {
             return;
         }
 
