@@ -238,7 +238,7 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
      */
     public function setParameter($key, $val)
     {
-        if (!empty($val)) {
+        if (is_bool($val) || !empty($val)) {
             /**
              * Make sure we know this parameter
              */
