@@ -69,6 +69,7 @@ define(
                     ]);
 
                 this.placeOrderFailure = ko.observable(false);
+                this.placeOrderAllowedFlag = ko.observable(true);
 
                 this.isTokenizing = ko.observable(false);
                 this.isTokenizing.subscribe(this.spinner.bind(this));
@@ -91,7 +92,9 @@ define(
 
                 this.isPlaceOrderActionAllowed = ko.computed({
                     read: this.checkPlaceOrderAllowed,
-                    write: function() {},
+                    write: function(value) {
+                        this.placeOrderAllowedFlag(value);
+                    },
                     owner: this
                 });
 
@@ -117,7 +120,9 @@ define(
              * checked upon submit and stop processing--so that's okay.
              */
             checkPlaceOrderAllowed: function () {
-                if (quote.billingAddress() === null || this.isTokenizing() === true) {
+                if (quote.billingAddress() === null
+                    || this.isTokenizing() === true
+                    || this.placeOrderAllowedFlag() === false) {
                     return false;
                 }
 
