@@ -102,7 +102,7 @@ input TokenBaseCardPaymentInput @doc(description: "Payment data for a stored car
     cc_last4: String @doc(description: "CC Last-4")
     cc_number: String @doc(description: "CC Number")
     cc_cid: String @doc(description: "CC CVV")
-    cc_exp_year: String @doc(description: "CC Expiration Year")
+    cc_exp_year: String @doc(description: "The full CC Expiration Year, ex: 2022")
     cc_exp_month: String @doc(description: "CC Expiration Month")
     echeck_account_name: String @doc(description: "ACH Account Name")
     echeck_bank_name: String @doc(description: "ACH Bank Name")
