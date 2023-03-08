@@ -127,9 +127,16 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
     protected $helper;
 
     /**
-     * @var
+     * @var \Magento\Framework\HTTP\ZendClientFactory
+     * @deprecated Class is nonfunctional in 2.4.6+.
+     * @see \Magento\Framework\HTTP\ClientInterface via $this->communicatorFactory
      */
     protected $httpClientFactory;
+
+    /**
+     * @var \Magento\Framework\HTTP\ClientInterfaceFactory
+     */
+    protected $communicatorFactory;
 
     /**
      * Constructor, yeah!
@@ -137,22 +144,31 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \ParadoxLabs\TokenBase\Model\Gateway\Xml $xml
      * @param \ParadoxLabs\TokenBase\Model\Gateway\ResponseFactory $responseFactory
-     * @param \Magento\Framework\HTTP\ZendClientFactory $httpClientFactory
+     * @param \Magento\Framework\HTTP\ZendClientFactory $httpClientFactory * Deprecated, will be removed in the future
      * @param array $data
+     * @param \Magento\Framework\HTTP\ClientInterfaceFactory|null $communicatorFactory
      */
     public function __construct(
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         \ParadoxLabs\TokenBase\Model\Gateway\Xml $xml,
         \ParadoxLabs\TokenBase\Model\Gateway\ResponseFactory $responseFactory,
         \Magento\Framework\HTTP\ZendClientFactory $httpClientFactory,
-        array $data = []
+        array $data = [],
+        \Magento\Framework\HTTP\ClientInterfaceFactory $communicatorFactory = null
     ) {
         $this->helper           = $helper;
         $this->responseFactory  = $responseFactory;
         $this->xml              = $xml;
         $this->httpClientFactory = $httpClientFactory;
+        $this->communicatorFactory = $communicatorFactory;
 
         parent::__construct($data);
+
+        // BC preservation -- argument added in 4.5.4
+        $om = \Magento\Framework\App\ObjectManager::getInstance();
+        $this->communicatorFactory = $communicatorFactory ?? $om->get(
+            \Magento\Framework\HTTP\ClientInterfaceFactory::class
+        );
     }
 
     /**
