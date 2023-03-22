@@ -570,18 +570,20 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
          * Grab transaction ID from the order
          */
         if ($payment->getParentTransactionId() != '') {
-            $transactionId = substr(
-                (string)$payment->getParentTransactionId(),
-                0,
-                strcspn((string)$payment->getParentTransactionId(), '-')
-            );
+            $txnId = $payment->getParentTransactionId();
         } else {
             if ($creditmemo && $creditmemo->getInvoice()->getTransactionId() != '') {
-                $transactionId = $creditmemo->getInvoice()->getTransactionId();
+                $txnId = $creditmemo->getInvoice()->getTransactionId();
             } else {
-                $transactionId = $payment->getLastTransId();
+                $txnId = $payment->getLastTransId();
             }
         }
+
+        $transactionId = substr(
+            (string)$txnId,
+            0,
+            strcspn((string)$txnId, '-')
+        );
 
         $this->gateway()->setTransactionId($transactionId);
 
