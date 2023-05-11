@@ -1,5 +1,9 @@
 # ParadoxLabs_TokenBase Changelog
 
+## 4.5.5 - May 11, 2023
+- Changed license from proprietary to Apache 2.0. Issues and contributions are welcome on GitHub.
+- Fixed hyphenated transaction IDs possibly being sent to payment gateway on refund.
+
 ## 4.5.4 - Mar 10, 2023
 - Added compatibility for Magento 2.4.6.
 - Changed GraphQL data assignment to allow order placement in a separate mutation. (Thanks Alfredo)

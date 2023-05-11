@@ -17,8 +17,8 @@
         "ext-json": "*"
     },
     "type": "magento2-module",
-    "version": "4.5.4",
-    "time": "2023-03-08",
+    "version": "4.5.5",
+    "time": "2023-05-11",
     "license": "Apache-2.0",
     "authors": [
         {
