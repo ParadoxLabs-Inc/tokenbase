@@ -1,6 +1,6 @@
-[![Latest Stable Version](https://poser.pugx.org/ParadoxLabs-Inc/tokenbase/v/stable)](https://packagist.org/packages/ParadoxLabs-Inc/tokenbase)
-[![License](https://poser.pugx.org/ParadoxLabs-Inc/tokenbase/license)](https://packagist.org/packages/ParadoxLabs-Inc/tokenbase)
-[![Total Downloads](https://poser.pugx.org/ParadoxLabs-Inc/tokenbase/downloads)](https://packagist.org/packages/ParadoxLabs-Inc/tokenbase)
+[![Latest Stable Version](https://poser.pugx.org/paradoxlabs/tokenbase/v/stable)](https://packagist.org/packages/paradoxlabs/tokenbase)
+[![License](https://poser.pugx.org/paradoxlabs/tokenbase/license)](https://packagist.org/packages/paradoxlabs/tokenbase)
+[![Total Downloads](https://poser.pugx.org/paradoxlabs/tokenbase/downloads)](https://packagist.org/packages/paradoxlabs/tokenbase)
 
 <p align="center">
     <a href="https://www.paradoxlabs.com"><img alt="ParadoxLabs" src="https://paradoxlabs.com/wp-content/uploads/2020/02/pl-logo-canva-2.png" width="250"></a>
@@ -49,7 +49,7 @@ Support
 
 This module is provided free and without support of any kind. You may report issues you've found in the module, and we will address them as we are able, but **no support will be provided here.**
 
-**DO NOT include any api keys, credentials, or customer-identifying in issues, pull requests, or comments. Any personally identifying information will be deleted on sight.**
+**DO NOT include any API keys, credentials, or customer-identifying in issues, pull requests, or comments. Any personally identifying information will be deleted on sight.**
 
 If you need personal support services, please [buy an extension support plan from ParadoxLabs](https://store.paradoxlabs.com/support-renewal.html), then open a ticket at [support.paradoxlabs.com](https://support.paradoxlabs.com).
 
