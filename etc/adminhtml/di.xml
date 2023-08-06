@@ -11,4 +11,15 @@
             <argument name="feedFactory" xsi:type="object">ParadoxLabs\TokenBase\Observer\AdminNotification\FeedFactoryVirtualType</argument>
         </arguments>
     </virtualType>
+
+    <type name="Magento\Sales\Model\ResourceModel\Order\Collection">
+        <plugin name="orderCollectionPaymentLoadTokenbaseId" type="ParadoxLabs\TokenBase\Plugin\OrderCollectionPaymentLoadTokenbaseId" />
+    </type>
+
+    <!-- Proxies for dependency resolution and efficiency -->
+    <type name="ParadoxLabs\TokenBase\Block\Adminhtml\Customer\Form">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
 </config>

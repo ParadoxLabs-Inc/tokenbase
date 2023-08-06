@@ -62,9 +62,6 @@
     <type name="Magento\Sales\Api\OrderRepositoryInterface">
         <plugin name="orderPaymentSaveTokenbaseId" type="ParadoxLabs\TokenBase\Plugin\OrderPaymentSaveTokenbaseId" />
     </type>
-    <type name="Magento\Sales\Model\ResourceModel\Order\Collection">
-        <plugin name="orderCollectionPaymentLoadTokenbaseId" type="ParadoxLabs\TokenBase\Plugin\OrderCollectionPaymentLoadTokenbaseId" />
-    </type>
 
     <!-- Add CC data to GraphQL quote payment response -->
     <type name="Magento\QuoteGraphQl\Model\Resolver\SelectedPaymentMethod">
@@ -112,44 +109,6 @@
     </type>
 
     <!-- Proxies for dependency resolution and efficiency -->
-    <type name="ParadoxLabs\TokenBase\Block\Adminhtml\Customer\Form">
-        <arguments>
-            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
-        </arguments>
-    </type>
-    <type name="ParadoxLabs\TokenBase\Block\Customer\Form">
-        <arguments>
-            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
-            <argument name="currentCustomer" xsi:type="object">Magento\Customer\Helper\Session\CurrentCustomer\Proxy</argument>
-        </arguments>
-    </type>
-    <type name="ParadoxLabs\TokenBase\Block\Form\Cc">
-        <arguments>
-            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
-            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
-        </arguments>
-    </type>
-    <type name="ParadoxLabs\TokenBase\Controller\Paymentinfo">
-        <arguments>
-            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
-        </arguments>
-    </type>
-    <type name="ParadoxLabs\TokenBase\Controller\Paymentinfo\Delete">
-        <arguments>
-            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
-        </arguments>
-    </type>
-    <type name="ParadoxLabs\TokenBase\Controller\Paymentinfo\Index">
-        <arguments>
-            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
-        </arguments>
-    </type>
-    <type name="ParadoxLabs\TokenBase\Controller\Paymentinfo\Save">
-        <arguments>
-            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
-            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
-        </arguments>
-    </type>
     <type name="ParadoxLabs\TokenBase\Helper\Data">
         <arguments>
             <argument name="backendSession" xsi:type="object">Magento\Backend\Model\Session\Quote\Proxy</argument>
@@ -162,41 +121,6 @@
     <type name="ParadoxLabs\TokenBase\Model\AbstractMethod">
         <arguments>
             <argument name="addressHelper" xsi:type="object">ParadoxLabs\TokenBase\Helper\Address\Proxy</argument>
-        </arguments>
-    </type>
-    <type name="ParadoxLabs\TokenBase\Model\Card\Context">
-        <arguments>
-            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
-        </arguments>
-    </type>
-    <type name="ParadoxLabs\TokenBase\Observer\CheckoutCheckFailuresObserver">
-        <arguments>
-            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
-        </arguments>
-    </type>
-    <type name="ParadoxLabs\TokenBase\Observer\CheckoutFailureRecordIncidentObserver">
-        <arguments>
-            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
-        </arguments>
-    </type>
-    <type name="ParadoxLabs\TokenBase\Observer\PaymentInfoAuthenticateObserver">
-        <arguments>
-            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
-        </arguments>
-    </type>
-    <type name="ParadoxLabs\TokenBase\Observer\SaveOrderAfterPaymentObserver">
-        <arguments>
-            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
-        </arguments>
-    </type>
-    <type name="ParadoxLabs\TokenBase\Plugin\Checkout\Model\PaymentInformationManagement\Plugin">
-        <arguments>
-            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
-        </arguments>
-    </type>
-    <type name="ParadoxLabs\TokenBase\Plugin\Checkout\Model\GuestPaymentInformationManagement\Plugin">
-        <arguments>
-            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
         </arguments>
     </type>
 </config>
