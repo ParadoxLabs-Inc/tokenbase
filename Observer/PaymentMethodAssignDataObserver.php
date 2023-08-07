@@ -101,6 +101,10 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
             $payment->setData('cc_last_4', substr($ccNumber, -4));
             $payment->setData('cc_number', $ccNumber);
             $payment->setData('tokenbase_id', null);
+        } elseif ($payment->getData('tokenbase_id') === null) {
+            // If the card number and id are both not set, ensure additional data is also removed/set correctly.
+            $payment->setData('cc_last_4', null);
+            $payment->setData('cc_number', null);
         }
 
         $payment->setData('cc_type', $data->getData('cc_type'));
