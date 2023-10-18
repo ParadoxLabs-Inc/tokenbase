@@ -1313,4 +1313,20 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
 
         return $this;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getWebsiteId()
+    {
+        return 0;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setWebsiteId(int $websiteId)
+    {
+        return $this;
+    }
 }
