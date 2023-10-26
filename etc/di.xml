@@ -109,39 +109,7 @@
     </type>
 
     <!-- Proxies for dependency resolution and efficiency -->
-    <type name="ParadoxLabs\TokenBase\Block\Adminhtml\Customer\Form">
-        <arguments>
-            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
-        </arguments>
-    </type>
-    <type name="ParadoxLabs\TokenBase\Block\Customer\Form">
-        <arguments>
-            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
-            <argument name="currentCustomer" xsi:type="object">Magento\Customer\Helper\Session\CurrentCustomer\Proxy</argument>
-        </arguments>
-    </type>
     <type name="ParadoxLabs\TokenBase\Block\Form\Cc">
-        <arguments>
-            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
-            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
-        </arguments>
-    </type>
-    <type name="ParadoxLabs\TokenBase\Controller\Paymentinfo">
-        <arguments>
-            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
-        </arguments>
-    </type>
-    <type name="ParadoxLabs\TokenBase\Controller\Paymentinfo\Delete">
-        <arguments>
-            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
-        </arguments>
-    </type>
-    <type name="ParadoxLabs\TokenBase\Controller\Paymentinfo\Index">
-        <arguments>
-            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
-        </arguments>
-    </type>
-    <type name="ParadoxLabs\TokenBase\Controller\Paymentinfo\Save">
         <arguments>
             <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
             <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
