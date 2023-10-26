@@ -754,8 +754,11 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
 
         if ($response->getData('is_approved')) {
             $payment->setData('parent_transaction_id', $transactionId);
+
             $transaction = $payment->getAuthorizationTransaction();
-            $transaction->setAdditionalInformation('is_transaction_fraud', false);
+            if ($transaction instanceof \Magento\Sales\Api\Data\TransactionInterface) {
+                $transaction->setAdditionalInformation('is_transaction_fraud', false);
+            }
 
             $payment->setIsTransactionApproved(true);
         } elseif ($response->getData('is_denied')) {
