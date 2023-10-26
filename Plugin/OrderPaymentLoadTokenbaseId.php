@@ -20,6 +20,8 @@
 
 namespace ParadoxLabs\TokenBase\Plugin;
 
+use Magento\Sales\Api\Data\OrderPaymentExtensionInterface;
+
 /**
  * OrderPaymentLoadTokenbaseId Plugin
  *
@@ -50,46 +52,36 @@ class OrderPaymentLoadTokenbaseId
     }
 
     /**
-     * @param \Magento\Sales\Model\Order $order
-     * @return void
+     * @param \Magento\Sales\Model\Order\Payment $subject
+     * @param OrderPaymentExtensionInterface|null $result
+     * @return OrderPaymentExtensionInterface|null
      */
-    private function setExtensionAttributeValue(\Magento\Sales\Model\Order $order)
-    {
-        $payment = $order->getPayment();
-        if ($payment instanceof \Magento\Sales\Api\Data\OrderPaymentInterface === false) {
-            return;
-        }
-
-        $paymentExtension = $payment->getExtensionAttributes();
-        if ($paymentExtension === null) {
-            $paymentExtension = $this->orderPaymentExtensionFactory->create();
-        }
-        $paymentExtension->setTokenbaseId($payment->getData('tokenbase_id'));
-
-        $payment->setExtensionAttributes($paymentExtension);
-    }
-
-    /**
-     * @param \Magento\Sales\Model\Order $subject
-     * @param \Magento\Sales\Model\Order $result
-     * @return \Magento\Sales\Model\Order
-     */
-    public function afterLoad(
-        \Magento\Sales\Model\Order $subject,
-        \Magento\Sales\Model\Order $result
+    public function afterGetExtensionAttributes(
+        \Magento\Sales\Model\Order\Payment $subject,
+        $result
     ) {
-        $this->setExtensionAttributeValue($result);
+        if ($result instanceof OrderPaymentExtensionInterface === false) {
+            $result = $this->orderPaymentExtensionFactory->create();
+        }
+        $result->setTokenbaseId($subject->getData('tokenbase_id'));
+
+        $subject->setExtensionAttributes($result);
 
         return $result;
     }
 
     /**
-     * @param \Magento\Sales\Model\Order $subject
-     * @return void
+     * @param \Magento\Sales\Model\Order\Payment $subject
+     * @param array|null|mixed $result
+     * @return array|null|mixed
      */
-    public function beforePlace(
-        \Magento\Sales\Model\Order $subject
+    public function afterGetAdditionalInformation(
+        \Magento\Sales\Model\Order\Payment $subject,
+        $result
     ) {
-        $this->setExtensionAttributeValue($subject);
+        // Trigger loading of extension attributes, because the above doesn't happen on its own during REST order load.
+        $subject->getExtensionAttributes();
+
+        return $result;
     }
 }

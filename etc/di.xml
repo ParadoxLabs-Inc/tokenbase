@@ -56,14 +56,11 @@
     </type>
 
     <!-- Adding tokenbase_id field to order API calls -->
-    <type name="Magento\Sales\Model\Order">
+    <type name="Magento\Sales\Model\Order\Payment">
         <plugin name="orderPaymentLoadTokenbaseId" type="ParadoxLabs\TokenBase\Plugin\OrderPaymentLoadTokenbaseId" />
     </type>
     <type name="Magento\Sales\Api\OrderRepositoryInterface">
         <plugin name="orderPaymentSaveTokenbaseId" type="ParadoxLabs\TokenBase\Plugin\OrderPaymentSaveTokenbaseId" />
-    </type>
-    <type name="Magento\Sales\Model\ResourceModel\Order\Collection">
-        <plugin name="orderCollectionPaymentLoadTokenbaseId" type="ParadoxLabs\TokenBase\Plugin\OrderCollectionPaymentLoadTokenbaseId" />
     </type>
 
     <!-- Add CC data to GraphQL quote payment response -->
