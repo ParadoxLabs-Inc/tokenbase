@@ -24,6 +24,9 @@
             <field name="echeck_account_no">
                 <aspect name="to_order_payment" />
             </field>
+            <field name="echeck_type">
+                <aspect name="to_order_payment" />
+            </field>
         </fieldset>
         <fieldset id="sales_convert_quote_payment">
             <field name="tokenbase_id">
@@ -47,6 +50,9 @@
             <field name="echeck_account_no">
                 <aspect name="to_order_payment" />
             </field>
+            <field name="echeck_type">
+                <aspect name="to_order_payment" />
+            </field>
         </fieldset>
         <fieldset id="sales_convert_order_payment">
             <field name="tokenbase_id">
@@ -68,6 +74,9 @@
                 <aspect name="to_quote_payment" />
             </field>
             <field name="echeck_account_no">
+                <aspect name="to_quote_payment" />
+            </field>
+            <field name="echeck_type">
                 <aspect name="to_quote_payment" />
             </field>
         </fieldset>

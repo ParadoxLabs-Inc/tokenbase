@@ -36,6 +36,7 @@ abstract class ConvertAbstract
         'echeck_routing_number',
         'echeck_routing_no',
         'echeck_account_no',
+        'echeck_type',
     ];
 
     /**

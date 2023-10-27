@@ -38,9 +38,10 @@ type TokenBaseCardAdditional @doc(description: "Details and metadata for a store
     echeck_routing_no: String @doc(description: "ACH Routing Number")
     echeck_routing_number_last4: String @doc(description: "ACH Routing Number Last-4")
     echeck_account_name: String @doc(description: "ACH Account Name")
-    echeck_account_type: TokenBaseEcheckAccountType @doc(description: "ACH Account type")
+    echeck_account_type: TokenBaseEcheckAccountType @doc(description: "ACH Account Type")
     echeck_account_no: String @doc(description: "ACH Account Number")
     echeck_account_number_last4: String @doc(description: "ACH Account Number Last-4")
+    echeck_type: String @doc(description: "ACH Transaction Type")
 }
 
 type TokenBaseCheckoutConfig @doc(description: "Checkout configuration for a TokenBase payment method.") {
@@ -109,6 +110,7 @@ input TokenBaseCardPaymentInput @doc(description: "Payment data for a stored car
     echeck_account_type: TokenBaseEcheckAccountType @doc(description: "ACH Account Type")
     echeck_routing_no: String @doc(description: "ACH Routing Number")
     echeck_account_no: String @doc(description: "ACH Account Number")
+    echeck_type: String @doc(description: "ACH Transaction Type")
     card_id: String @doc(description: "TokenBase Card Hash (used only during checkout)")
     save: Boolean @doc(description: "Save card (used only during checkout)")
 }
