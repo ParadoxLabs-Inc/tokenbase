@@ -41,14 +41,15 @@ class StoredAch extends \Magento\Payment\Gateway\Validator\AbstractValidator
         /**
          * If there is an ID, this might be an edit. Validate as much as we can.
          */
-        if ($payment->hasData('tokenbase_id') !== false) {
-            if ($payment->getData('echeck_account_name') != ''
+        $tokenbaseId = $payment->getData('tokenbase_id');
+        if (!empty($tokenbaseId)) {
+            if (!empty($payment->getData('echeck_account_name'))
                 && strlen((string)$payment->getData('echeck_account_name')) > 22) {
                 $fails[] = __('Please limit your account name to 22 characters.');
             }
 
-            if ($payment->getData('echeck_routing_no') != ''
-                && substr((string)$payment->getData('echeck_routing_no'), 0, 4) != 'XXXX'
+            if (!empty($payment->getData('echeck_routing_no'))
+                && substr((string)$payment->getData('echeck_routing_no'), 0, 4) !== 'XXXX'
             ) {
                 // If not masked and not 9 digits, or not numeric...
                 if (strlen((string)$payment->getData('echeck_routing_no')) != 9
@@ -58,8 +59,8 @@ class StoredAch extends \Magento\Payment\Gateway\Validator\AbstractValidator
                 }
             }
 
-            if ($payment->getData('echeck_account_no') != ''
-                && substr((string)$payment->getData('echeck_account_no'), 0, 4) != 'XXXX'
+            if (!empty($payment->getData('echeck_account_no'))
+                && substr((string)$payment->getData('echeck_account_no'), 0, 4) !== 'XXXX'
             ) {
                 // If not masked and not 5-17 digits, or not numeric...
                 if (strlen((string)$payment->getData('echeck_account_no')) < 5
