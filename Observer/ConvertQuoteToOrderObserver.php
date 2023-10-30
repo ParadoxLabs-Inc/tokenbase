@@ -20,6 +20,9 @@
 
 namespace ParadoxLabs\TokenBase\Observer;
 
+use Magento\Quote\Api\Data\PaymentExtensionInterface;
+use Magento\Sales\Api\Data\OrderPaymentExtensionInterface;
+
 /**
  * Custom data field conversion -- quote to order, etc, etc.
  */
@@ -74,11 +77,15 @@ class ConvertQuoteToOrderObserver extends ConvertAbstract implements \Magento\Fr
 
         if (!$payment->getData('tokenbase_id')) {
             $paymentAttributes = $payment->getExtensionAttributes();
-            if ($paymentAttributes && $paymentAttributes->getTokenbaseId()) {
+            if ($paymentAttributes instanceof PaymentExtensionInterface && $paymentAttributes->getTokenbaseId()) {
                 $tokenbaseId = $paymentAttributes->getTokenbaseId();
                 $payment->setData('tokenbase_id', $tokenbaseId);
-                $order->getPayment()->getExtensionAttributes()->setTokenbaseId($tokenbaseId);
                 $order->getPayment()->setData('tokenbase_id', $tokenbaseId);
+
+                $orderPaymentExtn = $order->getPayment()->getExtensionAttributes();
+                if ($orderPaymentExtn instanceof OrderPaymentExtensionInterface) {
+                    $orderPaymentExtn->setTokenbaseId($tokenbaseId);
+                }
             }
         }
 
