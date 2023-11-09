@@ -1,5 +1,12 @@
 # ParadoxLabs_TokenBase Changelog
 
+## 4.5.6 - Nov 9, 2023
+- Added preliminary support for Magento 2.4.7-beta2.
+- Fixed ACH form template on multishipping checkout.
+- Fixed payment info incorrectly persisting and preventing new card entry after a payment decline or admin reorder.
+- Fixed performance issue on order grid and order collection load. (#1 -- thanks @lbajsarowicz)
+- Fixed possible error on 'Get Payment Update' if transaction is closed. (#4)
+
 ## 4.5.5 - May 11, 2023
 - Changed license from proprietary to Apache 2.0. Issues and contributions are welcome on GitHub.
 - Fixed hyphenated transaction IDs possibly being sent to payment gateway on refund.
