@@ -20,6 +20,8 @@
 
 namespace ParadoxLabs\TokenBase\Gateway\Validator;
 
+use Magento\Vault\Api\Data\PaymentTokenInterface;
+
 /**
  * CreditCard Class
  */
@@ -74,7 +76,8 @@ class CreditCard extends \Magento\Payment\Gateway\Validator\AbstractValidator
         $payment = $validationSubject['payment'];
 
         $tokenbaseId = $payment->getData('tokenbase_id');
-        if (empty($tokenbaseId)) {
+        $publicHash  = $payment->getAdditionalInformation(PaymentTokenInterface::PUBLIC_HASH);
+        if (empty($tokenbaseId) && empty($publicHash)) {
             $availableTypes = explode(',', (string)$this->config->getValue('cctypes'));
 
             $ccNumber = preg_replace('/[\-\s]+/', '', (string)$payment->getData('cc_number'));

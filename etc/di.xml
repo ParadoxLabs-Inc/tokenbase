@@ -63,6 +63,17 @@
         <plugin name="orderPaymentSaveTokenbaseId" type="ParadoxLabs\TokenBase\Plugin\OrderPaymentSaveTokenbaseId" />
     </type>
 
+    <!-- Adding cards to Vault token lists -->
+    <type name="Magento\Vault\Model\PaymentTokenManagement">
+        <plugin name="tokenbaseAddCards" type="ParadoxLabs\TokenBase\Plugin\Vault\Api\PaymentTokenManagement" />
+    </type>
+    <type name="Magento\InstantPurchase\Model\PaymentMethodChoose\PaymentTokenChooserInterface">
+        <plugin name="tokenbaseActivatePaymentToken" type="ParadoxLabs\TokenBase\Plugin\InstantPurchase\Model\PaymentMethodChoose\PaymentTokenChooser" />
+    </type>
+    <type name="Magento\InstantPurchase\PaymentMethodIntegration\IntegrationsManager">
+        <plugin name="tokenbaseAddMethods" type="ParadoxLabs\TokenBase\Plugin\InstantPurchase\PaymentMethodIntegration\IntegrationsManager" />
+    </type>
+
     <!-- Add CC data to GraphQL quote payment response -->
     <type name="Magento\QuoteGraphQl\Model\Resolver\SelectedPaymentMethod">
         <plugin name="tokenbaseAddCcData" type="ParadoxLabs\TokenBase\Plugin\QuoteGraphQl\Model\Resolver\SelectedPaymentMethod" />

@@ -5,6 +5,8 @@
     -->
     <module name="ParadoxLabs_TokenBase">
         <sequence>
+            <module name="Magento_Vault" />
+            <module name="Magento_InstantPurchase" />
             <module name="Magento_Payment" />
             <module name="Magento_Quote" />
             <module name="Magento_Sales" />

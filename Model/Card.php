@@ -26,8 +26,7 @@ use Magento\Payment\Model\InfoInterface;
  * Payment record storage
  */
 class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
-    \ParadoxLabs\TokenBase\Api\Data\CardInterface,
-    \Magento\Vault\Api\Data\PaymentTokenInterface
+    \ParadoxLabs\TokenBase\Api\Data\CardInterface
 {
     const PROTECTED_ADDITIONAL_KEYS = [
         'acceptjs_key',

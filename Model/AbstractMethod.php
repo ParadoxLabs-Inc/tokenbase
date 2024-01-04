@@ -20,6 +20,8 @@
 
 namespace ParadoxLabs\TokenBase\Model;
 
+use Magento\Quote\Api\Data\CartInterface;
+use Magento\Vault\Api\Data\PaymentTokenInterface;
 use ParadoxLabs\TokenBase\Api\MethodInterface;
 
 /**
@@ -260,6 +262,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
             if ($card
                 && $card->getId() > 0
                 && ($byHash === false || $card->getHash() == $cardId)
+                && $card->getMethod() === $this->methodCode
                 && (empty($card->getCustomerId())
                     || $orderMatches
                     || $quoteMatches
@@ -858,13 +861,30 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
             $this->setCard($this->getCard());
 
             return $this->getCard();
-        } elseif ($payment->getData('tokenbase_card') instanceof \ParadoxLabs\TokenBase\Api\Data\CardInterface) {
+        }
+
+        if ($payment->getData('tokenbase_card') instanceof \ParadoxLabs\TokenBase\Api\Data\CardInterface) {
             $this->setCard($payment->getData('tokenbase_card'));
 
             return $this->getCard();
-        } elseif ($payment->hasData('tokenbase_id') && $payment->getData('tokenbase_id')) {
+        }
+
+        if ($payment->hasData('tokenbase_id') && $payment->getData('tokenbase_id')) {
             return $this->loadAndSetCard($payment->getData('tokenbase_id'));
-        } elseif ($this->paymentContainsCard($payment) === true) {
+        }
+
+        if ($payment->hasAdditionalInformation(PaymentTokenInterface::PUBLIC_HASH)) {
+            try {
+                return $this->loadAndSetCard(
+                    $payment->getAdditionalInformation(PaymentTokenInterface::PUBLIC_HASH),
+                    true
+                );
+            } catch (\Magento\Payment\Gateway\Command\CommandException $exception) {
+                // Unable to load TokenBase card by Vault hash; fall through
+            }
+        }
+
+        if ($this->paymentContainsCard($payment) === true) {
             /** @var Card $card */
             $card = $this->cardFactory->create();
             $card->setMethod($this->methodCode)
@@ -1224,5 +1244,373 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         \ParadoxLabs\TokenBase\Model\Gateway\Response $response
     ) {
         return $payment;
+    }
+
+    /**
+     * Retrieve payment method code
+     *
+     * @return string
+     */
+    public function getCode()
+    {
+        return $this->methodCode;
+    }
+
+    /**
+     * Get payment method code (for Vault)
+     *
+     * @return string
+     */
+    public function getProviderCode()
+    {
+        return $this->methodCode;
+    }
+
+    /**
+     * Retrieve block type for method form generation
+     *
+     * @return string
+     * @deprecated
+     */
+    public function getFormBlockType()
+    {
+        /**
+         * Don't use this method. Get an Adapter instance instead.
+         * @see \Magento\Payment\Model\Method\Adapter
+         */
+        return '';
+    }
+
+    /**
+     * Retrieve payment method title
+     *
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->getConfigData('title');
+    }
+
+    /**
+     * Store id getter
+     *
+     * @return int
+     */
+    public function getStore()
+    {
+        return $this->getData('store');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canOrder()
+    {
+        return $this->canPerformCommand('order');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canAuthorize()
+    {
+        return $this->canPerformCommand('authorize');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canCapture()
+    {
+        return $this->canPerformCommand('capture');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canCapturePartial()
+    {
+        return $this->canPerformCommand('capture_partial');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canCaptureOnce()
+    {
+        return $this->canPerformCommand('capture_once');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canRefund()
+    {
+        return $this->canPerformCommand('refund');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canRefundPartialPerInvoice()
+    {
+        return $this->canPerformCommand('refund_partial_per_invoice');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canVoid()
+    {
+        return $this->canPerformCommand('void');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canUseInternal()
+    {
+        return (bool)$this->getConfiguredValue('can_use_internal');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canUseCheckout()
+    {
+        return (bool)$this->getConfiguredValue('can_use_checkout');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canEdit()
+    {
+        return (bool)$this->getConfiguredValue('can_edit');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canFetchTransactionInfo()
+    {
+        return $this->canPerformCommand('fetch_transaction_info');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canReviewPayment()
+    {
+        return $this->canPerformCommand('review_payment');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isGateway()
+    {
+        return (bool)$this->getConfiguredValue('is_gateway');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isOffline()
+    {
+        return (bool)$this->getConfiguredValue('is_offline');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isInitializeNeeded()
+    {
+        return (bool)(int)$this->getConfiguredValue('can_initialize');
+    }
+
+    /**
+     * @inheritdoc
+     * @deprecated
+     */
+    public function isAvailable(CartInterface $quote = null)
+    {
+        /**
+         * Don't use this method. Get an Adapter instance instead.
+         * @see \Magento\Payment\Model\Method\Adapter
+         */
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isActive($storeId = null)
+    {
+        return (bool)$this->getConfiguredValue('active', $storeId);
+    }
+
+    /**
+     * @inheritdoc
+     * @deprecated
+     */
+    public function canUseForCountry($country)
+    {
+        /**
+         * Don't use this method. Get an Adapter instance instead.
+         * @see \Magento\Payment\Model\Method\Adapter
+         */
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     * @deprecated
+     */
+    public function canUseForCurrency($currencyCode)
+    {
+        /**
+         * Don't use this method. Get an Adapter instance instead.
+         * @see \Magento\Payment\Model\Method\Adapter
+         */
+        return false;
+    }
+
+    /**
+     * Whether payment command is supported and can be executed
+     *
+     * @param string $commandCode
+     * @return bool
+     */
+    private function canPerformCommand($commandCode)
+    {
+        return (bool)$this->getConfiguredValue('can_' . $commandCode);
+    }
+
+    /**
+     * Unifies configured value handling logic
+     *
+     * @param string $field
+     * @param int|null $storeId
+     * @return mixed
+     */
+    private function getConfiguredValue($field, $storeId = null)
+    {
+        return $this->getConfigData($field, $storeId);
+    }
+
+    /**
+     * Retrieve block type for display method information
+     *
+     * @return string
+     * @deprecated
+     */
+    public function getInfoBlockType()
+    {
+        /**
+         * Don't use this method. Get an Adapter instance instead.
+         * @see \Magento\Payment\Model\Method\Adapter
+         */
+        return '';
+    }
+
+    /**
+     * Validate payment method information object
+     *
+     * @return $this
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @deprecated
+     */
+    public function validate()
+    {
+        /**
+         * Don't use this method. Get an Adapter instance instead.
+         * @see \Magento\Payment\Model\Method\Adapter
+         */
+        return $this;
+    }
+
+    /**
+     * Attempt to accept a payment that us under review
+     *
+     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @return false
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @deprecated
+     */
+    public function acceptPayment(\Magento\Payment\Model\InfoInterface $payment)
+    {
+        /**
+         * Don't use this method. Get an Adapter instance instead.
+         * @see \Magento\Payment\Model\Method\Adapter
+         */
+        return false;
+    }
+
+    /**
+     * Attempt to deny a payment that us under review
+     *
+     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @return false
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @deprecated
+     */
+    public function denyPayment(\Magento\Payment\Model\InfoInterface $payment)
+    {
+        /**
+         * Don't use this method. Get an Adapter instance instead.
+         * @see \Magento\Payment\Model\Method\Adapter
+         */
+        return false;
+    }
+
+    /**
+     * Assign data to info model instance
+     *
+     * @param \Magento\Framework\DataObject $data
+     * @return $this
+     * @deprecated
+     */
+    public function assignData(\Magento\Framework\DataObject $data)
+    {
+        /**
+         * Don't use this method. Get an Adapter instance instead.
+         * @see \Magento\Payment\Model\Method\Adapter
+         */
+        return $this;
+    }
+
+    /**
+     * Method that will be executed instead of authorize or capture
+     * if flag isInitializeNeeded set to true
+     *
+     * @param string $paymentAction
+     * @param object $stateObject
+     * @return $this
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @deprecated
+     */
+    public function initialize($paymentAction, $stateObject)
+    {
+        /**
+         * Don't use this method. Get an Adapter instance instead.
+         * @see \Magento\Payment\Model\Method\Adapter
+         */
+        return $this;
+    }
+
+    /**
+     * Get config payment action url
+     *
+     * @return string
+     * @deprecated
+     */
+    public function getConfigPaymentAction()
+    {
+        /**
+         * Don't use this method. Get an Adapter instance instead.
+         * @see \Magento\Payment\Model\Method\Adapter
+         */
+        return '';
     }
 }

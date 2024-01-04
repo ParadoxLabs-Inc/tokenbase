@@ -19,12 +19,15 @@
  */
 namespace ParadoxLabs\TokenBase\Api\Data;
 
+use Magento\Framework\Api\ExtensibleDataInterface;
+use Magento\Vault\Api\Data\PaymentTokenInterface;
+
 /**
  * Payment record storage
  *
  * @api
  */
-interface CardInterface extends \Magento\Framework\Api\ExtensibleDataInterface
+interface CardInterface extends ExtensibleDataInterface, PaymentTokenInterface
 {
     /**
      * Get ID

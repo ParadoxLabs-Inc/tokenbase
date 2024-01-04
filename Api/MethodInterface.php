@@ -19,12 +19,14 @@
  */
 namespace ParadoxLabs\TokenBase\Api;
 
+use Magento\Vault\Model\VaultPaymentInterface;
+
 /**
  * Common actions and behavior for TokenBase payment methods
  *
  * @api
  */
-interface MethodInterface
+interface MethodInterface extends VaultPaymentInterface
 {
     /**
      * Set the payment config scope and reinitialize the API
