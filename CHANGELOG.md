@@ -1,5 +1,9 @@
 # ParadoxLabs_TokenBase Changelog
 
+## 4.6.0 - Jan 23, 2024
+- Added Instant Purchase support.
+- Fixed Maestro Domestic matching to prevent false matches.
+
 ## 4.5.6 - Nov 9, 2023
 - Added preliminary support for Magento 2.4.7-beta2.
 - Fixed ACH form template on multishipping checkout.
