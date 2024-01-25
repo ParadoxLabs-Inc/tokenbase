@@ -218,11 +218,14 @@ class PaymentTokenManagement
         $customerId
     ) {
         if ($result === null) {
-            $card = $this->cardRepository->getByHash($hash);
-
-            if ($card->getId() && (int)$card->getCustomerId() === (int)$customerId) {
-                /** @var \ParadoxLabs\TokenBase\Model\Card $result */
-                $result = $card;
+            try {
+                $card = $this->cardRepository->getByHash($hash);
+                if ($card->getId() && $card->getCustomerId() === (int)$customerId) {
+                    /** @var \ParadoxLabs\TokenBase\Model\Card $result */
+                    $result = $card;
+                }
+            } catch (\Magento\Framework\Exception\LocalizedException $e) {
+                // NO-OP: If we can't find the card in TB, ignore and let Vault continue.
             }
         }
 
