@@ -1,5 +1,8 @@
 # ParadoxLabs_TokenBase Changelog
 
+## 4.6.1 - Feb 23, 2024
+- Fixed NoSuchEntity exception on loading a Magento Vault card.
+
 ## 4.6.0 - Jan 23, 2024
 - Added Instant Purchase support.
 - Fixed Maestro Domestic matching to prevent false matches.
