@@ -42,7 +42,7 @@ ISSUES MISSING IMPORTANT INFORMATION MAY BE CLOSED WITHOUT INVESTIGATION.
 ```bash
 echo "
 TokenBase version: $(composer show paradoxlabs/tokenbase  | sed -n '/versions/s/^[^0-9]\+\([^,]\+\).*$/\1/p')
-Magento version: $(composer show paradoxlabs/tokenbase  | sed -n '/versions/s/^[^0-9]\+\([^,]\+\).*$/\1/p')
+Magento version: $(composer show magento/product-community-edition  | sed -n '/versions/s/^[^0-9]\+\([^,]\+\).*$/\1/p')
 PHP version: $(php --version)
 "
 ```
