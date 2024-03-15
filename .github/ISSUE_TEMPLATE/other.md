@@ -24,9 +24,19 @@ ISSUES MISSING IMPORTANT INFORMATION MAY BE CLOSED WITHOUT INVESTIGATION.
 
 ## Environment
 
+<!-- 
+```bash
+echo "
+TokenBase version: $(composer show paradoxlabs/tokenbase  | sed -n '/versions/s/^[^0-9]\+\([^,]\+\).*$/\1/p')
+Magento version: $(composer show magento/product-community-edition  | sed -n '/versions/s/^[^0-9]\+\([^,]\+\).*$/\1/p')
+PHP version: $(php --version)
+"
+```
+-->
+
 <pre><code>
-TokenBase version: X.Y.Z
-Magento version: X.Y.Z 
+TokenBase version: X.Y.Z 
+Magento version: X.Y.Z
 PHP version: X.Y.Z 
 <!-- Check whether this is still an issue in the most recent TokenBase version -->
 
