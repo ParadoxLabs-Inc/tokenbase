@@ -34,6 +34,11 @@ class ConvertQuoteToOrderObserver extends ConvertAbstract implements \Magento\Fr
     protected $helper;
 
     /**
+     * @var \Magento\Framework\App\State
+     */
+    protected $appState;
+
+    /**
      * @var \Magento\Framework\App\ResourceConnection
      */
     protected $resource;
@@ -42,13 +47,16 @@ class ConvertQuoteToOrderObserver extends ConvertAbstract implements \Magento\Fr
      * ConvertQuoteToOrderObserver constructor.
      *
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
+     * @param \Magento\Framework\App\State $appState
      * @param \Magento\Framework\App\ResourceConnection $resource
      */
     public function __construct(
         \ParadoxLabs\TokenBase\Helper\Data $helper,
+        \Magento\Framework\App\State $appState,
         \Magento\Framework\App\ResourceConnection $resource
     ) {
         $this->helper = $helper;
+        $this->appState = $appState;
         $this->resource = $resource;
     }
 
@@ -75,16 +83,19 @@ class ConvertQuoteToOrderObserver extends ConvertAbstract implements \Magento\Fr
          */
         $payment = $quote->getPayment();
 
-        if (!$payment->getData('tokenbase_id')) {
-            $paymentAttributes = $payment->getExtensionAttributes();
-            if ($paymentAttributes instanceof PaymentExtensionInterface && $paymentAttributes->getTokenbaseId()) {
-                $tokenbaseId = $paymentAttributes->getTokenbaseId();
-                $payment->setData('tokenbase_id', $tokenbaseId);
-                $order->getPayment()->setData('tokenbase_id', $tokenbaseId);
+        if ((defined('\Magento\Framework\App\Area::AREA_GRAPHQL')
+            && $this->appState->getAreaCode() === \Magento\Framework\App\Area::AREA_GRAPHQL)) {
+            if (!$payment->getData('tokenbase_id')) {
+                $paymentAttributes = $payment->getExtensionAttributes();
+                if ($paymentAttributes instanceof PaymentExtensionInterface && $paymentAttributes->getTokenbaseId()) {
+                    $tokenbaseId = $paymentAttributes->getTokenbaseId();
+                    $payment->setData('tokenbase_id', $tokenbaseId);
+                    $order->getPayment()->setData('tokenbase_id', $tokenbaseId);
 
-                $orderPaymentExtn = $order->getPayment()->getExtensionAttributes();
-                if ($orderPaymentExtn instanceof OrderPaymentExtensionInterface) {
-                    $orderPaymentExtn->setTokenbaseId($tokenbaseId);
+                    $orderPaymentExtn = $order->getPayment()->getExtensionAttributes();
+                    if ($orderPaymentExtn instanceof OrderPaymentExtensionInterface) {
+                        $orderPaymentExtn->setTokenbaseId($tokenbaseId);
+                    }
                 }
             }
         }
