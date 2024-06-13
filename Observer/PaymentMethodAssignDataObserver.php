@@ -20,6 +20,9 @@
 
 namespace ParadoxLabs\TokenBase\Observer;
 
+use Magento\Quote\Api\Data\PaymentExtensionInterface;
+use Magento\Sales\Api\Data\OrderPaymentExtensionInterface;
+
 /**
  * PaymentMethodAssignDataObserver Class
  */
@@ -100,7 +103,14 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
         if (!empty($ccNumber)) {
             $payment->setData('cc_last_4', substr($ccNumber, -4));
             $payment->setData('cc_number', $ccNumber);
+
             $payment->setData('tokenbase_id', null);
+
+            $paymentAttributes = $payment->getExtensionAttributes();
+            if ($paymentAttributes instanceof PaymentExtensionInterface
+                || $paymentAttributes instanceof OrderPaymentExtensionInterface) {
+                $paymentAttributes->setTokenbaseId(null);
+            }
         } elseif ($payment->getData('tokenbase_id') === null) {
             // If the card number and id are both not set, ensure additional data is also removed/set correctly.
             $payment->setData('cc_last_4', null);
@@ -170,6 +180,12 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
         } elseif ($payment->hasData('tokenbase_card') === false
             || $payment->getData('tokenbase_card')->getId() !== $payment->getData('tokenbase_id')) {
             $payment->setData('tokenbase_id', null);
+
+            $paymentAttributes = $payment->getExtensionAttributes();
+            if ($paymentAttributes instanceof PaymentExtensionInterface
+                || $paymentAttributes instanceof OrderPaymentExtensionInterface) {
+                $paymentAttributes->setTokenbaseId(null);
+            }
         }
 
         if ($data->hasData('save')) {
