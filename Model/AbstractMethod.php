@@ -1534,16 +1534,15 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * Attempt to accept a payment that us under review
      *
      * @param \Magento\Payment\Model\InfoInterface $payment
-     * @return false
+     * @return bool
      * @throws \Magento\Framework\Exception\LocalizedException
-     * @deprecated
      */
     public function acceptPayment(\Magento\Payment\Model\InfoInterface $payment)
     {
-        /**
-         * Don't use this method. Get an Adapter instance instead.
-         * @see \Magento\Payment\Model\Method\Adapter
-         */
+        /** @var \Magento\Sales\Model\Order\Payment $payment */
+
+        $this->log(sprintf('acceptPayment(%s %s)', get_class($payment), $payment->getId()));
+
         return false;
     }
 
@@ -1551,16 +1550,15 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * Attempt to deny a payment that us under review
      *
      * @param \Magento\Payment\Model\InfoInterface $payment
-     * @return false
+     * @return bool
      * @throws \Magento\Framework\Exception\LocalizedException
-     * @deprecated
      */
     public function denyPayment(\Magento\Payment\Model\InfoInterface $payment)
     {
-        /**
-         * Don't use this method. Get an Adapter instance instead.
-         * @see \Magento\Payment\Model\Method\Adapter
-         */
+        /** @var \Magento\Sales\Model\Order\Payment $payment */
+
+        $this->log(sprintf('denyPayment(%s %s)', get_class($payment), $payment->getId()));
+
         return false;
     }
 
