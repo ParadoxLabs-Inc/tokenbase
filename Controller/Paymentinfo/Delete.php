@@ -22,6 +22,7 @@ namespace ParadoxLabs\TokenBase\Controller\Paymentinfo;
 
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\View\Result\PageFactory;
 
 /**
@@ -44,7 +45,6 @@ class Delete extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
      * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \ParadoxLabs\TokenBase\Helper\Address $addressHelper
-     * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
      */
     public function __construct(
         Context $context,
@@ -56,10 +56,7 @@ class Delete extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
         \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository,
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         \ParadoxLabs\TokenBase\Helper\Address $addressHelper,
-        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
     ) {
-        $this->resultJsonFactory = $resultJsonFactory;
-
         parent::__construct(
             $context,
             $customerSession,
@@ -82,42 +79,30 @@ class Delete extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
     {
         $id     = $this->getRequest()->getParam('id');
         $method = $this->getRequest()->getParam('method');
+        $resultData = [];
 
         if ($this->formKeyIsValid() === true && $this->methodIsValid() === true && !empty($id)) {
             try {
                 /**
                  * Load the card and verify we are actually the cardholder before doing anything.
                  */
-
                 /** @var \ParadoxLabs\TokenBase\Model\Card $card */
                 $card = $this->cardRepository->getByHash($id);
                 $card = $card->getTypeInstance();
-
                 if ($card && $card->getHash() == $id && $card->hasOwner($this->helper->getCurrentCustomer()->getId())) {
-                    // TODO: Undo, for testing purposes only.
-                    //$card->queueDeletion();
-
-                    //$card = $this->cardRepository->save($card);
-
-                    $this->messageManager->addSuccessMessage(__('Payment record deleted.'));
+                    $card->queueDeletion();
+                    $this->cardRepository->save($card);
+                    $resultData = ['success' => true];
                 } else {
                     $this->messageManager->addErrorMessage(__('Invalid Request.'));
                 }
             } catch (\Exception $e) {
                 $this->helper->log($method, (string)$e);
-
                 $this->messageManager->addErrorMessage($e->getMessage());
             }
         } else {
             $this->messageManager->addErrorMessage(__('Invalid Request.'));
         }
-
-        $resultPage = $this->resultPageFactory->create();
-        // TODO: Obtain block, how so? Missing function elsewhere?
-        $block = $resultPage->getLayout()->getBlock('tokenbase_customer_wrapper');
-        // TODO: success = true, error = message
-        $resultJson = $this->resultJsonFactory->create();
-        $resultJson->setData(['result' => $block->toHtml()]);
-        return $resultJson;
+        return $this->resultFactory->create(ResultFactory::TYPE_JSON)->setData($resultData);
     }
 }

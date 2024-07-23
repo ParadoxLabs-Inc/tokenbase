@@ -27,19 +27,21 @@ require(
             e.preventDefault();
             confirmation({
                 title: 'Delete payment option',
-                content: 'Are you sure you want to delete this card?',
+                content: 'Are you sure you want to remove this card?',
                 actions: {
                     confirm: function () {
+                        var item = $(e.currentTarget).closest('fieldset');
+                        item.hide();
                         $.ajax({
-                            showLoader: true,
                             url: e.currentTarget.href,
                             type: "POST",
-                            success: function (data) {
-                                // TODO: Replace correct block, or add id's to card divs and remove them?
-                                $('.main').html(data.result);
-                            },
-                            error: function () {
-                                // TODO: Get traditional message as error.
+                            showLoader: false,
+                            async: true,
+                        }).done(function (data) {
+                            if (data.success) {
+                                item.remove();
+                            } else {
+                                location.assign(location.href);
                             }
                         });
                     },
