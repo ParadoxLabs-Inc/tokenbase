@@ -1,5 +1,10 @@
 # ParadoxLabs_TokenBase Changelog
 
+## 4.7.0 - Jun 28, 2024
+- Added CSP/SRI secure mode support for 2.4.0+ (2.4.7 checkout compatibility).
+- Fixed payment extension attributes holding tokenbase_id values improperly.
+- Fixed reorder applying the original payment method if a new card was entered.
+
 ## 4.6.1 - Feb 23, 2024
 - Fixed NoSuchEntity exception on loading a Magento Vault card.
 
