@@ -31,11 +31,10 @@ require(
                 actions: {
                     confirm: function () {
                         var item = $(e.currentTarget).closest('fieldset');
-                        item.hide();
                         $.ajax({
                             url: e.currentTarget.href,
                             type: "POST",
-                            showLoader: false,
+                            showLoader: true,
                             async: true,
                         }).done(function (data) {
                             if (data.success) {
