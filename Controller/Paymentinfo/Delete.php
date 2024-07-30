@@ -73,12 +73,13 @@ class Delete extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
     /**
      * Delete action
      *
-     * @return \Magento\Framework\Controller\Result\Json
+     * @return \Magento\Framework\Controller\Result\Json|\Magento\Framework\Controller\Result\Redirect
      */
     public function execute()
     {
         $id     = $this->getRequest()->getParam('id');
         $method = $this->getRequest()->getParam('method');
+        $isAjax = $this->getRequest()->isAjax();
         $resultData = [];
 
         if ($this->formKeyIsValid() === true && $this->methodIsValid() === true && !empty($id)) {
@@ -92,7 +93,11 @@ class Delete extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
                 if ($card && $card->getHash() == $id && $card->hasOwner($this->helper->getCurrentCustomer()->getId())) {
                     $card->queueDeletion();
                     $this->cardRepository->save($card);
-                    $resultData = ['success' => true];
+                    if ($isAjax) {
+                        $resultData = ['success' => true];
+                    } else {
+                        $this->messageManager->addSuccessMessage(__('Payment record deleted.'));
+                    }
                 } else {
                     $this->messageManager->addErrorMessage(__('Invalid Request.'));
                 }
@@ -103,6 +108,13 @@ class Delete extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
         } else {
             $this->messageManager->addErrorMessage(__('Invalid Request.'));
         }
-        return $this->resultFactory->create(ResultFactory::TYPE_JSON)->setData($resultData);
+
+        if ($isAjax) {
+            return $this->resultFactory->create(ResultFactory::TYPE_JSON)->setData($resultData);
+        } else {
+            $resultRedirect = $this->resultRedirectFactory->create();
+            $resultRedirect->setPath('*/*', ['method' => $method, '_secure' => true]);
+            return $resultRedirect;
+        }
     }
 }
