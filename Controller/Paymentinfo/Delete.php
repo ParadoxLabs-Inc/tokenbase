@@ -110,11 +110,12 @@ class Delete extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
         }
 
         if ($isAjax) {
-            return $this->resultFactory->create(ResultFactory::TYPE_JSON)->setData($resultData);
+            $result = $this->resultFactory->create(ResultFactory::TYPE_JSON)->setData($resultData);
         } else {
-            $resultRedirect = $this->resultRedirectFactory->create();
-            $resultRedirect->setPath('*/*', ['method' => $method, '_secure' => true]);
-            return $resultRedirect;
+            $result = $this->resultRedirectFactory->create();
+            $result->setPath('*/*', ['method' => $method, '_secure' => true]);
         }
+
+        return $result;
     }
 }
