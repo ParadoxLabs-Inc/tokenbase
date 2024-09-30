@@ -217,14 +217,18 @@ define(
             handleFailedOrder: function (response) {
                 this.placeOrderFailure(true);
 
-                var error = JSON.parse(response.responseText);
+                var error = JSON.parse(response.responseText || false);
                 if (error.parameters) {
                     for (var parameter in error.parameters) {
                         if (!error.parameters.hasOwnProperty(parameter)) {
                             continue;
                         }
+
+                        // Arrays are 0-indexed; phrase keys are 1-indexed
+                        var index = Number.isInteger(parameter) ? parameter + 1 : parameter;
+
                         error.message = error.message.replace(
-                            new RegExp('%' + parameter, 'g'),
+                            new RegExp('%' + index, 'g'),
                             error.parameters[parameter]
                         );
                     }
