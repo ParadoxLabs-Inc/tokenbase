@@ -123,4 +123,15 @@ class Feed extends \Magento\AdminNotification\Model\Feed
 
         return isset($composer['version']) ? $composer['version'] : '';
     }
+
+    /**
+     * Retrieve Update Frequency
+     *
+     * @return int
+     */
+    public function getFrequency()
+    {
+        // If frequency is 0 (or AdminNotification is disabled), default to checking daily.
+        return parent::getFrequency() ?? 86400;
+    }
 }
