@@ -140,11 +140,20 @@
         </div>
         <div class="admin__field number _required">
             <label for="<?= $code ?>-echeck-account-number" class="admin__field-label"><span><?= $block->escapeHtml(__('Account Number')) ?></span></label>
-            <div class="admin__field-control">
+            <div class="admin__field-control _with-tooltip">
                 <input type="text" id="<?= $code ?>-echeck-account-number" name="payment[echeck_account_no]"
                        title="<?= $block->escapeHtmlAttr(__('Account Number')) ?>" class="admin__control-text minimum-length-5 maximum-length-17"
                        value="<?php if ($block->getCard()->getId() && $block->getCard()->getAdditional('echeck_account_number_last4') != ''): ?>XXXX<?= $block->escapeHtmlAttr($block->getCard()->getAdditional('echeck_account_number_last4')); ?><?php endif; ?>" maxlength="17"
                        data-validate='{"required-number":true,"validate-length":true}' autocomplete="off" />
+                <div class="admin__field-tooltip tooltip">
+                    <span class="admin__field-tooltip-action action-help" tabindex="0" data-toggle="dropdown">
+                        <span><?= $block->escapeHtml(__('Where do I find these numbers?')) ?></span>
+                    </span>
+                    <div class="admin__field-tooltip-content" data-target="dropdown" aria-hidden="true">
+                        <p><?= $block->escapeHtml(__('On the bottom of your checks, you will see three groups of numbers. Usually the first one is your routing number, and the second is your account number.')) ?></p>
+                        <img src="<?= $block->escapeUrl($block->getViewFileUrl('ParadoxLabs_TokenBase::images/ach.png')) ?>" alt="<?= $block->escapeHtmlAttr(__('Visual reference for locating routing number and account number on a check')) ?>" />
+                    </div>
+                </div>
             </div>
         </div>
         <div class="admin__field type _required">

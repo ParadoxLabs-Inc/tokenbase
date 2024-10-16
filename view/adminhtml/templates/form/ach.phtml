@@ -56,19 +56,17 @@ $storedCards    = $block->getStoredCards();
         </div>
         <div class="admin__field hide-if-card-selected">
             <label class="label admin__field-label" for="<?= $code ?>-echeck-account-number"><?= $block->escapeHtml(__('Account Number')) ?><span class="required">*</span></label>
-            <div class="admin__field-control control">
+            <div class="admin__field-control control _with-tooltip">
                 <input type="text" id="<?= $code ?>-echeck-account-number" name="payment[echeck_account_no]" title="<?= $block->escapeHtmlAttr(__('Account Number')) ?>" class="input-text admin__control-text" value="<?= $block->escapeHtmlAttr($block->getInfoData('echeck_account_no')); ?>" maxlength="17" autocomplete="off" />
-                <?php /* Admin tooltip no workie 2015-08-14 2.0.0-b1
-                <?php $expln    = __('On the bottom of your checks, you will see three groups of numbers. Usually the first one is your routing number, and the second is your account number.'); ?>
-                <?php $image    = $block->getViewFileUrl('ParadoxLabs_TokenBase::images/ach.png'); ?>
-                <?php $alt      = __('Visual reference for locating routing number and account number on a check'); ?>
-                <?php $tooltip  = '<p>'.$expln.'</p><img src="'.$image.'" alt="'.$alt.'" />'; ?>
-                <div class="admin__field-note note">
-                    <a href="#" class="action cvv" title="<?= $block->escapeHtmlAttr(__('What is this?')) ?>"
-                       data-mage-init='{"tooltip": {"content": "<?= addslashes($tooltip) ?>"}}'>
+                <div class="admin__field-tooltip tooltip">
+                    <span class="admin__field-tooltip-action action-help" tabindex="0" data-toggle="dropdown">
                         <span><?= $block->escapeHtml(__('Where do I find these numbers?')) ?></span>
-                    </a>
-                </div>*/ ?>
+                    </span>
+                    <div class="admin__field-tooltip-content" data-target="dropdown" aria-hidden="true">
+                        <p><?= $block->escapeHtml(__('On the bottom of your checks, you will see three groups of numbers. Usually the first one is your routing number, and the second is your account number.')) ?></p>
+                        <img src="<?= $block->escapeUrl($block->getViewFileUrl('ParadoxLabs_TokenBase::images/ach.png')) ?>" alt="<?= $block->escapeHtmlAttr(__('Visual reference for locating routing number and account number on a check')) ?>" />
+                    </div>
+                </div>
             </div>
         </div>
         <div class="admin__field hide-if-card-selected">

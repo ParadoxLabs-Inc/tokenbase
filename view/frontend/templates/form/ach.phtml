@@ -64,15 +64,14 @@ $storedCards    = $block->getStoredCards();
                    title="<?= $block->escapeHtmlAttr(__('Account Number')) ?>" class="input-text minimum-length-5 maximum-length-17"
                    value="<?= $block->escapeHtmlAttr($block->getInfoData('echeck_account_no')) ?>" maxlength="17"
                    data-validate='{"required-number":true,"validate-length":true}' autocomplete="off" />
-            <?php $expln    = __('On the bottom of your checks, you will see three groups of numbers. Usually the first one is your routing number, and the second is your account number.'); ?>
-            <?php $image    = $block->escapeUrl($block->getViewFileUrl('ParadoxLabs_TokenBase::images/ach.png')); ?>
-            <?php $alt      = $block->escapeHtmlAttr(__('Visual reference for locating routing number and account number on a check')); ?>
-            <?php $tooltip  = '<p>'.$expln.'</p><img src="'.$image.'" alt="'.$alt.'" />'; ?>
-            <div class="note">
-                <a href="#" class="action cvv" title="<?= $block->escapeHtmlAttr(__('What is this?')) ?>"
-                   data-mage-init='{"tooltip": {"content": "<?= addslashes($tooltip) ?>"}}'>
+            <div class="field-tooltip tooltip note toggle">
+                <span class="field-tooltip-action tooltip-toggle action-cvv" tabindex="0" data-toggle="dropdown">
                     <span><?= $block->escapeHtml(__('Where do I find these numbers?')) ?></span>
-                </a>
+                </span>
+                <div class="tooltip-content" data-target="dropdown" aria-hidden="true">
+                    <p><?= $block->escapeHtml(__('On the bottom of your checks, you will see three groups of numbers. Usually the first one is your routing number, and the second is your account number.')) ?></p>
+                    <img src="<?= $block->escapeUrl($block->getViewFileUrl('ParadoxLabs_TokenBase::images/ach.png')) ?>" alt="<?= $block->escapeHtmlAttr(__('Visual reference for locating routing number and account number on a check')) ?>" />
+                </div>
             </div>
         </div>
     </div>
