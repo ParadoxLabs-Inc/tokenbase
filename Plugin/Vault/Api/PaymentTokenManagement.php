@@ -220,7 +220,7 @@ class PaymentTokenManagement
         if ($result === null) {
             try {
                 $card = $this->cardRepository->getByHash($hash);
-                if ($card->getId() && $card->getCustomerId() === (int)$customerId) {
+                if ($card->getId() && (int)$card->getCustomerId() === (int)$customerId) {
                     /** @var \ParadoxLabs\TokenBase\Model\Card $result */
                     $result = $card;
                 }
