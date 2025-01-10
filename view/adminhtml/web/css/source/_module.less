@@ -128,4 +128,45 @@
       width: 100%;
     }
   }
+
+    .paradoxlabs-module-header {
+        display: flex;
+        margin: 0 25px;
+        gap: 25px;
+        align-items: center;
+
+        > a.logo {
+            text-align: center;
+
+            img {
+                margin-left: 2px;
+            }
+        }
+
+        .message.success {
+            flex-grow: 1;
+            background-color: #e9fbdb;
+            line-height: 2.3em;
+
+            .btn {
+                margin-left: 15px;
+            }
+        }
+
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .partner {
+            float: right;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        img {
+            vertical-align: middle;
+        }
+    }
 }
