@@ -34,9 +34,13 @@ class FilterComment extends \Magento\Config\Block\System\Config\Form\Fieldset
         \Magento\Framework\View\Helper\Js $jsHelper,
         \Magento\Cms\Model\Template\FilterProvider $filterProvider,
         array $data = [],
-        ?\Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer = null
+        $secureRenderer = null
     ) {
-        parent::__construct($context, $authSession, $jsHelper, $data, $secureRenderer);
+        // Magento 2.3 compatibility: There is no SecureHtmlRenderer class or argument to pass there.
+        $args = func_get_args();
+        unset($args[3]);
+
+        parent::__construct(...array_filter($args));
 
         $this->filterProvider = $filterProvider;
     }
