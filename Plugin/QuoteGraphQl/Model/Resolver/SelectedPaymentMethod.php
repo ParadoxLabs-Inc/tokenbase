@@ -75,8 +75,8 @@ class SelectedPaymentMethod
         Field $field,
         $context,
         ResolveInfo $info,
-        array $value = null,
-        array $args = null
+        ?array $value = null,
+        ?array $args = null
     ) {
         if (empty($resolvedValue) || $value['model'] instanceof \Magento\Quote\Model\Quote === false) {
             return $resolvedValue;

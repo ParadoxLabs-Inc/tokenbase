@@ -117,8 +117,8 @@ class UpdateCard implements \ParadoxLabs\TokenBase\Model\Api\GraphQL\ResolverInt
         \Magento\Framework\GraphQl\Config\Element\Field $field,
         $context,
         \Magento\Framework\GraphQl\Schema\Type\ResolveInfo $info,
-        array $value = null,
-        array $args = null
+        ?array $value = null,
+        ?array $args = null
     ) {
         $this->graphQL->authenticate($context);
 

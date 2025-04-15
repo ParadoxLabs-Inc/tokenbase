@@ -91,7 +91,7 @@ class Plugin
         \Closure $proceed,
         $cartId,
         \Magento\Quote\Api\Data\PaymentInterface $paymentMethod,
-        \Magento\Quote\Api\Data\AddressInterface $billingAddress = null
+        ?\Magento\Quote\Api\Data\AddressInterface $billingAddress = null
     ) {
         try {
             return $proceed($cartId, $paymentMethod, $billingAddress);

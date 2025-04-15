@@ -43,7 +43,7 @@ class ValidateCardSave
      */
     public function __construct(
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Payment\Gateway\Validator\ValidatorPoolInterface $validatorPool = null
+        ?\Magento\Payment\Gateway\Validator\ValidatorPoolInterface $validatorPool = null
     ) {
         $this->validatorPool = $validatorPool;
         $this->storeManager = $storeManager;

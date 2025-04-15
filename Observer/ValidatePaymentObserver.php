@@ -36,7 +36,7 @@ class ValidatePaymentObserver implements \Magento\Framework\Event\ObserverInterf
      * @param \Magento\Payment\Gateway\Validator\ValidatorPoolInterface|null $validatorPool
      */
     public function __construct(
-        \Magento\Payment\Gateway\Validator\ValidatorPoolInterface $validatorPool = null
+        ?\Magento\Payment\Gateway\Validator\ValidatorPoolInterface $validatorPool = null
     ) {
         $this->validatorPool = $validatorPool;
     }

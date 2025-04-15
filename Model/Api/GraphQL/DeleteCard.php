@@ -84,8 +84,8 @@ class DeleteCard implements \ParadoxLabs\TokenBase\Model\Api\GraphQL\ResolverInt
         \Magento\Framework\GraphQl\Config\Element\Field $field,
         $context,
         \Magento\Framework\GraphQl\Schema\Type\ResolveInfo $info,
-        array $value = null,
-        array $args = null
+        ?array $value = null,
+        ?array $args = null
     ) {
         if (!isset($args['hash']) || empty($args['hash'])) {
             throw new GraphQlInputException(__('Card "hash" value must be specified'));

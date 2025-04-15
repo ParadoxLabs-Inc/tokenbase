@@ -61,7 +61,7 @@ interface CardInterface extends ExtensibleDataInterface, PaymentTokenInterface
      */
     public function setCustomer(
         \Magento\Customer\Api\Data\CustomerInterface $customer,
-        \Magento\Payment\Model\InfoInterface $payment = null
+        ?\Magento\Payment\Model\InfoInterface $payment = null
     );
 
     /**

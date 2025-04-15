@@ -82,8 +82,8 @@ class GetCheckoutConfig implements \ParadoxLabs\TokenBase\Model\Api\GraphQL\Reso
         \Magento\Framework\GraphQl\Config\Element\Field $field,
         $context,
         \Magento\Framework\GraphQl\Schema\Type\ResolveInfo $info,
-        array $value = null,
-        array $args = null
+        ?array $value = null,
+        ?array $args = null
     ) {
         // Validate
         $this->graphQL->authenticate($context);

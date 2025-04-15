@@ -161,7 +161,7 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
         \ParadoxLabs\TokenBase\Model\Gateway\ResponseFactory $responseFactory,
         \Magento\Framework\HTTP\ZendClientFactory $httpClientFactory,
         array $data = [],
-        \Magento\Framework\HTTP\ClientInterfaceFactory $communicatorFactory = null
+        ?\Magento\Framework\HTTP\ClientInterfaceFactory $communicatorFactory = null
     ) {
         $this->helper           = $helper;
         $this->responseFactory  = $responseFactory;
