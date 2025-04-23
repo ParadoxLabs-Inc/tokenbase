@@ -1,5 +1,14 @@
 # ParadoxLabs_TokenBase Changelog
 
+## 4.7.3 - Apr 23, 2025
+- Added support for Magento 2.4.8 (monolog/monolog ^3.0).
+- Fixed a Magento 2.3 compilation error.
+- Fixed PHP 8.4 compatibility.
+
+## 4.7.2 - Jan 13, 2025
+- Fixed Instant Purchase failing to load vault payment.
+- Fixed PHP 7.1-7.2 compatibility (regression in 4.7.0).
+
 ## 4.7.1 - Oct 16, 2024
 - Fixed checkout error message parameter replacement (causing "%1" rather than proper data in a message).
 - Fixed CVV/ACH help tooltips showing up at the end of the page after open.
