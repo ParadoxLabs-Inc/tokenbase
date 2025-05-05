@@ -1433,7 +1433,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @inheritdoc
      * @deprecated
      */
-    public function isAvailable(CartInterface $quote = null)
+    public function isAvailable(?CartInterface $quote = null)
     {
         /**
          * Don't use this method. Get an Adapter instance instead.
