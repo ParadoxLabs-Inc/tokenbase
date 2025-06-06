@@ -1220,7 +1220,7 @@ class Card extends \Magento\Framework\Model\AbstractExtensibleModel implements
      */
     public function getTokenDetails()
     {
-        return $this->getAdditional();
+        return is_array($this->getAdditional()) ? json_encode($this->getAdditional()) : (string)$this->getAdditional();
     }
 
     /**
