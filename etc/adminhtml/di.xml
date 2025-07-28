@@ -23,4 +23,7 @@
             <argument name="authSession" xsi:type="object">Magento\Backend\Model\Auth\Session\Proxy</argument>
         </arguments>
     </type>
+    <type name="Magento\Sales\Controller\Adminhtml\Order\CreditmemoLoader">
+        <plugin name="tokenbase_init_creditmemo_invoice" type="ParadoxLabs\TokenBase\Plugin\Magento\Sales\Controller\Adminhtml\Order\CreditmemoLoaderPlugin" sortOrder="100"/>
+    </type>
 </config>
