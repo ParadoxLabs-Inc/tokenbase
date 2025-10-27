@@ -176,6 +176,7 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
                     $card->setCustomer($customer);
                     $card->setAddress($newAddr);
                     $card->importPaymentInfo($newPayment);
+                    $card->setLastUse(time()); // Ignore 'save new card' checkbox at checkout, updated on first order.
 
                     $card = $this->cardRepository->save($card);
 
