@@ -352,7 +352,8 @@ class CardRepository implements CardRepositoryInterface
         if (!empty($card->getPaymentId())
             && empty($paymentData['cc_number'])
             && empty($paymentData['token'])
-            && empty($paymentData['acceptjs_value'])) {
+            && empty($paymentData['acceptjs_value'])
+            && !$card->hasDataChanges()) {
             return;
         }
 

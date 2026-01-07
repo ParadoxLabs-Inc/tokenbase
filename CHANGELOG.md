@@ -4,9 +4,10 @@
 - Added confirmation prompt before deleting stored payment cards.
 - Added feature to auto-load invoice when clicking 'Credit Memo' from an order.
 - Changed GraphQL to hard dependency, removing compatibility for Magento 2.2.
-- Fixed PHP 8.4 compatibility issue in AbstractMethod. (#11)
+- Fixed card address changes not syncing to gateway on API card save, for applicable gateways. (#12, thanks @damienwebdev)
 - Fixed card last_use timestamp not being set when saving a new card from My Payment Options.
 - Fixed getTokenDetails potentially returning non-string value in some API requests.
+- Fixed PHP 8.4 compatibility issue in AbstractMethod. (#11, thanks @richard-t-bermudez)
 
 ## 4.7.3 - Apr 23, 2025
 - Added support for Magento 2.4.8 (monolog/monolog ^3.0).
