@@ -20,53 +20,102 @@
 
 namespace ParadoxLabs\TokenBase\Controller\Paymentinfo;
 
+use Magento\Customer\Model\Session;
+use Magento\Framework\App\Action\Context;
+use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\View\Result\PageFactory;
+
 /**
  * Delete the given card, if valid
  */
 class Delete extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
 {
     /**
+     * @var \Magento\Framework\Controller\Result\JsonFactory
+     */
+    protected $resultJsonFactory;
+
+    /**
+     * @param \Magento\Framework\App\Action\Context $context
+     * @param \Magento\Customer\Model\Session $customerSession
+     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator
+     * @param \Magento\Framework\Registry $registry
+     * @param \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory
+     * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
+     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
+     * @param \ParadoxLabs\TokenBase\Helper\Address $addressHelper
+     */
+    public function __construct(
+        Context $context,
+        Session $customerSession,
+        PageFactory $resultPageFactory,
+        \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator,
+        \Magento\Framework\Registry $registry,
+        \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
+        \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository,
+        \ParadoxLabs\TokenBase\Helper\Data $helper,
+        \ParadoxLabs\TokenBase\Helper\Address $addressHelper,
+    ) {
+        parent::__construct(
+            $context,
+            $customerSession,
+            $resultPageFactory,
+            $formKeyValidator,
+            $registry,
+            $cardFactory,
+            $cardRepository,
+            $helper,
+            $addressHelper
+        );
+    }
+
+    /**
      * Delete action
      *
-     * @return \Magento\Framework\Controller\Result\Redirect
+     * @return \Magento\Framework\Controller\Result\Json|\Magento\Framework\Controller\Result\Redirect
      */
     public function execute()
     {
-        /** @var \Magento\Framework\Controller\Result\Redirect $resultRedirect */
-        $resultRedirect = $this->resultRedirectFactory->create();
-
         $id     = $this->getRequest()->getParam('id');
         $method = $this->getRequest()->getParam('method');
+        $isAjax = $this->getRequest()->isAjax();
+        $resultData = [];
 
         if ($this->formKeyIsValid() === true && $this->methodIsValid() === true && !empty($id)) {
             try {
                 /**
                  * Load the card and verify we are actually the cardholder before doing anything.
                  */
-
                 /** @var \ParadoxLabs\TokenBase\Model\Card $card */
                 $card = $this->cardRepository->getByHash($id);
                 $card = $card->getTypeInstance();
-
                 if ($card && $card->getHash() == $id && $card->hasOwner($this->helper->getCurrentCustomer()->getId())) {
                     $card->queueDeletion();
-
-                    $card = $this->cardRepository->save($card);
-
-                    $this->messageManager->addSuccessMessage(__('Payment record deleted.'));
+                    $this->cardRepository->save($card);
+                    if ($isAjax) {
+                        $resultData = ['success' => true];
+                    } else {
+                        $this->messageManager->addSuccessMessage(__('Payment record deleted.'));
+                    }
                 } else {
                     $this->messageManager->addErrorMessage(__('Invalid Request.'));
                 }
             } catch (\Exception $e) {
                 $this->helper->log($method, (string)$e);
-
                 $this->messageManager->addErrorMessage($e->getMessage());
             }
         } else {
             $this->messageManager->addErrorMessage(__('Invalid Request.'));
         }
 
-        $resultRedirect->setPath('*/*', ['method' => $method, '_secure' => true]);
-        return $resultRedirect;
+        if ($isAjax) {
+            $result = $this->resultFactory->create(ResultFactory::TYPE_JSON)->setData($resultData);
+        } else {
+            $result = $this->resultRedirectFactory->create();
+            $result->setPath('*/*', ['method' => $method, '_secure' => true]);
+        }
+
+        return $result;
     }
 }

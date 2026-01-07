@@ -6,7 +6,7 @@
     <div class="block-title">
         <h2><?= $block->escapeHtml($block->getPaymentMethodTitle()); ?></h2>
     </div>
-    <div class="block-content items checkout-payment-method">
+    <div class="block-content items checkout-payment-method" data-mage-init='{"tokenbaseConfirmation": {}}'>
         <?php $cards = $block->getCards(); ?>
         <?php if (!empty($cards)): ?>
             <?php /** @var \ParadoxLabs\TokenBase\Model\Card $card */ ?>
