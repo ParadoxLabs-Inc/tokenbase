@@ -80,7 +80,7 @@ class Delete extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
         $id     = $this->getRequest()->getParam('id');
         $method = $this->getRequest()->getParam('method');
         $isAjax = $this->getRequest()->isAjax();
-        $resultData = [];
+        $resultData = ['success' => false];
 
         if ($this->formKeyIsValid() === true && $this->methodIsValid() === true && !empty($id)) {
             try {

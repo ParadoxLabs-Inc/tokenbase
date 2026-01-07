@@ -17,38 +17,83 @@
  * @link https://support.paradoxlabs.com
  */
 
-require(
-    [
-        'jquery',
-        'Magento_Ui/js/modal/confirm'
-    ],
-    function ($, confirmation) {
-        $('.delete').on('click', function (e) {
+/*jshint jquery:true*/
+define([
+    "jquery",
+    'Magento_Ui/js/modal/confirm'
+], function($, confirmation) {
+    $.widget('mage.tokenbaseConfirmation', {
+        options: {
+            deleteSelector: '.action.delete',
+            confirmTitle: 'Delete payment option',
+            confirmMessage: 'Are you sure you want to remove this card?'
+        },
+
+        _create: function() {
+            this.element.on(
+                'click',
+                this.options.deleteSelector,
+                this.handleDeleteClick.bind(this)
+            );
+        },
+
+        /**
+         * Handle delete button click event
+         *
+         * @param {Event} e
+         */
+        handleDeleteClick: function(e) {
             e.preventDefault();
+
             confirmation({
-                title: 'Delete payment option',
-                content: 'Are you sure you want to remove this card?',
+                title: $.mage.__(this.options.confirmTitle),
+                content: $.mage.__(this.options.confirmMessage),
                 actions: {
-                    confirm: function () {
-                        var item = $(e.currentTarget).closest('fieldset');
-                        $.ajax({
-                            url: e.currentTarget.href,
-                            type: "POST",
-                            showLoader: true,
-                            async: true,
-                        }).done(function (data) {
-                            if (data.success) {
-                                item.remove();
-                            } else {
-                                location.assign(location.href);
-                            }
-                        });
-                    },
-                    cancel: function () {
-                        return false;
-                    }
+                    confirm: this.deleteCard.bind(this, e.currentTarget),
+                    cancel: this.cancelDelete.bind(this)
                 }
             });
-        });
-    }
-);
+        },
+
+        /**
+         * Delete the card via AJAX
+         *
+         * @param {HTMLElement} target
+         */
+        deleteCard: function(target) {
+            var item = $(target).closest('fieldset');
+
+            $.ajax({
+                url: target.href,
+                type: "POST",
+                showLoader: true,
+                async: true
+            }).done(this.handleDeleteResponse.bind(this, item));
+        },
+
+        /**
+         * Handle delete AJAX response
+         *
+         * @param {jQuery} item
+         * @param {Object} data
+         */
+        handleDeleteResponse: function(item, data) {
+            if (data.success) {
+                item.remove();
+            } else {
+                location.assign(location.href);
+            }
+        },
+
+        /**
+         * Handle cancel action
+         *
+         * @returns {boolean}
+         */
+        cancelDelete: function() {
+            return false;
+        }
+    });
+
+    return $.mage.tokenbaseConfirmation;
+});
