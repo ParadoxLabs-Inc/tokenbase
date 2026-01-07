@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -21,8 +21,12 @@
 namespace ParadoxLabs\TokenBase\Model\Api\GraphQL;
 
 /**
- * FauxResolverInterface Class
+ * ResolverInterface Class
+ *
+ * @added 3.8.0 to replace an alias for backwards compatibility
+ * @deprecated Use the core interface instead
+ * @see \Magento\Framework\GraphQl\Query\ResolverInterface
  */
-interface FauxResolverInterface
+interface ResolverInterface extends \Magento\Framework\GraphQl\Query\ResolverInterface
 {
 }

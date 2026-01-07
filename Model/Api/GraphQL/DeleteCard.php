@@ -23,27 +23,9 @@ namespace ParadoxLabs\TokenBase\Model\Api\GraphQL;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 
 /**
- * Soft dependency: Supporting 2.3 GraphQL without breaking <2.3 compatibility.
- * 2.3+ implements \Magento\Framework\GraphQL; lower does not.
- */
-if (!interface_exists('\ParadoxLabs\TokenBase\Model\Api\GraphQL\ResolverInterface')) {
-    if (interface_exists('\Magento\Framework\GraphQl\Query\ResolverInterface')) {
-        class_alias(
-            '\Magento\Framework\GraphQl\Query\ResolverInterface',
-            '\ParadoxLabs\TokenBase\Model\Api\GraphQL\ResolverInterface'
-        );
-    } else {
-        class_alias(
-            '\ParadoxLabs\TokenBase\Model\Api\GraphQL\FauxResolverInterface',
-            '\ParadoxLabs\TokenBase\Model\Api\GraphQL\ResolverInterface'
-        );
-    }
-}
-
-/**
  * DeleteCard Class
  */
-class DeleteCard implements \ParadoxLabs\TokenBase\Model\Api\GraphQL\ResolverInterface
+class DeleteCard implements \Magento\Framework\GraphQl\Query\ResolverInterface
 {
     /**
      * @var \ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface

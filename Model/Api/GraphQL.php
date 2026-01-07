@@ -53,16 +53,17 @@ class GraphQL
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Quote\Api\CartRepositoryInterface $cartRepository
+        \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
+        ?\Magento\Quote\Model\MaskedQuoteIdToQuoteIdInterface $maskedQuoteIdToQuoteId = null
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->cartRepository = $cartRepository;
 
-        if (interface_exists(\Magento\Quote\Model\MaskedQuoteIdToQuoteIdInterface::class)) {
-            // Loading as such because this class does not exist until Magento 2.3
-            $om = \Magento\Framework\App\ObjectManager::getInstance();
-            $this->maskedQuoteIdToQuoteId = $om->get(\Magento\Quote\Model\MaskedQuoteIdToQuoteIdInterface::class);
-        }
+        // BC preservation -- argument added in 4.8.0; class does not exist until Magento 2.3
+        $om = \Magento\Framework\App\ObjectManager::getInstance();
+        $this->maskedQuoteIdToQuoteId = $maskedQuoteIdToQuoteId ?? $om->get(
+            \Magento\Quote\Model\MaskedQuoteIdToQuoteIdInterface::class
+        );
     }
 
     /**
