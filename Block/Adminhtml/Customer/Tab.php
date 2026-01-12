@@ -25,9 +25,6 @@ use Magento\Customer\Controller\RegistryConstants;
 use Magento\Framework\Registry;
 use Magento\Ui\Component\Layout\Tabs\TabWrapper;
 
-/**
- * Class Tab
- */
 class Tab extends TabWrapper
 {
     /**

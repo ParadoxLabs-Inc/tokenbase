@@ -20,9 +20,6 @@
 
 namespace ParadoxLabs\TokenBase\Block\Adminhtml\Customer;
 
-/**
- * Wrapper Class
- */
 class Wrapper extends \Magento\Backend\Block\Template
 {
     /**

@@ -22,9 +22,6 @@ namespace ParadoxLabs\TokenBase\Gateway\Validator;
 
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 
-/**
- * CreditCard Class
- */
 class CreditCard extends \Magento\Payment\Gateway\Validator\AbstractValidator
 {
     /**

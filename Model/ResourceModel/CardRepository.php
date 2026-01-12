@@ -30,9 +30,6 @@ use Magento\Framework\Reflection\DataObjectProcessor;
 use ParadoxLabs\TokenBase\Api\CardRepositoryInterface;
 use ParadoxLabs\TokenBase\Api\Data;
 
-/**
- * Class CardRepository
- */
 class CardRepository implements CardRepositoryInterface
 {
     /**

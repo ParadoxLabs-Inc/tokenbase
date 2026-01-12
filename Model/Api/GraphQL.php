@@ -25,9 +25,6 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\GraphQl\Exception\GraphQlAuthorizationException;
 use Magento\Framework\GraphQl\Exception\GraphQlNoSuchEntityException;
 
-/**
- * GraphQL Class
- */
 class GraphQL
 {
     /**

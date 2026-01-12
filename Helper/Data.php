@@ -20,9 +20,6 @@
 
 namespace ParadoxLabs\TokenBase\Helper;
 
-/**
- * Class Data
- */
 class Data extends \Magento\Payment\Helper\Data
 {
     /**

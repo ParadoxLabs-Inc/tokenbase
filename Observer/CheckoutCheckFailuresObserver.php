@@ -20,9 +20,6 @@
 
 namespace ParadoxLabs\TokenBase\Observer;
 
-/**
- * CheckoutCheckFailuresObserver Class
- */
 class CheckoutCheckFailuresObserver implements \Magento\Framework\Event\ObserverInterface
 {
     /**

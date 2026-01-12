@@ -23,9 +23,6 @@ namespace ParadoxLabs\TokenBase\Observer;
 use Magento\Quote\Api\Data\PaymentExtensionInterface;
 use Magento\Sales\Api\Data\OrderPaymentExtensionInterface;
 
-/**
- * PaymentMethodAssignAchDataObserver Class
- */
 class PaymentMethodAssignAchDataObserver implements \Magento\Framework\Event\ObserverInterface
 {
     /**

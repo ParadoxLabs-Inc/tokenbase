@@ -20,9 +20,6 @@
 
 namespace ParadoxLabs\TokenBase\Observer;
 
-/**
- * MultishippingAllowZeroTotalCheckoutObserver Class
- */
 class MultishippingAllowZeroTotalCheckoutObserver implements \Magento\Framework\Event\ObserverInterface
 {
     /**

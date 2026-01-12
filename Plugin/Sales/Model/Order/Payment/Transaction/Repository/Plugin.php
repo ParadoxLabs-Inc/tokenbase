@@ -20,9 +20,6 @@
 
 namespace ParadoxLabs\TokenBase\Plugin\Sales\Model\Order\Payment\Transaction\Repository;
 
-/**
- * Plugin Class
- */
 class Plugin
 {
     /**

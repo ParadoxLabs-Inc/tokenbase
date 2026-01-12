@@ -20,9 +20,6 @@
 
 namespace ParadoxLabs\TokenBase\Observer;
 
-/**
- * FixAdminEmailAlreadyExistsObserver Class
- */
 class FixAdminEmailAlreadyExistsObserver implements \Magento\Framework\Event\ObserverInterface
 {
     /**

@@ -20,9 +20,6 @@
 
 namespace ParadoxLabs\TokenBase\Observer;
 
-/**
- * ValidatePaymentObserver Class
- */
 class ValidatePaymentObserver implements \Magento\Framework\Event\ObserverInterface
 {
     /**

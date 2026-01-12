@@ -20,9 +20,6 @@
 
 namespace ParadoxLabs\TokenBase\Model\Source;
 
-/**
- * OrderStatus Class
- */
 class OrderStatus extends \Magento\Sales\Model\Config\Source\Order\Status
 {
     /**

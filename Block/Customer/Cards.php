@@ -22,9 +22,6 @@ namespace ParadoxLabs\TokenBase\Block\Customer;
 
 use Magento\Framework\View\Element\Template;
 
-/**
- * Cards Class
- */
 class Cards extends \Magento\Framework\View\Element\Template
 {
     /**

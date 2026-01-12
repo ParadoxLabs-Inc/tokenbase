@@ -20,9 +20,6 @@
 
 namespace ParadoxLabs\TokenBase\Observer;
 
-/**
- * MultishippingAssignACHDataObserver Class
- */
 class MultishippingAssignACHDataObserver implements \Magento\Framework\Event\ObserverInterface
 {
     /**

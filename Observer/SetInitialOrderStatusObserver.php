@@ -20,9 +20,6 @@
 
 namespace ParadoxLabs\TokenBase\Observer;
 
-/**
- * SetInitialOrderStatusObserver Class
- */
 class SetInitialOrderStatusObserver implements \Magento\Framework\Event\ObserverInterface
 {
     /**

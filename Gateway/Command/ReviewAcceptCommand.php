@@ -20,9 +20,6 @@
 
 namespace ParadoxLabs\TokenBase\Gateway\Command;
 
-/**
- * ReviewAcceptCommand Class
- */
 class ReviewAcceptCommand implements \Magento\Payment\Gateway\CommandInterface
 {
     /**

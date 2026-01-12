@@ -20,9 +20,6 @@
 
 namespace ParadoxLabs\TokenBase\Model\Api;
 
-/**
- * CustomerCardRepository Class
- */
 class CustomerCardRepository implements \ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface
 {
     /**

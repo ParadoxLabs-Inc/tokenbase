@@ -23,9 +23,6 @@ namespace ParadoxLabs\TokenBase\Model\Api\GraphQL;
 use Magento\Authorization\Model\UserContextInterface;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 
-/**
- * UpdateCard Class
- */
 class UpdateCard implements \Magento\Framework\GraphQl\Query\ResolverInterface
 {
     /**

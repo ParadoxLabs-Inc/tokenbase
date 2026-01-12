@@ -20,9 +20,6 @@
 
 namespace ParadoxLabs\TokenBase\Plugin\Sales\Model\Order\CustomerManagement;
 
-/**
- * Plugin Class
- */
 class Plugin
 {
     /**

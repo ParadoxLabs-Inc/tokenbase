@@ -27,9 +27,6 @@ use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\GraphQl\Model\Query\Resolver\Context;
 use Magento\Framework\GraphQl\Query\Resolver\Value;
 
-/**
- * SelectedPaymentMethod Class
- */
 class SelectedPaymentMethod
 {
     /**

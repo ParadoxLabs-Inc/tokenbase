@@ -20,9 +20,6 @@
 
 namespace ParadoxLabs\TokenBase\Observer;
 
-/**
- * PaymentInfoAuthenticateObserver Class
- */
 class PaymentInfoAuthenticateObserver implements \Magento\Framework\Event\ObserverInterface
 {
     /**

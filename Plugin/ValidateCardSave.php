@@ -20,9 +20,6 @@
 
 namespace ParadoxLabs\TokenBase\Plugin;
 
-/**
- * ValidateCardSave Class
- */
 class ValidateCardSave
 {
     /**

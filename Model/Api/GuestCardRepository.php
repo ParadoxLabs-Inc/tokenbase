@@ -20,9 +20,6 @@
 
 namespace ParadoxLabs\TokenBase\Model\Api;
 
-/**
- * GuestCardRepository Class
- */
 class GuestCardRepository implements \ParadoxLabs\TokenBase\Api\GuestCardRepositoryInterface
 {
     /**

@@ -20,9 +20,6 @@
 
 namespace ParadoxLabs\TokenBase\Gateway\Validator;
 
-/**
- * StoredAch Class
- */
 class StoredAch extends \Magento\Payment\Gateway\Validator\AbstractValidator
 {
     /**

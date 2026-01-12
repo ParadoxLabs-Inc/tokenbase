@@ -22,9 +22,6 @@ namespace ParadoxLabs\TokenBase\Model\Api\GraphQL;
 
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 
-/**
- * DeleteCard Class
- */
 class DeleteCard implements \Magento\Framework\GraphQl\Query\ResolverInterface
 {
     /**

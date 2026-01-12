@@ -20,9 +20,6 @@
 
 namespace ParadoxLabs\TokenBase\Block\Adminhtml\Customer;
 
-/**
- * Form Class
- */
 class Form extends \Magento\Customer\Block\Address\Edit
 {
     /**

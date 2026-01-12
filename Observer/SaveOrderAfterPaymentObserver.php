@@ -20,9 +20,6 @@
 
 namespace ParadoxLabs\TokenBase\Observer;
 
-/**
- * SaveOrderAfterPaymentObserver Class
- */
 class SaveOrderAfterPaymentObserver implements \Magento\Framework\Event\ObserverInterface
 {
     /**

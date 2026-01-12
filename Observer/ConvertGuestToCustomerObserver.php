@@ -20,9 +20,6 @@
 
 namespace ParadoxLabs\TokenBase\Observer;
 
-/**
- * ConvertGuestToCustomerObserver Class
- */
 class ConvertGuestToCustomerObserver implements \Magento\Framework\Event\ObserverInterface
 {
     /**
