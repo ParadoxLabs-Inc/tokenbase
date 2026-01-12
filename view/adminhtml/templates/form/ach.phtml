@@ -17,7 +17,7 @@ $storedCards    = $block->getStoredCards();
     <fieldset class="admin__fieldset">
         <?php if ($image): ?>
             <div class="page-actions">
-                <img src="<?= $block->escapeHtmlAttr($image); ?>" />
+                <img src="<?= $block->escapeUrl($image); ?>" />
             </div>
         <?php endif; ?>
         <?php if ($block->haveStoredCards()): ?>
@@ -64,7 +64,7 @@ $storedCards    = $block->getStoredCards();
                     </span>
                     <div class="admin__field-tooltip-content" data-target="dropdown" aria-hidden="true">
                         <p><?= $block->escapeHtml(__('On the bottom of your checks, you will see three groups of numbers. Usually the first one is your routing number, and the second is your account number.')) ?></p>
-                        <img src="<?= $block->escapeHtmlAttr($block->getViewFileUrl('ParadoxLabs_TokenBase::images/ach.png')) ?>" alt="<?= $block->escapeHtmlAttr(__('Visual reference for locating routing number and account number on a check')) ?>" />
+                        <img src="<?= $block->escapeUrl($block->getViewFileUrl('ParadoxLabs_TokenBase::images/ach.png')) ?>" alt="<?= $block->escapeHtmlAttr(__('Visual reference for locating routing number and account number on a check')) ?>" />
                     </div>
                 </div>
             </div>

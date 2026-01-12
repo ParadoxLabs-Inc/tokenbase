@@ -43,17 +43,17 @@
         <div class="field street required">
             <label for="street" class="label"><span><?= $block->escapeHtml(__('Street')) ?></span></label>
             <div class="control">
-                <input type="text" name="billing[street][]" value="<?= $block->escapeHtmlAttr($block->getStreetLine(1)) ?>" title="<?= $block->escapeHtmlAttr(__('Street Address')) ?>" id="street" class="input-text <?= $_streetValidationClass ?>"  />
+                <input type="text" name="billing[street][]" value="<?= $block->escapeHtmlAttr($block->getStreetLine(1)) ?>" title="<?= $block->escapeHtmlAttr(__('Street Address')) ?>" id="street" class="input-text <?= /* @noEscape */ $_streetValidationClass ?>"  />
                 <div class="nested">
                     <?php $_streetValidationClass = trim(str_replace('required-entry', '', $_streetValidationClass)); ?>
                     <?php for ($_i = 1, $_n = $this->helper(\Magento\Customer\Helper\Address::class)->getStreetLines(); $_i < $_n; $_i++): ?>
                         <?php $lineNo = (int)($_i+1); ?>
                         <div class="field additional">
-                            <label class="label" for="street_<?= $lineNo ?>">
+                            <label class="label" for="street_<?= /* @noEscape */ $lineNo ?>">
                                 <span><?= $block->escapeHtml(__('Street Address %1', $lineNo)) ?></span>
                             </label>
                             <div class="control">
-                                <input type="text" name="billing[street][]" value="<?= $block->escapeHtmlAttr($block->getStreetLine($lineNo)) ?>" title="<?= $block->escapeHtmlAttr(__('Street Address %1', $lineNo)) ?>" id="street_<?= $lineNo ?>" class="input-text <?= $_streetValidationClass ?>">
+                                <input type="text" name="billing[street][]" value="<?= $block->escapeHtmlAttr($block->getStreetLine($lineNo)) ?>" title="<?= $block->escapeHtmlAttr(__('Street Address %1', $lineNo)) ?>" id="street_<?= /* @noEscape */ $lineNo ?>" class="input-text <?= /* @noEscape */ $_streetValidationClass ?>">
                             </div>
                         </div>
                     <?php endfor; ?>
@@ -131,7 +131,7 @@
                     </span>
                     <div class="tooltip-content" data-target="dropdown" aria-hidden="true">
                         <p><?= $block->escapeHtml(__('On the bottom of your checks, you will see three groups of numbers. Usually the first one is your routing number, and the second is your account number.')) ?></p>
-                        <img src="<?= $block->escapeHtmlAttr($block->getViewFileUrl('ParadoxLabs_TokenBase::images/ach.png')) ?>" alt="<?= $block->escapeHtmlAttr(__('Visual reference for locating routing number and account number on a check')) ?>" />
+                        <img src="<?= $block->escapeUrl($block->getViewFileUrl('ParadoxLabs_TokenBase::images/ach.png')) ?>" alt="<?= $block->escapeHtmlAttr(__('Visual reference for locating routing number and account number on a check')) ?>" />
                     </div>
                 </div>
             </div>
@@ -159,7 +159,7 @@
             </button>
         </div>
         <div class="secondary">
-            <a class="action back" href="<?= $block->escapeHtmlAttr($block->getBackUrl()) ?>"><span><?= $block->escapeHtml(__('Cancel')) ?></span></a>
+            <a class="action back" href="<?= $block->escapeUrl($block->getBackUrl()) ?>"><span><?= $block->escapeHtml(__('Cancel')) ?></span></a>
         </div>
     </div>
 </form>
@@ -175,9 +175,9 @@
                 "regionInputId": "#region",
                 "postcodeId": "#zip",
                 "form": "#form-validate",
-                "regionJson": <?= $this->helper(\Magento\Directory\Helper\Data::class)->getRegionJson() ?>,
+                "regionJson": <?= /* @noEscape */ $this->helper(\Magento\Directory\Helper\Data::class)->getRegionJson() ?>,
                 "defaultRegion": "<?= (int)$block->getRegionId() ?>",
-                "countriesWithOptionalZip": <?= $this->helper(\Magento\Directory\Helper\Data::class)->getCountriesWithOptionalZip(true) ?>
+                "countriesWithOptionalZip": <?= /* @noEscape */ $this->helper(\Magento\Directory\Helper\Data::class)->getCountriesWithOptionalZip(true) ?>
             }
         }
     }

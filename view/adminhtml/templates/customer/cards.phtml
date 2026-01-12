@@ -14,13 +14,13 @@
                     <?php if ($card->isInUse()): ?>
                         <abbr title="<?= $block->escapeHtmlAttr(__('This payment record cannot be modified while associated with pending orders.')); ?>"><?= $block->escapeHtml(__('Card In Use')); ?></abbr>
                     <?php else: ?>
-                        <a class="action-edit" href="<?= $block->escapeHtmlAttr($block->getUrl('*/*/*', ['_secure' => true, 'id' => $block->getRequest()->getParam('id'), 'form_key' => $block->getFormKey(), 'method' => $card->getMethod(), 'card_id' => $card->getHash()])) ?>"><span><?= $block->escapeHtml(__('Edit')) ?></span></a>
-                        <a class="action-delete" href="<?= $block->escapeHtmlAttr($block->getUrl('*/*/paymentinfoDelete', ['_secure' => true, 'id' => $block->getRequest()->getParam('id'), 'form_key' => $block->getFormKey(), 'method' => $card->getMethod(), 'card_id' => $card->getHash()])) ?>"><span><?= $block->escapeHtml(__('Delete')) ?></span></a>
+                        <a class="action-edit" href="<?= $block->escapeUrl($block->getUrl('*/*/*', ['_secure' => true, 'id' => $block->getRequest()->getParam('id'), 'form_key' => $block->getFormKey(), 'method' => $card->getMethod(), 'card_id' => $card->getHash()])) ?>"><span><?= $block->escapeHtml(__('Edit')) ?></span></a>
+                        <a class="action-delete" href="<?= $block->escapeUrl($block->getUrl('*/*/paymentinfoDelete', ['_secure' => true, 'id' => $block->getRequest()->getParam('id'), 'form_key' => $block->getFormKey(), 'method' => $card->getMethod(), 'card_id' => $card->getHash()])) ?>"><span><?= $block->escapeHtml(__('Delete')) ?></span></a>
                     <?php endif; ?>
                 </div>
                 <address>
                     <?php if (!empty($card->getType())): ?>
-                        <img class="credit-card-type payment-icon" src="<?= $block->getViewFileUrl('Magento_Payment::images/cc/' . strtolower((string)$card->getType()) . '.png'); ?>" alt="<?= $block->escapeHtmlAttr($block->getCcTypeLabel($card)); ?>" />
+                        <img class="credit-card-type payment-icon" src="<?= $block->escapeUrl($block->getViewFileUrl('Magento_Payment::images/cc/' . strtolower((string)$card->getType()) . '.png')); ?>" alt="<?= $block->escapeHtmlAttr($block->getCcTypeLabel($card)); ?>" />
                     <?php endif; ?>
                     <span><?= $block->escapeHtml($card->getLabel(empty($card->getType()))); ?></span>
                     <?php if (strtotime((string)$card->getExpires()) > time()): ?>
