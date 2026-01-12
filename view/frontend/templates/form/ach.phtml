@@ -6,18 +6,18 @@ $code           = $block->escapeHtmlAttr($block->getMethodCode());
 $image          = $block->getBrandingImage();
 $storedCards    = $block->getStoredCards();
 ?>
-<fieldset class="fieldset payment items ccard <?= $code ?>" id="payment_form_<?= $code ?>"
-          data-mage-init='{"tokenbaseForm":{"code":"<?= $code ?>"}}'>
+<fieldset class="fieldset payment items ccard <?= /* @noEscape */ $code ?>" id="payment_form_<?= /* @noEscape */ $code ?>"
+          data-mage-init='{"tokenbaseForm":{"code":"<?= /* @noEscape */ $code ?>"}}'>
     <?php if ($image): ?>
         <div class="sorter">
-            <img src="<?= $block->escapeUrl($image) ?>" />
+            <img src="<?= $block->escapeHtmlAttr($image) ?>" />
         </div>
     <?php endif; ?>
     <?php if ($block->haveStoredCards()): ?>
         <div class="field">
-            <label for="<?= $code ?>-card-id" class="label"><span><?= $block->escapeHtml(__('Payment Information')) ?></span></label>
+            <label for="<?= /* @noEscape */ $code ?>-card-id" class="label"><span><?= $block->escapeHtml(__('Payment Information')) ?></span></label>
             <div class="input-box">
-                <select id="<?= $code ?>-card-id" name="payment[card_id]">
+                <select id="<?= /* @noEscape */ $code ?>-card-id" name="payment[card_id]">
                     <?php /** @var \ParadoxLabs\TokenBase\Model\Card $card */ ?>
                     <?php foreach ($storedCards as $card): ?>
                         <?php $card = $card->getTypeInstance(); ?>
@@ -31,36 +31,36 @@ $storedCards    = $block->getStoredCards();
         </div>
     <?php endif; ?>
     <div class="field name required hide-if-card-selected">
-        <label for="<?= $code ?>-echeck-account-name" class="label"><span><?= $block->escapeHtml(__('Name on Account')) ?></span></label>
+        <label for="<?= /* @noEscape */ $code ?>-echeck-account-name" class="label"><span><?= $block->escapeHtml(__('Name on Account')) ?></span></label>
         <div class="control">
-            <input type="text" id="<?= $code ?>-echeck-account-name" name="payment[echeck_account_name]"
+            <input type="text" id="<?= /* @noEscape */ $code ?>-echeck-account-name" name="payment[echeck_account_name]"
                    title="<?= $block->escapeHtmlAttr(__('Name on Account')) ?>" class="input-text" maxlength="22"
                    value="<?= $block->escapeHtmlAttr($block->getInfoData('echeck_account_name')) ?>"
                    data-validate='{required:true}' />
         </div>
     </div>
     <div class="field name required hide-if-card-selected">
-        <label for="<?= $code ?>-echeck-bank-name" class="label"><span><?= $block->escapeHtml(__('Bank Name')) ?></span></label>
+        <label for="<?= /* @noEscape */ $code ?>-echeck-bank-name" class="label"><span><?= $block->escapeHtml(__('Bank Name')) ?></span></label>
         <div class="control">
-            <input type="text" id="<?= $code ?>-echeck-bank-name" name="payment[echeck_bank_name]"
+            <input type="text" id="<?= /* @noEscape */ $code ?>-echeck-bank-name" name="payment[echeck_bank_name]"
                    title="<?= $block->escapeHtmlAttr(__('Bank Name')) ?>" class="input-text" maxlength="50" autocomplete="off"
                    value="<?= $block->escapeHtmlAttr($block->getInfoData('echeck_bank_name')) ?>"
                    data-validate='{required:true}' />
         </div>
     </div>
     <div class="field number required hide-if-card-selected">
-        <label for="<?= $code ?>-echeck-routing-number" class="label"><span><?= $block->escapeHtml(__('Routing Number')) ?></span></label>
+        <label for="<?= /* @noEscape */ $code ?>-echeck-routing-number" class="label"><span><?= $block->escapeHtml(__('Routing Number')) ?></span></label>
         <div class="control">
-            <input type="number" id="<?= $code ?>-echeck-routing-number" name="payment[echeck_routing_no]"
+            <input type="number" id="<?= /* @noEscape */ $code ?>-echeck-routing-number" name="payment[echeck_routing_no]"
                    title="<?= $block->escapeHtmlAttr(__('Routing Number')) ?>" class="input-text minimum-length-9" maxlength="9"
                    value="<?= $block->escapeHtmlAttr($block->getInfoData('echeck_routing_no')) ?>" autocomplete="off"
                    data-validate='{"required-number":true,"validate-length":true}' />
         </div>
     </div>
     <div class="field number required hide-if-card-selected">
-        <label for="<?= $code ?>-echeck-account-number" class="label"><span><?= $block->escapeHtml(__('Account Number')) ?></span></label>
+        <label for="<?= /* @noEscape */ $code ?>-echeck-account-number" class="label"><span><?= $block->escapeHtml(__('Account Number')) ?></span></label>
         <div class="control _with-tooltip">
-            <input type="number" id="<?= $code ?>-echeck-account-number" name="payment[echeck_account_no]"
+            <input type="number" id="<?= /* @noEscape */ $code ?>-echeck-account-number" name="payment[echeck_account_no]"
                    title="<?= $block->escapeHtmlAttr(__('Account Number')) ?>" class="input-text minimum-length-5 maximum-length-17"
                    value="<?= $block->escapeHtmlAttr($block->getInfoData('echeck_account_no')) ?>" maxlength="17"
                    data-validate='{"required-number":true,"validate-length":true}' autocomplete="off" />
@@ -70,21 +70,21 @@ $storedCards    = $block->getStoredCards();
                 </span>
                 <div class="tooltip-content" data-target="dropdown" aria-hidden="true">
                     <p><?= $block->escapeHtml(__('On the bottom of your checks, you will see three groups of numbers. Usually the first one is your routing number, and the second is your account number.')) ?></p>
-                    <img src="<?= $block->escapeUrl($block->getViewFileUrl('ParadoxLabs_TokenBase::images/ach.png')) ?>" alt="<?= $block->escapeHtmlAttr(__('Visual reference for locating routing number and account number on a check')) ?>" />
+                    <img src="<?= $block->escapeHtmlAttr($block->getViewFileUrl('ParadoxLabs_TokenBase::images/ach.png')) ?>" alt="<?= $block->escapeHtmlAttr(__('Visual reference for locating routing number and account number on a check')) ?>" />
                 </div>
             </div>
         </div>
     </div>
     <div class="field type required hide-if-card-selected">
-        <label for="<?= $code ?>-echeck-account-type-checking" class="label"><span><?= $block->escapeHtml(__('Account Type')) ?></span></label>
+        <label for="<?= /* @noEscape */ $code ?>-echeck-account-type-checking" class="label"><span><?= $block->escapeHtml(__('Account Type')) ?></span></label>
         <?php $typeValue = ($block->getInfoData('echeck_account_type') != '') ? $block->getInfoData('echeck_account_type') : 'checking'; ?>
         <?php foreach ($block->getHelper()->getAchAccountTypes() as $k => $v): ?>
             <div class="control">
                 <input type="radio" name="payment[echeck_account_type]"
-                       id="<?= $code ?>-echeck-account-type-<?= $block->escapeHtmlAttr($k) ?>"
+                       id="<?= /* @noEscape */ $code ?>-echeck-account-type-<?= $block->escapeHtmlAttr($k) ?>"
                        value="<?= $block->escapeHtmlAttr($k) ?>" <?php if ($k == $typeValue): ?>checked="checked"<?php endif ?>
                        data-validate='{"validate-one-required-by-name":true}' />
-                <label for="<?= $code ?>-echeck-account-type-<?= $block->escapeHtmlAttr($k) ?>"><?= $block->escapeHtml($v) ?></label>
+                <label for="<?= /* @noEscape */ $code ?>-echeck-account-type-<?= $block->escapeHtmlAttr($k) ?>"><?= $block->escapeHtml($v) ?></label>
             </div>
         <?php endforeach ?>
     </div>
@@ -95,11 +95,11 @@ $storedCards    = $block->getStoredCards();
             <div class="control">
                 <?php if ($block->getMethod()->getConfigData('allow_unsaved')): ?>
                     <input type="hidden" name="payment[save]" value="0" />
-                    <input type="checkbox" title="<?= $block->escapeHtmlAttr(__('Save for next time')) ?>" class="input-checkbox" id="<?= $code ?>_save" name="payment[save]" value="1" <?php if ($block->getMethod()->getConfigData('savecard_opt_out') && $block->getInfoData('save') !== 0): ?>checked="checked"<?php endif; ?> />
-                    <label for="<?= $code ?>_save"><?= $block->escapeHtml(__('Save for next time')) ?></label>
+                    <input type="checkbox" title="<?= $block->escapeHtmlAttr(__('Save for next time')) ?>" class="input-checkbox" id="<?= /* @noEscape */ $code ?>_save" name="payment[save]" value="1" <?php if ($block->getMethod()->getConfigData('savecard_opt_out') && $block->getInfoData('save') !== 0): ?>checked="checked"<?php endif; ?> />
+                    <label for="<?= /* @noEscape */ $code ?>_save"><?= $block->escapeHtml(__('Save for next time')) ?></label>
                 <?php else: ?>
                     <input type="hidden" name="payment[save]" value="1" />
-                    <label class="label" for="<?= $code ?>_save"><?= $block->escapeHtml(__('For your convenience, this data will be stored securely by our payment processor.')) ?></label>
+                    <label class="label" for="<?= /* @noEscape */ $code ?>_save"><?= $block->escapeHtml(__('For your convenience, this data will be stored securely by our payment processor.')) ?></label>
                 <?php endif; ?>
             </div>
         </div>
@@ -109,8 +109,8 @@ $storedCards    = $block->getStoredCards();
     <?= /* @noEscape */ $secureRenderer->renderStyleAsTag('display:none', '#payment_form_' . $code) ?>
 <?php else: ?>
     <script>
-        if (document.querySelector('#payment_form_<?= $code ?>') instanceof Element) {
-            document.querySelector('#payment_form_<?= $code ?>').style.display = 'none';
+        if (document.querySelector('#payment_form_<?= /* @noEscape */ $code ?>') instanceof Element) {
+            document.querySelector('#payment_form_<?= /* @noEscape */ $code ?>').style.display = 'none';
         }
     </script>
 <?php endif; ?>

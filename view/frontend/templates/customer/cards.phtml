@@ -34,8 +34,8 @@
                             <?php if ($card->isInUse()): ?>
                                 <abbr title="<?= $block->escapeHtmlAttr(__('This payment record cannot be modified while associated with pending orders.')); ?>"><?= $block->escapeHtml(__('Card In Use')); ?></abbr>
                             <?php else: ?>
-                                <a class="action edit" href="<?= $block->escapeUrl($block->getUrl('*/*', ['_secure' => true, 'form_key' => $block->getFormKey(), 'method' => $card->getMethod(), 'id' => $card->getHash()])) ?>"><span><?= $block->escapeHtml(__('Edit')) ?></span></a>
-                                <a class="action delete" href="<?= $block->escapeUrl($block->getUrl('*/*/delete', ['_secure' => true, 'form_key' => $block->getFormKey(), 'method' => $card->getMethod(), 'id' => $card->getHash()])) ?>"><span><?= $block->escapeHtml(__('Delete')) ?></span></a>
+                                <a class="action edit" href="<?= $block->escapeHtmlAttr($block->getUrl('*/*', ['_secure' => true, 'form_key' => $block->getFormKey(), 'method' => $card->getMethod(), 'id' => $card->getHash()])) ?>"><span><?= $block->escapeHtml(__('Edit')) ?></span></a>
+                                <a class="action delete" href="<?= $block->escapeHtmlAttr($block->getUrl('*/*/delete', ['_secure' => true, 'form_key' => $block->getFormKey(), 'method' => $card->getMethod(), 'id' => $card->getHash()])) ?>"><span><?= $block->escapeHtml(__('Delete')) ?></span></a>
                             <?php endif; ?>
                         </div>
                     </div>

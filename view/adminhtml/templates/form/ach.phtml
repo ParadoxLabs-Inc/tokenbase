@@ -6,24 +6,24 @@ $code           = $block->escapeHtmlAttr($block->getMethodCode());
 $image          = $block->getBrandingImage();
 $storedCards    = $block->getStoredCards();
 ?>
-<div id="payment_form_<?= $code ?>" class="admin__page-section-item"
+<div id="payment_form_<?= /* @noEscape */ $code ?>" class="admin__page-section-item"
      data-mage-init='{
     "tokenbaseForm": {
-        "code":"<?= $code ?>",
+        "code":"<?= /* @noEscape */ $code ?>",
         "validateForm": false
     }
 }'>
-    <input id="<?= $code ?>-payment-method" type="hidden" name="payment[method]" value="<?= $code ?>" />
+    <input id="<?= /* @noEscape */ $code ?>-payment-method" type="hidden" name="payment[method]" value="<?= /* @noEscape */ $code ?>" />
     <fieldset class="admin__fieldset">
         <?php if ($image): ?>
             <div class="page-actions">
-                <img src="<?= $block->escapeUrl($image); ?>" />
+                <img src="<?= $block->escapeHtmlAttr($image); ?>" />
             </div>
         <?php endif; ?>
         <?php if ($block->haveStoredCards()): ?>
             <div class="admin__field">
                 <div class="admin__field-control control">
-                    <select id="<?= $code ?>-card-id" name="payment[card_id]" class="select admin__control-select">
+                    <select id="<?= /* @noEscape */ $code ?>-card-id" name="payment[card_id]" class="select admin__control-select">
                         <?php /** @var \ParadoxLabs\TokenBase\Model\Card $card */ ?>
                         <?php foreach ($storedCards as $card): ?>
                             <?php $card = $card->getTypeInstance(); ?>
@@ -37,42 +37,42 @@ $storedCards    = $block->getStoredCards();
             </div>
         <?php endif; ?>
         <div class="admin__field hide-if-card-selected">
-            <label class="label admin__field-label" for="<?= $code ?>-echeck-account-name"><?= $block->escapeHtml(__('Name on Account')) ?><span class="required">*</span></label>
+            <label class="label admin__field-label" for="<?= /* @noEscape */ $code ?>-echeck-account-name"><?= $block->escapeHtml(__('Name on Account')) ?><span class="required">*</span></label>
             <div class="admin__field-control control">
-                <input type="text" id="<?= $code ?>-echeck-account-name" name="payment[echeck_account_name]" title="<?= $block->escapeHtmlAttr(__('Name on Account')) ?>" class="input-text admin__control-text" value="<?= $block->escapeHtmlAttr($block->getInfoData('echeck_account_name')); ?>" maxlength="22" />
+                <input type="text" id="<?= /* @noEscape */ $code ?>-echeck-account-name" name="payment[echeck_account_name]" title="<?= $block->escapeHtmlAttr(__('Name on Account')) ?>" class="input-text admin__control-text" value="<?= $block->escapeHtmlAttr($block->getInfoData('echeck_account_name')); ?>" maxlength="22" />
             </div>
         </div>
         <div class="admin__field hide-if-card-selected">
-            <label class="label admin__field-label" for="<?= $code ?>-echeck-bank-name"><?= $block->escapeHtml(__('Bank Name')) ?><span class="required">*</span></label>
+            <label class="label admin__field-label" for="<?= /* @noEscape */ $code ?>-echeck-bank-name"><?= $block->escapeHtml(__('Bank Name')) ?><span class="required">*</span></label>
             <div class="admin__field-control control">
-                <input type="text" id="<?= $code ?>-echeck-bank-name" name="payment[echeck_bank_name]" title="<?= $block->escapeHtmlAttr(__('Bank Name')) ?>" class="input-text admin__control-text" value="<?= $block->escapeHtmlAttr($block->getInfoData('echeck_bank_name')); ?>" maxlength="50" autocomplete="off" />
+                <input type="text" id="<?= /* @noEscape */ $code ?>-echeck-bank-name" name="payment[echeck_bank_name]" title="<?= $block->escapeHtmlAttr(__('Bank Name')) ?>" class="input-text admin__control-text" value="<?= $block->escapeHtmlAttr($block->getInfoData('echeck_bank_name')); ?>" maxlength="50" autocomplete="off" />
             </div>
         </div>
         <div class="admin__field hide-if-card-selected">
-            <label class="label admin__field-label" for="<?= $code ?>-echeck-routing-number"><?= $block->escapeHtml(__('Routing Number')) ?><span class="required">*</span></label>
+            <label class="label admin__field-label" for="<?= /* @noEscape */ $code ?>-echeck-routing-number"><?= $block->escapeHtml(__('Routing Number')) ?><span class="required">*</span></label>
             <div class="admin__field-control control">
-                <input type="text" id="<?= $code ?>-echeck-routing-number" name="payment[echeck_routing_no]" title="<?= $block->escapeHtmlAttr(__('Routing Number')) ?>" class="input-text admin__control-text" value="<?= $block->escapeHtmlAttr($block->getInfoData('echeck_routing_no')); ?>" maxlength="9" autocomplete="off" />
+                <input type="text" id="<?= /* @noEscape */ $code ?>-echeck-routing-number" name="payment[echeck_routing_no]" title="<?= $block->escapeHtmlAttr(__('Routing Number')) ?>" class="input-text admin__control-text" value="<?= $block->escapeHtmlAttr($block->getInfoData('echeck_routing_no')); ?>" maxlength="9" autocomplete="off" />
             </div>
         </div>
         <div class="admin__field hide-if-card-selected">
-            <label class="label admin__field-label" for="<?= $code ?>-echeck-account-number"><?= $block->escapeHtml(__('Account Number')) ?><span class="required">*</span></label>
+            <label class="label admin__field-label" for="<?= /* @noEscape */ $code ?>-echeck-account-number"><?= $block->escapeHtml(__('Account Number')) ?><span class="required">*</span></label>
             <div class="admin__field-control control _with-tooltip">
-                <input type="text" id="<?= $code ?>-echeck-account-number" name="payment[echeck_account_no]" title="<?= $block->escapeHtmlAttr(__('Account Number')) ?>" class="input-text admin__control-text" value="<?= $block->escapeHtmlAttr($block->getInfoData('echeck_account_no')); ?>" maxlength="17" autocomplete="off" />
+                <input type="text" id="<?= /* @noEscape */ $code ?>-echeck-account-number" name="payment[echeck_account_no]" title="<?= $block->escapeHtmlAttr(__('Account Number')) ?>" class="input-text admin__control-text" value="<?= $block->escapeHtmlAttr($block->getInfoData('echeck_account_no')); ?>" maxlength="17" autocomplete="off" />
                 <div class="admin__field-tooltip tooltip">
                     <span class="admin__field-tooltip-action action-help" tabindex="0" data-toggle="dropdown">
                         <span><?= $block->escapeHtml(__('Where do I find these numbers?')) ?></span>
                     </span>
                     <div class="admin__field-tooltip-content" data-target="dropdown" aria-hidden="true">
                         <p><?= $block->escapeHtml(__('On the bottom of your checks, you will see three groups of numbers. Usually the first one is your routing number, and the second is your account number.')) ?></p>
-                        <img src="<?= $block->escapeUrl($block->getViewFileUrl('ParadoxLabs_TokenBase::images/ach.png')) ?>" alt="<?= $block->escapeHtmlAttr(__('Visual reference for locating routing number and account number on a check')) ?>" />
+                        <img src="<?= $block->escapeHtmlAttr($block->getViewFileUrl('ParadoxLabs_TokenBase::images/ach.png')) ?>" alt="<?= $block->escapeHtmlAttr(__('Visual reference for locating routing number and account number on a check')) ?>" />
                     </div>
                 </div>
             </div>
         </div>
         <div class="admin__field hide-if-card-selected">
-            <label class="label admin__field-label" for="<?= $code ?>-echeck-account-type" ><?= $block->escapeHtml(__('Account Type')) ?><span class="required">*</span></label>
+            <label class="label admin__field-label" for="<?= /* @noEscape */ $code ?>-echeck-account-type" ><?= $block->escapeHtml(__('Account Type')) ?><span class="required">*</span></label>
             <div class="admin__field-control control">
-                <select id="<?= $code ?>-echeck-account-type" name="payment[echeck_account_type]" class="account-type required-entry _required select admin__control-select">
+                <select id="<?= /* @noEscape */ $code ?>-echeck-account-type" name="payment[echeck_account_type]" class="account-type required-entry _required select admin__control-select">
                     <?php foreach ($block->getHelper()->getAchAccountTypes() as $k => $v): ?>
                         <option value="<?= $block->escapeHtmlAttr($k); ?>" <?php if ($k == $block->getInfoData('echeck_account_type')): ?>selected="selected"<?php endif ?>><?= $block->escapeHtml($v); ?></option>
                     <?php endforeach ?>
@@ -85,11 +85,11 @@ $storedCards    = $block->getStoredCards();
                 <div class="admin__field-control control">
                     <?php if ($block->getMethod()->getConfigData('allow_unsaved')): ?>
                         <input type="hidden" name="payment[save]" value="0" />
-                        <input type="checkbox" title="<?= $block->escapeHtmlAttr(__('Save for next time')) ?>" class="input-checkbox" id="<?= $code ?>-save" name="payment[save]" value="1" <?php if ($block->getMethod()->getConfigData('savecard_opt_out') && $block->getInfoData('save') !== 0): ?>checked="checked"<?php endif; ?> />
-                        <label for="<?= $code ?>-save"><?= $block->escapeHtml(__('Save for next time')) ?></label>
+                        <input type="checkbox" title="<?= $block->escapeHtmlAttr(__('Save for next time')) ?>" class="input-checkbox" id="<?= /* @noEscape */ $code ?>-save" name="payment[save]" value="1" <?php if ($block->getMethod()->getConfigData('savecard_opt_out') && $block->getInfoData('save') !== 0): ?>checked="checked"<?php endif; ?> />
+                        <label for="<?= /* @noEscape */ $code ?>-save"><?= $block->escapeHtml(__('Save for next time')) ?></label>
                     <?php else: ?>
                         <input type="hidden" name="payment[save]" value="1" />
-                        <label class="label admin__field-label" for="<?= $code ?>-save"><?= $block->escapeHtml(__('For your convenience, this data will be stored securely by our payment processor.')) ?></label>
+                        <label class="label admin__field-label" for="<?= /* @noEscape */ $code ?>-save"><?= $block->escapeHtml(__('For your convenience, this data will be stored securely by our payment processor.')) ?></label>
                     <?php endif; ?>
                 </div>
             </div>
@@ -100,8 +100,8 @@ $storedCards    = $block->getStoredCards();
     <?= /* @noEscape */ $secureRenderer->renderStyleAsTag('display:none', '#payment_form_' . $code) ?>
 <?php else: ?>
     <script>
-        if (document.querySelector('#payment_form_<?= $code ?>') instanceof Element) {
-            document.querySelector('#payment_form_<?= $code ?>').style.display = 'none';
+        if (document.querySelector('#payment_form_<?= /* @noEscape */ $code ?>') instanceof Element) {
+            document.querySelector('#payment_form_<?= /* @noEscape */ $code ?>').style.display = 'none';
         }
     </script>
 <?php endif; ?>

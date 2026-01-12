@@ -10,7 +10,7 @@
                 <ul class="ui-tabs-nav tabs-horiz">
                     <?php foreach ($activeMethods as $method): ?>
                         <li class="ui-state-default <?php if ($block->getCurrentMethod() == $method): ?>ui-state-active<?php endif; ?>">
-                            <a href="<?= $block->escapeUrl($block->getUrl('*/*/paymentinfo', [ 'method' => $method, 'id' => $block->getRequest()->getParam('id'), 'form_key' => $block->getFormKey() ])); ?>" class="ui-tabs-anchor">
+                            <a href="<?= $block->escapeHtmlAttr($block->getUrl('*/*/paymentinfo', [ 'method' => $method, 'id' => $block->getRequest()->getParam('id'), 'form_key' => $block->getFormKey() ])); ?>" class="ui-tabs-anchor">
                                 <?= $block->escapeHtml($block->getMethodTitle($method)); ?>
                             </a>
                         </li>
