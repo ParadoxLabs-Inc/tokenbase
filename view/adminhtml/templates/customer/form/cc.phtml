@@ -20,7 +20,7 @@
         "ccTypeContainer": ".credit-card-types"
     }
 }'>
-    <?= $block->getBlockHtml('formkey'); ?>
+    <?= /* @noEscape */ $block->getBlockHtml('formkey'); ?>
     <input type="hidden" name="card_id" value="<?= $block->getCard()->getId() ? $block->escapeHtmlAttr($block->getCard()->getHash()) : ''; ?>" />
     <input type="hidden" name="method" value="<?= /* @noEscape */ $code; ?>" />
     <fieldset class="admin__fieldset">
@@ -106,7 +106,7 @@
         <div class="admin__field country _required">
             <label class="admin__field-label" for="<?= /* @noEscape */ $code; ?>-country"><span><?= $block->escapeHtml(__('Country')) ?></span></label>
             <div class="admin__field-control">
-                <?= str_replace('class="', 'class="admin__control-select ', $block->getCountryHtmlSelect($block->getAddress()->getCountryId(), 'billing[country_id]', $code . '-country')) ?>
+                <?= /* @noEscape */ str_replace('class="', 'class="admin__control-select ', $block->getCountryHtmlSelect($block->getAddress()->getCountryId(), 'billing[country_id]', $code . '-country')) ?>
             </div>
         </div>
     </fieldset>

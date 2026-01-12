@@ -15,13 +15,13 @@
 </div>
 
 <form action="<?= $block->escapeHtmlAttr($block->getAction()); ?>" method="post" id="form-validate" class="checkout-payment-method" data-hasrequired="<?= $block->escapeHtmlAttr(__('* Required Fields')) ?>">
-    <?= $block->getBlockHtml('formkey'); ?>
+    <?= /* @noEscape */ $block->getBlockHtml('formkey'); ?>
     <input type="hidden" name="id" value="<?= $block->getCard()->getId() ? $block->escapeHtmlAttr($block->getCard()->getHash()) : ''; ?>" />
     <input type="hidden" name="method" value="<?= /* @noEscape */ $code; ?>" />
     <fieldset class="fieldset">
         <legend class="legend"><span><?= $block->escapeHtml(__('Cardholder Information')) ?></span></legend><br>
 
-        <?= $block->getNameBlockHtml() ?>
+        <?= /* @noEscape */ $block->getNameBlockHtml() ?>
         <div class="field company">
             <label class="label" for="company"><span><?= $block->escapeHtml(__('Company')) ?></span></label>
             <div class="control">
@@ -84,7 +84,7 @@
         <div class="field country required">
             <label class="label" for="country"><span><?= $block->escapeHtml(__('Country')) ?></span></label>
             <div class="control">
-                <?= $block->getCountryHtmlSelect($block->getAddress()->getCountryId(), 'billing[country_id]') ?>
+                <?= /* @noEscape */ $block->getCountryHtmlSelect($block->getAddress()->getCountryId(), 'billing[country_id]') ?>
             </div>
         </div>
     </fieldset>

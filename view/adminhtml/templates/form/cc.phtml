@@ -75,7 +75,7 @@ $storedCards    = $block->getStoredCards();
                 </select>
             </div>
         </div>
-        <?= $block->getChildHtml() ?>
+        <?= /* @noEscape */ $block->getChildHtml() ?>
         <?php if ($block->hasVerification()): ?>
             <div class="admin__field _required cvv <?php if ($block->getMethod()->getConfigData('require_ccv') == 0): ?>hide-if-card-selected<?php endif; ?>">
                 <label class="label admin__field-label" for="<?= /* @noEscape */ $code ?>-cc-cid" ><span><?= $block->escapeHtml(__('Card Verification Number')) ?></span></label>

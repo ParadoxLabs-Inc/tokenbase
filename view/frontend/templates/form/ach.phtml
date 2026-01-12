@@ -89,7 +89,7 @@ $storedCards    = $block->getStoredCards();
         <?php endforeach ?>
     </div>
 
-    <?= $block->getChildHtml() ?>
+    <?= /* @noEscape */ $block->getChildHtml() ?>
     <?php if (!$block->isGuestCheckout()): ?>
         <div class="field save hide-if-card-selected">
             <div class="control">

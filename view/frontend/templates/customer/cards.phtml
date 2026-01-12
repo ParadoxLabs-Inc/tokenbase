@@ -28,7 +28,7 @@
                     </legend>
                     <div class="box-content">
                         <address>
-                            <?= $block->getFormattedCardAddress($card->getAddressObject()); ?>
+                            <?= /* @noEscape */ $block->getFormattedCardAddress($card->getAddressObject()); ?>
                         </address>
                         <div class="item actions box-actions">
                             <?php if ($card->isInUse()): ?>

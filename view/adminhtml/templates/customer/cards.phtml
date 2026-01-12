@@ -27,7 +27,7 @@
                         <small><?= $block->escapeHtml(__('(Expires %1)', date('m/Y', (int)strtotime((string)$card->getExpires())))); ?></small>
                     <?php endif; ?><br>
 
-                    <?= $block->getFormattedCardAddress($card->getAddressObject()); ?>
+                    <?= /* @noEscape */ $block->getFormattedCardAddress($card->getAddressObject()); ?>
                 </address>
             </li>
         <?php endforeach; ?>

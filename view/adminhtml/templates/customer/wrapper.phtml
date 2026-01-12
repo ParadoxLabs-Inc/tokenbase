@@ -22,7 +22,7 @@
     <div class="admin__fieldset-wrapper-content">
         <div class="manage-payment-method">
             <?php if (!empty($activeMethods)): ?>
-                <?= $block->getChildHtml(); ?>
+                <?= /* @noEscape */ $block->getChildHtml(); ?>
             <?php else: ?>
                 <?= $block->escapeHtml(__('There are currently no active TokenBase payment methods.')); ?>
             <?php endif; ?>

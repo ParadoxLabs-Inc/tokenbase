@@ -3,10 +3,10 @@
 // @codingStandardsIgnoreFile
 ?>
 <div class="ui-tabs">
-    <?= $block->getChildHtml('tokenbase_customer_method_left'); ?>
+    <?= /* @noEscape */ $block->getChildHtml('tokenbase_customer_method_left'); ?>
     <div class="address-item-edit">
         <div class="address-item-edit-content">
-            <?= $block->getChildHtml('tokenbase_customer_method_right'); ?>
+            <?= /* @noEscape */ $block->getChildHtml('tokenbase_customer_method_right'); ?>
         </div>
     </div>
 </div>

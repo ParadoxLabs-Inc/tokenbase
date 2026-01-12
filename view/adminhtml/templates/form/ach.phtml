@@ -79,7 +79,7 @@ $storedCards    = $block->getStoredCards();
                 </select>
             </div>
         </div>
-        <?= $block->getChildHtml(); ?>
+        <?= /* @noEscape */ $block->getChildHtml(); ?>
         <?php if (!$block->isGuestCheckout()): ?>
             <div class="admin__field hide-if-card-selected">
                 <div class="admin__field-control control">
