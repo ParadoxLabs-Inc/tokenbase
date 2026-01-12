@@ -7,7 +7,7 @@
                           value: getCode(),
                           checked: isChecked,
                           click: selectPaymentMethod,
-                          visible: isRadioButtonVisible()"/>
+                          visible: isRadioButtonVisible()">
         <label class="label" data-bind="attr: {'for': getCode()}"><span data-bind="text: getTitle()"></span></label>
     </div>
 
@@ -24,7 +24,7 @@
             <!-- /ko -->
             <!-- ko if: (getLogoImage())-->
             <div class="sorter">
-                <img data-bind="attr: {'src': getLogoImage()}" />
+                <img data-bind="attr: {'src': getLogoImage()}">
             </div>
             <!--/ko-->
             <!-- ko if: (useVault()) -->
@@ -53,7 +53,7 @@
                 <div class="control">
                     <input type="text" name="payment[echeck_account_name]" class="input-text" value="" maxlength="22"
                            data-bind="attr: {id: getCode() + '-echeck-account-name', title: $t('Name on Account'), 'data-container': getCode() + '-echeck-account-name', 'data-validate': JSON.stringify({'required':true})},
-                    enable: true, textInput: echeckAccountName"/>
+                    enable: true, textInput: echeckAccountName">
                 </div>
             </div>
             <div class="field name required" data-bind="visible: isFormShown">
@@ -63,7 +63,7 @@
                 <div class="control">
                     <input type="text" name="payment[echeck_bank_name]" class="input-text" value="" maxlength="50"
                            data-bind="attr: {id: getCode() + '-echeck-bank-name', title: $t('Bank Name'), 'data-container': getCode() + '-echeck-bank-name', 'data-validate': JSON.stringify({'required':true})},
-                    enable: true, textInput: echeckBankName"/>
+                    enable: true, textInput: echeckBankName">
                 </div>
             </div>
             <div class="field number required" data-bind="visible: isFormShown">
@@ -73,7 +73,7 @@
                 <div class="control">
                     <input type="number" name="payment[echeck_routing_no]" class="input-text minimum-length-9" value="" maxlength="9"
                            data-bind="attr: {id: getCode() + '-echeck-routing-number', title: $t('Routing Number'), 'data-container': getCode() + '-echeck-routing-number', 'data-validate': JSON.stringify({'required-number':true,'validate-length':true})},
-                    enable: true, textInput: echeckRoutingNumber"/>
+                    enable: true, textInput: echeckRoutingNumber">
                 </div>
             </div>
             <div class="field number required" data-bind="visible: isFormShown">
@@ -83,7 +83,7 @@
                 <div class="control">
                     <input type="number" name="payment[echeck_account_no]" class="input-text minimum-length-5 maximum-length-17" value="" maxlength="17"
                            data-bind="attr: {id: getCode() + '-echeck-account-number', title: $t('Account Number'), 'data-container': getCode() + '-echeck-account-number', 'data-validate': JSON.stringify({'required-number':true,'validate-length':true})},
-                    enable: true, textInput: echeckAccountNumber"/>
+                    enable: true, textInput: echeckAccountNumber">
                     <div class="field-tooltip toggle">
                         <span class="field-tooltip-action action-ach"
                               tabindex="0"
@@ -94,7 +94,7 @@
                         <div class="field-tooltip-content"
                              data-target="dropdown">
                             <p><!-- ko text: $t('On the bottom of your checks, you will see three groups of numbers. Usually the first one is your routing number, and the second is your account number.')--><!-- /ko --></p>
-                            <img data-bind="attr: {src: getAchImage(), alt: $t('Visual reference for locating routing number and account number on a check')}" />
+                            <img data-bind="attr: {src: getAchImage(), alt: $t('Visual reference for locating routing number and account number on a check')}">
                         </div>
                     </div>
                 </div>
@@ -126,7 +126,7 @@
                            value="1"
                            checked="checked"
                            class="checkbox"
-                           data-bind="attr: {id: getCode() + '-save'}, checked: save"/>
+                           data-bind="attr: {id: getCode() + '-save'}, checked: save">
                     <label class="label" data-bind="attr: {for: getCode() + '-save'}">
                         <span><!-- ko text: $t('For your convenience, this data will be stored securely by our payment processor.')--><!-- /ko --></span>
                     </label>
@@ -137,7 +137,7 @@
                            value="1"
                            checked="checked"
                            class="checkbox"
-                           data-bind="attr: {id: getCode() + '-save'}, checked: save"/>
+                           data-bind="attr: {id: getCode() + '-save'}, checked: save">
                     <label class="label" data-bind="attr: {for: getCode() + '-save'}">
                         <span><!-- ko text: $t('Save for next time')--><!-- /ko --></span>
                     </label>
