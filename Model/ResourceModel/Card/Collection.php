@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,12 +15,17 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Model\ResourceModel\Card;
 
-class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
+use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
+use ParadoxLabs\TokenBase\Model\Card as CardModel;
+use ParadoxLabs\TokenBase\Model\ResourceModel\Card as CardResource;
+
+class Collection extends AbstractCollection
 {
     /**
      * Define resource model
@@ -30,8 +35,8 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     protected function _construct()
     {
         $this->_init(
-            \ParadoxLabs\TokenBase\Model\Card::class,
-            \ParadoxLabs\TokenBase\Model\ResourceModel\Card::class
+            CardModel::class,
+            CardResource::class
         );
     }
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,64 +15,31 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Controller;
 
+use Magento\Customer\Controller\AbstractAccount;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\Data\Form\FormKey\Validator;
+use Magento\Framework\Registry;
 use Magento\Framework\View\Result\PageFactory;
 use ParadoxLabs\TokenBase\Api\CardRepositoryInterface;
+use ParadoxLabs\TokenBase\Helper\Address;
+use ParadoxLabs\TokenBase\Helper\Data;
+use ParadoxLabs\TokenBase\Model\CardFactory;
 
 /**
  * Paymentinfo abstract controller
  */
-abstract class Paymentinfo extends \Magento\Customer\Controller\AbstractAccount
+abstract class Paymentinfo extends AbstractAccount
 {
     /**
-     * @var \Magento\Framework\Registry
-     */
-    protected $registry;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
-     * @var \Magento\Framework\Data\Form\FormKey\Validator
-     */
-    protected $formKeyValidator;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Model\CardFactory
-     */
-    protected $cardFactory;
-
-    /**
-     * @var CardRepositoryInterface
-     */
-    protected $cardRepository;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Address
-     */
-    protected $addressHelper;
-
-    /**
-     * @var Session
-     */
-    protected $session;
-
-    /**
-     * @var PageFactory
-     */
-    protected $resultPageFactory;
-
-    /**
      * @param Context $context
-     * @param Session $customerSession *Proxy
+     * @param Session $session *Proxy
      * @param PageFactory $resultPageFactory
      * @param \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator
      * @param \Magento\Framework\Registry $registry
@@ -83,24 +50,15 @@ abstract class Paymentinfo extends \Magento\Customer\Controller\AbstractAccount
      */
     public function __construct(
         Context $context,
-        Session $customerSession,
-        PageFactory $resultPageFactory,
-        \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator,
-        \Magento\Framework\Registry $registry,
-        \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
-        \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository,
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \ParadoxLabs\TokenBase\Helper\Address $addressHelper
+        protected Session $session,
+        protected PageFactory $resultPageFactory,
+        protected Validator $formKeyValidator,
+        protected Registry $registry,
+        protected CardFactory $cardFactory,
+        protected CardRepositoryInterface $cardRepository,
+        protected Data $helper,
+        protected Address $addressHelper
     ) {
-        $this->formKeyValidator = $formKeyValidator;
-        $this->registry = $registry;
-        $this->helper = $helper;
-        $this->cardFactory = $cardFactory;
-        $this->cardRepository = $cardRepository;
-        $this->addressHelper = $addressHelper;
-        $this->session = $customerSession;
-        $this->resultPageFactory = $resultPageFactory;
-
         parent::__construct(
             $context
         );

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,10 +15,38 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Helper;
+
+use Magento\Backend\Model\Session\Quote;
+use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Customer\Api\Data\CustomerInterface;
+use Magento\Customer\Api\Data\CustomerInterfaceFactory;
+use Magento\Customer\Helper\Session\CurrentCustomer;
+use Magento\Customer\Model\Customer;
+use Magento\Customer\Model\Session;
+use Magento\Framework\App\Area;
+use Magento\Framework\App\Config\Initial;
+use Magento\Framework\App\Helper\Context;
+use Magento\Framework\App\State;
+use Magento\Framework\Registry;
+use Magento\Framework\View\LayoutFactory;
+use Magento\Payment\Model\Config;
+use Magento\Payment\Model\Method\Factory;
+use Magento\Quote\Model\Quote\PaymentFactory;
+use Magento\Store\Model\App\Emulation;
+use Magento\Store\Model\Store;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Store\Model\WebsiteFactory;
+use ParadoxLabs\TokenBase\Helper\Address as AddressHelper;
+use ParadoxLabs\TokenBase\Helper\Operation as OperationHelper;
+use ParadoxLabs\TokenBase\Model\CardFactory;
+use ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory;
+use Throwable;
 
 class Data extends \Magento\Payment\Helper\Data
 {
@@ -33,64 +61,9 @@ class Data extends \Magento\Payment\Helper\Data
     protected $cards = [];
 
     /**
-     * @var \Magento\Framework\App\State
-     */
-    protected $appState;
-
-    /**
-     * @var \Magento\Store\Model\StoreManagerInterface
-     */
-    protected $storeManager;
-
-    /**
-     * @var \Magento\Framework\Registry
-     */
-    protected $registry;
-
-    /**
-     * @var \Magento\Store\Model\WebsiteFactory
-     */
-    protected $websiteFactory;
-
-    /**
-     * @var \Magento\Customer\Api\Data\CustomerInterfaceFactory
-     */
-    protected $customerFactory;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Model\CardFactory
-     */
-    protected $cardFactory;
-
-    /**
-     * @var \Magento\Customer\Api\CustomerRepositoryInterface
-     */
-    protected $customerRepository;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory
-     */
-    protected $cardCollectionFactory;
-
-    /**
      * @var \Magento\Customer\Api\Data\CustomerInterface
      */
     protected $currentCustomer;
-
-    /**
-     * @var Address
-     */
-    protected $addressHelper;
-
-    /**
-     * @var \Magento\Quote\Model\Quote\PaymentFactory
-     */
-    protected $paymentFactory;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Operation
-     */
-    protected $operationHelper;
 
     /**
      * @var array
@@ -100,31 +73,12 @@ class Data extends \Magento\Payment\Helper\Data
     /**
      * @var array
      */
-    protected $achAccountTypes = [
-        'checking'         => 'Checking',
-        'savings'          => 'Savings',
-        'businessChecking' => 'Business Checking',
-    ];
-
-    /**
-     * @var \Magento\Backend\Model\Session\Quote
-     */
-    protected $backendSession;
-
-    /**
-     * @var \Magento\Checkout\Model\Session
-     */
-    protected $checkoutSession;
-
-    /**
-     * @var \Magento\Customer\Model\Session
-     */
-    protected $customerSession;
-
-    /**
-     * @var \Magento\Customer\Helper\Session\CurrentCustomer
-     */
-    protected $currentCustomerSession;
+    protected $achAccountTypes
+        = [
+            'checking' => 'Checking',
+            'savings' => 'Savings',
+            'businessChecking' => 'Business Checking',
+        ];
 
     /**
      * @var array
@@ -158,48 +112,32 @@ class Data extends \Magento\Payment\Helper\Data
      * @param \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomerSession *Proxy
      * @param \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory
      * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
-     * @param \ParadoxLabs\TokenBase\Helper\Address $addressHelper *Proxy
-     * @param \ParadoxLabs\TokenBase\Helper\Operation $operationHelper
+     * @param AddressHelper $addressHelper *Proxy
+     * @param OperationHelper $operationHelper
      */
     public function __construct(
-        \Magento\Framework\App\Helper\Context $context,
-        \Magento\Framework\View\LayoutFactory $layoutFactory,
-        \Magento\Payment\Model\Method\Factory $paymentMethodFactory,
-        \Magento\Store\Model\App\Emulation $appEmulation,
-        \Magento\Payment\Model\Config $paymentConfig,
-        \Magento\Framework\App\Config\Initial $initialConfig,
-        \Magento\Framework\App\State $appState,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Framework\Registry $registry,
-        \Magento\Store\Model\WebsiteFactory $websiteFactory,
-        \Magento\Customer\Api\Data\CustomerInterfaceFactory $customerFactory,
-        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
-        \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory,
-        \Magento\Backend\Model\Session\Quote $backendSession,
-        \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Customer\Model\Session $customerSession,
-        \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomerSession,
-        \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
-        \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory,
-        \ParadoxLabs\TokenBase\Helper\Address $addressHelper,
-        \ParadoxLabs\TokenBase\Helper\Operation $operationHelper
+        Context $context,
+        LayoutFactory $layoutFactory,
+        Factory $paymentMethodFactory,
+        Emulation $appEmulation,
+        Config $paymentConfig,
+        Initial $initialConfig,
+        protected State $appState,
+        protected StoreManagerInterface $storeManager,
+        protected Registry $registry,
+        protected WebsiteFactory $websiteFactory,
+        protected CustomerInterfaceFactory $customerFactory,
+        protected CustomerRepositoryInterface $customerRepository,
+        protected PaymentFactory $paymentFactory,
+        protected Quote $backendSession,
+        protected CheckoutSession $checkoutSession,
+        protected Session $customerSession,
+        protected CurrentCustomer $currentCustomerSession,
+        protected CardFactory $cardFactory,
+        protected CollectionFactory $cardCollectionFactory,
+        protected AddressHelper $addressHelper,
+        protected OperationHelper $operationHelper
     ) {
-        $this->appState = $appState;
-        $this->storeManager = $storeManager;
-        $this->registry = $registry;
-        $this->websiteFactory = $websiteFactory;
-        $this->customerFactory = $customerFactory;
-        $this->customerRepository = $customerRepository;
-        $this->cardFactory = $cardFactory;
-        $this->cardCollectionFactory = $cardCollectionFactory;
-        $this->addressHelper = $addressHelper;
-        $this->paymentFactory = $paymentFactory;
-        $this->operationHelper = $operationHelper;
-        $this->backendSession = $backendSession;
-        $this->checkoutSession = $checkoutSession;
-        $this->customerSession = $customerSession;
-        $this->currentCustomerSession = $currentCustomerSession;
-
         parent::__construct(
             $context,
             $layoutFactory,
@@ -213,9 +151,9 @@ class Data extends \Magento\Payment\Helper\Data
     /**
      * Return active payment methods (if any) implementing tokenbase.
      *
+     * @return array
      * @api
      *
-     * @return array
      */
     public function getActiveMethods()
     {
@@ -238,9 +176,9 @@ class Data extends \Magento\Payment\Helper\Data
     /**
      * Return all tokenbase-derived payment methods, without an active check.
      *
+     * @return array
      * @api
      *
-     * @return array
      */
     public function getAllMethods()
     {
@@ -272,11 +210,11 @@ class Data extends \Magento\Payment\Helper\Data
          * Persist instances to reduce object instantiation -- ONLY FOR THIS OBJECT. \Magento\Payment\Helper\Data will
          * still create at each call, as will MethodFactory. @see \ParadoxLabs\TokenBase\Model\Method\Factory
          */
-        if (!isset($this->methodInstances[$code])) {
-            $this->methodInstances[$code] = parent::getMethodInstance($code);
+        if (!isset($this->methodInstances[ $code ])) {
+            $this->methodInstances[ $code ] = parent::getMethodInstance($code);
         }
 
-        return $this->methodInstances[$code];
+        return $this->methodInstances[ $code ];
     }
 
     /**
@@ -296,11 +234,11 @@ class Data extends \Magento\Payment\Helper\Data
                 if ($storeId < 1) {
                     /** @var \Magento\Store\Model\Website $website */
 
-                    $websiteId  = $this->registry->registry('current_customer')->getWebsiteId();
-                    $website    = $this->websiteFactory->create();
-                    $store      = $website->load($websiteId)->getDefaultStore();
+                    $websiteId = $this->registry->registry('current_customer')->getWebsiteId();
+                    $website   = $this->websiteFactory->create();
+                    $store     = $website->load($websiteId)->getDefaultStore();
 
-                    if ($store instanceof \Magento\Store\Model\Store) {
+                    if ($store instanceof Store) {
                         $storeId = $store->getId();
                     }
                 }
@@ -348,9 +286,9 @@ class Data extends \Magento\Payment\Helper\Data
 
         $registryCustomer = $this->registry->registry('current_customer');
 
-        if ($registryCustomer instanceof \Magento\Customer\Model\Customer) {
+        if ($registryCustomer instanceof Customer) {
             $this->currentCustomer = $registryCustomer->getDataModel();
-        } elseif ($registryCustomer instanceof \Magento\Customer\Api\Data\CustomerInterface) {
+        } elseif ($registryCustomer instanceof CustomerInterface) {
             $this->currentCustomer = $registryCustomer;
         } elseif (!$this->getIsFrontend()) {
             $this->currentCustomer = $this->getCurrentBackendCustomer();
@@ -360,7 +298,7 @@ class Data extends \Magento\Payment\Helper\Data
             );
         }
 
-        if (($this->currentCustomer instanceof \Magento\Customer\Api\Data\CustomerInterface) === false) {
+        if (($this->currentCustomer instanceof CustomerInterface) === false) {
             $this->currentCustomer = $this->customerFactory->create();
         }
 
@@ -412,7 +350,7 @@ class Data extends \Magento\Payment\Helper\Data
      */
     public function getActiveCard($method = null)
     {
-        $method = ($method === null) ? $this->registry->registry('tokenbase_method') : $method;
+        $method ??= $this->registry->registry('tokenbase_method');
 
         if ($this->card === null) {
             if ($this->registry->registry('active_card')) {
@@ -434,7 +372,7 @@ class Data extends \Magento\Payment\Helper\Data
                 $data = $this->customerSession->getTokenbaseFormData(true);
 
                 if (isset($data['billing']) && !empty($data['billing'])) {
-                    $address        = $this->addressHelper->buildAddressFromInput(
+                    $address = $this->addressHelper->buildAddressFromInput(
                         $data['billing'],
                         $this->card->getAddress()
                     );
@@ -443,11 +381,11 @@ class Data extends \Magento\Payment\Helper\Data
                 }
 
                 if (isset($data['payment']) && !empty($data['payment'])) {
-                    $cardData = $data['payment'];
-                    $cardData['method']     = $method;
-                    $cardData['card_id']    = $data['id'];
+                    $cardData            = $data['payment'];
+                    $cardData['method']  = $method;
+                    $cardData['card_id'] = $data['id'];
                     // This bypasses the validation check in importData below. Does not matter otherwise.
-                    $cardData['cc_cid']     = '000';
+                    $cardData['cc_cid'] = '000';
 
                     unset($cardData['cc_number'], $cardData['echeck_account_no'], $cardData['echeck_routing_no']);
 
@@ -460,7 +398,7 @@ class Data extends \Magento\Payment\Helper\Data
 
                     try {
                         $newPayment->importData($cardData);
-                    } catch (\Exception $e) {
+                    } catch (Throwable) {
                         // We're only trying to load prior-entered data for the form. Ignore validation errors.
                         $this->card->getId();
                     }
@@ -481,14 +419,14 @@ class Data extends \Magento\Payment\Helper\Data
      */
     public function getActiveCustomerCardsByMethod($method = null)
     {
-        $method = ($method === null) ? $this->registry->registry('tokenbase_method') : $method;
+        $method ??= $this->registry->registry('tokenbase_method');
 
         if (!isset($this->cards[ $method ])) {
             $this->_eventManager->dispatch(
                 'tokenbase_before_load_active_cards',
                 [
-                    'method'    => $method,
-                    'customer'  => $this->getCurrentCustomer(),
+                    'method' => $method,
+                    'customer' => $this->getCurrentCustomer(),
                 ]
             );
 
@@ -497,7 +435,7 @@ class Data extends \Magento\Payment\Helper\Data
             if (!$this->getIsFrontend()) {
                 if ($this->backendSession->getData('quote_id')
                     && $this->backendSession->getQuote()->getPayment()->getData('tokenbase_id') > 0
-                    && !($this->registry->registry('current_customer') instanceof \Magento\Customer\Model\Customer)) {
+                    && !($this->registry->registry('current_customer') instanceof Customer)) {
                     // Case where we want to show a card that may not otherwise be (edit or reorder)
                     $tokenbaseId = $this->backendSession->getQuote()->getPayment()->getData('tokenbase_id');
 
@@ -519,14 +457,14 @@ class Data extends \Magento\Payment\Helper\Data
                 } elseif ($this->getCurrentCustomer()->getId() > 0) {
                     // Case where we want to show a customer's stored cards (if any)
                     $this->cards[ $method ]->addFieldToFilter('active', 1)
-                        ->addFieldToFilter('customer_id', $this->getCurrentCustomer()->getId());
+                                           ->addFieldToFilter('customer_id', $this->getCurrentCustomer()->getId());
                 } else {
                     // Guest
                     return [];
                 }
             } elseif ($this->getCurrentCustomer()->getId() > 0) {
                 $this->cards[ $method ]->addFieldToFilter('active', 1)
-                    ->addFieldToFilter('customer_id', $this->getCurrentCustomer()->getId());
+                                       ->addFieldToFilter('customer_id', $this->getCurrentCustomer()->getId());
             } else {
                 return [];
             }
@@ -540,9 +478,9 @@ class Data extends \Magento\Payment\Helper\Data
             $this->_eventManager->dispatch(
                 'tokenbase_after_load_active_cards',
                 [
-                    'method'    => $method,
-                    'customer'  => $this->getCurrentCustomer(),
-                    'cards'     => $this->cards[ $method ],
+                    'method' => $method,
+                    'customer' => $this->getCurrentCustomer(),
+                    'cards' => $this->cards[ $method ],
                 ]
             );
         }
@@ -558,10 +496,10 @@ class Data extends \Magento\Payment\Helper\Data
     public function getIsFrontend()
     {
         // The REST and GraphQL APIs have to be considered part of the frontend.
-        if ($this->appState->getAreaCode() === \Magento\Framework\App\Area::AREA_FRONTEND
-            || $this->appState->getAreaCode() === \Magento\Framework\App\Area::AREA_WEBAPI_REST
+        if ($this->appState->getAreaCode() === Area::AREA_FRONTEND
+            || $this->appState->getAreaCode() === Area::AREA_WEBAPI_REST
             || (defined('\Magento\Framework\App\Area::AREA_GRAPHQL')
-                && $this->appState->getAreaCode() === \Magento\Framework\App\Area::AREA_GRAPHQL)) {
+                && $this->appState->getAreaCode() === Area::AREA_GRAPHQL)) {
             return true;
         }
 
@@ -587,10 +525,10 @@ class Data extends \Magento\Payment\Helper\Data
     /**
      * Turn the given internal card type ID into a proper translated label.
      *
-     * @api
-     *
      * @param $type
      * @return \Magento\Framework\Phrase
+     * @api
+     *
      */
     public function translateCardType($type)
     {
@@ -614,11 +552,7 @@ class Data extends \Magento\Payment\Helper\Data
     public function getAchAccountTypes($code = null)
     {
         if ($code !== null) {
-            if (isset($this->achAccountTypes[$code])) {
-                return $this->achAccountTypes[$code];
-            }
-
-            return $code;
+            return $this->achAccountTypes[ $code ] ?? $code;
         }
 
         return $this->achAccountTypes;
@@ -627,10 +561,10 @@ class Data extends \Magento\Payment\Helper\Data
     /**
      * Map CC Type to Magento's. Should be implemented by the child method.
      *
-     * @api
-     *
      * @param string $type
      * @return string|null
+     * @api
+     *
      */
     public function mapCcTypeToMagento($type)
     {
@@ -651,9 +585,9 @@ class Data extends \Magento\Payment\Helper\Data
     /**
      * Pull a value from a nested array safely (without notices, default fallback)
      *
-     * @param  array  $data    source array
-     * @param  string $path    path to pull, separated by slashes
-     * @param  string $default default response (if key DNE)
+     * @param array $data source array
+     * @param string $path path to pull, separated by slashes
+     * @param string $default default response (if key DNE)
      * @return mixed           target value or default
      */
     public function getArrayValue($data, $path, $default = '')

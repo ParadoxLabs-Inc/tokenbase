@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,31 +15,31 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Observer\AdminNotification;
+
+use Magento\AdminNotification\Model\InboxFactory;
+use Magento\Backend\App\ConfigInterface;
+use Magento\Framework\App\DeploymentConfig;
+use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Framework\Data\Collection\AbstractDb;
+use Magento\Framework\Filesystem\Io\File;
+use Magento\Framework\HTTP\Adapter\CurlFactory;
+use Magento\Framework\Model\Context;
+use Magento\Framework\Model\ResourceModel\AbstractResource;
+use Magento\Framework\Module\Dir;
+use Magento\Framework\Registry;
+use Magento\Framework\UrlInterface;
+use ParadoxLabs\TokenBase\Helper\Data;
 
 /**
  * Check for extension updates/notifications and add any to the system.
  */
 class Feed extends \Magento\AdminNotification\Model\Feed
 {
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
-     * @var \Magento\Framework\Module\Dir
-     */
-    protected $moduleDir;
-
-    /**
-     * @var \Magento\Framework\Filesystem\Io\File
-     */
-    protected $fileHandler;
-
     /**
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
@@ -57,25 +57,21 @@ class Feed extends \Magento\AdminNotification\Model\Feed
      * @param array $data
      */
     public function __construct(
-        \Magento\Framework\Model\Context $context,
-        \Magento\Framework\Registry $registry,
-        \Magento\Backend\App\ConfigInterface $backendConfig,
-        \Magento\AdminNotification\Model\InboxFactory $inboxFactory,
-        \Magento\Framework\HTTP\Adapter\CurlFactory $curlFactory,
-        \Magento\Framework\App\DeploymentConfig $deploymentConfig,
-        \Magento\Framework\App\ProductMetadataInterface $productMetadata,
-        \Magento\Framework\UrlInterface $urlBuilder,
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \Magento\Framework\Module\Dir $moduleDir,
-        \Magento\Framework\Filesystem\Io\File $fileHandler,
-        ?\Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        ?\Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        Context $context,
+        Registry $registry,
+        ConfigInterface $backendConfig,
+        InboxFactory $inboxFactory,
+        CurlFactory $curlFactory,
+        DeploymentConfig $deploymentConfig,
+        ProductMetadataInterface $productMetadata,
+        UrlInterface $urlBuilder,
+        protected Data $helper,
+        protected Dir $moduleDir,
+        protected File $fileHandler,
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null,
         array $data = []
     ) {
-        $this->helper = $helper;
-        $this->moduleDir = $moduleDir;
-        $this->fileHandler = $fileHandler;
-
         parent::__construct(
             $context,
             $registry,
@@ -98,8 +94,8 @@ class Feed extends \Magento\AdminNotification\Model\Feed
      */
     public function getFeedUrl()
     {
-        $methods        = $this->helper->getAllMethods();
-        $methods[]      = 'tokenbase';
+        $methods   = $this->helper->getAllMethods();
+        $methods[] = 'tokenbase';
 
         $this->_feedUrl = 'https://store.paradoxlabs.com/updates.php?key=' . implode(',', $methods)
             . '&version=' . $this->getModuleVersion('ParadoxLabs_TokenBase');
@@ -121,7 +117,7 @@ class Feed extends \Magento\AdminNotification\Model\Feed
 
         $composer = json_decode((string)$composerFile, true);
 
-        return isset($composer['version']) ? $composer['version'] : '';
+        return $composer['version'] ?? '';
     }
 
     /**

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,12 +15,16 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Plugin;
 
+use Magento\Sales\Api\Data\OrderPaymentExtensionFactory;
 use Magento\Sales\Api\Data\OrderPaymentExtensionInterface;
+use Magento\Sales\Model\Order\Payment;
+use ParadoxLabs\TokenBase\Helper\Data;
 
 /**
  * OrderPaymentLoadTokenbaseId Plugin
@@ -30,25 +34,13 @@ use Magento\Sales\Api\Data\OrderPaymentExtensionInterface;
 class OrderPaymentLoadTokenbaseId
 {
     /**
-     * @var \Magento\Sales\Api\Data\OrderPaymentExtensionFactory
-     */
-    protected $orderPaymentExtensionFactory;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
      * @param \Magento\Sales\Api\Data\OrderPaymentExtensionFactory $orderPaymentExtensionFactory
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      */
     public function __construct(
-        \Magento\Sales\Api\Data\OrderPaymentExtensionFactory $orderPaymentExtensionFactory,
-        \ParadoxLabs\TokenBase\Helper\Data $helper
+        protected OrderPaymentExtensionFactory $orderPaymentExtensionFactory,
+        protected Data $helper
     ) {
-        $this->orderPaymentExtensionFactory = $orderPaymentExtensionFactory;
-        $this->helper = $helper;
     }
 
     /**
@@ -57,7 +49,7 @@ class OrderPaymentLoadTokenbaseId
      * @return OrderPaymentExtensionInterface|null
      */
     public function afterGetExtensionAttributes(
-        \Magento\Sales\Model\Order\Payment $subject,
+        Payment $subject,
         $result
     ) {
         if ($result instanceof OrderPaymentExtensionInterface === false) {
@@ -76,7 +68,7 @@ class OrderPaymentLoadTokenbaseId
      * @return array|null|mixed
      */
     public function afterGetAdditionalInformation(
-        \Magento\Sales\Model\Order\Payment $subject,
+        Payment $subject,
         $result
     ) {
         // Trigger loading of extension attributes, because the above doesn't happen on its own during REST order load.

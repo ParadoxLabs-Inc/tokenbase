@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,21 +15,26 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Model\Source;
 
-class OrderStatus extends \Magento\Sales\Model\Config\Source\Order\Status
+use Magento\Sales\Model\Config\Source\Order\Status;
+use Magento\Sales\Model\Order;
+
+class OrderStatus extends Status
 {
     /**
      * Limit order statuses to ones associated with the 'new', 'processing', or 'hold' states.
      *
      * @var string[]
      */
-    protected $_stateStatuses = [
-        \Magento\Sales\Model\Order::STATE_NEW,
-        \Magento\Sales\Model\Order::STATE_PROCESSING,
-        \Magento\Sales\Model\Order::STATE_HOLDED,
-    ];
+    protected $_stateStatuses
+        = [
+            Order::STATE_NEW,
+            Order::STATE_PROCESSING,
+            Order::STATE_HOLDED,
+        ];
 }

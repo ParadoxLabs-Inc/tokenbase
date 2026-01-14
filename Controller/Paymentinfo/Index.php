@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,15 +15,18 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Controller\Paymentinfo;
 
+use ParadoxLabs\TokenBase\Controller\Paymentinfo;
+
 /**
  * Index: Show cards and form for the default or chosen payment method.
  */
-class Index extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
+class Index extends Paymentinfo
 {
     /**
      * Payment data index page
@@ -49,6 +52,7 @@ class Index extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
                 $this->messageManager->addErrorMessage(__('No payment methods are currently available.'));
 
                 $resultRedirect->setPath('*/account');
+
                 return $resultRedirect;
             }
         }
@@ -56,7 +60,7 @@ class Index extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
         /**
          * Check for card input and validate if present.
          */
-        $id    = $this->getRequest()->getParam('id');
+        $id = $this->getRequest()->getParam('id');
 
         if (empty($id) || $this->formKeyIsValid() !== true) {
             $id = null;

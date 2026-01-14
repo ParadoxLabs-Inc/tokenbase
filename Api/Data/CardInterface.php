@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,11 +15,16 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
+
 namespace ParadoxLabs\TokenBase\Api\Data;
 
+use Magento\Customer\Api\Data\AddressInterface;
+use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Framework\Api\ExtensibleDataInterface;
+use Magento\Payment\Model\InfoInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 
 /**
@@ -60,8 +65,8 @@ interface CardInterface extends ExtensibleDataInterface, PaymentTokenInterface
      * @return $this
      */
     public function setCustomer(
-        \Magento\Customer\Api\Data\CustomerInterface $customer,
-        ?\Magento\Payment\Model\InfoInterface $payment = null
+        CustomerInterface $customer,
+        ?InfoInterface $payment = null
     );
 
     /**
@@ -70,7 +75,7 @@ interface CardInterface extends ExtensibleDataInterface, PaymentTokenInterface
      * @param \Magento\Payment\Model\InfoInterface $payment
      * @return $this
      */
-    public function importPaymentInfo(\Magento\Payment\Model\InfoInterface $payment);
+    public function importPaymentInfo(InfoInterface $payment);
 
     /**
      * Check whether customer has permission to use/modify this card.
@@ -143,7 +148,7 @@ interface CardInterface extends ExtensibleDataInterface, PaymentTokenInterface
      * @param \Magento\Customer\Api\Data\AddressInterface $address
      * @return $this
      */
-    public function setAddress(\Magento\Customer\Api\Data\AddressInterface $address);
+    public function setAddress(AddressInterface $address);
 
     /**
      * Return a customer address object containing the card address data.
@@ -338,7 +343,7 @@ interface CardInterface extends ExtensibleDataInterface, PaymentTokenInterface
      * @param \Magento\Payment\Model\InfoInterface $payment
      * @return $this
      */
-    public function setInfoInstance(\Magento\Payment\Model\InfoInterface $payment);
+    public function setInfoInstance(InfoInterface $payment);
 
     /**
      * Get card label (formatted number).

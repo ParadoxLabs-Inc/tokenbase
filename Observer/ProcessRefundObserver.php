@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,27 +15,26 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Observer;
 
+use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
+use ParadoxLabs\TokenBase\Helper\Data;
+
 /**
  * Refund Observer
  */
-class ProcessRefundObserver implements \Magento\Framework\Event\ObserverInterface
+class ProcessRefundObserver implements ObserverInterface
 {
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
     /**
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      */
-    public function __construct(\ParadoxLabs\TokenBase\Helper\Data $helper)
+    public function __construct(protected Data $helper)
     {
-        $this->helper = $helper;
     }
 
     /**
@@ -45,7 +44,7 @@ class ProcessRefundObserver implements \Magento\Framework\Event\ObserverInterfac
      * @param \Magento\Framework\Event\Observer $observer
      * @return void
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         $memo    = $observer->getEvent()->getData('creditmemo');
         $methods = $this->helper->getAllMethods();

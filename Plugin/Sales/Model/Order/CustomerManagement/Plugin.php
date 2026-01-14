@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,28 +15,21 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Plugin\Sales\Model\Order\CustomerManagement;
 
+use Magento\Customer\Api\Data\CustomerInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Sales\Api\OrderCustomerManagementInterface;
+use Magento\Store\Model\ScopeInterface;
+use ParadoxLabs\TokenBase\Api\CardRepositoryInterface;
+use ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory;
+
 class Plugin
 {
-    /**
-     * @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory
-     */
-    protected $cardCollectionFactory;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Api\CardRepositoryInterface
-     */
-    protected $cardRepository;
-
-    /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    protected $scopeConfig;
-
     /**
      * Plugin constructor.
      *
@@ -45,13 +38,10 @@ class Plugin
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-        \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory,
-        \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+        protected CollectionFactory $cardCollectionFactory,
+        protected CardRepositoryInterface $cardRepository,
+        protected ScopeConfigInterface $scopeConfig
     ) {
-        $this->cardCollectionFactory = $cardCollectionFactory;
-        $this->cardRepository = $cardRepository;
-        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -62,8 +52,8 @@ class Plugin
      * @return \Magento\Customer\Api\Data\CustomerInterface
      */
     public function afterCreate(
-        \Magento\Sales\Api\OrderCustomerManagementInterface $subject,
-        \Magento\Customer\Api\Data\CustomerInterface $customer
+        OrderCustomerManagementInterface $subject,
+        CustomerInterface $customer
     ) {
         /**
          * Look for a guest card used by this email within the last day, and blindly attach it if we get a match.
@@ -90,7 +80,7 @@ class Plugin
                 // Activate the card by default if config is opt-out.
                 $activate = (int)$this->scopeConfig->getValue(
                     'payment/' . $card->getMethod() . '/savecard_opt_out',
-                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                    ScopeInterface::SCOPE_STORE
                 );
                 if ($activate === 1) {
                     $card->setActive(1);

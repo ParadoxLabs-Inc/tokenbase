@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,50 +15,53 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Controller\Adminhtml\Index;
 
+use Magento\Backend\App\Action\Context;
+use Magento\Backend\Model\View\Result\ForwardFactory;
 use Magento\Customer\Api\AccountManagementInterface;
 use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Api\Data\AddressInterfaceFactory;
 use Magento\Customer\Api\Data\CustomerInterfaceFactory;
+use Magento\Customer\Helper\View;
 use Magento\Customer\Model\Address\Mapper;
+use Magento\Customer\Model\AddressFactory;
+use Magento\Customer\Model\Customer\Mapper as CustomerMapper;
+use Magento\Customer\Model\CustomerFactory;
+use Magento\Customer\Model\Metadata\FormFactory;
 use Magento\Framework\Api\DataObjectHelper;
+use Magento\Framework\Api\ExtensibleDataObjectConverter;
+use Magento\Framework\App\Response\Http\FileFactory;
+use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\DataObjectFactory as ObjectFactory;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Math\Random;
+use Magento\Framework\Reflection\DataObjectProcessor;
+use Magento\Framework\Registry;
+use Magento\Framework\View\LayoutFactory as ViewLayoutFactory;
+use Magento\Framework\View\Result\LayoutFactory;
+use Magento\Framework\View\Result\PageFactory;
+use Magento\Newsletter\Model\SubscriberFactory;
+use Magento\Payment\Helper\Data;
+use Magento\Quote\Api\Data\CartInterfaceFactory;
+use Magento\Quote\Model\Quote\PaymentFactory;
+use ParadoxLabs\TokenBase\Api\CardRepositoryInterface;
+use ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory;
+use ParadoxLabs\TokenBase\Helper\Address;
+use ParadoxLabs\TokenBase\Helper\Data as TokenbaseHelper;
+use Throwable;
 
 /**
  * TokenbaseCardsSave Class
  */
 class PaymentinfoSave extends Paymentinfo
 {
-    /**
-     * @var bool
-     */
-    protected $skipCardLoad = true;
-
-    /**
-     * @var \Magento\Quote\Model\Quote\PaymentFactory
-     */
-    protected $paymentFactory;
-
-    /**
-     * @var \Magento\Quote\Api\Data\CartInterfaceFactory
-     */
-    protected $quoteFactory;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory
-     */
-    protected $cardFactory;
-
-    /**
-     * @var \Magento\Payment\Helper\Data
-     */
-    protected $paymentHelper;
+    protected bool $skipCardLoad = true;
 
     /**
      * PaymentinfoDelete constructor.
@@ -97,44 +100,39 @@ class PaymentinfoSave extends Paymentinfo
      * @param \Magento\Payment\Helper\Data $paymentHelper
      */
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\Registry $coreRegistry,
-        \Magento\Framework\App\Response\Http\FileFactory $fileFactory,
-        \Magento\Customer\Model\CustomerFactory $customerFactory,
-        \Magento\Customer\Model\AddressFactory $addressFactory,
-        \Magento\Customer\Model\Metadata\FormFactory $formFactory,
-        \Magento\Newsletter\Model\SubscriberFactory $subscriberFactory,
-        \Magento\Customer\Helper\View $viewHelper,
-        \Magento\Framework\Math\Random $random,
+        Context $context,
+        Registry $coreRegistry,
+        FileFactory $fileFactory,
+        CustomerFactory $customerFactory,
+        AddressFactory $addressFactory,
+        FormFactory $formFactory,
+        SubscriberFactory $subscriberFactory,
+        View $viewHelper,
+        Random $random,
         CustomerRepositoryInterface $customerRepository,
-        \Magento\Framework\Api\ExtensibleDataObjectConverter $extensibleDataObjectConverter,
+        ExtensibleDataObjectConverter $extensibleDataObjectConverter,
         Mapper $addressMapper,
         AccountManagementInterface $customerAccountManagement,
         AddressRepositoryInterface $addressRepository,
         CustomerInterfaceFactory $customerDataFactory,
         AddressInterfaceFactory $addressDataFactory,
-        \Magento\Customer\Model\Customer\Mapper $customerMapper,
-        \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor,
+        CustomerMapper $customerMapper,
+        DataObjectProcessor $dataObjectProcessor,
         DataObjectHelper $dataObjectHelper,
         ObjectFactory $objectFactory,
-        \Magento\Framework\View\LayoutFactory $layoutFactory,
-        \Magento\Framework\View\Result\LayoutFactory $resultLayoutFactory,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory,
-        \Magento\Backend\Model\View\Result\ForwardFactory $resultForwardFactory,
-        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
-        \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository,
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \ParadoxLabs\TokenBase\Helper\Address $addressHelper,
-        \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory,
-        \Magento\Quote\Api\Data\CartInterfaceFactory $quoteFactory,
-        \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $cardFactory,
-        \Magento\Payment\Helper\Data $paymentHelper
+        ViewLayoutFactory $layoutFactory,
+        LayoutFactory $resultLayoutFactory,
+        PageFactory $resultPageFactory,
+        ForwardFactory $resultForwardFactory,
+        JsonFactory $resultJsonFactory,
+        CardRepositoryInterface $cardRepository,
+        TokenbaseHelper $helper,
+        Address $addressHelper,
+        protected PaymentFactory $paymentFactory,
+        protected CartInterfaceFactory $quoteFactory,
+        protected CardInterfaceFactory $cardFactory,
+        protected Data $paymentHelper
     ) {
-        $this->paymentFactory = $paymentFactory;
-        $this->quoteFactory = $quoteFactory;
-        $this->cardFactory = $cardFactory;
-        $this->paymentHelper = $paymentHelper;
-
         parent::__construct(
             $context,
             $coreRegistry,
@@ -201,13 +199,13 @@ class PaymentinfoSave extends Paymentinfo
                     $card->setMethod($card->getMethod() ?: $method);
                 }
 
-                $card       = $card->getTypeInstance();
+                $card = $card->getTypeInstance();
 
                 if ($card && (empty($id) || $card->getHash() == $id)) {
                     /**
                      * Process address data
                      */
-                    $newAddrId    = (int)$this->getRequest()->getParam('billing_address_id');
+                    $newAddrId = (int)$this->getRequest()->getParam('billing_address_id');
 
                     if ($newAddrId > 0) {
                         // Existing address
@@ -228,9 +226,9 @@ class PaymentinfoSave extends Paymentinfo
                     /**
                      * Process payment data
                      */
-                    $cardData = $this->getRequest()->getParam('payment');
-                    $cardData['method']     = $method;
-                    $cardData['card_id']    = $card->getId() > 0 ? $card->getHash() : '';
+                    $cardData            = $this->getRequest()->getParam('payment');
+                    $cardData['method']  = $method;
+                    $cardData['card_id'] = $card->getId() > 0 ? $card->getHash() : '';
 
                     if (isset($cardData['cc_number'])) {
                         $cardData['cc_last4'] = substr($cardData['cc_number'], -4);
@@ -269,7 +267,7 @@ class PaymentinfoSave extends Paymentinfo
                 } else {
                     $response['message'] = __('Invalid card reference.');
                 }
-            } catch (\Exception $e) {
+            } catch (Throwable $e) {
                 $this->_session->setData('tokenbase_form_data', $this->getRequest()->getParams());
 
                 $this->helper->log($method, (string)$e);
@@ -282,6 +280,7 @@ class PaymentinfoSave extends Paymentinfo
         if ($response['success'] === false) {
             /** @var \Magento\Framework\Controller\Result\Json $resultJson */
             $resultJson = $this->resultJsonFactory->create();
+
             return $resultJson->setData($response);
         } else {
             // If successful, rebuild and output the entire tab.
@@ -289,6 +288,7 @@ class PaymentinfoSave extends Paymentinfo
             /** @var \Magento\Framework\Controller\Result\Forward $resultForward */
             $resultForward = $this->resultForwardFactory->create();
             $resultForward->forward('paymentinfo');
+
             return $resultForward;
         }
     }

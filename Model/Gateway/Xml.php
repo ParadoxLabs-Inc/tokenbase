@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,10 +15,14 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Model\Gateway;
+
+use DomDocument;
+use Magento\Framework\Exception\LocalizedException;
 
 /**
  * Integrates Array2XML and XML2Array for XML parsing.
@@ -60,9 +64,9 @@ class Xml
      */
     public static function init($version = '1.0', $encoding = 'UTF-8', $format_output = true)
     {
-        self::$xml = new \DomDocument($version, $encoding);
+        self::$xml               = new DomDocument($version, $encoding);
         self::$xml->formatOutput = $format_output;
-        self::$encoding = $encoding;
+        self::$encoding          = $encoding;
     }
 
     /**
@@ -78,6 +82,7 @@ class Xml
         $xml->appendChild(self::convertArrayToXml($node_name, $arr));
 
         self::$xml = null;
+
         return $xml;
     }
 
@@ -91,7 +96,7 @@ class Xml
      */
     private static function &convertArrayToXml($node_name, $arr = [])
     {
-        $xml = self::getXMLRoot();
+        $xml  = self::getXMLRoot();
         $node = $xml->createElement($node_name);
 
         if (is_array($arr)) {
@@ -99,7 +104,7 @@ class Xml
             if (isset($arr['@attributes'])) {
                 foreach ($arr['@attributes'] as $key => $value) {
                     if (!self::isValidTagName($key)) {
-                        throw new \Magento\Framework\Exception\LocalizedException(
+                        throw new LocalizedException(
                             __(
                                 '[Array2XML] Illegal character in attribute name. attribute: %1 in node: %2',
                                 $key,
@@ -157,20 +162,20 @@ class Xml
 
             $parsed = $xml->loadXML($input_xml);
             if (!$parsed) {
-                throw new \Magento\Framework\Exception\LocalizedException(
+                throw new LocalizedException(
                     __('[XML2Array] Error parsing the XML string.')
                 );
             }
         } else {
-            if (get_class($input_xml) != 'DOMDocument') {
-                throw new \Magento\Framework\Exception\LocalizedException(
+            if ($input_xml::class != 'DOMDocument') {
+                throw new LocalizedException(
                     __('[XML2Array] The input XML object should be of type DOMDocument.')
                 );
             }
             $xml = self::$xml = $input_xml;
         }
 
-        $array = self::convertXmlToArray($xml->documentElement);
+        $array     = self::convertXmlToArray($xml->documentElement);
         self::$xml = null;
 
         return $array;
@@ -182,25 +187,18 @@ class Xml
      * @param mixed $node - XML as a string or as an object of \DOMDocument
      * @return mixed
      */
-    private static function &convertXmlToArray($node)
+    private static function &convertXmlToArray(mixed $node)
     {
         $output = [];
 
-        switch ($node->nodeType) {
-            case XML_CDATA_SECTION_NODE:
-                $output = [
-                    '@cdata' => trim((string)$node->textContent),
-                ];
-                break;
-
-            case XML_TEXT_NODE:
-                $output = trim((string)$node->textContent);
-                break;
-
-            case XML_ELEMENT_NODE:
-                $output = self::convertXmlElementToArray($node);
-                break;
-        }
+        $output = match ($node->nodeType) {
+            XML_CDATA_SECTION_NODE => [
+                '@cdata' => trim((string)$node->textContent),
+            ],
+            XML_TEXT_NODE => trim((string)$node->textContent),
+            XML_ELEMENT_NODE => self::convertXmlElementToArray($node),
+            default => $output,
+        };
 
         return $output;
     }
@@ -264,7 +262,7 @@ class Xml
             // recurse to get the node for that key
             foreach ($arr as $key => $value) {
                 if (!self::isValidTagName($key)) {
-                    throw new \Magento\Framework\Exception\LocalizedException(
+                    throw new LocalizedException(
                         __(
                             '[Array2XML] Illegal character in tag name. tag: %1 in node: %2',
                             $key,
@@ -286,7 +284,7 @@ class Xml
                 }
 
                 //remove the key from the array once done.
-                unset($arr[$key]);
+                unset($arr[ $key ]);
             }
         }
     }
@@ -303,7 +301,7 @@ class Xml
             // if only one node of its kind, assign it directly instead if array($value);
             foreach ($output as $t => $v) {
                 if (is_array($v) && count($v) == 1) {
-                    $output[$t] = $v[0];
+                    $output[ $t ] = $v[0];
                 }
             }
             if (empty($output)) {
@@ -315,7 +313,7 @@ class Xml
         if ($node->attributes->length) {
             $a = [];
             foreach ($node->attributes as $attrName => $attrNode) {
-                $a[$attrName] = (string)$attrNode->value;
+                $a[ $attrName ] = (string)$attrNode->value;
             }
             // if its an leaf node, store the value in @value instead of directly storing it.
             if (!is_array($output)) {
@@ -337,15 +335,15 @@ class Xml
         // for each child node, call the convert function recursively
         for ($i = 0, $m = $node->childNodes->length; $i < $m; $i++) {
             $child = $node->childNodes->item($i);
-            $v = self::convertXmlToArray($child);
+            $v     = self::convertXmlToArray($child);
             if (isset($child->tagName)) {
                 $t = $child->tagName;
 
                 // assume more nodes of same kind are coming
-                if (!isset($output[$t])) {
-                    $output[$t] = [];
+                if (!isset($output[ $t ])) {
+                    $output[ $t ] = [];
                 }
-                $output[$t][] = $v;
+                $output[ $t ][] = $v;
             } else {
                 //check if it is not an empty text node
                 if ($v !== '') {

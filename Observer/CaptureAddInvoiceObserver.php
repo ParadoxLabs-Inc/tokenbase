@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,15 +15,19 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Observer;
 
+use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
+
 /**
  * In core, invoice is not directly accessible from the payment. What's with that?.
  */
-class CaptureAddInvoiceObserver implements \Magento\Framework\Event\ObserverInterface
+class CaptureAddInvoiceObserver implements ObserverInterface
 {
     /**
      * Add invoice to payment info instance on capture
@@ -31,7 +35,7 @@ class CaptureAddInvoiceObserver implements \Magento\Framework\Event\ObserverInte
      * @param \Magento\Framework\Event\Observer $observer
      * @return void
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         $payment = $observer->getEvent()->getData('payment');
         $invoice = $observer->getEvent()->getData('invoice');

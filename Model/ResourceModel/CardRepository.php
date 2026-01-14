@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,75 +15,38 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Model\ResourceModel;
 
+use Magento\Customer\Api\Data\AddressInterface;
 use Magento\Framework\Api\DataObjectHelper;
+use Magento\Framework\Api\Search\FilterGroup;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Reflection\DataObjectProcessor;
+use Magento\Quote\Api\Data\CartInterfaceFactory;
+use Magento\Quote\Model\Quote\PaymentFactory;
 use ParadoxLabs\TokenBase\Api\CardRepositoryInterface;
 use ParadoxLabs\TokenBase\Api\Data;
+use ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface;
+use ParadoxLabs\TokenBase\Api\Data\CardInterface;
+use ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory;
+use ParadoxLabs\TokenBase\Model\CardFactory;
+use ParadoxLabs\TokenBase\Model\ResourceModel\Card as CardResource;
+use ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection;
+use ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory;
+use Throwable;
 
 class CardRepository implements CardRepositoryInterface
 {
     /**
-     * @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card
-     */
-    protected $resource;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Model\CardFactory
-     */
-    protected $cardFactory;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory
-     */
-    protected $cardCollectionFactory;
-
-    /**
-     * @var Data\CardSearchResultsInterfaceFactory
-     */
-    protected $searchResultsFactory;
-
-    /**
-     * @var DataObjectHelper
-     */
-    protected $dataObjectHelper;
-
-    /**
-     * @var DataObjectProcessor
-     */
-    protected $dataObjectProcessor;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory
-     */
-    protected $dataCardFactory;
-
-    /**
-     * @var \Magento\Quote\Model\Quote\PaymentFactory
-     */
-    protected $paymentFactory;
-
-    /**
-     * @var \Magento\Quote\Api\Data\CartInterfaceFactory
-     */
-    protected $quoteFactory;
-
-    /**
-     * @var \Magento\Payment\Helper\Data
-     */
-    protected $paymentHelper;
-
-    /**
-     * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card $resource
+     * @param CardResource $resource
      * @param \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory
      * @param Data\CardInterfaceFactory $dataCardFactory
      * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
@@ -95,27 +58,17 @@ class CardRepository implements CardRepositoryInterface
      * @param \Magento\Payment\Helper\Data $paymentHelper
      */
     public function __construct(
-        \ParadoxLabs\TokenBase\Model\ResourceModel\Card $resource,
-        \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
-        \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $dataCardFactory,
-        \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory,
-        Data\CardSearchResultsInterfaceFactory $searchResultsFactory,
-        DataObjectHelper $dataObjectHelper,
-        DataObjectProcessor $dataObjectProcessor,
-        \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory,
-        \Magento\Quote\Api\Data\CartInterfaceFactory $quoteFactory,
-        \Magento\Payment\Helper\Data $paymentHelper
+        protected CardResource $resource,
+        protected CardFactory $cardFactory,
+        protected CardInterfaceFactory $dataCardFactory,
+        protected CollectionFactory $cardCollectionFactory,
+        protected Data\CardSearchResultsInterfaceFactory $searchResultsFactory,
+        protected DataObjectHelper $dataObjectHelper,
+        protected DataObjectProcessor $dataObjectProcessor,
+        protected PaymentFactory $paymentFactory,
+        protected CartInterfaceFactory $quoteFactory,
+        protected \Magento\Payment\Helper\Data $paymentHelper
     ) {
-        $this->resource = $resource;
-        $this->cardFactory = $cardFactory;
-        $this->cardCollectionFactory = $cardCollectionFactory;
-        $this->searchResultsFactory = $searchResultsFactory;
-        $this->dataObjectHelper = $dataObjectHelper;
-        $this->dataCardFactory = $dataCardFactory;
-        $this->dataObjectProcessor = $dataObjectProcessor;
-        $this->paymentFactory = $paymentFactory;
-        $this->quoteFactory = $quoteFactory;
-        $this->paymentHelper = $paymentHelper;
     }
 
     /**
@@ -125,9 +78,9 @@ class CardRepository implements CardRepositoryInterface
      * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
      * @throws LocalizedException
      */
-    public function save(\ParadoxLabs\TokenBase\Api\Data\CardInterface $card)
+    public function save(CardInterface $card)
     {
-        if (get_class($card) === \ParadoxLabs\TokenBase\Model\Card::class) {
+        if ($card::class === \ParadoxLabs\TokenBase\Model\Card::class) {
             /** @var \ParadoxLabs\TokenBase\Model\Card $card */
             $card = $card->getTypeInstance();
         }
@@ -150,9 +103,9 @@ class CardRepository implements CardRepositoryInterface
      * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
      */
     public function saveExtended(
-        \ParadoxLabs\TokenBase\Api\Data\CardInterface $card,
-        \Magento\Customer\Api\Data\AddressInterface $address,
-        \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface $additional
+        CardInterface $card,
+        AddressInterface $address,
+        CardAdditionalInterface $additional
     ) {
         $card->setAddress($address);
         $card->setAdditional($additional);
@@ -272,11 +225,11 @@ class CardRepository implements CardRepositoryInterface
      * @return bool
      * @throws CouldNotDeleteException
      */
-    public function delete(Data\CardInterface $card)
+    public function delete(CardInterface $card)
     {
         try {
             if ((int)$card->getActive() === 0) {
-                if (get_class($card) === \ParadoxLabs\TokenBase\Model\Card::class) {
+                if ($card::class === \ParadoxLabs\TokenBase\Model\Card::class) {
                     /** @var \ParadoxLabs\TokenBase\Model\Card $card */
                     $card = $card->getTypeInstance();
                 }
@@ -286,7 +239,7 @@ class CardRepository implements CardRepositoryInterface
                 $card->queueDeletion();
                 $this->resource->save($card);
             }
-        } catch (\Exception $exception) {
+        } catch (Throwable $exception) {
             throw new CouldNotDeleteException(__($exception->getMessage()));
         }
 
@@ -314,8 +267,8 @@ class CardRepository implements CardRepositoryInterface
      * @return void
      */
     protected function addFilterGroupToCollection(
-        \Magento\Framework\Api\Search\FilterGroup $filterGroup,
-        \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection $collection
+        FilterGroup $filterGroup,
+        Collection $collection
     ) {
         $fields = [];
         $conds  = [];

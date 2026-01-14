@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,9 +15,14 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
+
 namespace ParadoxLabs\TokenBase\Api;
+
+use Magento\Payment\Model\InfoInterface;
+use ParadoxLabs\TokenBase\Api\Data\CardInterface;
 
 /**
  * Common API gateway methods, logging, exceptions, etc.
@@ -59,12 +64,11 @@ interface GatewayInterface
      * Set a parameter.
      *
      * @param string $key
-     * @param mixed $val
      * @return $this
      * @throws \Exception
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function setParameter($key, $val);
+    public function setParameter($key, mixed $val);
 
     /**
      * Get parameters. Debugging purposes.
@@ -80,10 +84,9 @@ interface GatewayInterface
      * Get a single parameter
      *
      * @param string $key
-     * @param mixed $default
      * @return mixed
      */
-    public function getParameter($key, $default = '');
+    public function getParameter($key, mixed $default = '');
 
     /**
      * Check whether parameter exists
@@ -115,7 +118,7 @@ interface GatewayInterface
      * @param \ParadoxLabs\TokenBase\Api\Data\CardInterface $card
      * @return $this
      */
-    public function setCard(\ParadoxLabs\TokenBase\Api\Data\CardInterface $card);
+    public function setCard(CardInterface $card);
 
     /**
      * Return the card set on the gateway (if any).
@@ -169,7 +172,7 @@ interface GatewayInterface
      * @param float $amount
      * @return \ParadoxLabs\TokenBase\Model\Gateway\Response
      */
-    public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount);
+    public function authorize(InfoInterface $payment, $amount);
 
     /**
      * Run a capture transaction for $amount with the given payment info
@@ -179,7 +182,7 @@ interface GatewayInterface
      * @param string $transactionId
      * @return \ParadoxLabs\TokenBase\Model\Gateway\Response
      */
-    public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount, $transactionId = null);
+    public function capture(InfoInterface $payment, $amount, $transactionId = null);
 
     /**
      * Run a refund transaction for $amount with the given payment info
@@ -189,7 +192,7 @@ interface GatewayInterface
      * @param string $transactionId
      * @return \ParadoxLabs\TokenBase\Model\Gateway\Response
      */
-    public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount, $transactionId = null);
+    public function refund(InfoInterface $payment, $amount, $transactionId = null);
 
     /**
      * Run a void transaction for the given payment info
@@ -198,7 +201,7 @@ interface GatewayInterface
      * @param string $transactionId
      * @return \ParadoxLabs\TokenBase\Model\Gateway\Response
      */
-    public function void(\Magento\Payment\Model\InfoInterface $payment, $transactionId = null);
+    public function void(InfoInterface $payment, $transactionId = null);
 
     /**
      * Fetch a transaction status update
@@ -207,5 +210,5 @@ interface GatewayInterface
      * @param string $transactionId
      * @return \ParadoxLabs\TokenBase\Model\Gateway\Response
      */
-    public function fraudUpdate(\Magento\Payment\Model\InfoInterface $payment, $transactionId);
+    public function fraudUpdate(InfoInterface $payment, $transactionId);
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,10 +15,13 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Model\Logger;
+
+use Monolog\Logger;
 
 /**
  * Custom payment gateway logger for debugging
@@ -33,5 +36,5 @@ class Debug extends Handler
     /**
      * @var int
      */
-    protected $loggerType = \Monolog\Logger::DEBUG;
+    protected $loggerType = Logger::DEBUG;
 }

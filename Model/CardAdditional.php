@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,18 +15,22 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Model;
+
+use Magento\Framework\Model\AbstractExtensibleModel;
+use ParadoxLabs\TokenBase\Api\Data\CardAdditionalExtensionInterface;
+use ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface;
 
 /**
  * CardAdditional Class
  *
  * Note: Not all keys are used by all methods. Added all keys used by any tokenbase method at time of implementation.
  */
-class CardAdditional extends \Magento\Framework\Model\AbstractExtensibleModel implements
-    \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface
+class CardAdditional extends AbstractExtensibleModel implements CardAdditionalInterface
 {
     /**
      * @return mixed
@@ -385,7 +389,7 @@ class CardAdditional extends \Magento\Framework\Model\AbstractExtensibleModel im
      * @return $this
      */
     public function setExtensionAttributes(
-        \ParadoxLabs\TokenBase\Api\Data\CardAdditionalExtensionInterface $extensionAttributes
+        CardAdditionalExtensionInterface $extensionAttributes
     ) {
         return $this->_setExtensionAttributes($extensionAttributes);
     }

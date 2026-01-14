@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,23 +15,23 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Observer;
 
-class SetInitialOrderStatusObserver implements \Magento\Framework\Event\ObserverInterface
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
+use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
+use Magento\Sales\Model\Order;
+use Magento\Store\Model\ScopeInterface;
+use ParadoxLabs\TokenBase\Helper\Data;
+
+class SetInitialOrderStatusObserver implements ObserverInterface
 {
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    protected $scopeConfig;
-
     /**
      * Plugin constructor
      *
@@ -39,11 +39,9 @@ class SetInitialOrderStatusObserver implements \Magento\Framework\Event\Observer
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      */
     public function __construct(
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \ParadoxLabs\TokenBase\Helper\Data $helper
+        protected ScopeConfigInterface $scopeConfig,
+        protected Data $helper
     ) {
-        $this->helper = $helper;
-        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -54,7 +52,7 @@ class SetInitialOrderStatusObserver implements \Magento\Framework\Event\Observer
      * @param \Magento\Framework\Event\Observer $observer
      * @return void
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         /** @var \Magento\Sales\Model\Order\Payment $payment */
         $payment = $observer->getData('payment');
@@ -66,7 +64,7 @@ class SetInitialOrderStatusObserver implements \Magento\Framework\Event\Observer
         if ($this->canSetOrderStatus($order, $payment)) {
             $status = $this->scopeConfig->getValue(
                 'payment/' . $payment->getMethod() . '/order_status',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
 
             $order->addStatusHistoryComment('', $status);
@@ -81,8 +79,8 @@ class SetInitialOrderStatusObserver implements \Magento\Framework\Event\Observer
      * @return bool
      */
     public function canSetOrderStatus(
-        \Magento\Sales\Api\Data\OrderInterface $order,
-        \Magento\Sales\Api\Data\OrderPaymentInterface $payment
+        OrderInterface $order,
+        OrderPaymentInterface $payment
     ) {
         // Do not allow status change if transaction is incomplete
         if ($payment->getIsTransactionPending()) {
@@ -95,7 +93,7 @@ class SetInitialOrderStatusObserver implements \Magento\Framework\Event\Observer
         }
 
         // Or order state is not processing (possibly redundant)
-        if ($order->getState() !== \Magento\Sales\Model\Order::STATE_PROCESSING) {
+        if ($order->getState() !== Order::STATE_PROCESSING) {
             return false;
         }
 

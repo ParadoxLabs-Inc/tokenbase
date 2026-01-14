@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,71 +15,36 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Helper;
 
+use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Api\Data\AddressInterface;
+use Magento\Customer\Api\Data\AddressInterfaceFactory;
 use Magento\Customer\Api\Data\RegionInterface;
+use Magento\Customer\Api\Data\RegionInterfaceFactory;
 use Magento\Customer\Model\Address\AddressModelInterface;
+use Magento\Customer\Model\Address\Config;
+use Magento\Customer\Model\Address\Mapper;
+use Magento\Customer\Model\Metadata\FormFactory;
+use Magento\Directory\Model\RegionFactory;
 use Magento\Directory\Model\ResourceModel\Region;
+use Magento\Directory\Model\ResourceModel\Region as RegionResource;
+use Magento\Framework\Api\DataObjectHelper;
+use Magento\Framework\Api\ExtensibleDataObjectConverter;
+use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Framework\App\Helper\Context;
+use Magento\Framework\Exception\LocalizedException;
+use Throwable;
 
 /**
  * Exposing some helpful methods for processing address submission. Yeah!
  */
-class Address extends \Magento\Framework\App\Helper\AbstractHelper
+class Address extends AbstractHelper
 {
-    /**
-     * @var \Magento\Customer\Model\Metadata\FormFactory
-     */
-    protected $formFactory;
-
-    /**
-     * @var \Magento\Customer\Api\Data\AddressInterfaceFactory
-     */
-    protected $addressDataFactory;
-
-    /**
-     * @var \Magento\Framework\Api\DataObjectHelper
-     */
-    protected $dataObjectHelper;
-
-    /**
-     * @var \Magento\Customer\Api\Data\RegionInterfaceFactory
-     */
-    protected $regionDataFactory;
-
-    /**
-     * @var \Magento\Directory\Model\RegionFactory
-     */
-    protected $regionFactory;
-
-    /**
-     * @var \Magento\Customer\Api\AddressRepositoryInterface
-     */
-    protected $addressRepository;
-
-    /**
-     * @var Region
-     */
-    protected $regionResource;
-
-    /**
-     * @var \Magento\Framework\Api\ExtensibleDataObjectConverter
-     */
-    protected $extensibleDataObjectConverter;
-
-    /**
-     * @var \Magento\Customer\Model\Address\Mapper
-     */
-    protected $addressMapper;
-
-    /**
-     * @var \Magento\Customer\Model\Address\Config
-     */
-    protected $addressConfig;
-
     /**
      * Address constructor.
      *
@@ -96,30 +61,19 @@ class Address extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Customer\Model\Address\Config $addressConfig
      */
     public function __construct(
-        \Magento\Framework\App\Helper\Context $context,
-        \Magento\Customer\Model\Metadata\FormFactory $formFactory,
-        \Magento\Customer\Api\Data\AddressInterfaceFactory $addressDataFactory,
-        \Magento\Framework\Api\DataObjectHelper $dataObjectHelper,
-        \Magento\Customer\Api\Data\RegionInterfaceFactory $regionDataFactory,
-        \Magento\Directory\Model\RegionFactory $regionFactory,
-        \Magento\Directory\Model\ResourceModel\Region $regionResource,
-        \Magento\Customer\Api\AddressRepositoryInterface $addressRepository,
-        \Magento\Framework\Api\ExtensibleDataObjectConverter $extensibleDataObjectConverter,
-        \Magento\Customer\Model\Address\Mapper $addressMapper,
-        \Magento\Customer\Model\Address\Config $addressConfig
+        Context $context,
+        protected FormFactory $formFactory,
+        protected AddressInterfaceFactory $addressDataFactory,
+        protected DataObjectHelper $dataObjectHelper,
+        protected RegionInterfaceFactory $regionDataFactory,
+        protected RegionFactory $regionFactory,
+        protected RegionResource $regionResource,
+        protected AddressRepositoryInterface $addressRepository,
+        protected ExtensibleDataObjectConverter $extensibleDataObjectConverter,
+        protected Mapper $addressMapper,
+        protected Config $addressConfig
     ) {
         parent::__construct($context);
-
-        $this->formFactory = $formFactory;
-        $this->addressDataFactory = $addressDataFactory;
-        $this->dataObjectHelper = $dataObjectHelper;
-        $this->regionDataFactory = $regionDataFactory;
-        $this->regionFactory = $regionFactory;
-        $this->addressRepository = $addressRepository;
-        $this->regionResource = $regionResource;
-        $this->extensibleDataObjectConverter = $extensibleDataObjectConverter;
-        $this->addressMapper = $addressMapper;
-        $this->addressConfig = $addressConfig;
     }
 
     /**
@@ -138,20 +92,20 @@ class Address extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         /** @var \Magento\Customer\Model\Metadata\Form $addressForm */
-        $addressForm     = $this->formFactory->create('customer_address', 'customer_address_edit', $origAddressData);
+        $addressForm = $this->formFactory->create('customer_address', 'customer_address_edit', $origAddressData);
 
         if (isset($addressData['street']) && is_string($addressData['street'])) {
             $addressData['street'] = explode("\n", str_replace("\r", '', $addressData['street']));
         }
 
-        $request         = $addressForm->prepareRequest($addressData);
-        $addressData     = $addressForm->extractData($request);
+        $request     = $addressForm->prepareRequest($addressData);
+        $addressData = $addressForm->extractData($request);
 
         if ($validate === true) {
             $addressErrors = $addressForm->validateData($addressData);
 
             if ($addressErrors !== true) {
-                throw new \Magento\Framework\Exception\LocalizedException(__(implode(' ', $addressErrors)));
+                throw new LocalizedException(__(implode(' ', $addressErrors)));
             }
         }
 
@@ -186,19 +140,19 @@ class Address extends \Magento\Framework\App\Helper\AbstractHelper
             $this->regionResource->load($newRegion, $addressArray['region_id']);
 
             $addressArray['region_code'] = $newRegion->getCode();
-            $addressArray['region'] = $newRegion->getDefaultName();
+            $addressArray['region']      = $newRegion->getDefaultName();
         } elseif (!empty($addressArray['region_code'])) {
             /** @var \Magento\Directory\Model\Region $newRegion */
             $newRegion = $this->regionFactory->create();
             $this->regionResource->loadByCode($newRegion, $addressArray['region_code'], $addressArray['country_id']);
 
             $addressArray['region_id'] = $newRegion->getId();
-            $addressArray['region'] = $newRegion->getDefaultName();
+            $addressArray['region']    = $newRegion->getDefaultName();
         }
 
         $regionData = [
-            RegionInterface::REGION_ID   => !empty($addressArray['region_id']) ? $addressArray['region_id'] : null,
-            RegionInterface::REGION      => !empty($addressArray['region']) ? $addressArray['region'] : null,
+            RegionInterface::REGION_ID => !empty($addressArray['region_id']) ? $addressArray['region_id'] : null,
+            RegionInterface::REGION => !empty($addressArray['region']) ? $addressArray['region'] : null,
             RegionInterface::REGION_CODE => !empty($addressArray['region_code']) ? $addressArray['region_code'] : null,
         ];
 
@@ -282,7 +236,7 @@ class Address extends \Magento\Framework\App\Helper\AbstractHelper
             $addressData = $this->addressMapper->toFlatArray($address);
 
             return $renderer->renderArray($addressData);
-        } catch (\Exception $exception) {
+        } catch (Throwable) {
             return '';
         }
     }

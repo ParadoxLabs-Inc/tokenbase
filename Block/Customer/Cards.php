@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,44 +15,28 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Block\Customer;
 
+use Magento\Customer\Api\Data\AddressInterface;
+use Magento\Customer\Model\Address\Config;
+use Magento\Customer\Model\Address\Mapper;
+use Magento\Framework\Data\Form\FormKey;
+use Magento\Framework\Registry;
 use Magento\Framework\View\Element\Template;
+use ParadoxLabs\TokenBase\Helper\Data;
+use ParadoxLabs\TokenBase\Model\Card;
+use Throwable;
 
 class Cards extends \Magento\Framework\View\Element\Template
 {
     /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
-     * @var \Magento\Framework\Registry
-     */
-    protected $registry;
-
-    /**
      * @var \Magento\Payment\Model\MethodInterface
      */
     protected $method;
-
-    /**
-     * @var \Magento\Customer\Model\Address\Mapper
-     */
-    protected $addressMapper;
-
-    /**
-     * @var \Magento\Customer\Model\Address\Config
-     */
-    protected $addressConfig;
-
-    /**
-     * @var \Magento\Framework\Data\Form\FormKey
-     */
-    protected $formKey;
 
     /**
      * Constructor
@@ -67,19 +51,13 @@ class Cards extends \Magento\Framework\View\Element\Template
      */
     public function __construct(
         Template\Context $context,
-        \Magento\Framework\Registry $registry,
-        \Magento\Customer\Model\Address\Mapper $addressMapper,
-        \Magento\Customer\Model\Address\Config $addressConfig,
-        \Magento\Framework\Data\Form\FormKey $formKey,
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
+        protected Registry $registry,
+        protected Mapper $addressMapper,
+        protected Config $addressConfig,
+        protected FormKey $formKey,
+        protected Data $helper,
         array $data = []
     ) {
-        $this->helper = $helper;
-        $this->registry = $registry;
-        $this->addressMapper = $addressMapper;
-        $this->addressConfig = $addressConfig;
-        $this->formKey = $formKey;
-
         $this->method = $this->helper->getMethodInstance($this->registry->registry('tokenbase_method'));
 
         parent::__construct($context, $data);
@@ -122,7 +100,7 @@ class Cards extends \Magento\Framework\View\Element\Template
      * @return string
      * @see \Magento\Customer\Model\Address\AbstractAddress::format()
      */
-    public function getFormattedCardAddress(\Magento\Customer\Api\Data\AddressInterface $address)
+    public function getFormattedCardAddress(AddressInterface $address)
     {
         try {
             /** @var \Magento\Customer\Block\Address\Renderer\RendererInterface $renderer */
@@ -130,7 +108,7 @@ class Cards extends \Magento\Framework\View\Element\Template
             $addressData = $this->addressMapper->toFlatArray($address);
 
             return $renderer->renderArray($addressData);
-        } catch (\Exception $exception) {
+        } catch (Throwable) {
             return '';
         }
     }
@@ -141,7 +119,7 @@ class Cards extends \Magento\Framework\View\Element\Template
      * @param \ParadoxLabs\TokenBase\Model\Card $card
      * @return \Magento\Framework\Phrase|null
      */
-    public function getCcTypeLabel(\ParadoxLabs\TokenBase\Model\Card $card)
+    public function getCcTypeLabel(Card $card)
     {
         return $card->getType() ? $this->helper->translateCardType($card->getType()) : null;
     }

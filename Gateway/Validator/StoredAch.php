@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,12 +15,15 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Gateway\Validator;
 
-class StoredAch extends \Magento\Payment\Gateway\Validator\AbstractValidator
+use Magento\Payment\Gateway\Validator\AbstractValidator;
+
+class StoredAch extends AbstractValidator
 {
     /**
      * Performs domain-related validation for business object
@@ -46,7 +49,7 @@ class StoredAch extends \Magento\Payment\Gateway\Validator\AbstractValidator
             }
 
             if (!empty($payment->getData('echeck_routing_no'))
-                && substr((string)$payment->getData('echeck_routing_no'), 0, 4) !== 'XXXX'
+                && !str_starts_with((string)$payment->getData('echeck_routing_no'), 'XXXX')
             ) {
                 // If not masked and not 9 digits, or not numeric...
                 if (strlen((string)$payment->getData('echeck_routing_no')) != 9
@@ -57,7 +60,7 @@ class StoredAch extends \Magento\Payment\Gateway\Validator\AbstractValidator
             }
 
             if (!empty($payment->getData('echeck_account_no'))
-                && substr((string)$payment->getData('echeck_account_no'), 0, 4) !== 'XXXX'
+                && !str_starts_with((string)$payment->getData('echeck_account_no'), 'XXXX')
             ) {
                 // If not masked and not 5-17 digits, or not numeric...
                 if (strlen((string)$payment->getData('echeck_account_no')) < 5

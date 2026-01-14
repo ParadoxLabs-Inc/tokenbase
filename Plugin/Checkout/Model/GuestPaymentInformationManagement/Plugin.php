@@ -15,10 +15,25 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Plugin\Checkout\Model\GuestPaymentInformationManagement;
+
+use Closure;
+use Magento\Checkout\Api\GuestPaymentInformationManagementInterface;
+use Magento\Checkout\Model\Session;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Quote\Api\Data\AddressInterface;
+use Magento\Quote\Api\Data\PaymentInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Payment;
+use Magento\Store\Model\ScopeInterface;
+use ParadoxLabs\TokenBase\Helper\Data;
+use Psr\Log\LoggerInterface;
+use Throwable;
 
 class Plugin
 {
@@ -62,17 +77,17 @@ class Plugin
      * @param \Psr\Log\LoggerInterface $logger
      */
     public function __construct(
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
-        \Psr\Log\LoggerInterface $logger
+        ScopeConfigInterface $scopeConfig,
+        Data $helper,
+        Session $checkoutSession,
+        OrderRepositoryInterface $orderRepository,
+        LoggerInterface $logger
     ) {
-        $this->scopeConfig = $scopeConfig;
-        $this->helper = $helper;
+        $this->scopeConfig     = $scopeConfig;
+        $this->helper          = $helper;
         $this->checkoutSession = $checkoutSession;
         $this->orderRepository = $orderRepository;
-        $this->logger = $logger;
+        $this->logger          = $logger;
     }
 
     /**
@@ -87,16 +102,16 @@ class Plugin
      * @return mixed
      */
     public function aroundSavePaymentInformationAndPlaceOrder(
-        \Magento\Checkout\Api\GuestPaymentInformationManagementInterface $subject,
-        \Closure $proceed,
+        GuestPaymentInformationManagementInterface $subject,
+        Closure $proceed,
         $cartId,
         $email,
-        \Magento\Quote\Api\Data\PaymentInterface $paymentMethod,
-        ?\Magento\Quote\Api\Data\AddressInterface $billingAddress = null
+        PaymentInterface $paymentMethod,
+        ?AddressInterface $billingAddress = null
     ) {
         try {
             return $proceed($cartId, $email, $paymentMethod, $billingAddress);
-        } catch (\Exception $exception) {
+        } catch (Throwable $exception) {
             if ($this->orderWasSaved()) {
                 $order = $this->getOrder();
 
@@ -146,7 +161,7 @@ class Plugin
     {
         $enabled = (bool)$this->scopeConfig->getValue(
             'checkout/tokenbase/save_order_after_payment',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
 
         return $enabled;
@@ -161,8 +176,8 @@ class Plugin
     {
         $order = $this->getOrder();
 
-        return $order instanceof \Magento\Sales\Model\Order === true
-            && $order->getPayment() instanceof \Magento\Sales\Model\Order\Payment === true
+        return $order instanceof Order === true
+            && $order->getPayment() instanceof Payment === true
             && in_array($order->getPayment()->getMethod(), $this->helper->getAllMethods(), true) === true;
     }
 

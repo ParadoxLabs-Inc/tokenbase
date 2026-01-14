@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,10 +15,13 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Block\Info;
+
+use Magento\Framework\View\Element\Template;
 
 /**
  * ACH info block for TokenBase methods.
@@ -38,17 +41,17 @@ class Ach extends Cc
      */
     protected function _prepareSpecificInformation($transport = null)
     {
-        $transport  = parent::_prepareSpecificInformation($transport);
-        $data       = [];
+        $transport = parent::_prepareSpecificInformation($transport);
+        $data      = [];
 
         if ($this->getIsSecureMode() === false && $this->isEcheck() === true) {
             /** @var \Magento\Sales\Model\Order\Payment\Info $info */
             $info = $this->getInfo();
 
-            $accName    = $info->getData('echeck_account_name');
+            $accName = $info->getData('echeck_account_name');
 
             if (!empty($accName)) {
-                $data[(string)__('Name on Account')] = $accName;
+                $data[ (string)__('Name on Account') ] = $accName;
             }
         }
 
@@ -69,7 +72,7 @@ class Ach extends Cc
             // We have to do this because we don't want to save them to the DB or session, but can't lose them entirely.
             /** @var \Magento\Framework\View\Element\Template $childBlock */
             $childBlock = $this->getLayout()->createBlock(
-                \Magento\Framework\View\Element\Template::class,
+                Template::class,
                 $this->getNameInLayout() . '.multiship'
             );
             $childBlock->setTemplate('ParadoxLabs_TokenBase::info/ach.phtml');

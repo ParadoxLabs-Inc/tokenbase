@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,6 +15,7 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
@@ -24,43 +25,32 @@ use Magento\Backend\Block\Template\Context;
 use Magento\Customer\Controller\RegistryConstants;
 use Magento\Framework\Registry;
 use Magento\Ui\Component\Layout\Tabs\TabWrapper;
+use ParadoxLabs\TokenBase\Helper\Data;
 
 class Tab extends TabWrapper
 {
-    /**
-     * Core registry
-     *
-     * @var Registry
-     */
-    protected $coreRegistry;
-
     /**
      * @var bool
      */
     protected $isAjaxLoaded = true;
 
     /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
      * Constructor
      *
      * @param Context $context
-     * @param Registry $registry
+     * @param Registry $coreRegistry
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param array $data
      */
     public function __construct(
         Context $context,
-        Registry $registry,
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
+        /**
+         * Core registry
+         */
+        protected Registry $coreRegistry,
+        protected Data $helper,
         array $data = []
     ) {
-        $this->coreRegistry = $registry;
-        $this->helper = $helper;
-
         parent::__construct($context, $data);
     }
 

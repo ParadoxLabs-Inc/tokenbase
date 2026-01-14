@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,10 +15,15 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Api;
+
+use Magento\Customer\Api\Data\AddressInterface;
+use ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface;
+use ParadoxLabs\TokenBase\Api\Data\CardInterface;
 
 /**
  * Interface GuestCardRepositoryInterface
@@ -36,9 +41,9 @@ interface GuestCardRepositoryInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function saveExtended(
-        \ParadoxLabs\TokenBase\Api\Data\CardInterface $card,
-        \Magento\Customer\Api\Data\AddressInterface $address,
-        \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface $additional
+        CardInterface $card,
+        AddressInterface $address,
+        CardAdditionalInterface $additional
     );
 
     /**

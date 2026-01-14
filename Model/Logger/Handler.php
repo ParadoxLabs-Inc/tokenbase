@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,17 +15,21 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Model\Logger;
 
 use Magento\Framework\Filesystem\DriverInterface;
+use Magento\Framework\Logger\Handler\Base;
+use Monolog\Formatter\LineFormatter;
+use Monolog\Logger;
 
 /**
  * Custom payment gateway logger
  */
-class Handler extends \Magento\Framework\Logger\Handler\Base
+class Handler extends Base
 {
     /**
      * @var string
@@ -35,7 +39,7 @@ class Handler extends \Magento\Framework\Logger\Handler\Base
     /**
      * @var int
      */
-    protected $loggerType = \Monolog\Logger::INFO;
+    protected $loggerType = Logger::INFO;
 
     /**
      * @param DriverInterface $filesystem
@@ -44,7 +48,7 @@ class Handler extends \Magento\Framework\Logger\Handler\Base
      */
     public function __construct(
         DriverInterface $filesystem,
-        \Monolog\Formatter\LineFormatter $lineFormatter,
+        LineFormatter $lineFormatter,
         $filePath = null
     ) {
         parent::__construct($filesystem, $filePath);

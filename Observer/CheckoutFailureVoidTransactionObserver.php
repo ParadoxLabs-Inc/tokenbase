@@ -15,22 +15,30 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Observer;
 
+use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Payment;
+use ParadoxLabs\TokenBase\Helper\Data;
+use ParadoxLabs\TokenBase\Model\Method\Factory;
+use Throwable;
 
 /**
  * CheckoutFailureVoidTransactionObserver Observer
  */
-class CheckoutFailureVoidTransactionObserver implements \Magento\Framework\Event\ObserverInterface
+class CheckoutFailureVoidTransactionObserver implements ObserverInterface
 {
-    protected const FAILED_ORDER_STATES = [
-        Order::STATE_CANCELED,
-        Order::STATE_CLOSED,
-    ];
+    protected const FAILED_ORDER_STATES
+        = [
+            Order::STATE_CANCELED,
+            Order::STATE_CLOSED,
+        ];
 
     /**
      * @var \ParadoxLabs\TokenBase\Helper\Data
@@ -47,10 +55,10 @@ class CheckoutFailureVoidTransactionObserver implements \Magento\Framework\Event
      * @param \ParadoxLabs\TokenBase\Model\Method\Factory $methodFactory
      */
     public function __construct(
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \ParadoxLabs\TokenBase\Model\Method\Factory $methodFactory
+        Data $helper,
+        Factory $methodFactory
     ) {
-        $this->helper = $helper;
+        $this->helper        = $helper;
         $this->methodFactory = $methodFactory;
     }
 
@@ -60,12 +68,12 @@ class CheckoutFailureVoidTransactionObserver implements \Magento\Framework\Event
      * @param \Magento\Framework\Event\Observer $observer
      * @return void
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         $order = $observer->getData('order');
 
         if ($order instanceof Order === false
-            || $order->getPayment() instanceof \Magento\Sales\Model\Order\Payment === false
+            || $order->getPayment() instanceof Payment === false
             || empty($order->getPayment()->getLastTransId())
             || in_array($order->getPayment()->getMethod(), $this->helper->getAllMethods(), true) === false
             || $order->getData('_tokenbase_saved_order') === true) {
@@ -91,7 +99,7 @@ class CheckoutFailureVoidTransactionObserver implements \Magento\Framework\Event
                 $order->getPayment()->getMethod(),
                 'Auto-voided transaction due to checkout failure: ' . $response->toJson()
             );
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
             // Log and ignore any errors; we don't want to throw them in this context.
             $this->helper->log(
                 $order->getPayment()->getMethod(),

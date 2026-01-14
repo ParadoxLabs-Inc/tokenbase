@@ -17,6 +17,7 @@ use Magento\Customer\Model\Customer;
 use Magento\InstantPurchase\Model\PaymentMethodChoose\PaymentTokenChooserInterface;
 use Magento\Store\Model\Store;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
+use Magento\Vault\Model\PaymentTokenManagement;
 
 class PaymentTokenChooser
 {
@@ -31,7 +32,7 @@ class PaymentTokenChooser
      * @param \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
      */
     public function __construct(
-        \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
+        PaymentTokenManagement $paymentTokenManagement
     ) {
         $this->paymentTokenManagement = $paymentTokenManagement;
     }

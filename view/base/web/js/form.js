@@ -20,7 +20,7 @@
 /*jshint jquery:true*/
 define([
     "jquery"
-], function($) {
+], function ($) {
     "use strict";
 
     $.widget('mage.tokenbaseForm', {
@@ -33,13 +33,13 @@ define([
             pollInterval: 1000
         },
 
-        toggleFields: function(disabled) {
+        toggleFields: function (disabled) {
             var fields = this.element.find(this.options.toggleFieldsSelector);
             if (fields.first().is(':hidden') !== disabled) {
                 fields.toggle(!disabled);
             }
 
-            fields.find(this.options.toggleFieldInputs).each(function(index, el) {
+            fields.find(this.options.toggleFieldInputs).each(function (index, el) {
                 el = jQuery(el);
                 if (el.is(':hidden') !== disabled) {
                     el.toggle(!disabled);
@@ -48,7 +48,7 @@ define([
             });
         },
 
-        _create: function() {
+        _create: function () {
             var cardSelect = this.element.find(this.options.cardSelectInput);
 
             if (cardSelect.length > 0) {

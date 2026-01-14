@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,23 +15,20 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Block\Adminhtml\Customer;
 
-class Wrapper extends \Magento\Backend\Block\Template
+use Magento\Backend\Block\Template;
+use Magento\Backend\Block\Template\Context;
+use Magento\Framework\Registry;
+use Magento\Store\Model\ScopeInterface;
+use ParadoxLabs\TokenBase\Helper\Data;
+
+class Wrapper extends Template
 {
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
-     * @var \Magento\Framework\Registry
-     */
-    protected $registry;
-
     /**
      * Wrapper constructor.
      *
@@ -41,14 +38,11 @@ class Wrapper extends \Magento\Backend\Block\Template
      * @param array $data
      */
     public function __construct(
-        \Magento\Backend\Block\Template\Context $context,
-        \Magento\Framework\Registry $registry,
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
+        Context $context,
+        protected Registry $registry,
+        protected Data $helper,
         array $data = []
     ) {
-        $this->helper = $helper;
-        $this->registry = $registry;
-
         parent::__construct($context, $data);
     }
 
@@ -82,7 +76,7 @@ class Wrapper extends \Magento\Backend\Block\Template
     {
         return $this->_scopeConfig->getValue(
             'payment/' . $method . '/title',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
 }

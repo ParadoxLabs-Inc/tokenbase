@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,10 +15,16 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Api;
+
+use Magento\Customer\Api\Data\AddressInterface;
+use Magento\Framework\Api\SearchCriteriaInterface;
+use ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface;
+use ParadoxLabs\TokenBase\Api\Data\CardInterface;
 
 /**
  * Card CRUD interface.
@@ -34,7 +40,7 @@ interface CardRepositoryInterface
      * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function save(\ParadoxLabs\TokenBase\Api\Data\CardInterface $card);
+    public function save(CardInterface $card);
 
     /**
      * Save card with extended objects.
@@ -45,9 +51,9 @@ interface CardRepositoryInterface
      * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
      */
     public function saveExtended(
-        \ParadoxLabs\TokenBase\Api\Data\CardInterface $card,
-        \Magento\Customer\Api\Data\AddressInterface $address,
-        \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface $additional
+        CardInterface $card,
+        AddressInterface $address,
+        CardAdditionalInterface $additional
     );
 
     /**
@@ -84,7 +90,7 @@ interface CardRepositoryInterface
      * @return \ParadoxLabs\TokenBase\Api\Data\CardSearchResultsInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getList(\Magento\Framework\Api\SearchCriteriaInterface $searchCriteria);
+    public function getList(SearchCriteriaInterface $searchCriteria);
 
     /**
      * Delete card.

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,30 +15,43 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Model;
 
+use Magento\Customer\Api\Data\CustomerInterface;
+use Magento\Customer\Model\Address\AddressModelInterface;
+use Magento\Framework\App\ScopeInterface;
+use Magento\Framework\DataObject;
+use Magento\Framework\Exception\StateException;
+use Magento\Framework\Registry;
+use Magento\Payment\Gateway\Command\CommandException;
+use Magento\Payment\Gateway\ConfigInterface;
+use Magento\Payment\Model\InfoInterface;
 use Magento\Quote\Api\Data\CartInterface;
+use Magento\Quote\Model\Quote\Payment as QuotePayment;
+use Magento\Sales\Api\Data\TransactionInterface;
+use Magento\Sales\Model\Order\Invoice;
+use Magento\Sales\Model\Order\Payment as OrderPayment;
+use Magento\Sales\Model\Order\Payment\Transaction;
+use Magento\Sales\Model\Order\Payment\Transaction\Repository;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
+use ParadoxLabs\TokenBase\Api\CardRepositoryInterface;
+use ParadoxLabs\TokenBase\Api\Data\CardInterface;
+use ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory;
 use ParadoxLabs\TokenBase\Api\MethodInterface;
+use ParadoxLabs\TokenBase\Helper\Address;
+use ParadoxLabs\TokenBase\Helper\Data;
+use ParadoxLabs\TokenBase\Model\Gateway\Response;
+use Throwable;
 
 /**
  * Common actions and behavior for TokenBase payment methods
  */
-abstract class AbstractMethod extends \Magento\Framework\DataObject implements MethodInterface
+abstract class AbstractMethod extends DataObject implements MethodInterface
 {
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Model\AbstractGateway
-     */
-    protected $gateway;
-
     /**
      * @var \Magento\Payment\Model\Info
      */
@@ -50,44 +63,9 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
     protected $customer;
 
     /**
-     * @var \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory
-     */
-    protected $cardFactory;
-
-    /**
      * @var \ParadoxLabs\TokenBase\Model\Card
      */
     protected $card;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Address
-     */
-    protected $addressHelper;
-
-    /**
-     * @var \Magento\Sales\Model\Order\Payment\Transaction\Repository
-     */
-    protected $transactionRepository;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Api\CardRepositoryInterface
-     */
-    protected $cardRepository;
-
-    /**
-     * @var \Magento\Payment\Gateway\ConfigInterface
-     */
-    protected $config;
-
-    /**
-     * @var string
-     */
-    protected $methodCode;
-
-    /**
-     * @var \Magento\Framework\Registry
-     */
-    protected $registry;
 
     /**
      * @param \Magento\Sales\Model\Order\Payment\Transaction\Repository $transactionRepository
@@ -103,29 +81,19 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @throws \Magento\Payment\Gateway\Command\CommandException
      */
     public function __construct(
-        \Magento\Sales\Model\Order\Payment\Transaction\Repository $transactionRepository,
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \ParadoxLabs\TokenBase\Model\AbstractGateway $gateway,
-        \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $cardFactory,
-        \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository,
-        \ParadoxLabs\TokenBase\Helper\Address $addressHelper,
-        \Magento\Payment\Gateway\ConfigInterface $config,
-        \Magento\Framework\Registry $registry,
-        $methodCode = '',
+        protected Repository $transactionRepository,
+        protected Data $helper,
+        protected AbstractGateway $gateway,
+        protected CardInterfaceFactory $cardFactory,
+        protected CardRepositoryInterface $cardRepository,
+        protected Address $addressHelper,
+        protected ConfigInterface $config,
+        protected Registry $registry,
+        protected string $methodCode = '',
         array $data = []
     ) {
-        $this->helper = $helper;
-        $this->gateway = $gateway;
-        $this->cardFactory = $cardFactory;
-        $this->cardRepository = $cardRepository;
-        $this->addressHelper = $addressHelper;
-        $this->transactionRepository = $transactionRepository;
-        $this->config = $config;
-        $this->registry = $registry;
-        $this->methodCode = $methodCode;
-
-        if (empty($methodCode)) {
-            throw new \Magento\Payment\Gateway\Command\CommandException(__("Missing argument 'methodCode'"));
+        if (empty($this->methodCode)) {
+            throw new CommandException(__("Missing argument 'methodCode'"));
         }
 
         $this->setStore($this->helper->getCurrentStoreId());
@@ -144,7 +112,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
     public function setStore($storeId)
     {
         // Whelp.
-        if ($storeId instanceof \Magento\Framework\App\ScopeInterface) {
+        if ($storeId instanceof ScopeInterface) {
             $storeId = $storeId->getId();
         }
 
@@ -161,7 +129,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @param \Magento\Customer\Api\Data\CustomerInterface $customer
      * @return $this
      */
-    public function setCustomer(\Magento\Customer\Api\Data\CustomerInterface $customer)
+    public function setCustomer(CustomerInterface $customer)
     {
         $this->customer = $customer;
 
@@ -202,7 +170,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @param \Magento\Payment\Model\InfoInterface $info
      * @return $this
      */
-    public function setInfoInstance(\Magento\Payment\Model\InfoInterface $info)
+    public function setInfoInstance(InfoInterface $info)
     {
         $this->infoInstance = $info;
 
@@ -220,18 +188,18 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
     /**
      * Initialize/return the API gateway class.
      *
+     * @return \ParadoxLabs\TokenBase\Api\GatewayInterface
      * @api
      *
-     * @return \ParadoxLabs\TokenBase\Api\GatewayInterface
      */
     public function gateway()
     {
         if ($this->gateway->isInitialized() !== true) {
             $this->gateway->init([
-                'login'      => $this->getConfigData('login'),
-                'password'   => $this->getConfigData('trans_key'),
+                'login' => $this->getConfigData('login'),
+                'password' => $this->getConfigData('trans_key'),
                 'secret_key' => $this->getConfigData('secret_key'),
-                'test_mode'  => $this->getConfigData('test'),
+                'test_mode' => $this->getConfigData('test'),
                 'verify_ssl' => $this->getConfigData('verify_ssl'),
             ]);
         }
@@ -254,8 +222,8 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         try {
             $card = $this->cardRepository->getById($cardId);
 
-            $isOrder = $this->getInfoInstance() instanceof \Magento\Sales\Model\Order\Payment;
-            $isQuote = $this->getInfoInstance() instanceof \Magento\Quote\Model\Quote\Payment;
+            $isOrder      = $this->getInfoInstance() instanceof OrderPayment;
+            $isQuote      = $this->getInfoInstance() instanceof QuotePayment;
             $orderMatches = $isOrder && $card->getCustomerId() == $this->getInfoInstance()->getOrder()->getCustomerId();
             $quoteMatches = $isQuote && $card->getCustomerId() == $this->getInfoInstance()->getQuote()->getCustomerId();
 
@@ -272,10 +240,10 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
 
                 return $this->getCard();
             }
-        } catch (\Magento\Framework\Exception\StateException $e) {
+        } catch (StateException $e) {
             $this->log($e->getMessage());
             throw $e;
-        } catch (\Exception $e) {
+        } catch (Throwable) {
             // Any error is inability to load card -- handle same as auth failure.
         }
 
@@ -284,7 +252,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
          */
         $this->log(sprintf('Unable to load payment data. Please check the form and try again.'));
 
-        throw new \Magento\Payment\Gateway\Command\CommandException(
+        throw new CommandException(
             __('Unable to load payment data. Please check the form and try again.')
         );
     }
@@ -305,7 +273,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @param \ParadoxLabs\TokenBase\Api\Data\CardInterface $card
      * @return $this
      */
-    public function setCard(\ParadoxLabs\TokenBase\Api\Data\CardInterface $card)
+    public function setCard(CardInterface $card)
     {
         $this->log(sprintf('setCard(%s)', $card->getId()));
 
@@ -313,7 +281,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         $card = $card->getTypeInstance();
         $card->setMethodInstance($this);
 
-        if ($this->getInfoInstance() instanceof \Magento\Payment\Model\InfoInterface) {
+        if ($this->getInfoInstance() instanceof InfoInterface) {
             $card->setInfoInstance($this->getInfoInstance());
         } else {
             $this->setInfoInstance($card->getInfoInstance());
@@ -324,10 +292,10 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         $this->gateway()->setCard($card);
 
         $this->getInfoInstance()->setData('tokenbase_id', $card->getId())
-                                ->setData('cc_type', $card->getType())
-                                ->setData('cc_last_4', $card->getAdditional('cc_last4'))
-                                ->setData('cc_exp_month', $card->getAdditional('cc_exp_month'))
-                                ->setData('cc_exp_year', $card->getAdditional('cc_exp_year'));
+             ->setData('cc_type', $card->getType())
+             ->setData('cc_last_4', $card->getAdditional('cc_last4'))
+             ->setData('cc_exp_month', $card->getAdditional('cc_exp_month'))
+             ->setData('cc_exp_year', $card->getAdditional('cc_exp_year'));
 
         if ($this->getConfigData('can_store_bin') == 1) {
             $this->getInfoInstance()->setAdditionalInformation('cc_bin', $card->getAdditional('cc_bin'));
@@ -343,11 +311,11 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @param float $amount
      * @return $this
      */
-    public function order(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    public function order(InfoInterface $payment, $amount)
     {
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
+        /** @var OrderPayment $payment */
 
-        $this->log(sprintf('order(%s %s, %s)', get_class($payment), $payment->getId(), $amount));
+        $this->log(sprintf('order(%s %s, %s)', $payment::class, $payment->getId(), $amount));
 
         $this->loadOrCreateCard($payment);
         $this->resyncStoredCard($payment);
@@ -361,7 +329,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         ];
 
         $payment->setTransactionAdditionalInfo(
-            \Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS,
+            Transaction::RAW_DETAILS,
             $paymentData
         );
 
@@ -389,11 +357,11 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @param float $amount
      * @return $this
      */
-    public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    public function authorize(InfoInterface $payment, $amount)
     {
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
+        /** @var OrderPayment $payment */
 
-        $this->log(sprintf('authorize(%s %s, %s)', get_class($payment), $payment->getId(), $amount));
+        $this->log(sprintf('authorize(%s %s, %s)', $payment::class, $payment->getId(), $amount));
 
         $this->loadOrCreateCard($payment);
 
@@ -430,7 +398,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         $this->afterAuthorize($payment, $amount, $response);
 
         $payment->setTransactionAdditionalInfo(
-            \Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS,
+            Transaction::RAW_DETAILS,
             $response->getData()
         );
 
@@ -464,11 +432,11 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @param float $amount
      * @return $this
      */
-    public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    public function capture(InfoInterface $payment, $amount)
     {
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
+        /** @var OrderPayment $payment */
 
-        $this->log(sprintf('capture(%s %s, %s)', get_class($payment), $payment->getId(), $amount));
+        $this->log(sprintf('capture(%s %s, %s)', $payment::class, $payment->getId(), $amount));
 
         $this->loadOrCreateCard($payment);
 
@@ -480,14 +448,14 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
          * Check for existing auth code.
          */
         $authTxn = $payment->getAuthorizationTransaction();
-        if ($authTxn instanceof \Magento\Sales\Api\Data\TransactionInterface
+        if ($authTxn instanceof TransactionInterface
             && $authTxn->getIsClosed() == 0
             && !empty($authTxn->getTxnId())
-            && substr((string)$authTxn->getTxnId(), -5) !== '-auth') {
+            && !str_ends_with((string)$authTxn->getTxnId(), '-auth')) {
             $this->gateway()->setHaveAuthorized(true);
 
             $authTxnInfo = $authTxn->getAdditionalInformation(
-                \Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS
+                Transaction::RAW_DETAILS
             );
 
             if (is_array($authTxnInfo) && isset($authTxnInfo['auth_code'])) {
@@ -520,7 +488,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         $this->afterCapture($payment, $amount, $response);
 
         $payment->setTransactionAdditionalInfo(
-            \Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS,
+            Transaction::RAW_DETAILS,
             $response->getData()
         );
 
@@ -561,11 +529,11 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @param float $amount
      * @return $this
      */
-    public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    public function refund(InfoInterface $payment, $amount)
     {
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
+        /** @var OrderPayment $payment */
 
-        $this->log(sprintf('refund(%s %s, %s)', get_class($payment), $payment->getId(), $amount));
+        $this->log(sprintf('refund(%s %s, %s)', $payment::class, $payment->getId(), $amount));
 
         $this->loadOrCreateCard($payment);
 
@@ -622,7 +590,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
         $payment->setIsTransactionClosed(1);
 
         $payment->setTransactionAdditionalInfo(
-            \Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS,
+            Transaction::RAW_DETAILS,
             $response->getData()
         );
 
@@ -655,11 +623,11 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @param \Magento\Payment\Model\InfoInterface $payment
      * @return $this
      */
-    public function void(\Magento\Payment\Model\InfoInterface $payment)
+    public function void(InfoInterface $payment)
     {
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
+        /** @var OrderPayment $payment */
 
-        $this->log(sprintf('void(%s %s)', get_class($payment), $payment->getId()));
+        $this->log(sprintf('void(%s %s)', $payment::class, $payment->getId()));
 
         try {
             $this->loadOrCreateCard($payment);
@@ -668,7 +636,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
              * Short-circuit if we don't have a real transaction ID. That means reauth not working or failed.
              * Not doing this can result in voiding a valid (potentially already-captured) transaction. Bad.
              */
-            if (strpos((string)$payment->getParentTransactionId(), '-auth') !== false) {
+            if (str_contains((string)$payment->getParentTransactionId(), '-auth')) {
                 $this->log(
                     sprintf(
                         'Skipping void; do not have a valid auth transaction ID. (%s)',
@@ -696,20 +664,20 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
             );
 
             $payment->setTransactionAdditionalInfo(
-                \Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS,
+                Transaction::RAW_DETAILS,
                 $response->getData()
             );
 
             $this->log(json_encode($response->getData()));
-        } catch (\Exception $exception) {
+        } catch (Throwable $exception) {
             $this->log($exception->getMessage());
             // Ignore void errors, let Magento proceed like it happened. Most likely the auth already expired.
         }
 
         $payment->setShouldCloseParentTransaction(1)
-            ->setIsTransactionClosed(1);
+                ->setIsTransactionClosed(1);
 
-        if ($this->getCard() instanceof \ParadoxLabs\TokenBase\Api\Data\CardInterface) {
+        if ($this->getCard() instanceof CardInterface) {
             $this->getCard()->updateLastUse();
             $this->getCard()->setData('no_sync', true);
             $this->card = $this->cardRepository->save($this->getCard());
@@ -724,11 +692,11 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @param \Magento\Payment\Model\InfoInterface $payment
      * @return $this
      */
-    public function cancel(\Magento\Payment\Model\InfoInterface $payment)
+    public function cancel(InfoInterface $payment)
     {
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
+        /** @var OrderPayment $payment */
 
-        $this->log(sprintf('cancel(%s %s)', get_class($payment), $payment->getId()));
+        $this->log(sprintf('cancel(%s %s)', $payment::class, $payment->getId()));
 
         return $this->void($payment);
     }
@@ -740,11 +708,11 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @param string $transactionId
      * @return array
      */
-    public function fetchTransactionInfo(\Magento\Payment\Model\InfoInterface $payment, $transactionId)
+    public function fetchTransactionInfo(InfoInterface $payment, $transactionId)
     {
-        $this->log('fetchTransactionInfo('.$transactionId.')');
+        $this->log('fetchTransactionInfo(' . $transactionId . ')');
 
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
+        /** @var OrderPayment $payment */
 
         $this->loadOrCreateCard($payment);
 
@@ -759,7 +727,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
             $payment->setData('parent_transaction_id', $transactionId);
 
             $transaction = $payment->getAuthorizationTransaction();
-            if ($transaction instanceof \Magento\Sales\Api\Data\TransactionInterface) {
+            if ($transaction instanceof TransactionInterface) {
                 $transaction->setAdditionalInformation('is_transaction_fraud', false);
             }
 
@@ -779,14 +747,14 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @param \Magento\Payment\Model\InfoInterface $payment
      * @return $this
      */
-    protected function captureGetInvoiceInfo(\Magento\Payment\Model\InfoInterface $payment)
+    protected function captureGetInvoiceInfo(InfoInterface $payment)
     {
         /** @var \Magento\Sales\Model\Order\Invoice $invoice */
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
+        /** @var OrderPayment $payment */
         $invoice = null;
 
         if ($payment->hasData('invoice')
-            && $payment->getData('invoice') instanceof \Magento\Sales\Model\Order\Invoice) {
+            && $payment->getData('invoice') instanceof Invoice) {
             $invoice = $payment->getData('invoice');
         } else {
             $invoice = $this->registry->registry('current_invoice');
@@ -814,12 +782,12 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @param string $transactionId
      * @return string
      */
-    protected function getValidTransactionId(\Magento\Payment\Model\InfoInterface $payment, $transactionId)
+    protected function getValidTransactionId(InfoInterface $payment, $transactionId)
     {
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
+        /** @var OrderPayment $payment */
 
-        $baseId       = $transactionId;
-        $increment    = 1;
+        $baseId    = $transactionId;
+        $increment = 1;
 
         /**
          * Try to load a transaction by ID, incrementing until we get one that does not exist.
@@ -835,7 +803,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
             );
 
             if ($transaction !== false) {
-                $found = true;
+                $found         = true;
                 $transactionId = $baseId . '-' . ($increment++);
             }
         } while ($found == true);
@@ -851,11 +819,11 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
      * @throws \Magento\Payment\Gateway\Command\CommandException
      */
-    protected function loadOrCreateCard(\Magento\Payment\Model\InfoInterface $payment)
+    protected function loadOrCreateCard(InfoInterface $payment)
     {
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
+        /** @var OrderPayment $payment */
 
-        $this->log(sprintf('loadOrCreateCard(%s %s)', get_class($payment), $payment->getId()));
+        $this->log(sprintf('loadOrCreateCard(%s %s)', $payment::class, $payment->getId()));
 
         if ($this->getCard() !== null) {
             $this->setCard($this->getCard());
@@ -863,7 +831,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
             return $this->getCard();
         }
 
-        if ($payment->getData('tokenbase_card') instanceof \ParadoxLabs\TokenBase\Api\Data\CardInterface) {
+        if ($payment->getData('tokenbase_card') instanceof CardInterface) {
             $this->setCard($payment->getData('tokenbase_card'));
 
             return $this->getCard();
@@ -879,7 +847,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
                     $payment->getAdditionalInformation(PaymentTokenInterface::PUBLIC_HASH),
                     true
                 );
-            } catch (\Magento\Payment\Gateway\Command\CommandException $exception) {
+            } catch (CommandException) {
                 // Unable to load TokenBase card by Vault hash; fall through
             }
         }
@@ -907,11 +875,11 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
                 );
 
                 /** @var \Magento\Customer\Api\Data\AddressInterface $billingAddress */
-                $billingAddress     = $this->addressHelper->buildAddressFromInput($billingAddressData);
+                $billingAddress = $this->addressHelper->buildAddressFromInput($billingAddressData);
 
                 $card->setAddress($billingAddress);
             } else {
-                throw new \Magento\Payment\Gateway\Command\CommandException(
+                throw new CommandException(
                     __('Could not find billing address.')
                 );
             }
@@ -928,7 +896,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
          */
         $this->log(sprintf('Invalid payment data provided. Please check the form and try again.'));
 
-        throw new \Magento\Payment\Gateway\Command\CommandException(
+        throw new CommandException(
             __('Invalid payment data provided. Please check the form and try again.')
         );
     }
@@ -939,9 +907,9 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @param \Magento\Payment\Model\InfoInterface $payment
      * @return bool
      */
-    protected function paymentContainsCard(\Magento\Payment\Model\InfoInterface $payment)
+    protected function paymentContainsCard(InfoInterface $payment)
     {
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
+        /** @var OrderPayment $payment */
 
         if ($payment->hasData('cc_number') && $payment->hasData('cc_exp_year') && $payment->hasData('cc_exp_month')) {
             return true;
@@ -956,13 +924,13 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @param \Magento\Payment\Model\InfoInterface $payment
      * @return $this
      */
-    protected function resyncStoredCard(\Magento\Payment\Model\InfoInterface $payment)
+    protected function resyncStoredCard(InfoInterface $payment)
     {
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
+        /** @var OrderPayment $payment */
 
-        $this->log(sprintf('resyncStoredCard(%s %s)', get_class($payment), $payment->getId()));
+        $this->log(sprintf('resyncStoredCard(%s %s)', $payment::class, $payment->getId()));
 
-        if ($this->getCard() instanceof \ParadoxLabs\TokenBase\Api\Data\CardInterface
+        if ($this->getCard() instanceof CardInterface
             && $this->getCard()->getId() > 0) {
             $haveChanges = false;
 
@@ -980,7 +948,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
                 $address = $payment->getData('billing_address');
             }
 
-            if (isset($address) && $address instanceof \Magento\Customer\Model\Address\AddressModelInterface) {
+            if (isset($address) && $address instanceof AddressModelInterface) {
                 $fields = [
                     'firstname',
                     'lastname',
@@ -1045,7 +1013,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @param float $amount
      * @return void
      */
-    protected function beforeAuthorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    protected function beforeAuthorize(InfoInterface $payment, $amount)
     {
         $this->handleShippingAddress($payment);
     }
@@ -1057,9 +1025,9 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @return void
      */
     protected function afterAuthorize(
-        \Magento\Payment\Model\InfoInterface $payment,
+        InfoInterface $payment,
         $amount,
-        \ParadoxLabs\TokenBase\Model\Gateway\Response $response
+        Response $response
     ) {
         $this->storeTransactionStatuses($payment, $response);
     }
@@ -1069,7 +1037,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @param float $amount
      * @return void
      */
-    protected function beforeCapture(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    protected function beforeCapture(InfoInterface $payment, $amount)
     {
         $this->handleShippingAddress($payment);
     }
@@ -1081,11 +1049,11 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @return void
      */
     protected function afterCapture(
-        \Magento\Payment\Model\InfoInterface $payment,
+        InfoInterface $payment,
         $amount,
-        \ParadoxLabs\TokenBase\Model\Gateway\Response $response
+        Response $response
     ) {
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
+        /** @var OrderPayment $payment */
 
         /**
          * If this is a pre-auth capture for less than the total value of the order,
@@ -1107,8 +1075,8 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
                     $this->handleShippingAddress($payment);
                     $this->gateway()->setHaveAuthorized(true);
 
-                    $authResponse    = $this->gateway()->authorize($payment, $outstanding);
-                } catch (\Exception $e) {
+                    $authResponse = $this->gateway()->authorize($payment, $outstanding);
+                } catch (Throwable) {
                     // Reauth failed: Take no action
                     $this->log('afterCapture(): Reauthorization not successful. Continuing with original transaction.');
                 }
@@ -1124,7 +1092,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
                 );
 
                 $payment->setTransactionAdditionalInfo(
-                    \Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS,
+                    Transaction::RAW_DETAILS,
                     $authResponse->getData()
                 );
 
@@ -1142,7 +1110,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
             $payment->setIsTransactionClosed(0);
 
             $transaction = $payment->addTransaction(
-                \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH,
+                Transaction::TYPE_AUTH,
                 $payment->getOrder(),
                 false
             );
@@ -1163,7 +1131,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @param float $amount
      * @return void
      */
-    protected function beforeRefund(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    protected function beforeRefund(InfoInterface $payment, $amount)
     {
     }
 
@@ -1174,9 +1142,9 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @return void
      */
     protected function afterRefund(
-        \Magento\Payment\Model\InfoInterface $payment,
+        InfoInterface $payment,
         $amount,
-        \ParadoxLabs\TokenBase\Model\Gateway\Response $response
+        Response $response
     ) {
     }
 
@@ -1184,7 +1152,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @param \Magento\Payment\Model\InfoInterface $payment
      * @return void
      */
-    protected function beforeVoid(\Magento\Payment\Model\InfoInterface $payment)
+    protected function beforeVoid(InfoInterface $payment)
     {
     }
 
@@ -1194,8 +1162,8 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @return void
      */
     protected function afterVoid(
-        \Magento\Payment\Model\InfoInterface $payment,
-        \ParadoxLabs\TokenBase\Model\Gateway\Response $response
+        InfoInterface $payment,
+        Response $response
     ) {
     }
 
@@ -1204,7 +1172,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @param string $transactionId
      * @return void
      */
-    protected function beforeFraudUpdate(\Magento\Payment\Model\InfoInterface $payment, $transactionId)
+    protected function beforeFraudUpdate(InfoInterface $payment, $transactionId)
     {
     }
 
@@ -1215,9 +1183,9 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @return void
      */
     protected function afterFraudUpdate(
-        \Magento\Payment\Model\InfoInterface $payment,
+        InfoInterface $payment,
         $transactionId,
-        \ParadoxLabs\TokenBase\Model\Gateway\Response $response
+        Response $response
     ) {
     }
 
@@ -1227,7 +1195,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @param \Magento\Payment\Model\InfoInterface $payment
      * @return $this
      */
-    protected function handleShippingAddress(\Magento\Payment\Model\InfoInterface $payment)
+    protected function handleShippingAddress(InfoInterface $payment)
     {
         return $this;
     }
@@ -1240,8 +1208,8 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @return \Magento\Payment\Model\InfoInterface
      */
     protected function storeTransactionStatuses(
-        \Magento\Payment\Model\InfoInterface $payment,
-        \ParadoxLabs\TokenBase\Model\Gateway\Response $response
+        InfoInterface $payment,
+        Response $response
     ) {
         return $payment;
     }
@@ -1276,6 +1244,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
     {
         /**
          * Don't use this method. Get an Adapter instance instead.
+         *
          * @see \Magento\Payment\Model\Method\Adapter
          */
         return '';
@@ -1437,6 +1406,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
     {
         /**
          * Don't use this method. Get an Adapter instance instead.
+         *
          * @see \Magento\Payment\Model\Method\Adapter
          */
         return false;
@@ -1458,6 +1428,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
     {
         /**
          * Don't use this method. Get an Adapter instance instead.
+         *
          * @see \Magento\Payment\Model\Method\Adapter
          */
         return false;
@@ -1471,6 +1442,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
     {
         /**
          * Don't use this method. Get an Adapter instance instead.
+         *
          * @see \Magento\Payment\Model\Method\Adapter
          */
         return false;
@@ -1509,6 +1481,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
     {
         /**
          * Don't use this method. Get an Adapter instance instead.
+         *
          * @see \Magento\Payment\Model\Method\Adapter
          */
         return '';
@@ -1525,6 +1498,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
     {
         /**
          * Don't use this method. Get an Adapter instance instead.
+         *
          * @see \Magento\Payment\Model\Method\Adapter
          */
         return $this;
@@ -1537,11 +1511,11 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @return bool
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function acceptPayment(\Magento\Payment\Model\InfoInterface $payment)
+    public function acceptPayment(InfoInterface $payment)
     {
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
+        /** @var OrderPayment $payment */
 
-        $this->log(sprintf('acceptPayment(%s %s)', get_class($payment), $payment->getId()));
+        $this->log(sprintf('acceptPayment(%s %s)', $payment::class, $payment->getId()));
 
         return false;
     }
@@ -1553,11 +1527,11 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @return bool
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function denyPayment(\Magento\Payment\Model\InfoInterface $payment)
+    public function denyPayment(InfoInterface $payment)
     {
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
+        /** @var OrderPayment $payment */
 
-        $this->log(sprintf('denyPayment(%s %s)', get_class($payment), $payment->getId()));
+        $this->log(sprintf('denyPayment(%s %s)', $payment::class, $payment->getId()));
 
         return false;
     }
@@ -1569,10 +1543,11 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
      * @return $this
      * @deprecated
      */
-    public function assignData(\Magento\Framework\DataObject $data)
+    public function assignData(DataObject $data)
     {
         /**
          * Don't use this method. Get an Adapter instance instead.
+         *
          * @see \Magento\Payment\Model\Method\Adapter
          */
         return $this;
@@ -1592,6 +1567,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
     {
         /**
          * Don't use this method. Get an Adapter instance instead.
+         *
          * @see \Magento\Payment\Model\Method\Adapter
          */
         return $this;
@@ -1607,6 +1583,7 @@ abstract class AbstractMethod extends \Magento\Framework\DataObject implements M
     {
         /**
          * Don't use this method. Get an Adapter instance instead.
+         *
          * @see \Magento\Payment\Model\Method\Adapter
          */
         return '';

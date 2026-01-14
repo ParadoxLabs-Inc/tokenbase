@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,10 +15,17 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Plugin\Sales\Model\Order\Payment\Transaction\Repository;
+
+use Closure;
+use Magento\Framework\Api\SearchCriteria;
+use Magento\Framework\Api\SortOrder;
+use Magento\Framework\DB\Select;
+use Magento\Sales\Model\Order\Payment\Transaction\Repository;
 
 class Plugin
 {
@@ -35,14 +42,14 @@ class Plugin
      * @throws \Zend_Db_Select_Exception
      */
     public function aroundGetList(
-        \Magento\Sales\Model\Order\Payment\Transaction\Repository $subject,
-        \Closure $proceed,
-        \Magento\Framework\Api\SearchCriteria $searchCriteria
+        Repository $subject,
+        Closure $proceed,
+        SearchCriteria $searchCriteria
     ) {
         /** @var \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\Collection $collection */
         $collection = $proceed($searchCriteria);
 
-        $sort = $collection->getSelect()->getPart(\Magento\Framework\DB\Select::ORDER);
+        $sort = $collection->getSelect()->getPart(Select::ORDER);
 
         if (empty($sort)) {
             // Add missing sort order(s)
@@ -51,7 +58,7 @@ class Plugin
                 foreach ($sortOrders as $sortOrder) {
                     $collection->addOrder(
                         $sortOrder->getField(),
-                        ($sortOrder->getDirection() == \Magento\Framework\Api\SortOrder::SORT_ASC) ? 'ASC' : 'DESC'
+                        ($sortOrder->getDirection() == SortOrder::SORT_ASC) ? 'ASC' : 'DESC'
                     );
                 }
             }

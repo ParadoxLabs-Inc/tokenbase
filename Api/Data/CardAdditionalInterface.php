@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,16 +15,20 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
+
 namespace ParadoxLabs\TokenBase\Api\Data;
+
+use Magento\Framework\Api\ExtensibleDataInterface;
 
 /**
  * Interface CardAdditionalInterface
  *
  * Info interface: Exposes data keys and extensibility to the API.
  */
-interface CardAdditionalInterface extends \Magento\Framework\Api\ExtensibleDataInterface
+interface CardAdditionalInterface extends ExtensibleDataInterface
 {
     /**
      * @return mixed

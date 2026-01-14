@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,10 +15,16 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Plugin;
+
+use Magento\Quote\Api\Data\PaymentExtensionFactory;
+use Magento\Quote\Api\Data\PaymentInterface;
+use Magento\Quote\Model\Quote;
+use ParadoxLabs\TokenBase\Helper\Data;
 
 /**
  * QuotePaymentLoadTokenbaseId Plugin
@@ -28,35 +34,23 @@ namespace ParadoxLabs\TokenBase\Plugin;
 class QuotePaymentLoadTokenbaseId
 {
     /**
-     * @var \Magento\Quote\Api\Data\PaymentExtensionFactory
-     */
-    protected $quotePaymentExtensionFactory;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
      * @param \Magento\Quote\Api\Data\PaymentExtensionFactory $quotePaymentExtensionFactory
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      */
     public function __construct(
-        \Magento\Quote\Api\Data\PaymentExtensionFactory $quotePaymentExtensionFactory,
-        \ParadoxLabs\TokenBase\Helper\Data $helper
+        protected PaymentExtensionFactory $quotePaymentExtensionFactory,
+        protected Data $helper
     ) {
-        $this->quotePaymentExtensionFactory = $quotePaymentExtensionFactory;
-        $this->helper = $helper;
     }
 
     /**
      * @param \Magento\Quote\Model\Quote $quote
      * @return void
      */
-    private function setExtensionAttributeValue(\Magento\Quote\Model\Quote $quote)
+    private function setExtensionAttributeValue(Quote $quote)
     {
         $payment = $quote->getPayment();
-        if ($payment instanceof \Magento\Quote\Api\Data\PaymentInterface === false) {
+        if ($payment instanceof PaymentInterface === false) {
             return;
         }
 
@@ -75,8 +69,8 @@ class QuotePaymentLoadTokenbaseId
      * @return \Magento\Quote\Model\Quote
      */
     public function afterLoad(
-        \Magento\Quote\Model\Quote $subject,
-        \Magento\Quote\Model\Quote $result
+        Quote $subject,
+        Quote $result
     ) {
         $this->setExtensionAttributeValue($result);
 
@@ -89,8 +83,8 @@ class QuotePaymentLoadTokenbaseId
      * @return \Magento\Quote\Model\Quote
      */
     public function afterLoadActive(
-        \Magento\Quote\Model\Quote $subject,
-        \Magento\Quote\Model\Quote $result
+        Quote $subject,
+        Quote $result
     ) {
         $this->setExtensionAttributeValue($result);
 
@@ -103,8 +97,8 @@ class QuotePaymentLoadTokenbaseId
      * @return \Magento\Quote\Model\Quote
      */
     public function afterLoadByCustomer(
-        \Magento\Quote\Model\Quote $subject,
-        \Magento\Quote\Model\Quote $result
+        Quote $subject,
+        Quote $result
     ) {
         $this->setExtensionAttributeValue($result);
 
@@ -117,8 +111,8 @@ class QuotePaymentLoadTokenbaseId
      * @return \Magento\Quote\Model\Quote
      */
     public function afterLoadByIdWithoutStore(
-        \Magento\Quote\Model\Quote $subject,
-        \Magento\Quote\Model\Quote $result
+        Quote $subject,
+        Quote $result
     ) {
         $this->setExtensionAttributeValue($result);
 

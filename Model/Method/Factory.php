@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,10 +15,17 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Model\Method;
+
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\ObjectManagerInterface;
+use Magento\Store\Model\ScopeInterface;
+use ParadoxLabs\TokenBase\Api\MethodInterface;
 
 /**
  * Method Factory
@@ -26,29 +33,18 @@ namespace ParadoxLabs\TokenBase\Model\Method;
 class Factory
 {
     /**
-     * Object manager
-     *
-     * @var \Magento\Framework\ObjectManagerInterface
-     */
-    private $objectManager;
-
-    /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    private $scopeConfig;
-
-    /**
      * Construct
      *
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-        \Magento\Framework\ObjectManagerInterface $objectManager,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+        /**
+         * Object manager
+         */
+        private ObjectManagerInterface $objectManager,
+        private ScopeConfigInterface $scopeConfig
     ) {
-        $this->objectManager = $objectManager;
-        $this->scopeConfig   = $scopeConfig;
     }
 
     /**
@@ -63,8 +59,8 @@ class Factory
     {
         $card = $this->objectManager->create($className, $data);
 
-        if (!$card instanceof \ParadoxLabs\TokenBase\Api\MethodInterface) {
-            throw new \Magento\Framework\Exception\LocalizedException(
+        if (!$card instanceof MethodInterface) {
+            throw new LocalizedException(
                 __('%1 class doesn\'t implement \ParadoxLabs\TokenBase\Api\MethodInterface', $className)
             );
         }
@@ -84,11 +80,11 @@ class Factory
         // Get model from config for the given payment method
         $methodModel = $this->scopeConfig->getValue(
             'payment/' . $methodCode . '/method_model',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
 
         if (empty($methodCode) || empty($methodModel)) {
-            throw new \Magento\Framework\Exception\LocalizedException(
+            throw new LocalizedException(
                 __("Invalid methodCode: '%1'", $methodCode)
             );
         }

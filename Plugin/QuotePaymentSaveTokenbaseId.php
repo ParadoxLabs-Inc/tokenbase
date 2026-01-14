@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,10 +15,16 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Plugin;
+
+use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Quote\Api\Data\CartInterface;
+use Magento\Quote\Api\Data\PaymentInterface;
+use ParadoxLabs\TokenBase\Helper\Data;
 
 /**
  * QuotePaymentSaveTokenbaseId Plugin
@@ -28,17 +34,10 @@ namespace ParadoxLabs\TokenBase\Plugin;
 class QuotePaymentSaveTokenbaseId
 {
     /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      */
-    public function __construct(
-        \ParadoxLabs\TokenBase\Helper\Data $helper
-    ) {
-        $this->helper = $helper;
+    public function __construct(protected Data $helper)
+    {
     }
 
     /**
@@ -48,12 +47,12 @@ class QuotePaymentSaveTokenbaseId
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      */
     public function beforeSave(
-        \Magento\Quote\Api\CartRepositoryInterface $subject,
-        \Magento\Quote\Api\Data\CartInterface $quote
+        CartRepositoryInterface $subject,
+        CartInterface $quote
     ) {
         /** @var \Magento\Quote\Model\Quote\Payment $payment */
         $payment = $quote->getPayment();
-        if ($payment instanceof \Magento\Quote\Api\Data\PaymentInterface === false) {
+        if ($payment instanceof PaymentInterface === false) {
             return [$quote];
         }
 

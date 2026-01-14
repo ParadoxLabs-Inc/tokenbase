@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,33 +15,28 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Model\Api;
 
-class CustomerCardRepository implements \ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface
+use Magento\Customer\Api\Data\AddressInterface;
+use Magento\Framework\Api\FilterBuilder;
+use Magento\Framework\Api\Search\FilterGroupBuilder;
+use Magento\Framework\Api\SearchCriteriaInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Exception\AuthorizationException;
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Store\Model\ScopeInterface;
+use ParadoxLabs\TokenBase\Api\CardRepositoryInterface;
+use ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface;
+use ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface;
+use ParadoxLabs\TokenBase\Api\Data\CardInterface;
+
+class CustomerCardRepository implements CustomerCardRepositoryInterface
 {
-    /**
-     * @var \ParadoxLabs\TokenBase\Api\CardRepositoryInterface
-     */
-    protected $cardRepository;
-
-    /**
-     * @var \Magento\Framework\Api\Search\FilterGroupBuilder
-     */
-    protected $filterGroupBuilder;
-
-    /**
-     * @var \Magento\Framework\Api\FilterBuilder
-     */
-    protected $filterBuilder;
-
-    /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    protected $scopeConfig;
-
     /**
      * GuestCardRepository constructor.
      *
@@ -51,15 +46,11 @@ class CustomerCardRepository implements \ParadoxLabs\TokenBase\Api\CustomerCardR
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-        \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository,
-        \Magento\Framework\Api\Search\FilterGroupBuilder $filterGroupBuilder,
-        \Magento\Framework\Api\FilterBuilder $filterBuilder,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+        protected CardRepositoryInterface $cardRepository,
+        protected FilterGroupBuilder $filterGroupBuilder,
+        protected FilterBuilder $filterBuilder,
+        protected ScopeConfigInterface $scopeConfig
     ) {
-        $this->cardRepository = $cardRepository;
-        $this->filterGroupBuilder = $filterGroupBuilder;
-        $this->filterBuilder = $filterBuilder;
-        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -75,9 +66,9 @@ class CustomerCardRepository implements \ParadoxLabs\TokenBase\Api\CustomerCardR
      */
     public function saveExtended(
         $customerId,
-        \ParadoxLabs\TokenBase\Api\Data\CardInterface $card,
-        \Magento\Customer\Api\Data\AddressInterface $address,
-        \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface $additional
+        CardInterface $card,
+        AddressInterface $address,
+        CardAdditionalInterface $additional
     ) {
         $this->validateEnabled();
 
@@ -86,7 +77,7 @@ class CustomerCardRepository implements \ParadoxLabs\TokenBase\Api\CustomerCardR
             try {
                 $originalCard = $this->getByHash($customerId, $card->getHash());
                 $this->validateCustomerCard($customerId, $originalCard);
-            } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
+            } catch (NoSuchEntityException) {
                 // No-op: Ignore card hash does not exist
             }
         } elseif ($card->getId()) {
@@ -127,7 +118,7 @@ class CustomerCardRepository implements \ParadoxLabs\TokenBase\Api\CustomerCardR
      * @return \ParadoxLabs\TokenBase\Api\Data\CardSearchResultsInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getList($customerId, \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria)
+    public function getList($customerId, SearchCriteriaInterface $searchCriteria)
     {
         $this->validateEnabled();
 
@@ -142,7 +133,7 @@ class CustomerCardRepository implements \ParadoxLabs\TokenBase\Api\CustomerCardR
                                             ->setConditionType('eq')
                                             ->create();
 
-        $filterGroups = $searchCriteria->getFilterGroups();
+        $filterGroups   = $searchCriteria->getFilterGroups();
         $filterGroups[] = $this->filterGroupBuilder->setFilters([$customerFilter])->create();
         $filterGroups[] = $this->filterGroupBuilder->setFilters([$activeFilter])->create();
 
@@ -177,11 +168,11 @@ class CustomerCardRepository implements \ParadoxLabs\TokenBase\Api\CustomerCardR
      * @return void
      * @throws \Magento\Framework\Exception\InputException
      */
-    protected function validateCustomerCard($customerId, \ParadoxLabs\TokenBase\Api\Data\CardInterface $card)
+    protected function validateCustomerCard($customerId, CardInterface $card)
     {
         if ((int)$card->getCustomerId() !== (int)$customerId
             || (int)$card->getActive() === 0) {
-            throw new \Magento\Framework\Exception\InputException(__('You do not have permission for this action.'));
+            throw new InputException(__('You do not have permission for this action.'));
         }
     }
 
@@ -195,11 +186,11 @@ class CustomerCardRepository implements \ParadoxLabs\TokenBase\Api\CustomerCardR
     {
         $isEnabled = (bool)$this->scopeConfig->getValue(
             'checkout/tokenbase/enable_public_api',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
 
         if ($isEnabled !== true) {
-            throw new \Magento\Framework\Exception\AuthorizationException(
+            throw new AuthorizationException(
                 __('The public TokenBase API is not enabled.')
             );
         }

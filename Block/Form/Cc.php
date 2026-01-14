@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,10 +15,17 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Block\Form;
+
+use Magento\Checkout\Model\Session;
+use Magento\Framework\View\Element\Template\Context;
+use Magento\Payment\Model\Config;
+use ParadoxLabs\TokenBase\Helper\Data;
+use ParadoxLabs\TokenBase\Model\Method\Factory;
 
 /**
  * Credit card input form on checkout for TokenBase methods.
@@ -43,26 +50,6 @@ class Cc extends \Magento\Payment\Block\Form\Cc
     protected $cards;
 
     /**
-     * @var \Magento\Customer\Model\Session
-     */
-    protected $customerSession;
-
-    /**
-     * @var \Magento\Checkout\Model\Session
-     */
-    protected $checkoutSession;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Model\Method\Factory
-     */
-    protected $tokenbaseMethodFactory;
-
-    /**
      * @var \ParadoxLabs\TokenBase\Api\MethodInterface
      */
     protected $tokenbaseMethod;
@@ -77,19 +64,14 @@ class Cc extends \Magento\Payment\Block\Form\Cc
      * @param array $data
      */
     public function __construct(
-        \Magento\Framework\View\Element\Template\Context $context,
-        \Magento\Payment\Model\Config $paymentConfig,
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \Magento\Customer\Model\Session $customerSession,
-        \Magento\Checkout\Model\Session $checkoutSession,
-        \ParadoxLabs\TokenBase\Model\Method\Factory $tokenbaseMethodFactory,
+        Context $context,
+        Config $paymentConfig,
+        protected Data $helper,
+        protected \Magento\Customer\Model\Session $customerSession,
+        protected Session $checkoutSession,
+        protected Factory $tokenbaseMethodFactory,
         array $data = []
     ) {
-        $this->helper = $helper;
-        $this->customerSession = $customerSession;
-        $this->checkoutSession = $checkoutSession;
-        $this->tokenbaseMethodFactory = $tokenbaseMethodFactory;
-
         parent::__construct($context, $paymentConfig, $data);
     }
 
@@ -153,7 +135,7 @@ class Cc extends \Magento\Payment\Block\Form\Cc
         if ($this->helper->getIsFrontend() !== true) {
             return false;
         } elseif ($this->customerSession->isLoggedIn() !== true
-                && $this->checkoutSession->getQuote()->getCheckoutMethod() != 'register') {
+            && $this->checkoutSession->getQuote()->getCheckoutMethod() != 'register') {
             return true;
         }
 

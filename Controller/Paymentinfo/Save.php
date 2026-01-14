@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,36 +15,32 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Controller\Paymentinfo;
 
+use Exception;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\Data\Form\FormKey\Validator;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Registry;
 use Magento\Framework\View\Result\PageFactory;
+use Magento\Payment\Helper\Data;
+use Magento\Quote\Model\Quote\PaymentFactory;
+use ParadoxLabs\TokenBase\Api\CardRepositoryInterface;
+use ParadoxLabs\TokenBase\Controller\Paymentinfo;
+use ParadoxLabs\TokenBase\Helper\Address;
+use ParadoxLabs\TokenBase\Model\CardFactory;
+use Throwable;
 
 /**
  * Save the card create/edit form
  */
-class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
+class Save extends Paymentinfo
 {
-    /**
-     * @var \Magento\Quote\Model\Quote\PaymentFactory
-     */
-    protected $paymentFactory;
-
-    /**
-     * @var \Magento\Checkout\Model\Session
-     */
-    protected $checkoutSession;
-
-    /**
-     * @var \Magento\Payment\Helper\Data
-     */
-    protected $paymentHelper;
-
     /**
      * @param Context $context
      * @param Session $customerSession *Proxy
@@ -63,20 +59,16 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
         Context $context,
         Session $customerSession,
         PageFactory $resultPageFactory,
-        \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator,
-        \Magento\Framework\Registry $registry,
-        \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
-        \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository,
+        Validator $formKeyValidator,
+        Registry $registry,
+        CardFactory $cardFactory,
+        CardRepositoryInterface $cardRepository,
         \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \ParadoxLabs\TokenBase\Helper\Address $addressHelper,
-        \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory,
-        \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Payment\Helper\Data $paymentHelper
+        Address $addressHelper,
+        protected PaymentFactory $paymentFactory,
+        protected \Magento\Checkout\Model\Session $checkoutSession,
+        protected Data $paymentHelper
     ) {
-        $this->paymentFactory   = $paymentFactory;
-        $this->checkoutSession  = $checkoutSession;
-        $this->paymentHelper = $paymentHelper;
-
         parent::__construct(
             $context,
             $customerSession,
@@ -100,8 +92,8 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
         /** @var \Magento\Framework\Controller\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
 
-        $id            = $this->getRequest()->getParam('id');
-        $method        = $this->getRequest()->getParam('method');
+        $id     = $this->getRequest()->getParam('id');
+        $method = $this->getRequest()->getParam('method');
 
         if ($this->formKeyIsValid() === true && $this->methodIsValid() === true) {
             /**
@@ -120,14 +112,14 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
                     $card->setMethod($card->getMethod() ?: $method);
                 }
 
-                $card       = $card->getTypeInstance();
-                $customer   = $this->helper->getCurrentCustomer();
+                $card     = $card->getTypeInstance();
+                $customer = $this->helper->getCurrentCustomer();
 
                 if ($card && (empty($id) || ($card->getHash() == $id && $card->hasOwner($customer->getId())))) {
                     /**
                      * Process address data
                      */
-                    $newAddrId    = (int)$this->getRequest()->getParam('billing_address_id');
+                    $newAddrId = (int)$this->getRequest()->getParam('billing_address_id');
 
                     if ($newAddrId > 0) {
                         // Existing address
@@ -148,9 +140,9 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
                     /**
                      * Process payment data
                      */
-                    $cardData = $this->getRequest()->getParam('payment');
-                    $cardData['method']     = $method;
-                    $cardData['card_id']    = $card->getId() > 0 ? $card->getHash() : '';
+                    $cardData            = $this->getRequest()->getParam('payment');
+                    $cardData['method']  = $method;
+                    $cardData['card_id'] = $card->getId() > 0 ? $card->getHash() : '';
 
                     if (isset($cardData['cc_number'])) {
                         $cardData['cc_last4'] = substr((string)$cardData['cc_number'], -4);
@@ -186,7 +178,7 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
                 } else {
                     $this->messageManager->addErrorMessage(__('Invalid Request.'));
                 }
-            } catch (\Exception $e) {
+            } catch (Throwable $e) {
                 $this->session->setData('tokenbase_form_data', $this->getRequest()->getParams());
 
                 $this->helper->log($method, (string)$e);
@@ -199,6 +191,7 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
         }
 
         $resultRedirect->setPath('*/*', ['method' => $method, '_secure' => true]);
+
         return $resultRedirect;
     }
 
@@ -209,14 +202,14 @@ class Save extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
      * @param \Exception $e
      * @return void
      */
-    protected function recordSessionFailure(\Exception $e)
+    protected function recordSessionFailure(Exception $e)
     {
         $failures = $this->session->getData('tokenbase_failures');
         if (is_array($failures) === false) {
             $failures = [];
         }
 
-        $failures[time()] = $e->getMessage();
+        $failures[ time() ] = $e->getMessage();
 
         $this->session->setData('tokenbase_failures', $failures);
     }

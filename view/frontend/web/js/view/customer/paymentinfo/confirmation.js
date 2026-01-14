@@ -21,7 +21,7 @@
 define([
     "jquery",
     'Magento_Ui/js/modal/confirm'
-], function($, confirmation) {
+], function ($, confirmation) {
     $.widget('mage.tokenbaseConfirmation', {
         options: {
             deleteSelector: '.action.delete',
@@ -29,7 +29,7 @@ define([
             confirmMessage: 'Are you sure you want to remove this card?'
         },
 
-        _create: function() {
+        _create: function () {
             this.element.on(
                 'click',
                 this.options.deleteSelector,
@@ -42,7 +42,7 @@ define([
          *
          * @param {Event} e
          */
-        handleDeleteClick: function(e) {
+        handleDeleteClick: function (e) {
             e.preventDefault();
 
             confirmation({
@@ -60,7 +60,7 @@ define([
          *
          * @param {HTMLElement} target
          */
-        deleteCard: function(target) {
+        deleteCard: function (target) {
             var item = $(target).closest('fieldset');
 
             $.ajax({
@@ -77,7 +77,7 @@ define([
          * @param {jQuery} item
          * @param {Object} data
          */
-        handleDeleteResponse: function(item, data) {
+        handleDeleteResponse: function (item, data) {
             if (data.success) {
                 item.remove();
             } else {
@@ -90,7 +90,7 @@ define([
          *
          * @returns {boolean}
          */
-        cancelDelete: function() {
+        cancelDelete: function () {
             return false;
         }
     });

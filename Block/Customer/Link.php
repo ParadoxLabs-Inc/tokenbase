@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,23 +15,23 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Block\Customer;
 
 use Magento\Customer\Block\Account\SortLinkInterface;
+use Magento\Framework\App\DefaultPathInterface;
+use Magento\Framework\View\Element\Html\Link\Current;
+use Magento\Framework\View\Element\Template\Context;
+use ParadoxLabs\TokenBase\Helper\Data;
 
 /**
  * Add 'payment data' link to the customer account.
  */
-class Link extends \Magento\Framework\View\Element\Html\Link\Current implements SortLinkInterface
+class Link extends Current implements SortLinkInterface
 {
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
     /**
      * Constructor
      *
@@ -41,13 +41,11 @@ class Link extends \Magento\Framework\View\Element\Html\Link\Current implements 
      * @param array $data
      */
     public function __construct(
-        \Magento\Framework\View\Element\Template\Context $context,
-        \Magento\Framework\App\DefaultPathInterface $defaultPath,
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
+        Context $context,
+        DefaultPathInterface $defaultPath,
+        protected Data $helper,
         array $data = []
     ) {
-        $this->helper = $helper;
-
         parent::__construct($context, $defaultPath, $data);
     }
 

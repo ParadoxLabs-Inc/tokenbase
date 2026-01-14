@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,30 +15,24 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Plugin\QuoteGraphQl\Model\Resolver;
 
-use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\GraphQl\Config\Element\Field;
+use Magento\Framework\GraphQl\Query\Resolver\Value;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\GraphQl\Model\Query\Resolver\Context;
-use Magento\Framework\GraphQl\Query\Resolver\Value;
+use Magento\Quote\Model\Quote;
+use ParadoxLabs\TokenBase\Api\CardRepositoryInterface;
+use ParadoxLabs\TokenBase\Helper\Data;
+use Throwable;
 
 class SelectedPaymentMethod
 {
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Api\CardRepositoryInterface
-     */
-    protected $cardRepository;
-
     /**
      * SelectedPaymentMethod constructor.
      *
@@ -46,11 +40,9 @@ class SelectedPaymentMethod
      * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
      */
     public function __construct(
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
+        protected Data $helper,
+        protected CardRepositoryInterface $cardRepository
     ) {
-        $this->helper = $helper;
-        $this->cardRepository = $cardRepository;
     }
 
     /**
@@ -75,7 +67,7 @@ class SelectedPaymentMethod
         ?array $value = null,
         ?array $args = null
     ) {
-        if (empty($resolvedValue) || $value['model'] instanceof \Magento\Quote\Model\Quote === false) {
+        if (empty($resolvedValue) || $value['model'] instanceof Quote === false) {
             return $resolvedValue;
         }
 
@@ -85,15 +77,17 @@ class SelectedPaymentMethod
         $payment = $quote->getPayment();
 
         if (in_array($payment->getMethod(), $this->helper->getAllMethods(), true)) {
-            $resolvedValue['tokenbase_data'] = $payment->getData() + $payment->getAdditionalInformation();
+            $resolvedValue['tokenbase_data']             = $payment->getData() + $payment->getAdditionalInformation();
             $resolvedValue['tokenbase_data']['cc_last4'] = $payment->getData('cc_last_4');
-            $resolvedValue['tokenbase_save'] = (bool)$payment->getAdditionalInformation('save');
+            $resolvedValue['tokenbase_save']             = (bool)$payment->getAdditionalInformation('save');
 
             if (!empty($payment->getData('tokenbase_id'))) {
                 try {
-                    $card = $this->cardRepository->getById($payment->getData('tokenbase_id'));
+                    $card                               = $this->cardRepository->getById(
+                        $payment->getData('tokenbase_id')
+                    );
                     $resolvedValue['tokenbase_card_id'] = $card->getHash();
-                } catch (\Exception $exception) {
+                } catch (Throwable) {
                     // No-op
                 }
             }

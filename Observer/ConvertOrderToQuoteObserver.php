@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,15 +15,19 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Observer;
 
+use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
+
 /**
  * Custom data field conversion -- quote to order, etc, etc.
  */
-class ConvertOrderToQuoteObserver extends ConvertAbstract implements \Magento\Framework\Event\ObserverInterface
+class ConvertOrderToQuoteObserver extends ConvertAbstract implements ObserverInterface
 {
     /**
      * Copy fields from order payment to quote payment
@@ -31,13 +35,13 @@ class ConvertOrderToQuoteObserver extends ConvertAbstract implements \Magento\Fr
      * @param \Magento\Framework\Event\Observer $observer
      * @return void
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         /** @var \Magento\Quote\Model\Quote $quote */
-        $quote  = $observer->getEvent()->getData('quote');
+        $quote = $observer->getEvent()->getData('quote');
 
         /** @var \Magento\Sales\Model\Order $order */
-        $order  = $observer->getEvent()->getData('order');
+        $order = $observer->getEvent()->getData('order');
 
         // Do the magic. Yeah, this is it.
         $this->copyData(

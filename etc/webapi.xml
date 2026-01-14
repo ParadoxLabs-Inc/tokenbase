@@ -36,7 +36,7 @@
     <route url="/V1/tokenbase/mine/:cardHash" method="GET">
         <service class="ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface" method="getByHash"/>
         <resources>
-            <resource ref="self" />
+            <resource ref="self"/>
         </resources>
         <data>
             <parameter name="customerId" force="true">%customer_id%</parameter>
@@ -45,7 +45,7 @@
     <route url="/V1/tokenbase/mine/search" method="GET">
         <service class="ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface" method="getList"/>
         <resources>
-            <resource ref="self" />
+            <resource ref="self"/>
         </resources>
         <data>
             <parameter name="customerId" force="true">%customer_id%</parameter>
@@ -54,7 +54,7 @@
     <route url="/V1/tokenbase/mine" method="POST">
         <service class="ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface" method="saveExtended"/>
         <resources>
-            <resource ref="self" />
+            <resource ref="self"/>
         </resources>
         <data>
             <parameter name="customerId" force="true">%customer_id%</parameter>
@@ -63,7 +63,7 @@
     <route url="/V1/tokenbase/mine/:cardHash" method="PUT">
         <service class="ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface" method="saveExtended"/>
         <resources>
-            <resource ref="self" />
+            <resource ref="self"/>
         </resources>
         <data>
             <parameter name="customerId" force="true">%customer_id%</parameter>
@@ -72,7 +72,7 @@
     <route url="/V1/tokenbase/mine/:cardHash" method="DELETE">
         <service class="ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface" method="deleteByHash"/>
         <resources>
-            <resource ref="self" />
+            <resource ref="self"/>
         </resources>
         <data>
             <parameter name="customerId" force="true">%customer_id%</parameter>
@@ -83,13 +83,13 @@
     <route url="/V1/tokenbase/guest/:cardHash" method="GET">
         <service class="ParadoxLabs\TokenBase\Api\GuestCardRepositoryInterface" method="getByHash"/>
         <resources>
-            <resource ref="anonymous" />
+            <resource ref="anonymous"/>
         </resources>
     </route>
     <route url="/V1/tokenbase/guest" method="POST">
         <service class="ParadoxLabs\TokenBase\Api\GuestCardRepositoryInterface" method="saveExtended"/>
         <resources>
-            <resource ref="anonymous" />
+            <resource ref="anonymous"/>
         </resources>
     </route>
 </routes>

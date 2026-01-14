@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,47 +15,52 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Controller\Adminhtml\Index;
 
+use Magento\Backend\App\Action\Context;
+use Magento\Backend\Model\View\Result\ForwardFactory;
 use Magento\Customer\Api\AccountManagementInterface;
 use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Api\Data\AddressInterfaceFactory;
 use Magento\Customer\Api\Data\CustomerInterfaceFactory;
+use Magento\Customer\Controller\Adminhtml\Index;
+use Magento\Customer\Helper\View;
 use Magento\Customer\Model\Address\Mapper;
+use Magento\Customer\Model\AddressFactory;
+use Magento\Customer\Model\Customer\Mapper as CustomerMapper;
+use Magento\Customer\Model\CustomerFactory;
+use Magento\Customer\Model\Metadata\FormFactory;
 use Magento\Framework\Api\DataObjectHelper;
+use Magento\Framework\Api\ExtensibleDataObjectConverter;
+use Magento\Framework\App\Response\Http\FileFactory;
+use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\DataObjectFactory as ObjectFactory;
+use Magento\Framework\Math\Random;
+use Magento\Framework\Reflection\DataObjectProcessor;
+use Magento\Framework\Registry;
+use Magento\Framework\View\LayoutFactory as ViewLayoutFactory;
+use Magento\Framework\View\Result\LayoutFactory;
+use Magento\Framework\View\Result\PageFactory;
+use Magento\Newsletter\Model\SubscriberFactory;
+use ParadoxLabs\TokenBase\Api\CardRepositoryInterface;
+use ParadoxLabs\TokenBase\Helper\Address;
+use ParadoxLabs\TokenBase\Helper\Data;
 
 /**
  * TokenbaseCards controller - manage cards on admin customer view
  */
-class Paymentinfo extends \Magento\Customer\Controller\Adminhtml\Index
+class Paymentinfo extends Index
 {
-    /**
-     * @var \ParadoxLabs\TokenBase\Api\CardRepositoryInterface
-     */
-    protected $cardRepository;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Address
-     */
-    protected $addressHelper;
-
-    /**
-     * @var bool
-     */
-    protected $skipCardLoad = false;
+    protected bool $skipCardLoad = false;
 
     /**
      * Paymentinfo constructor.
+     *
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\Registry $coreRegistry
      * @param \Magento\Framework\App\Response\Http\FileFactory $fileFactory
@@ -86,39 +91,35 @@ class Paymentinfo extends \Magento\Customer\Controller\Adminhtml\Index
      * @param \ParadoxLabs\TokenBase\Helper\Address $addressHelper
      */
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\Registry $coreRegistry,
-        \Magento\Framework\App\Response\Http\FileFactory $fileFactory,
-        \Magento\Customer\Model\CustomerFactory $customerFactory,
-        \Magento\Customer\Model\AddressFactory $addressFactory,
-        \Magento\Customer\Model\Metadata\FormFactory $formFactory,
-        \Magento\Newsletter\Model\SubscriberFactory $subscriberFactory,
-        \Magento\Customer\Helper\View $viewHelper,
-        \Magento\Framework\Math\Random $random,
+        Context $context,
+        Registry $coreRegistry,
+        FileFactory $fileFactory,
+        CustomerFactory $customerFactory,
+        AddressFactory $addressFactory,
+        FormFactory $formFactory,
+        SubscriberFactory $subscriberFactory,
+        View $viewHelper,
+        Random $random,
         CustomerRepositoryInterface $customerRepository,
-        \Magento\Framework\Api\ExtensibleDataObjectConverter $extensibleDataObjectConverter,
+        ExtensibleDataObjectConverter $extensibleDataObjectConverter,
         Mapper $addressMapper,
         AccountManagementInterface $customerAccountManagement,
         AddressRepositoryInterface $addressRepository,
         CustomerInterfaceFactory $customerDataFactory,
         AddressInterfaceFactory $addressDataFactory,
-        \Magento\Customer\Model\Customer\Mapper $customerMapper,
-        \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor,
+        CustomerMapper $customerMapper,
+        DataObjectProcessor $dataObjectProcessor,
         DataObjectHelper $dataObjectHelper,
         ObjectFactory $objectFactory,
-        \Magento\Framework\View\LayoutFactory $layoutFactory,
-        \Magento\Framework\View\Result\LayoutFactory $resultLayoutFactory,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory,
-        \Magento\Backend\Model\View\Result\ForwardFactory $resultForwardFactory,
-        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
-        \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository,
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \ParadoxLabs\TokenBase\Helper\Address $addressHelper
+        ViewLayoutFactory $layoutFactory,
+        LayoutFactory $resultLayoutFactory,
+        PageFactory $resultPageFactory,
+        ForwardFactory $resultForwardFactory,
+        JsonFactory $resultJsonFactory,
+        protected CardRepositoryInterface $cardRepository,
+        protected Data $helper,
+        protected Address $addressHelper
     ) {
-        $this->cardRepository = $cardRepository;
-        $this->helper = $helper;
-        $this->addressHelper = $addressHelper;
-
         parent::__construct(
             $context,
             $coreRegistry,
@@ -173,7 +174,7 @@ class Paymentinfo extends \Magento\Customer\Controller\Adminhtml\Index
         /**
          * Check for card input and validate if present.
          */
-        $id    = $this->getRequest()->getParam('card_id');
+        $id = $this->getRequest()->getParam('card_id');
 
         if (empty($id) || $this->formKeyIsValid() !== true) {
             $id = null;

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,10 +15,17 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Model\Card;
+
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\ObjectManagerInterface;
+use Magento\Store\Model\ScopeInterface;
+use ParadoxLabs\TokenBase\Api\Data\CardInterface;
 
 /**
  * Card factory
@@ -26,29 +33,18 @@ namespace ParadoxLabs\TokenBase\Model\Card;
 class Factory
 {
     /**
-     * Object manager
-     *
-     * @var \Magento\Framework\ObjectManagerInterface
-     */
-    private $objectManager;
-
-    /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    private $scopeConfig;
-
-    /**
      * Construct
      *
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-        \Magento\Framework\ObjectManagerInterface $objectManager,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+        /**
+         * Object manager
+         */
+        private ObjectManagerInterface $objectManager,
+        private ScopeConfigInterface $scopeConfig
     ) {
-        $this->objectManager = $objectManager;
-        $this->scopeConfig   = $scopeConfig;
     }
 
     /**
@@ -63,8 +59,8 @@ class Factory
     {
         $card = $this->objectManager->create((string)$className, $data);
 
-        if (!$card instanceof \ParadoxLabs\TokenBase\Api\Data\CardInterface) {
-            throw new \Magento\Framework\Exception\LocalizedException(
+        if (!$card instanceof CardInterface) {
+            throw new LocalizedException(
                 __('%1 class doesn\'t implement \ParadoxLabs\TokenBase\Api\Data\CardInterface', $className)
             );
         }
@@ -80,16 +76,16 @@ class Factory
      * @param \ParadoxLabs\TokenBase\Api\Data\CardInterface $card
      * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
      */
-    public function getTypeInstance(\ParadoxLabs\TokenBase\Api\Data\CardInterface $card)
+    public function getTypeInstance(CardInterface $card)
     {
         if ($card->getMethod() !== null) {
             // Get model from config for the card's payment method
-            $cardModel      = $this->scopeConfig->getValue(
+            $cardModel = $this->scopeConfig->getValue(
                 'payment/' . $card->getMethod() . '/card_model',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
 
-            $existingClass = str_replace('\\Interceptor', '', (string)get_class($card));
+            $existingClass = str_replace('\\Interceptor', '', (string)$card::class);
 
             if ($existingClass !== $cardModel && !empty($cardModel)) {
                 // Create and initialize the instance via object man.

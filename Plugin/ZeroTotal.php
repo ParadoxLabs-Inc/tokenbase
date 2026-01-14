@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,10 +15,18 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Plugin;
+
+use Closure;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Payment\Model\MethodInterface;
+use Magento\Quote\Model\Quote;
+use Magento\Store\Model\ScopeInterface;
+use ParadoxLabs\TokenBase\Helper\Data;
 
 /**
  * Allow zero subtotal checkout for TokenBase methods
@@ -28,31 +36,20 @@ class ZeroTotal
     /**
      * Payment method codes that don't support $0 checkout whatsoever
      */
-    protected static $noZeroSubtotalSupportMethods = [
-        'braintree',
-        'braintree_cc_vault',
-    ];
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    protected $scopeConfig;
+    protected static $noZeroSubtotalSupportMethods
+        = [
+            'braintree',
+            'braintree_cc_vault',
+        ];
 
     /**
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+        protected Data $helper,
+        protected ScopeConfigInterface $scopeConfig
     ) {
-        $this->helper = $helper;
-        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -66,9 +63,9 @@ class ZeroTotal
      */
     public function aroundIsApplicable(
         \Magento\Payment\Model\Checks\ZeroTotal $subject,
-        \Closure $proceed,
-        \Magento\Payment\Model\MethodInterface $paymentMethod,
-        \Magento\Quote\Model\Quote $quote
+        Closure $proceed,
+        MethodInterface $paymentMethod,
+        Quote $quote
     ) {
         $returnValue = $proceed($paymentMethod, $quote);
 
@@ -97,7 +94,7 @@ class ZeroTotal
         // Unlisted Vault or TokenBase?
         $vaultMethodActive = (int)$this->scopeConfig->getValue(
             'payment/' . $methodCode . '_cc_vault/active',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
 
         if ($vaultMethodActive === 1 || in_array($methodCode, $this->helper->getActiveMethods())) {

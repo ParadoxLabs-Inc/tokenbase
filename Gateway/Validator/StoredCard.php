@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,40 +15,32 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Gateway\Validator;
 
+use Magento\Payment\Gateway\ConfigInterface;
+use Magento\Payment\Gateway\Validator\AbstractValidator;
+use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
+
 /**
  * StoredCard Validator
  */
-class StoredCard extends \Magento\Payment\Gateway\Validator\AbstractValidator
+class StoredCard extends AbstractValidator
 {
-    /**
-     * @var \ParadoxLabs\TokenBase\Gateway\Validator\CreditCard
-     */
-    private $ccValidator;
-
-    /**
-     * @var \Magento\Payment\Gateway\ConfigInterface
-     */
-    private $config;
-
     /**
      * @param \Magento\Payment\Gateway\Validator\ResultInterfaceFactory $resultFactory
      * @param \ParadoxLabs\TokenBase\Gateway\Validator\CreditCard $ccValidator
      * @param \Magento\Payment\Gateway\ConfigInterface $config
      */
     public function __construct(
-        \Magento\Payment\Gateway\Validator\ResultInterfaceFactory $resultFactory,
-        \ParadoxLabs\TokenBase\Gateway\Validator\CreditCard $ccValidator,
-        \Magento\Payment\Gateway\ConfigInterface $config
+        ResultInterfaceFactory $resultFactory,
+        private \ParadoxLabs\TokenBase\Gateway\Validator\CreditCard $ccValidator,
+        private ConfigInterface $config
     ) {
         parent::__construct($resultFactory);
-
-        $this->ccValidator = $ccValidator;
-        $this->config = $config;
     }
 
     /**
@@ -98,7 +90,11 @@ class StoredCard extends \Magento\Payment\Gateway\Validator\AbstractValidator
             /**
              * This might be a card edit. Validate this too, as much as we can.
              */
-            if (!empty($payment->getData('cc_number')) && substr((string)$payment->getData('cc_number'), 0, 4) !== 'XXXX') {
+            if (!empty($payment->getData('cc_number'))
+                && !str_starts_with(
+                    (string)$payment->getData('cc_number'),
+                    'XXXX'
+                )) {
                 if (strlen((string)$payment->getData('cc_number')) < 13
                     || !is_numeric($payment->getData('cc_number'))
                     || $this->ccValidator->isCcNumberMod10Valid($payment->getData('cc_number')) === false) {
@@ -107,7 +103,7 @@ class StoredCard extends \Magento\Payment\Gateway\Validator\AbstractValidator
                 }
             }
 
-            $year  = $payment->getData('cc_exp_year');
+            $year = $payment->getData('cc_exp_year');
             $month = $payment->getData('cc_exp_month');
 
             if (!empty($year) && !empty($month) && $this->ccValidator->isDateExpired($year, $month) === true) {

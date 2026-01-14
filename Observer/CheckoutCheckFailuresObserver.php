@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,28 +15,24 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Observer;
 
-class CheckoutCheckFailuresObserver implements \Magento\Framework\Event\ObserverInterface
+use Magento\Customer\Model\Session;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Exception\AuthorizationException;
+use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Payment;
+use Magento\Store\Model\ScopeInterface;
+use ParadoxLabs\TokenBase\Helper\Data;
+
+class CheckoutCheckFailuresObserver implements ObserverInterface
 {
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
-     * @var \Magento\Customer\Model\Session
-     */
-    protected $customerSession;
-
-    /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    protected $scopeConfig;
-
     /**
      * CheckoutCheckFailuresObserver constructor.
      *
@@ -45,13 +41,10 @@ class CheckoutCheckFailuresObserver implements \Magento\Framework\Event\Observer
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \Magento\Customer\Model\Session $customerSession,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+        protected Data $helper,
+        protected Session $customerSession,
+        protected ScopeConfigInterface $scopeConfig
     ) {
-        $this->helper = $helper;
-        $this->customerSession = $customerSession;
-        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -62,16 +55,16 @@ class CheckoutCheckFailuresObserver implements \Magento\Framework\Event\Observer
      * @return void
      * @throws \Magento\Framework\Exception\AuthorizationException
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         /** @var \Magento\Sales\Model\Order $order */
         $order = $observer->getData('order');
 
-        if ($order instanceof \Magento\Sales\Model\Order
-            && $order->getPayment() instanceof \Magento\Sales\Model\Order\Payment
+        if ($order instanceof Order
+            && $order->getPayment() instanceof Payment
             && in_array($order->getPayment()->getMethod(), $this->helper->getAllMethods(), true)
             && $this->customerHasTooManyFailures()) {
-            throw new \Magento\Framework\Exception\AuthorizationException(
+            throw new AuthorizationException(
                 __('Checkout is currently unavailable due to excessive errors. Please contact us for assistance.')
             );
         }
@@ -89,13 +82,13 @@ class CheckoutCheckFailuresObserver implements \Magento\Framework\Event\Observer
         // Number of failures to block after (default 5)
         $failureLimit = $this->scopeConfig->getValue(
             'checkout/tokenbase/failure_limit',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
 
         // Number of seconds to keep failures (default 86400, 1 day)
         $failureWindow = $this->scopeConfig->getValue(
             'checkout/tokenbase/failure_window',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
 
         if (is_array($failures) && count($failures) >= $failureLimit) {

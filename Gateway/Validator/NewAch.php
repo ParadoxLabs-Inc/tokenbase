@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,32 +15,37 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Gateway\Validator;
 
+use Magento\Payment\Gateway\Validator\AbstractValidator;
+use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
+
 /**
  * Ach Class
  */
-class NewAch extends \Magento\Payment\Gateway\Validator\AbstractValidator
+class NewAch extends AbstractValidator
 {
     /**
      * @var array
      */
-    protected $achFields = [
-        'echeck_account_name',
-        'echeck_bank_name',
-        'echeck_routing_no',
-        'echeck_account_no',
-        'echeck_account_type',
-    ];
+    protected $achFields
+        = [
+            'echeck_account_name',
+            'echeck_bank_name',
+            'echeck_routing_no',
+            'echeck_account_no',
+            'echeck_account_type',
+        ];
 
     /**
      * @param \Magento\Payment\Gateway\Validator\ResultInterfaceFactory $resultFactory
      */
     public function __construct(
-        \Magento\Payment\Gateway\Validator\ResultInterfaceFactory $resultFactory
+        ResultInterfaceFactory $resultFactory
     ) {
         parent::__construct($resultFactory);
     }
@@ -68,6 +73,7 @@ class NewAch extends \Magento\Payment\Gateway\Validator\AbstractValidator
 
                 if (empty($value)) {
                     $fails[] = __('Please complete all required fields.');
+
                     return $this->createResult(false, $fails);
                 }
             }

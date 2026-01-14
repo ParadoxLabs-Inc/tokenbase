@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,48 +15,29 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Observer;
 
-class PaymentInfoAuthenticateObserver implements \Magento\Framework\Event\ObserverInterface
+use Magento\Customer\Model\Session;
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\App\Action\Action;
+use Magento\Framework\App\ActionInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Message\ManagerInterface;
+use Magento\Framework\UrlInterface;
+use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order;
+use Magento\Store\Model\ScopeInterface;
+use ParadoxLabs\TokenBase\Helper\Data;
+
+class PaymentInfoAuthenticateObserver implements ObserverInterface
 {
-    /**
-     * @var \Magento\Sales\Api\OrderRepositoryInterface
-     */
-    protected $orderRepository;
-
-    /**
-     * @var \Magento\Framework\Api\SearchCriteriaBuilder
-     */
-    protected $searchCriteriaBuilder;
-
-    /**
-     * @var \Magento\Customer\Model\Session
-     */
-    protected $customerSession;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
-     * @var \Magento\Framework\UrlInterface
-     */
-    protected $urlBuilder;
-
-    /**
-     * @var \Magento\Framework\Message\ManagerInterface
-     */
-    protected $messageManager;
-
-    /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    protected $scopeConfig;
-
     /**
      * PaymentInfoAuthenticateObserver constructor.
      *
@@ -69,21 +50,14 @@ class PaymentInfoAuthenticateObserver implements \Magento\Framework\Event\Observ
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-        \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
-        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
-        \Magento\Customer\Model\Session $customerSession,
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \Magento\Framework\UrlInterface $urlBuilder,
-        \Magento\Framework\Message\ManagerInterface $messageManager,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+        protected OrderRepositoryInterface $orderRepository,
+        protected SearchCriteriaBuilder $searchCriteriaBuilder,
+        protected Session $customerSession,
+        protected Data $helper,
+        protected UrlInterface $urlBuilder,
+        protected ManagerInterface $messageManager,
+        protected ScopeConfigInterface $scopeConfig
     ) {
-        $this->orderRepository = $orderRepository;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-        $this->customerSession = $customerSession;
-        $this->helper = $helper;
-        $this->urlBuilder = $urlBuilder;
-        $this->messageManager = $messageManager;
-        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -92,11 +66,11 @@ class PaymentInfoAuthenticateObserver implements \Magento\Framework\Event\Observ
      * @param \Magento\Framework\Event\Observer $observer
      * @return void
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         /** @var \Magento\Framework\App\Action\Action $action */
         $action = $observer->getEvent()->getData('controller_action');
-        if ($action instanceof \Magento\Framework\App\Action\Action) {
+        if ($action instanceof Action) {
             $preventAccess = false;
 
             if ($this->customerHasOrdered() === false) {
@@ -116,7 +90,7 @@ class PaymentInfoAuthenticateObserver implements \Magento\Framework\Event\Observ
             if ($preventAccess === true) {
                 // No orders: prevent access
                 $actionFlag = $action->getActionFlag();
-                $actionFlag->set('', \Magento\Framework\App\ActionInterface::FLAG_NO_DISPATCH, true);
+                $actionFlag->set('', ActionInterface::FLAG_NO_DISPATCH, true);
 
                 /** @var \Magento\Framework\App\Response\Http $response */
                 $response = $action->getResponse();
@@ -137,7 +111,7 @@ class PaymentInfoAuthenticateObserver implements \Magento\Framework\Event\Observ
         // Allow this restriction to be turned off
         $active = $this->scopeConfig->getValue(
             'checkout/tokenbase/paymentinfo_require_order',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
         if ($active != 1) {
             return true;
@@ -150,15 +124,15 @@ class PaymentInfoAuthenticateObserver implements \Magento\Framework\Event\Observ
                 // Find an order belonging to this customer. Skip any that are canceled, refunded, held for review, etc.
                 $searchCriteria = $this->searchCriteriaBuilder
                     ->addFilter(
-                        \Magento\Sales\Api\Data\OrderInterface::CUSTOMER_ID,
+                        OrderInterface::CUSTOMER_ID,
                         $this->customerSession->getCustomerId()
                     )
                     ->addFilter(
-                        \Magento\Sales\Api\Data\OrderInterface::STATE,
+                        OrderInterface::STATE,
                         [
-                            \Magento\Sales\Model\Order::STATE_NEW,
-                            \Magento\Sales\Model\Order::STATE_PROCESSING,
-                            \Magento\Sales\Model\Order::STATE_COMPLETE,
+                            Order::STATE_NEW,
+                            Order::STATE_PROCESSING,
+                            Order::STATE_COMPLETE,
                         ],
                         'in'
                     )
@@ -193,13 +167,13 @@ class PaymentInfoAuthenticateObserver implements \Magento\Framework\Event\Observ
             // Number of failures to block after (default 5)
             $failureLimit = $this->scopeConfig->getValue(
                 'checkout/tokenbase/failure_limit',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
 
             // Number of seconds to keep failures (default 86400, 1 day)
             $failureWindow = $this->scopeConfig->getValue(
                 'checkout/tokenbase/failure_window',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
 
             if (is_array($failures) && count($failures) >= $failureLimit) {

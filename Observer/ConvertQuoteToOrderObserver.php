@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,34 +15,26 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Observer;
 
+use Magento\Framework\App\Area;
+use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\App\State;
+use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
 use Magento\Quote\Api\Data\PaymentExtensionInterface;
 use Magento\Sales\Api\Data\OrderPaymentExtensionInterface;
+use ParadoxLabs\TokenBase\Helper\Data;
 
 /**
  * Custom data field conversion -- quote to order, etc, etc.
  */
-class ConvertQuoteToOrderObserver extends ConvertAbstract implements \Magento\Framework\Event\ObserverInterface
+class ConvertQuoteToOrderObserver extends ConvertAbstract implements ObserverInterface
 {
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
-     * @var \Magento\Framework\App\State
-     */
-    protected $appState;
-
-    /**
-     * @var \Magento\Framework\App\ResourceConnection
-     */
-    protected $resource;
-
     /**
      * ConvertQuoteToOrderObserver constructor.
      *
@@ -51,13 +43,10 @@ class ConvertQuoteToOrderObserver extends ConvertAbstract implements \Magento\Fr
      * @param \Magento\Framework\App\ResourceConnection $resource
      */
     public function __construct(
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \Magento\Framework\App\State $appState,
-        \Magento\Framework\App\ResourceConnection $resource
+        protected Data $helper,
+        protected State $appState,
+        protected ResourceConnection $resource
     ) {
-        $this->helper = $helper;
-        $this->appState = $appState;
-        $this->resource = $resource;
     }
 
     /**
@@ -66,13 +55,13 @@ class ConvertQuoteToOrderObserver extends ConvertAbstract implements \Magento\Fr
      * @param \Magento\Framework\Event\Observer $observer
      * @return void
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         /** @var \Magento\Quote\Model\Quote $quote */
-        $quote  = $observer->getEvent()->getData('quote');
+        $quote = $observer->getEvent()->getData('quote');
 
         /** @var \Magento\Sales\Model\Order $order */
-        $order  = $observer->getEvent()->getData('order');
+        $order = $observer->getEvent()->getData('order');
 
         if (in_array($order->getPayment()->getMethod(), $this->helper->getAllMethods(), true) !== true) {
             return;
@@ -84,7 +73,7 @@ class ConvertQuoteToOrderObserver extends ConvertAbstract implements \Magento\Fr
         $payment = $quote->getPayment();
 
         if ((defined('\Magento\Framework\App\Area::AREA_GRAPHQL')
-            && $this->appState->getAreaCode() === \Magento\Framework\App\Area::AREA_GRAPHQL)) {
+            && $this->appState->getAreaCode() === Area::AREA_GRAPHQL)) {
             if (!$payment->getData('tokenbase_id')) {
                 $paymentAttributes = $payment->getExtensionAttributes();
                 if ($paymentAttributes instanceof PaymentExtensionInterface && $paymentAttributes->getTokenbaseId()) {

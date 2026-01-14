@@ -4,6 +4,6 @@
         <observer name="tokenbase_checkout_record_failure" instance="ParadoxLabs\TokenBase\Observer\CheckoutFailureRecordIncidentObserver"/>
     </event>
     <event name="sales_order_place_before">
-        <observer name="tokenbase_checkout_authenticate" instance="ParadoxLabs\TokenBase\Observer\CheckoutCheckFailuresObserver" />
+        <observer name="tokenbase_checkout_authenticate" instance="ParadoxLabs\TokenBase\Observer\CheckoutCheckFailuresObserver"/>
     </event>
 </config>

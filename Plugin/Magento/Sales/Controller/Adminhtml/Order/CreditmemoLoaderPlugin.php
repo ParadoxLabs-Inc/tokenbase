@@ -15,23 +15,25 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Plugin\Magento\Sales\Controller\Adminhtml\Order;
 
+use Magento\Framework\Message\ManagerInterface;
+use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Controller\Adminhtml\Order\CreditmemoLoader;
+use Magento\Sales\Model\ResourceModel\Order\Invoice\CollectionFactory;
+use ParadoxLabs\TokenBase\Helper\Data;
+use Zend_Db_Expr;
 
 /**
  * Interceptor for @see \Magento\Sales\Controller\Adminhtml\Order\CreditmemoLoader
  */
 class CreditmemoLoaderPlugin
 {
-    protected \Magento\Sales\Api\OrderRepositoryInterface $orderRepository;
-    protected \ParadoxLabs\TokenBase\Helper\Data $tokenbaseHelper;
-    protected \Magento\Sales\Model\ResourceModel\Order\Invoice\CollectionFactory $invoiceCollectionFactory;
-    protected \Magento\Framework\Message\ManagerInterface $messageManager;
-
     /**
      * CreditmemoLoaderPlugin constructor.
      *
@@ -41,15 +43,11 @@ class CreditmemoLoaderPlugin
      * @param \Magento\Framework\Message\ManagerInterface $messageManager
      */
     public function __construct(
-        \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
-        \ParadoxLabs\TokenBase\Helper\Data $tokenbaseHelper,
-        \Magento\Sales\Model\ResourceModel\Order\Invoice\CollectionFactory $invoiceCollectionFactory,
-        \Magento\Framework\Message\ManagerInterface $messageManager
+        protected OrderRepositoryInterface $orderRepository,
+        protected Data $tokenbaseHelper,
+        protected CollectionFactory $invoiceCollectionFactory,
+        protected ManagerInterface $messageManager
     ) {
-        $this->orderRepository = $orderRepository;
-        $this->tokenbaseHelper = $tokenbaseHelper;
-        $this->invoiceCollectionFactory = $invoiceCollectionFactory;
-        $this->messageManager = $messageManager;
     }
 
     /**
@@ -82,7 +80,7 @@ class CreditmemoLoaderPlugin
             return false;
         }
 
-        $order = $this->getOrder((int)$subject->getOrderId());
+        $order             = $this->getOrder((int)$subject->getOrderId());
         $paymentMethodCode = $order->getPayment()->getMethod();
         if (in_array($paymentMethodCode, $this->tokenbaseHelper->getActiveMethods(), true) === false) {
             return false;
@@ -112,7 +110,7 @@ class CreditmemoLoaderPlugin
             'main_table.base_total_refunded',
             [
                 ['null' => true],
-                ['lt' => new \Zend_Db_Expr('`main_table`.`base_grand_total`')],
+                ['lt' => new Zend_Db_Expr('`main_table`.`base_grand_total`')],
             ]
         );
 
@@ -144,7 +142,7 @@ class CreditmemoLoaderPlugin
      * @param int $orderId
      * @return \Magento\Sales\Api\Data\OrderInterface
      */
-    protected function getOrder(int $orderId): \Magento\Sales\Api\Data\OrderInterface
+    protected function getOrder(int $orderId): OrderInterface
     {
         return $this->orderRepository->get($orderId);
     }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,30 +15,21 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Gateway\Validator;
 
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use Magento\Payment\Gateway\ConfigInterface;
+use Magento\Payment\Gateway\Validator\AbstractValidator;
+use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
+use ParadoxLabs\TokenBase\Gateway\Validator\CreditCard\Types;
 
-class CreditCard extends \Magento\Payment\Gateway\Validator\AbstractValidator
+class CreditCard extends AbstractValidator
 {
-    /**
-     * @var \Magento\Payment\Gateway\ConfigInterface
-     */
-    protected $config;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Gateway\Validator\CreditCard\Types
-     */
-    protected $ccTypes;
-
-    /**
-     * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
-     */
-    protected $dateProcessor;
-
     /**
      * @param \Magento\Payment\Gateway\Validator\ResultInterfaceFactory $resultFactory
      * @param \Magento\Payment\Gateway\ConfigInterface $config
@@ -46,16 +37,12 @@ class CreditCard extends \Magento\Payment\Gateway\Validator\AbstractValidator
      * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $dateProcessor
      */
     public function __construct(
-        \Magento\Payment\Gateway\Validator\ResultInterfaceFactory $resultFactory,
-        \Magento\Payment\Gateway\ConfigInterface $config,
-        \ParadoxLabs\TokenBase\Gateway\Validator\CreditCard\Types $ccTypes,
-        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $dateProcessor
+        ResultInterfaceFactory $resultFactory,
+        protected ConfigInterface $config,
+        protected Types $ccTypes,
+        protected TimezoneInterface $dateProcessor
     ) {
         parent::__construct($resultFactory);
-
-        $this->config = $config;
-        $this->ccTypes = $ccTypes;
-        $this->dateProcessor = $dateProcessor;
     }
 
     /**
@@ -130,7 +117,7 @@ class CreditCard extends \Magento\Payment\Gateway\Validator\AbstractValidator
      */
     public function isDateExpired($year, $month)
     {
-        $date  = $this->dateProcessor->date();
+        $date = $this->dateProcessor->date();
 
         $year  = (int)$year;
         $month = (int)$month;
@@ -155,7 +142,7 @@ class CreditCard extends \Magento\Payment\Gateway\Validator\AbstractValidator
      *
      * Based on Rolands Kusins's implementation at http://www.phpclasses.org/browse/file/51066.html (GPL)
      *
-     * @param   string $ccNumber
+     * @param string $ccNumber
      * @return  bool
      */
     public function isCcNumberMod10Valid($ccNumber)
@@ -164,8 +151,8 @@ class CreditCard extends \Magento\Payment\Gateway\Validator\AbstractValidator
         // This sum must be a multiple of 10 to be a valid credit card number.
         $number   = preg_replace('/[^\d]/', '', (string)$ccNumber);
         $sumTable = [
-            [0,1,2,3,4,5,6,7,8,9],
-            [0,2,4,6,8,1,3,5,7,9]
+            [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            [0, 2, 4, 6, 8, 1, 3, 5, 7, 9],
         ];
 
         $length = strlen((string)$number);
@@ -173,7 +160,7 @@ class CreditCard extends \Magento\Payment\Gateway\Validator\AbstractValidator
         $flip   = 1;
 
         for ($i = $length - 2; $i >= 0; --$i) {
-            $sum += $sumTable[$flip++ & 0x1][$number[$i]];
+            $sum += $sumTable[ $flip++ & 0x1 ][ $number[ $i ] ];
         }
 
         $sum += (int)substr((string)$number, -1);

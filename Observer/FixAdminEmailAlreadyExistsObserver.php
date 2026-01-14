@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,23 +15,23 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Observer;
 
-class FixAdminEmailAlreadyExistsObserver implements \Magento\Framework\Event\ObserverInterface
+use Magento\Backend\Model\Session\Quote;
+use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Customer\Api\Data\CustomerInterface;
+use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Sales\Model\AdminOrder\Create;
+use Magento\Store\Api\StoreRepositoryInterface;
+
+class FixAdminEmailAlreadyExistsObserver implements ObserverInterface
 {
-    /**
-     * @var \Magento\Customer\Api\CustomerRepositoryInterface
-     */
-    protected $customerRepository;
-
-    /**
-     * @var \Magento\Store\Api\StoreRepositoryInterface
-     */
-    protected $storeRepository;
-
     /**
      * FixAdminEmailAlreadyExistsObserver constructor.
      *
@@ -39,11 +39,9 @@ class FixAdminEmailAlreadyExistsObserver implements \Magento\Framework\Event\Obs
      * @param \Magento\Store\Api\StoreRepositoryInterface $storeRepository
      */
     public function __construct(
-        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
-        \Magento\Store\Api\StoreRepositoryInterface $storeRepository
+        protected CustomerRepositoryInterface $customerRepository,
+        protected StoreRepositoryInterface $storeRepository
     ) {
-        $this->customerRepository = $customerRepository;
-        $this->storeRepository = $storeRepository;
     }
 
     /**
@@ -52,7 +50,7 @@ class FixAdminEmailAlreadyExistsObserver implements \Magento\Framework\Event\Obs
      *
      * @param \Magento\Framework\Event\Observer $observer
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         /** @var \Magento\Sales\Model\AdminOrder\Create $orderCreateModel */
         $orderCreateModel = $observer->getData('order_create_model');
@@ -78,9 +76,10 @@ class FixAdminEmailAlreadyExistsObserver implements \Magento\Framework\Event\Obs
 
             // Check if a customer with that email exists
             $customer = $this->customerRepository->get($params['order']['account']['email'], $websiteId);
-        } catch (\Magento\Framework\Exception\NoSuchEntityException $exception) {
+        } catch (NoSuchEntityException) {
             // Ignore nonexistent emails, let Magento process that normally.
             $this->resetCustomer($session, $orderCreateModel);
+
             return;
         }
 
@@ -97,8 +96,8 @@ class FixAdminEmailAlreadyExistsObserver implements \Magento\Framework\Event\Obs
      * @return void
      */
     protected function resetCustomer(
-        \Magento\Backend\Model\Session\Quote $session,
-        \Magento\Sales\Model\AdminOrder\Create $orderCreateModel
+        Quote $session,
+        Create $orderCreateModel
     ) {
         $session->setCustomerId(null);
 
@@ -117,9 +116,9 @@ class FixAdminEmailAlreadyExistsObserver implements \Magento\Framework\Event\Obs
      * @return void
      */
     protected function assignCustomer(
-        \Magento\Backend\Model\Session\Quote $session,
-        \Magento\Sales\Model\AdminOrder\Create $orderCreateModel,
-        \Magento\Customer\Api\Data\CustomerInterface $customer
+        Quote $session,
+        Create $orderCreateModel,
+        CustomerInterface $customer
     ) {
         $session->setCustomerId((int)$customer->getId());
         $orderCreateModel->getQuote()->setCustomer($customer);

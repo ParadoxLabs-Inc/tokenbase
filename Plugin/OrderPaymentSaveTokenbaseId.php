@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,10 +15,16 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Plugin;
+
+use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
+use ParadoxLabs\TokenBase\Helper\Data;
 
 /**
  * OrderPaymentSaveTokenbaseId Plugin
@@ -28,17 +34,10 @@ namespace ParadoxLabs\TokenBase\Plugin;
 class OrderPaymentSaveTokenbaseId
 {
     /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      */
-    public function __construct(
-        \ParadoxLabs\TokenBase\Helper\Data $helper
-    ) {
-        $this->helper = $helper;
+    public function __construct(protected Data $helper)
+    {
     }
 
     /**
@@ -48,12 +47,12 @@ class OrderPaymentSaveTokenbaseId
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      */
     public function beforeSave(
-        \Magento\Sales\Api\OrderRepositoryInterface $subject,
-        \Magento\Sales\Api\Data\OrderInterface $order
+        OrderRepositoryInterface $subject,
+        OrderInterface $order
     ) {
         /** @var \Magento\Sales\Model\Order\Payment $payment */
         $payment = $order->getPayment();
-        if ($payment instanceof \Magento\Sales\Api\Data\OrderPaymentInterface === false) {
+        if ($payment instanceof OrderPaymentInterface === false) {
             return [$order];
         }
 

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,21 +15,23 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Helper;
 
+use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Framework\App\Helper\Context;
+use Magento\Framework\DataObject;
+use Magento\Framework\Phrase;
+use Monolog\Logger;
+
 /**
  * Operation helper -- common data things
  */
-class Operation extends \Magento\Framework\App\Helper\AbstractHelper
+class Operation extends AbstractHelper
 {
-    /**
-     * @var \Monolog\Logger
-     */
-    protected $tokenbaseLogger;
-
     /**
      * Data constructor.
      *
@@ -37,12 +39,10 @@ class Operation extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Monolog\Logger $tokenbaseLogger
      */
     public function __construct(
-        \Magento\Framework\App\Helper\Context $context,
-        \Monolog\Logger $tokenbaseLogger
+        Context $context,
+        protected Logger $tokenbaseLogger
     ) {
         parent::__construct($context);
-
-        $this->tokenbaseLogger = $tokenbaseLogger;
     }
 
     /**
@@ -69,22 +69,22 @@ class Operation extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Pull a value from a nested array safely (without notices, default fallback)
      *
-     * @param  array  $data    source array
-     * @param  string $path    path to pull, separated by slashes
-     * @param  string $default default response (if key DNE)
+     * @param array $data source array
+     * @param string $path path to pull, separated by slashes
+     * @param string $default default response (if key DNE)
      * @return mixed           target value or default
      */
     public function getArrayValue($data, $path, $default = '')
     {
         $keys = explode('/', (string)$path);
-        $val =& $data;
+        $val  =& $data;
 
         foreach ($keys as $key) {
-            if (!isset($val[$key])) {
+            if (!isset($val[ $key ])) {
                 return $default;
             }
 
-            $val =& $val[$key];
+            $val =& $val[ $key ];
         }
 
         return $val;
@@ -101,9 +101,9 @@ class Operation extends \Magento\Framework\App\Helper\AbstractHelper
     public function log($code, $message, $debug = false)
     {
         if (is_object($message)) {
-            if ($message instanceof \Magento\Framework\Phrase) {
+            if ($message instanceof Phrase) {
                 $message = (string)$message;
-            } elseif ($message instanceof \Magento\Framework\DataObject) {
+            } elseif ($message instanceof DataObject) {
                 $message = $message->getData();
 
                 $this->cleanupArray($message);

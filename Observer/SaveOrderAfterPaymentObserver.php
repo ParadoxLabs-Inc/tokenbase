@@ -15,12 +15,24 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Observer;
 
-class SaveOrderAfterPaymentObserver implements \Magento\Framework\Event\ObserverInterface
+use Magento\Checkout\Model\Session;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
+use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Payment;
+use Magento\Store\Model\ScopeInterface;
+use ParadoxLabs\TokenBase\Helper\Data;
+
+class SaveOrderAfterPaymentObserver implements ObserverInterface
 {
     /**
      * @var \ParadoxLabs\TokenBase\Helper\Data
@@ -57,16 +69,16 @@ class SaveOrderAfterPaymentObserver implements \Magento\Framework\Event\Observer
      * @param \Magento\Checkout\Model\Session $checkoutSession *Proxy
      */
     public function __construct(
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
-        \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
-        \Magento\Checkout\Model\Session $checkoutSession
+        ScopeConfigInterface $scopeConfig,
+        Data $helper,
+        OrderRepositoryInterface $orderRepository,
+        CartRepositoryInterface $cartRepository,
+        Session $checkoutSession
     ) {
-        $this->helper = $helper;
-        $this->scopeConfig = $scopeConfig;
+        $this->helper          = $helper;
+        $this->scopeConfig     = $scopeConfig;
         $this->orderRepository = $orderRepository;
-        $this->cartRepository = $cartRepository;
+        $this->cartRepository  = $cartRepository;
         $this->checkoutSession = $checkoutSession;
     }
 
@@ -76,7 +88,7 @@ class SaveOrderAfterPaymentObserver implements \Magento\Framework\Event\Observer
      * @param \Magento\Framework\Event\Observer $observer
      * @return void
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         if ($this->isCheckoutSaveEnabled() !== true) {
             return;
@@ -103,7 +115,7 @@ class SaveOrderAfterPaymentObserver implements \Magento\Framework\Event\Observer
     {
         $enabled = (bool)$this->scopeConfig->getValue(
             'checkout/tokenbase/save_order_after_payment',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
 
         return $enabled;
@@ -117,8 +129,8 @@ class SaveOrderAfterPaymentObserver implements \Magento\Framework\Event\Observer
      */
     protected function isCheckoutSaveEligible($order): bool
     {
-        return $order instanceof \Magento\Sales\Model\Order === true
-            && $order->getPayment() instanceof \Magento\Sales\Model\Order\Payment === true
+        return $order instanceof Order === true
+            && $order->getPayment() instanceof Payment === true
             && in_array($order->getPayment()->getMethod(), $this->helper->getAllMethods(), true) === true;
     }
 
@@ -129,7 +141,7 @@ class SaveOrderAfterPaymentObserver implements \Magento\Framework\Event\Observer
      * @return void
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    protected function saveOrder(\Magento\Sales\Model\Order $order): void
+    protected function saveOrder(Order $order): void
     {
         $this->orderRepository->save($order);
         $order->setData('_tokenbase_saved_order', true);

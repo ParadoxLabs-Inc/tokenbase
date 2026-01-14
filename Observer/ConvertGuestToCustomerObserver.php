@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,38 +15,25 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Observer;
 
-class ConvertGuestToCustomerObserver implements \Magento\Framework\Event\ObserverInterface
+use Magento\Customer\Api\Data\CustomerInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\HTTP\PhpEnvironment\RemoteAddress;
+use Magento\Sales\Model\Order\PaymentFactory;
+use Magento\Sales\Model\ResourceModel\Order\Payment;
+use Magento\Store\Model\ScopeInterface;
+use ParadoxLabs\TokenBase\Api\CardRepositoryInterface;
+
+class ConvertGuestToCustomerObserver implements ObserverInterface
 {
-    /**
-     * @var \ParadoxLabs\TokenBase\Api\CardRepositoryInterface
-     */
-    protected $cardRepository;
-
-    /**
-     * @var \Magento\Sales\Model\Order\PaymentFactory
-     */
-    protected $paymentFactory;
-
-    /**
-     * @var \Magento\Sales\Model\ResourceModel\Order\Payment
-     */
-    protected $paymentResource;
-
-    /**
-     * @var \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress
-     */
-    protected $remoteAddress;
-
-    /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    protected $scopeConfig;
-
     /**
      * ConvertGuestToCustomerObserver constructor.
      *
@@ -57,23 +44,18 @@ class ConvertGuestToCustomerObserver implements \Magento\Framework\Event\Observe
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-        \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository,
-        \Magento\Sales\Model\Order\PaymentFactory $paymentFactory,
-        \Magento\Sales\Model\ResourceModel\Order\Payment $paymentResource,
-        \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+        protected CardRepositoryInterface $cardRepository,
+        protected PaymentFactory $paymentFactory,
+        protected Payment $paymentResource,
+        protected RemoteAddress $remoteAddress,
+        protected ScopeConfigInterface $scopeConfig
     ) {
-        $this->cardRepository = $cardRepository;
-        $this->paymentFactory = $paymentFactory;
-        $this->paymentResource = $paymentResource;
-        $this->remoteAddress = $remoteAddress;
-        $this->scopeConfig = $scopeConfig;
     }
 
     /**
      * @param \Magento\Framework\Event\Observer $observer
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         /** @var \Magento\Customer\Api\Data\CustomerInterface $customer */
         $customer = $observer->getData('customer_data_object');
@@ -81,7 +63,7 @@ class ConvertGuestToCustomerObserver implements \Magento\Framework\Event\Observe
         $delegateData = $observer->getData('delegate_data');
 
         if (isset($delegateData['__sales_assign_order_id'])
-            && $customer instanceof \Magento\Customer\Api\Data\CustomerInterface) {
+            && $customer instanceof CustomerInterface) {
             /** @var \Magento\Sales\Model\Order\Payment $payment */
             $payment = $this->paymentFactory->create();
             $this->paymentResource->load($payment, $delegateData['__sales_assign_order_id'], 'parent_id');
@@ -93,14 +75,14 @@ class ConvertGuestToCustomerObserver implements \Magento\Framework\Event\Observe
                 // Activate the card by default if config is opt-out.
                 $activate = (int)$this->scopeConfig->getValue(
                     'payment/' . $card->getMethod() . '/savecard_opt_out',
-                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                    ScopeInterface::SCOPE_STORE
                 );
                 if ($activate === 1) {
                     $card->setActive(1);
                 }
 
                 $this->cardRepository->save($card);
-            } catch (\Magento\Framework\Exception\LocalizedException $e) {
+            } catch (LocalizedException) {
                 // No-op: gracefully skip a card save if it fails.
             }
         }

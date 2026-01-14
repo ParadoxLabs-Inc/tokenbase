@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,52 +15,37 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Model\Api;
 
 use Magento\Authorization\Model\UserContextInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\GraphQl\Exception\GraphQlAuthorizationException;
 use Magento\Framework\GraphQl\Exception\GraphQlNoSuchEntityException;
+use Magento\Framework\GraphQl\Query\Resolver\ContextInterface;
+use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Quote\Model\MaskedQuoteIdToQuoteIdInterface;
+use Magento\Store\Model\ScopeInterface;
+use ParadoxLabs\TokenBase\Api\Data\CardInterface;
 
 class GraphQL
 {
-    /**
-     * @var \Magento\Quote\Api\CartRepositoryInterface
-     */
-    protected $cartRepository;
-
-    /**
-     * @var \Magento\Quote\Model\MaskedQuoteIdToQuoteIdInterface
-     */
-    protected $maskedQuoteIdToQuoteId;
-
-    /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    protected $scopeConfig;
-
     /**
      * GraphQL constructor.
      *
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
+     * @param \Magento\Quote\Model\MaskedQuoteIdToQuoteIdInterface $maskedQuoteIdToQuoteId
      */
     public function __construct(
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
-        ?\Magento\Quote\Model\MaskedQuoteIdToQuoteIdInterface $maskedQuoteIdToQuoteId = null
+        protected ScopeConfigInterface $scopeConfig,
+        protected CartRepositoryInterface $cartRepository,
+        protected MaskedQuoteIdToQuoteIdInterface $maskedQuoteIdToQuoteId,
     ) {
-        $this->scopeConfig = $scopeConfig;
-        $this->cartRepository = $cartRepository;
-
-        // BC preservation -- argument added in 4.8.0; class does not exist until Magento 2.3
-        $om = \Magento\Framework\App\ObjectManager::getInstance();
-        $this->maskedQuoteIdToQuoteId = $maskedQuoteIdToQuoteId ?? $om->get(
-            \Magento\Quote\Model\MaskedQuoteIdToQuoteIdInterface::class
-        );
     }
 
     /**
@@ -72,12 +57,12 @@ class GraphQL
      * @throws \Magento\Framework\GraphQl\Exception\GraphQlAuthorizationException
      */
     public function authenticate(
-        \Magento\Framework\GraphQl\Query\Resolver\ContextInterface $context,
+        ContextInterface $context,
         $requireLogin = false
     ) {
         $isEnabled = (bool)$this->scopeConfig->getValue(
             'checkout/tokenbase/enable_public_api',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
 
         if ($isEnabled !== true) {
@@ -103,7 +88,7 @@ class GraphQL
      * @param \ParadoxLabs\TokenBase\Api\Data\CardInterface $card
      * @return array
      */
-    public function convertCardForOutput(\ParadoxLabs\TokenBase\Api\Data\CardInterface $card)
+    public function convertCardForOutput(CardInterface $card)
     {
         /** @var \ParadoxLabs\TokenBase\Model\Card $card */
         $cardData                      = $card->toArray();
@@ -111,9 +96,9 @@ class GraphQL
         $cardData['address']           = $card->getAddress();
         $cardData['address']['street'] = explode("\n", $cardData['address']['street']);
         $cardData['address']['region'] = [
-            'region_code' => isset($cardData['address']['region_code']) ? $cardData['address']['region_code'] : null,
-            'region'      => isset($cardData['address']['region']) ? $cardData['address']['region'] : null,
-            'region_id'   => isset($cardData['address']['region_id']) ? $cardData['address']['region_id'] : null,
+            'region_code' => $cardData['address']['region_code'] ?? null,
+            'region' => $cardData['address']['region'] ?? null,
+            'region_id' => $cardData['address']['region_id'] ?? null,
         ];
         $cardData['label']             = $card->getLabel();
 
@@ -152,7 +137,7 @@ class GraphQL
         try {
             $quoteId = $this->maskedQuoteIdToQuoteId->execute($quoteHash);
             $quote   = $this->cartRepository->get($quoteId);
-        } catch (NoSuchEntityException $e) {
+        } catch (NoSuchEntityException) {
             throw new GraphQlNoSuchEntityException(
                 __('Could not find a cart with ID "%masked_cart_id"', ['masked_cart_id' => $quoteHash])
             );

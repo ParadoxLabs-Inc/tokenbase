@@ -13,7 +13,10 @@
 
 namespace ParadoxLabs\TokenBase\Plugin\InstantPurchase\PaymentMethodIntegration;
 
-use \Magento\InstantPurchase\PaymentMethodIntegration\IntegrationsManager as IntegrationsManagerOrig;
+use Magento\InstantPurchase\PaymentMethodIntegration\IntegrationFactory;
+use Magento\InstantPurchase\PaymentMethodIntegration\IntegrationsManager as IntegrationsManagerOrig;
+use ParadoxLabs\TokenBase\Helper\Data;
+use ParadoxLabs\TokenBase\Model\Method\Factory;
 
 class IntegrationsManager
 {
@@ -40,13 +43,13 @@ class IntegrationsManager
      * @param \ParadoxLabs\TokenBase\Model\Method\Factory $methodFactory
      */
     public function __construct(
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \Magento\InstantPurchase\PaymentMethodIntegration\IntegrationFactory $integrationFactory,
-        \ParadoxLabs\TokenBase\Model\Method\Factory $methodFactory
+        Data $helper,
+        IntegrationFactory $integrationFactory,
+        Factory $methodFactory
     ) {
-        $this->helper = $helper;
+        $this->helper             = $helper;
         $this->integrationFactory = $integrationFactory;
-        $this->methodFactory = $methodFactory;
+        $this->methodFactory      = $methodFactory;
     }
 
     /**

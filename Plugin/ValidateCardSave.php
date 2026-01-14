@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,23 +15,21 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Plugin;
 
+use Magento\Framework\DataObject;
+use Magento\Framework\Exception\NotFoundException;
+use Magento\Payment\Gateway\Command\CommandException;
+use Magento\Payment\Gateway\Validator\ValidatorPoolInterface;
+use Magento\Store\Model\StoreManagerInterface;
+use ParadoxLabs\TokenBase\Api\Data\CardInterface;
+
 class ValidateCardSave
 {
-    /**
-     * @var \Magento\Store\Model\StoreManagerInterface
-     */
-    protected $storeManager;
-
-    /**
-     * @var \Magento\Payment\Gateway\Validator\ValidatorPoolInterface|null
-     */
-    protected $validatorPool;
-
     /**
      * ValidatePaymentObserver constructor.
      *
@@ -39,11 +37,9 @@ class ValidateCardSave
      * @param \Magento\Payment\Gateway\Validator\ValidatorPoolInterface|null $validatorPool
      */
     public function __construct(
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        ?\Magento\Payment\Gateway\Validator\ValidatorPoolInterface $validatorPool = null
+        protected StoreManagerInterface $storeManager,
+        protected ?ValidatorPoolInterface $validatorPool = null
     ) {
-        $this->validatorPool = $validatorPool;
-        $this->storeManager = $storeManager;
     }
 
     /**
@@ -57,9 +53,9 @@ class ValidateCardSave
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function beforeBeforeSave(
-        \ParadoxLabs\TokenBase\Api\Data\CardInterface $subject
+        CardInterface $subject
     ) {
-        if ($subject instanceof \Magento\Framework\DataObject === false
+        if ($subject instanceof DataObject === false
             || $subject->hasData('info_instance') === false
             || $subject->getData('no_sync') === true
             || $subject->getData('no_validate') === true) {
@@ -75,11 +71,11 @@ class ValidateCardSave
             ]);
 
             if (!$result->isValid()) {
-                throw new \Magento\Payment\Gateway\Command\CommandException(
+                throw new CommandException(
                     __(implode("\n", $result->getFailsDescription()))
                 );
             }
-        } catch (\Magento\Framework\Exception\NotFoundException $exception) {
+        } catch (NotFoundException) {
             // No validator pool for this payment method -- nothing to validate
             return;
         }

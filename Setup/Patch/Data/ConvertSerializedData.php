@@ -15,6 +15,7 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
@@ -23,6 +24,7 @@ namespace ParadoxLabs\TokenBase\Setup\Patch\Data;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Framework\Setup\Patch\PatchVersionInterface;
+use Magento\Framework\Unserialize\Unserialize;
 
 class ConvertSerializedData implements DataPatchInterface, PatchVersionInterface
 {
@@ -42,10 +44,10 @@ class ConvertSerializedData implements DataPatchInterface, PatchVersionInterface
      */
     public function __construct(
         ModuleDataSetupInterface $moduleDataSetup,
-        \Magento\Framework\Unserialize\Unserialize $unserialize
+        Unserialize $unserialize
     ) {
         $this->moduleDataSetup = $moduleDataSetup;
-        $this->unserialize = $unserialize;
+        $this->unserialize     = $unserialize;
     }
 
     /**
@@ -119,7 +121,7 @@ class ConvertSerializedData implements DataPatchInterface, PatchVersionInterface
                 $setup->getTable('paradoxlabs_stored_card'),
                 [
                     'additional' => $this->jsonify($item['additional']),
-                    'address'    => $this->jsonify($item['address']),
+                    'address' => $this->jsonify($item['address']),
                 ],
                 ['id = ?' => $item['id']]
             );

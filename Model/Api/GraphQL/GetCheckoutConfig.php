@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,10 +15,16 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Model\Api\GraphQL;
+
+use Magento\Framework\GraphQl\Config\Element\Field;
+use Magento\Framework\GraphQl\Exception\GraphQlInputException;
+use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
+use ParadoxLabs\TokenBase\Model\Api\GraphQL;
 
 /**
  * CheckoutConfig Class
@@ -26,27 +32,15 @@ namespace ParadoxLabs\TokenBase\Model\Api\GraphQL;
 class GetCheckoutConfig implements \Magento\Framework\GraphQl\Query\ResolverInterface
 {
     /**
-     * @var \Magento\Payment\Model\CcGenericConfigProvider[]
-     */
-    private $configProviders;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Model\Api\GraphQL
-     */
-    private $graphQL;
-
-    /**
      * CheckoutConfig constructor.
      *
      * @param \ParadoxLabs\TokenBase\Model\Api\GraphQL $graphQL
      * @param array $configProviders
      */
     public function __construct(
-        \ParadoxLabs\TokenBase\Model\Api\GraphQL $graphQL,
-        array $configProviders = []
+        private GraphQL $graphQL,
+        private array $configProviders = []
     ) {
-        $this->configProviders = $configProviders;
-        $this->graphQL = $graphQL;
     }
 
     /**
@@ -57,44 +51,45 @@ class GetCheckoutConfig implements \Magento\Framework\GraphQl\Query\ResolverInte
      * @param \Magento\Framework\GraphQl\Schema\Type\ResolveInfo $info
      * @param array|null $value
      * @param array|null $args
-     * @throws \Exception
      * @return mixed|\Magento\Framework\GraphQl\Query\Resolver\Value
+     * @throws \Exception
      */
     public function resolve(
-        \Magento\Framework\GraphQl\Config\Element\Field $field,
+        Field $field,
         $context,
-        \Magento\Framework\GraphQl\Schema\Type\ResolveInfo $info,
+        ResolveInfo $info,
         ?array $value = null,
         ?array $args = null
     ) {
         // Validate
         $this->graphQL->authenticate($context);
 
-        $method = isset($args['method']) ? $args['method'] : '';
-        if (empty($method) || !isset($this->configProviders[$method])) {
-            throw new \Magento\Framework\GraphQl\Exception\GraphQlInputException(
+        $method = $args['method'] ?? '';
+        if (empty($method) || !isset($this->configProviders[ $method ])) {
+            throw new GraphQlInputException(
                 __('Invalid TokenBase method provided.')
             );
         }
 
         // Get checkout config for the given payment method
-        $paymentConfig = $this->configProviders[$method]->getConfig();
+        $paymentConfig = $this->configProviders[ $method ]->getConfig();
 
-        if (!isset($paymentConfig['payment'][$method])) {
+        if (!isset($paymentConfig['payment'][ $method ])) {
             return [];
         }
 
         // Merge in ccform values
         foreach ($paymentConfig['payment']['ccform'] as $key => $methods) {
-            if (isset($methods[$method])) {
-                $paymentConfig['payment'][$method][$key] = is_array($methods[$method])
-                    ? $this->graphQL->toKeyValueArray($methods[$method])
-                    : $methods[$method];
+            if (isset($methods[ $method ])) {
+                $paymentConfig['payment'][ $method ][ $key ] = is_array($methods[ $method ])
+                    ? $this->graphQL->toKeyValueArray($methods[ $method ])
+                    : $methods[ $method ];
             }
         }
 
         // Output
-        $paymentConfig['payment'][$method]['method'] = $method;
-        return $paymentConfig['payment'][$method];
+        $paymentConfig['payment'][ $method ]['method'] = $method;
+
+        return $paymentConfig['payment'][ $method ];
     }
 }

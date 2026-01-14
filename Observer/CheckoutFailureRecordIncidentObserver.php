@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,33 +15,31 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Observer;
 
-class CheckoutFailureRecordIncidentObserver implements \Magento\Framework\Event\ObserverInterface
+use Exception;
+use Magento\Customer\Model\Session;
+use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Exception\AuthorizationException;
+use Magento\Quote\Model\Quote;
+use Magento\Quote\Model\Quote\Payment;
+use ParadoxLabs\TokenBase\Helper\Data;
+
+class CheckoutFailureRecordIncidentObserver implements ObserverInterface
 {
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
-     * @var \Magento\Customer\Model\Session
-     */
-    protected $customerSession;
-
     /**
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \Magento\Customer\Model\Session $customerSession *Proxy
      */
     public function __construct(
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \Magento\Customer\Model\Session $customerSession
+        protected Data $helper,
+        protected Session $customerSession
     ) {
-        $this->helper          = $helper;
-        $this->customerSession = $customerSession;
     }
 
     /**
@@ -50,7 +48,7 @@ class CheckoutFailureRecordIncidentObserver implements \Magento\Framework\Event\
      * @param \Magento\Framework\Event\Observer $observer
      * @return void
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         /** @var \Magento\Quote\Model\Quote $quote */
         $quote = $observer->getData('quote');
@@ -59,10 +57,10 @@ class CheckoutFailureRecordIncidentObserver implements \Magento\Framework\Event\
 
         // Note: We skip AuthorizationException errors to not count attempts we block ourselves.
         // @see \ParadoxLabs\TokenBase\Observer\CheckoutCheckFailuresObserver
-        if ($quote instanceof \Magento\Quote\Model\Quote
-            && $exception instanceof \Exception
-            && ($exception instanceof \Magento\Framework\Exception\AuthorizationException) === false
-            && $quote->getPayment() instanceof \Magento\Quote\Model\Quote\Payment
+        if ($quote instanceof Quote
+            && $exception instanceof Exception
+            && ($exception instanceof AuthorizationException) === false
+            && $quote->getPayment() instanceof Payment
             && in_array($quote->getPayment()->getMethod(), $this->helper->getAllMethods(), true)) {
             $this->recordSessionFailure($exception);
         }
@@ -75,14 +73,14 @@ class CheckoutFailureRecordIncidentObserver implements \Magento\Framework\Event\
      * @param \Exception $e
      * @return void
      */
-    protected function recordSessionFailure(\Exception $e)
+    protected function recordSessionFailure(Exception $e)
     {
         $failures = $this->customerSession->getData('tokenbase_failures');
         if (is_array($failures) === false) {
             $failures = [];
         }
 
-        $failures[time()] = $e->getMessage();
+        $failures[ time() ] = $e->getMessage();
 
         $this->customerSession->setData('tokenbase_failures', $failures);
     }

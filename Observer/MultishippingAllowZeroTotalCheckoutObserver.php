@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,33 +15,28 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Observer;
 
-class MultishippingAllowZeroTotalCheckoutObserver implements \Magento\Framework\Event\ObserverInterface
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
+use Magento\Store\Model\ScopeInterface;
+use ParadoxLabs\TokenBase\Helper\Data;
+
+class MultishippingAllowZeroTotalCheckoutObserver implements ObserverInterface
 {
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    protected $scopeConfig;
-
     /**
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+        protected Data $helper,
+        protected ScopeConfigInterface $scopeConfig
     ) {
-        $this->helper = $helper;
-        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -51,7 +46,7 @@ class MultishippingAllowZeroTotalCheckoutObserver implements \Magento\Framework\
      * @param \Magento\Framework\Event\Observer $observer
      * @return void
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         $order = $observer->getEvent()->getData('order');
         $quote = $observer->getEvent()->getData('quote');
@@ -60,7 +55,7 @@ class MultishippingAllowZeroTotalCheckoutObserver implements \Magento\Framework\
         if ($order->getPayment()->getMethod() === 'free' && $quote->getPayment()->getMethod() !== 'free') {
             $vaultMethodActive = (int)$this->scopeConfig->getValue(
                 'payment/' . $quote->getPayment()->getMethod() . '_cc_vault/active',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
 
             // And if this is a Vault-enabled method, or a TokenBase method, allow.

@@ -13,7 +13,11 @@
 
 namespace ParadoxLabs\TokenBase\Model\InstantPurchase;
 
-class TokenFormatter extends \Magento\InstantPurchase\PaymentMethodIntegration\SimplePaymentTokenFormatter
+use Magento\InstantPurchase\PaymentMethodIntegration\SimplePaymentTokenFormatter;
+use Magento\Vault\Api\Data\PaymentTokenInterface;
+use ParadoxLabs\TokenBase\Api\Data\CardInterface;
+
+class TokenFormatter extends SimplePaymentTokenFormatter
 {
     /**
      * Creates string presentation of payment token.
@@ -22,11 +26,11 @@ class TokenFormatter extends \Magento\InstantPurchase\PaymentMethodIntegration\S
      * @return string
      * @since 100.2.0
      */
-    public function formatPaymentToken(\Magento\Vault\Api\Data\PaymentTokenInterface $paymentToken): string
+    public function formatPaymentToken(PaymentTokenInterface $paymentToken): string
     {
         $methodTitle = parent::formatPaymentToken($paymentToken);
 
-        if ($paymentToken instanceof \ParadoxLabs\TokenBase\Api\Data\CardInterface) {
+        if ($paymentToken instanceof CardInterface) {
             return sprintf('%s: %s', $methodTitle, $paymentToken->getLabel());
         }
 

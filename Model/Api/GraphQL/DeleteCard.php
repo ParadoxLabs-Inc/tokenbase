@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,25 +15,21 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Model\Api\GraphQL;
 
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
+use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
+use ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface;
+use ParadoxLabs\TokenBase\Model\Api\GraphQL;
 
 class DeleteCard implements \Magento\Framework\GraphQl\Query\ResolverInterface
 {
-    /**
-     * @var \ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface
-     */
-    private $customerCardRepository;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Model\Api\GraphQL
-     */
-    private $graphQL;
-
     /**
      * Card constructor.
      *
@@ -41,11 +37,9 @@ class DeleteCard implements \Magento\Framework\GraphQl\Query\ResolverInterface
      * @param \ParadoxLabs\TokenBase\Model\Api\GraphQL $graphQL
      */
     public function __construct(
-        \ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface $customerCardRepository,
-        \ParadoxLabs\TokenBase\Model\Api\GraphQL $graphQL
+        private CustomerCardRepositoryInterface $customerCardRepository,
+        private GraphQL $graphQL
     ) {
-        $this->customerCardRepository = $customerCardRepository;
-        $this->graphQL = $graphQL;
     }
 
     /**
@@ -56,13 +50,13 @@ class DeleteCard implements \Magento\Framework\GraphQl\Query\ResolverInterface
      * @param \Magento\Framework\GraphQl\Schema\Type\ResolveInfo $info
      * @param array|null $value
      * @param array|null $args
-     * @throws \Exception
      * @return mixed|\Magento\Framework\GraphQl\Query\Resolver\Value
+     * @throws \Exception
      */
     public function resolve(
-        \Magento\Framework\GraphQl\Config\Element\Field $field,
+        Field $field,
         $context,
-        \Magento\Framework\GraphQl\Schema\Type\ResolveInfo $info,
+        ResolveInfo $info,
         ?array $value = null,
         ?array $args = null
     ) {
@@ -74,7 +68,7 @@ class DeleteCard implements \Magento\Framework\GraphQl\Query\ResolverInterface
 
         try {
             $this->customerCardRepository->deleteByHash($context->getUserId(), $args['hash']);
-        } catch (\Magento\Framework\Exception\LocalizedException $e) {
+        } catch (LocalizedException $e) {
             throw new GraphQlInputException(__($e->getMessage()), $e);
         }
 

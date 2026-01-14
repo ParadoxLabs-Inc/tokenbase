@@ -30,9 +30,19 @@ define(
         'Magento_Checkout/js/model/full-screen-loader',
         'mage/validation'
     ],
-    function (ko, $, Component, placeOrderAction, cardNumberValidator, additionalValidators, alert, quote, fullScreenLoader) {
+    function (
+        ko,
+        $,
+        Component,
+        placeOrderAction,
+        cardNumberValidator,
+        additionalValidators,
+        alert,
+        quote,
+        fullScreenLoader
+    ) {
         'use strict';
-        var config=null;
+        var config = null;
         return Component.extend({
             defaults: {
                 template: 'ParadoxLabs_TokenBase/payment/cc',
@@ -46,19 +56,19 @@ define(
                 logoImage: config ? config.logoImage : false
             },
 
-            isShowLegend: function() {
+            isShowLegend: function () {
                 return true;
             },
 
-            isActive: function() {
+            isActive: function () {
                 return true;
             },
 
-            initVars: function() {
-                this.canSaveCard     = config ? config.canSaveCard : false;
-                this.forceSaveCard   = config ? config.forceSaveCard : false;
+            initVars: function () {
+                this.canSaveCard = config ? config.canSaveCard : false;
+                this.forceSaveCard = config ? config.forceSaveCard : false;
                 this.defaultSaveCard = config ? config.defaultSaveCard : false;
-                this.requireCcv      = config ? config.requireCcv : false;
+                this.requireCcv = config ? config.requireCcv : false;
             },
 
             /**
@@ -85,33 +95,33 @@ define(
 
                 this.isFormShown = ko.computed(function () {
                     return !this.useVault()
-                        || this.selectedCard() === undefined
-                        || this.selectedCard() === '';
+                           || this.selectedCard() === undefined
+                           || this.selectedCard() === '';
                 }, this);
 
                 this.isCcvShown = ko.computed(function () {
                     return this.hasVerification()
-                        && (this.requireCcv()
-                            || !this.useVault()
-                            || this.selectedCard() === undefined
-                            || this.selectedCard() === '');
+                           && (this.requireCcv()
+                               || !this.useVault()
+                               || this.selectedCard() === undefined
+                               || this.selectedCard() === '');
                 }, this);
 
                 this.isPlaceOrderActionAllowed = ko.computed({
                     read: this.checkPlaceOrderAllowed,
-                    write: function(value) {
+                    write: function (value) {
                         this.placeOrderAllowedFlag(value);
                     },
                     owner: this
                 });
 
-                this.creditCardNumberFormatted.subscribe(function(value) {
-                    this.creditCardNumber(value.replace(/\D/g,''));
+                this.creditCardNumberFormatted.subscribe(function (value) {
+                    this.creditCardNumber(value.replace(/\D/g, ''));
                 }.bind(this));
 
                 // Trigger form validation periodically for clean UX.
                 setInterval(
-                    function() {
+                    function () {
                         this.selectedCard.notifySubscribers();
                     }.bind(this),
                     100
@@ -171,23 +181,23 @@ define(
                 return this.item.method;
             },
 
-            useVault: function() {
+            useVault: function () {
                 return this.getStoredCards().length > 0;
             },
 
-            forceSaveCard: function() {
+            forceSaveCard: function () {
                 return this.forceSaveCard;
             },
 
-            isCcDetectionEnabled: function() {
+            isCcDetectionEnabled: function () {
                 return true;
             },
 
-            getStoredCards: function() {
+            getStoredCards: function () {
                 return this.storedCards();
             },
 
-            getLogoImage: function() {
+            getLogoImage: function () {
                 return this.logoImage;
             },
 
@@ -200,8 +210,8 @@ define(
                 }
 
                 return $.validator.validateSingleElement('#' + this.item.method + '-cc-number')
-                    && $.validator.validateSingleElement('#' + this.item.method + '-cc-exp-month')
-                    && $.validator.validateSingleElement('#' + this.item.method + '-cc-cid');
+                       && $.validator.validateSingleElement('#' + this.item.method + '-cc-exp-month')
+                       && $.validator.validateSingleElement('#' + this.item.method + '-cc-cid');
             },
 
             /**
@@ -211,7 +221,7 @@ define(
                 this.placeOrderFailure(false);
 
                 return this._super()
-                           .fail(this.handleFailedOrder.bind(this));
+                    .fail(this.handleFailedOrder.bind(this));
             },
 
             handleFailedOrder: function (response) {
@@ -256,7 +266,7 @@ define(
                 }
             },
 
-            spinner: function(isTokenizing) {
+            spinner: function (isTokenizing) {
                 if (isTokenizing === true) {
                     fullScreenLoader.startLoader();
                 } else {

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,41 +15,31 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Observer;
 
-class MultishippingAssignACHDataObserver implements \Magento\Framework\Event\ObserverInterface
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\DataObject;
+use Magento\Framework\Event\ManagerInterface;
+use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
+use ParadoxLabs\TokenBase\Helper\Data;
+
+class MultishippingAssignACHDataObserver implements ObserverInterface
 {
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
-     * @var \Magento\Framework\App\RequestInterface
-     */
-    protected $request;
-
-    /**
-     * @var \Magento\Framework\Event\ManagerInterface
-     */
-    protected $eventManager;
-
     /**
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \Magento\Framework\App\RequestInterface $request
      * @param \Magento\Framework\Event\ManagerInterface $eventManager
      */
     public function __construct(
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \Magento\Framework\App\RequestInterface $request,
-        \Magento\Framework\Event\ManagerInterface $eventManager
+        protected Data $helper,
+        protected RequestInterface $request,
+        protected ManagerInterface $eventManager
     ) {
-        $this->helper = $helper;
-        $this->request = $request;
-        $this->eventManager = $eventManager;
     }
 
     /**
@@ -59,7 +49,7 @@ class MultishippingAssignACHDataObserver implements \Magento\Framework\Event\Obs
      * @param \Magento\Framework\Event\Observer $observer
      * @return void
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         /** @var \Magento\Quote\Model\Quote $quote */
         $quote = $observer->getEvent()->getData('quote');
@@ -72,7 +62,7 @@ class MultishippingAssignACHDataObserver implements \Magento\Framework\Event\Obs
                 [
                     'method' => $this->helper->getMethodInstance($quote->getPayment()->getMethod()),
                     'payment_model' => $quote->getPayment(),
-                    'data' => new \Magento\Framework\DataObject($post['payment']),
+                    'data' => new DataObject($post['payment']),
                 ]
             );
         }

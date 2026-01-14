@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,10 +15,13 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Observer;
+
+use Magento\Framework\DataObject;
 
 /**
  * Custom data field conversion -- quote to order, etc, etc.
@@ -28,16 +31,17 @@ abstract class ConvertAbstract
     /**
      * @var string[]
      */
-    protected $fields = [
-        'tokenbase_id',
-        'echeck_account_name',
-        'echeck_bank_name',
-        'echeck_account_type',
-        'echeck_routing_number',
-        'echeck_routing_no',
-        'echeck_account_no',
-        'echeck_type',
-    ];
+    protected $fields
+        = [
+            'tokenbase_id',
+            'echeck_account_name',
+            'echeck_bank_name',
+            'echeck_account_type',
+            'echeck_routing_number',
+            'echeck_routing_no',
+            'echeck_account_no',
+            'echeck_type',
+        ];
 
     /**
      * Copy payment data fields from A to B
@@ -46,7 +50,7 @@ abstract class ConvertAbstract
      * @param \Magento\Framework\DataObject $to
      * @return void
      */
-    protected function copyData(\Magento\Framework\DataObject $from, \Magento\Framework\DataObject $to)
+    protected function copyData(DataObject $from, DataObject $to)
     {
         // Do the magic. Yeah, this is it.
         foreach ($this->fields as $field) {

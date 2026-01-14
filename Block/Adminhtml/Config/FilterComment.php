@@ -13,7 +13,13 @@
 
 namespace ParadoxLabs\TokenBase\Block\Adminhtml\Config;
 
-class FilterComment extends \Magento\Config\Block\System\Config\Form\Fieldset
+use Magento\Backend\Block\Context;
+use Magento\Backend\Model\Auth\Session;
+use Magento\Cms\Model\Template\FilterProvider;
+use Magento\Config\Block\System\Config\Form\Fieldset;
+use Magento\Framework\View\Helper\Js;
+
+class FilterComment extends Fieldset
 {
     /**
      * @var \Magento\Cms\Model\Template\FilterProvider
@@ -29,10 +35,10 @@ class FilterComment extends \Magento\Config\Block\System\Config\Form\Fieldset
      * @param \Magento\Framework\View\Helper\SecureHtmlRenderer|null $secureRenderer
      */
     public function __construct(
-        \Magento\Backend\Block\Context $context,
-        \Magento\Backend\Model\Auth\Session $authSession,
-        \Magento\Framework\View\Helper\Js $jsHelper,
-        \Magento\Cms\Model\Template\FilterProvider $filterProvider,
+        Context $context,
+        Session $authSession,
+        Js $jsHelper,
+        FilterProvider $filterProvider,
         array $data = [],
         $secureRenderer = null
     ) {

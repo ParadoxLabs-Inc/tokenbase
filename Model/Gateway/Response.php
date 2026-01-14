@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,15 +15,18 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Model\Gateway;
 
+use Magento\Framework\DataObject;
+
 /**
  * Response object: Container for various response data (txn ID, status, etc.)
  */
-class Response extends \Magento\Framework\DataObject
+class Response extends DataObject
 {
     /**
      * Mark response as fraud or not fraud
@@ -177,9 +180,9 @@ class Response extends \Magento\Framework\DataObject
             if (is_array($value)) {
                 $result += $this->flattenArray($value, $prefix . $key . '.');
             } elseif (is_bool($value)) {
-                $result[$prefix . $key] = $value ? '1' : '0';
+                $result[ $prefix . $key ] = $value ? '1' : '0';
             } else {
-                $result[$prefix . $key] = $value;
+                $result[ $prefix . $key ] = $value;
             }
         }
 

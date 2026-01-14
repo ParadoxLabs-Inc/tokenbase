@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,10 +15,16 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Api;
+
+use Magento\Customer\Api\Data\AddressInterface;
+use Magento\Framework\Api\SearchCriteriaInterface;
+use ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface;
+use ParadoxLabs\TokenBase\Api\Data\CardInterface;
 
 /**
  * Interface CustomerCardRepositoryInterface
@@ -38,9 +44,9 @@ interface CustomerCardRepositoryInterface
      */
     public function saveExtended(
         $customerId,
-        \ParadoxLabs\TokenBase\Api\Data\CardInterface $card,
-        \Magento\Customer\Api\Data\AddressInterface $address,
-        \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface $additional
+        CardInterface $card,
+        AddressInterface $address,
+        CardAdditionalInterface $additional
     );
 
     /**
@@ -62,7 +68,7 @@ interface CustomerCardRepositoryInterface
      * @return \ParadoxLabs\TokenBase\Api\Data\CardSearchResultsInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getList($customerId, \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria);
+    public function getList($customerId, SearchCriteriaInterface $searchCriteria);
 
     /**
      * Delete card. Will accept hash only.

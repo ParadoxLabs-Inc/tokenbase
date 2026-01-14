@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,32 +15,38 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Block\Customer;
 
-class Form extends \Magento\Customer\Block\Address\Edit
-{
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
+use Magento\Customer\Api\AddressRepositoryInterface;
+use Magento\Customer\Api\Data\AddressInterfaceFactory;
+use Magento\Customer\Block\Address\Edit;
+use Magento\Customer\Block\Widget\Name;
+use Magento\Customer\Helper\Session\CurrentCustomer;
+use Magento\Customer\Model\Session;
+use Magento\Directory\Helper\Data as DirectoryHelper;
+use Magento\Directory\Model\ResourceModel\Country\CollectionFactory;
+use Magento\Directory\Model\ResourceModel\Region\CollectionFactory as RegionCollectionFactory;
+use Magento\Framework\Api\DataObjectHelper;
+use Magento\Framework\App\Cache\Type\Config;
+use Magento\Framework\Json\EncoderInterface;
+use Magento\Framework\Registry;
+use Magento\Framework\View\Element\Template\Context;
+use Magento\Payment\Block\Form\Cc;
+use ParadoxLabs\TokenBase\Helper\Data;
+use ParadoxLabs\TokenBase\Model\CardFactory;
+use ParadoxLabs\TokenBase\Model\Method\Factory;
+use Throwable;
 
+class Form extends Edit
+{
     /**
      * @var \ParadoxLabs\TokenBase\Model\Card
      */
     protected $card;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Model\CardFactory
-     */
-    protected $cardFactory;
-
-    /**
-     * @var \Magento\Framework\Registry
-     */
-    protected $registry;
 
     /**
      * @var \ParadoxLabs\TokenBase\Api\MethodInterface
@@ -51,11 +57,6 @@ class Form extends \Magento\Customer\Block\Address\Edit
      * @var \Magento\Payment\Block\Form\Cc
      */
     protected $ccBlock;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Model\Method\Factory
-     */
-    protected $tokenbaseMethodFactory;
 
     /**
      * Constructor
@@ -80,28 +81,23 @@ class Form extends \Magento\Customer\Block\Address\Edit
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
-        \Magento\Framework\View\Element\Template\Context $context,
-        \Magento\Directory\Helper\Data $directoryHelper,
-        \Magento\Framework\Json\EncoderInterface $jsonEncoder,
-        \Magento\Framework\App\Cache\Type\Config $configCacheType,
-        \Magento\Directory\Model\ResourceModel\Region\CollectionFactory $regionCollectionFactory,
-        \Magento\Directory\Model\ResourceModel\Country\CollectionFactory $countryCollectionFactory,
-        \Magento\Customer\Model\Session $customerSession,
-        \Magento\Customer\Api\AddressRepositoryInterface $addressRepository,
-        \Magento\Customer\Api\Data\AddressInterfaceFactory $addressDataFactory,
-        \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer,
-        \Magento\Framework\Api\DataObjectHelper $dataObjectHelper,
-        \Magento\Framework\Registry $registry,
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
-        \ParadoxLabs\TokenBase\Model\Method\Factory $tokenbaseMethodFactory,
+        Context $context,
+        DirectoryHelper $directoryHelper,
+        EncoderInterface $jsonEncoder,
+        Config $configCacheType,
+        RegionCollectionFactory $regionCollectionFactory,
+        CollectionFactory $countryCollectionFactory,
+        Session $customerSession,
+        AddressRepositoryInterface $addressRepository,
+        AddressInterfaceFactory $addressDataFactory,
+        CurrentCustomer $currentCustomer,
+        DataObjectHelper $dataObjectHelper,
+        protected Registry $registry,
+        protected Data $helper,
+        protected CardFactory $cardFactory,
+        protected Factory $tokenbaseMethodFactory,
         array $data = []
     ) {
-        $this->helper = $helper;
-        $this->cardFactory = $cardFactory;
-        $this->registry = $registry;
-        $this->tokenbaseMethodFactory = $tokenbaseMethodFactory;
-
         $this->method = $this->tokenbaseMethodFactory->getMethodInstance($this->getCode());
 
         parent::__construct(
@@ -160,7 +156,7 @@ class Form extends \Magento\Customer\Block\Address\Edit
         if ($this->card === null) {
             try {
                 $this->card = $this->helper->getActiveCard($this->getCode());
-            } catch (\Exception $e) {
+            } catch (Throwable) {
                 $this->card = $this->cardFactory->create();
             }
         }
@@ -188,7 +184,7 @@ class Form extends \Magento\Customer\Block\Address\Edit
     {
         $street = $this->getAddress()->getStreet();
 
-        return isset($street[$lineNumber - 1]) ? $street[$lineNumber - 1] : '';
+        return $street[ $lineNumber - 1 ] ?? '';
     }
 
     /**
@@ -200,7 +196,7 @@ class Form extends \Magento\Customer\Block\Address\Edit
     {
         /** @var \Magento\Customer\Block\Widget\Name $nameBlock */
         $nameBlock = $this->getLayout()
-                          ->createBlock(\Magento\Customer\Block\Widget\Name::class);
+                          ->createBlock(Name::class);
 
         $nameBlock->setObject($this->getAddress());
         $nameBlock->setData('field_name_format', 'billing[%s]');
@@ -244,7 +240,7 @@ class Form extends \Magento\Customer\Block\Address\Edit
     public function getCcBlock()
     {
         if ($this->ccBlock === null) {
-            $this->ccBlock = $this->getLayout()->createBlock(\Magento\Payment\Block\Form\Cc::class);
+            $this->ccBlock = $this->getLayout()->createBlock(Cc::class);
             $this->ccBlock->setMethod($this->helper->getMethodInstance($this->getCode()));
         }
 

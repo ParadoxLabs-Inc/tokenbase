@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,6 +15,7 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
@@ -23,12 +24,20 @@ namespace ParadoxLabs\TokenBase\Controller\Paymentinfo;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Data\Form\FormKey\Validator;
+use Magento\Framework\Registry;
 use Magento\Framework\View\Result\PageFactory;
+use ParadoxLabs\TokenBase\Api\CardRepositoryInterface;
+use ParadoxLabs\TokenBase\Controller\Paymentinfo;
+use ParadoxLabs\TokenBase\Helper\Address;
+use ParadoxLabs\TokenBase\Helper\Data;
+use ParadoxLabs\TokenBase\Model\CardFactory;
+use Throwable;
 
 /**
  * Delete the given card, if valid
  */
-class Delete extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
+class Delete extends Paymentinfo
 {
     /**
      * @var \Magento\Framework\Controller\Result\JsonFactory
@@ -50,12 +59,12 @@ class Delete extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
         Context $context,
         Session $customerSession,
         PageFactory $resultPageFactory,
-        \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator,
-        \Magento\Framework\Registry $registry,
-        \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory,
-        \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository,
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \ParadoxLabs\TokenBase\Helper\Address $addressHelper,
+        Validator $formKeyValidator,
+        Registry $registry,
+        CardFactory $cardFactory,
+        CardRepositoryInterface $cardRepository,
+        Data $helper,
+        Address $addressHelper,
     ) {
         parent::__construct(
             $context,
@@ -77,9 +86,9 @@ class Delete extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
      */
     public function execute()
     {
-        $id     = $this->getRequest()->getParam('id');
-        $method = $this->getRequest()->getParam('method');
-        $isAjax = $this->getRequest()->isAjax();
+        $id         = $this->getRequest()->getParam('id');
+        $method     = $this->getRequest()->getParam('method');
+        $isAjax     = $this->getRequest()->isAjax();
         $resultData = ['success' => false];
 
         if ($this->formKeyIsValid() === true && $this->methodIsValid() === true && !empty($id)) {
@@ -101,7 +110,7 @@ class Delete extends \ParadoxLabs\TokenBase\Controller\Paymentinfo
                 } else {
                     $this->messageManager->addErrorMessage(__('Invalid Request.'));
                 }
-            } catch (\Exception $e) {
+            } catch (Throwable $e) {
                 $this->helper->log($method, (string)$e);
                 $this->messageManager->addErrorMessage($e->getMessage());
             }

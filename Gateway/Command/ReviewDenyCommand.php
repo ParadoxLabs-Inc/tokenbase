@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,25 +15,22 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Gateway\Command;
 
-class ReviewDenyCommand implements \Magento\Payment\Gateway\CommandInterface
-{
-    /**
-     * @var \ParadoxLabs\TokenBase\Api\MethodInterface
-     */
-    protected $method;
+use Magento\Payment\Gateway\CommandInterface;
+use ParadoxLabs\TokenBase\Api\MethodInterface;
 
+class ReviewDenyCommand implements CommandInterface
+{
     /**
      * @param \ParadoxLabs\TokenBase\Api\MethodInterface $method
      */
-    public function __construct(
-        \ParadoxLabs\TokenBase\Api\MethodInterface $method
-    ) {
-        $this->method = $method;
+    public function __construct(protected MethodInterface $method)
+    {
     }
 
     /**

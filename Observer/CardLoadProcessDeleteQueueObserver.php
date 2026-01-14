@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,36 +15,31 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Observer;
 
+use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Registry;
+use ParadoxLabs\TokenBase\Api\CardRepositoryInterface;
+use Throwable;
+
 /**
  * CardLoad Observer
  */
-class CardLoadProcessDeleteQueueObserver implements \Magento\Framework\Event\ObserverInterface
+class CardLoadProcessDeleteQueueObserver implements ObserverInterface
 {
-    /**
-     * @var \Magento\Framework\Registry
-     */
-    protected $registry;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Api\CardRepositoryInterface
-     */
-    protected $cardRepository;
-
     /**
      * @param \Magento\Framework\Registry $registry
      * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
      */
     public function __construct(
-        \Magento\Framework\Registry $registry,
-        \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
+        protected Registry $registry,
+        protected CardRepositoryInterface $cardRepository
     ) {
-        $this->registry = $registry;
-        $this->cardRepository = $cardRepository;
     }
 
     /**
@@ -55,7 +50,7 @@ class CardLoadProcessDeleteQueueObserver implements \Magento\Framework\Event\Obs
      * @param \Magento\Framework\Event\Observer $observer
      * @return void
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         try {
             /** @var \ParadoxLabs\TokenBase\Model\Card $card */
@@ -71,7 +66,7 @@ class CardLoadProcessDeleteQueueObserver implements \Magento\Framework\Event\Obs
                     $this->cardRepository->delete($card);
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Throwable) {
             // No-op -- never throw an exception in this context.
         }
     }

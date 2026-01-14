@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,40 +15,29 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Block\Adminhtml\Config;
 
+use Magento\Backend\Block\Template\Context;
+use Magento\Config\Block\System\Config\Form\Field;
+use Magento\Framework\Data\Form\Element\AbstractElement;
+use Magento\Store\Model\StoreFactory;
+use Magento\Store\Model\WebsiteFactory;
+use ParadoxLabs\TokenBase\Helper\Data;
+use ParadoxLabs\TokenBase\Model\Method\Factory;
+
 /**
  * ApiTest Class
  */
-abstract class ApiTest extends \Magento\Config\Block\System\Config\Form\Field
+abstract class ApiTest extends Field
 {
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
     /**
      * @var int
      */
     protected $storeId;
-
-    /**
-     * @var \Magento\Store\Model\StoreFactory
-     */
-    protected $storeFactory;
-
-    /**
-     * @var \Magento\Store\Model\WebsiteFactory
-     */
-    protected $websiteFactory;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Model\Method\Factory
-     */
-    protected $methodFactory;
 
     /**
      * @param \Magento\Backend\Block\Template\Context $context
@@ -59,18 +48,13 @@ abstract class ApiTest extends \Magento\Config\Block\System\Config\Form\Field
      * @param array $data
      */
     public function __construct(
-        \Magento\Backend\Block\Template\Context $context,
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \Magento\Store\Model\StoreFactory $storeFactory,
-        \Magento\Store\Model\WebsiteFactory $websiteFactory,
-        \ParadoxLabs\TokenBase\Model\Method\Factory $methodFactory,
+        Context $context,
+        protected Data $helper,
+        protected StoreFactory $storeFactory,
+        protected WebsiteFactory $websiteFactory,
+        protected Factory $methodFactory,
         array $data = []
     ) {
-        $this->helper = $helper;
-        $this->storeFactory = $storeFactory;
-        $this->websiteFactory = $websiteFactory;
-        $this->methodFactory = $methodFactory;
-
         parent::__construct($context, $data);
     }
 
@@ -108,11 +92,11 @@ abstract class ApiTest extends \Magento\Config\Block\System\Config\Form\Field
      * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
      * @return string
      */
-    protected function _getElementHtml(\Magento\Framework\Data\Form\Element\AbstractElement $element)
+    protected function _getElementHtml(AbstractElement $element)
     {
         $html = (string)$this->testApi();
 
-        if (strpos($html, 'success') !== false) {
+        if (str_contains($html, 'success')) {
             $html = '<strong style="color:#0a0;">' . $html . '</strong>';
         } else {
             $html = '<strong style="color:#D40707;">' . $html . '</strong>';

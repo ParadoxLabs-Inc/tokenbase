@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,17 +15,27 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Model;
 
+use Magento\Framework\DataObject;
+use Magento\Framework\HTTP\ClientInterfaceFactory;
+use Magento\Payment\Gateway\Command\CommandException;
+use Magento\Payment\Model\InfoInterface;
+use ParadoxLabs\TokenBase\Api\Data\CardInterface;
 use ParadoxLabs\TokenBase\Api\GatewayInterface;
+use ParadoxLabs\TokenBase\Helper\Data;
+use ParadoxLabs\TokenBase\Model\Gateway\ResponseFactory;
+use ParadoxLabs\TokenBase\Model\Gateway\Xml;
+use Throwable;
 
 /**
  * Common API gateway methods, logging, exceptions, etc.
  */
-abstract class AbstractGateway extends \Magento\Framework\DataObject implements GatewayInterface
+abstract class AbstractGateway extends DataObject implements GatewayInterface
 {
     /**
      * @var string
@@ -64,19 +74,19 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
      *
      * @var array
      */
-    protected $fields           = [];
+    protected $fields = [];
 
     /**
      * These hold parameters for each request.
      *
      * @var array
      */
-    protected $params           = [];
+    protected $params = [];
 
     /**
      * @var array
      */
-    protected $defaults         = [];
+    protected $defaults = [];
 
     /**
      * @var string
@@ -96,54 +106,27 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
     /**
      * @var string
      */
-    protected $log              = '';
+    protected $log = '';
 
     /**
      * @var string
      */
-    protected $endpointLive     = '';
+    protected $endpointLive = '';
 
     /**
      * @var string
      */
-    protected $endpointTest     = '';
+    protected $endpointTest = '';
 
     /**
      * @var bool
      */
-    protected $initialized      = false;
+    protected $initialized = false;
 
     /**
      * @var bool
      */
-    protected $haveAuthorized   = false;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Model\Gateway\Xml
-     */
-    protected $xml;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Model\Gateway\ResponseFactory
-     */
-    protected $responseFactory;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
-     * @var \Magento\Framework\HTTP\ZendClientFactory
-     * @deprecated Class is nonfunctional in 2.4.6+.
-     * @see \Magento\Framework\HTTP\ClientInterface via $this->communicatorFactory
-     */
-    protected $httpClientFactory;
-
-    /**
-     * @var \Magento\Framework\HTTP\ClientInterfaceFactory
-     */
-    protected $communicatorFactory;
+    protected $haveAuthorized = false;
 
     /**
      * Constructor, yeah!
@@ -151,31 +134,17 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \ParadoxLabs\TokenBase\Model\Gateway\Xml $xml
      * @param \ParadoxLabs\TokenBase\Model\Gateway\ResponseFactory $responseFactory
-     * @param \Magento\Framework\HTTP\ZendClientFactory $httpClientFactory * Deprecated, will be removed in the future
      * @param array $data
-     * @param \Magento\Framework\HTTP\ClientInterfaceFactory|null $communicatorFactory
+     * @param \Magento\Framework\HTTP\ClientInterfaceFactory $communicatorFactory
      */
     public function __construct(
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \ParadoxLabs\TokenBase\Model\Gateway\Xml $xml,
-        \ParadoxLabs\TokenBase\Model\Gateway\ResponseFactory $responseFactory,
-        \Magento\Framework\HTTP\ZendClientFactory $httpClientFactory,
+        protected Data $helper,
+        protected Xml $xml,
+        protected ResponseFactory $responseFactory,
+        protected ClientInterfaceFactory $communicatorFactory,
         array $data = [],
-        ?\Magento\Framework\HTTP\ClientInterfaceFactory $communicatorFactory = null
     ) {
-        $this->helper           = $helper;
-        $this->responseFactory  = $responseFactory;
-        $this->xml              = $xml;
-        $this->httpClientFactory = $httpClientFactory;
-        $this->communicatorFactory = $communicatorFactory;
-
         parent::__construct($data);
-
-        // BC preservation -- argument added in 4.5.4
-        $om = \Magento\Framework\App\ObjectManager::getInstance();
-        $this->communicatorFactory = $communicatorFactory ?? $om->get(
-            \Magento\Framework\HTTP\ClientInterfaceFactory::class
-        );
     }
 
     /**
@@ -186,13 +155,13 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
      */
     public function init(array $parameters)
     {
-        $this->secretKey    = isset($parameters['secret_key']) ? $parameters['secret_key'] : '';
-        $this->testMode     = isset($parameters['test_mode']) ? (bool)$parameters['test_mode'] : false;
-        $this->verifySsl    = isset($parameters['verify_ssl']) ? (bool)$parameters['verify_ssl'] : false;
+        $this->secretKey = $parameters['secret_key'] ?? '';
+        $this->testMode  = isset($parameters['test_mode']) ? (bool)$parameters['test_mode'] : false;
+        $this->verifySsl = isset($parameters['verify_ssl']) ? (bool)$parameters['verify_ssl'] : false;
 
-        $this->defaults     = [
-            'login'     => $parameters['login'],
-            'password'  => $parameters['password']
+        $this->defaults = [
+            'login' => $parameters['login'],
+            'password' => $parameters['password'],
         ];
 
         if (isset($parameters['endpoint'])) {
@@ -203,7 +172,7 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
 
         $this->clearParameters();
 
-        $this->initialized  = true;
+        $this->initialized = true;
 
         return $this;
     }
@@ -225,14 +194,14 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
      */
     public function reset()
     {
-        $this->defaults     = [];
-        $this->secretKey    = '';
-        $this->testMode     = null;
-        $this->endpoint     = null;
+        $this->defaults  = [];
+        $this->secretKey = '';
+        $this->testMode  = null;
+        $this->endpoint  = null;
 
         $this->clearParameters();
 
-        $this->initialized  = false;
+        $this->initialized = false;
 
         return $this;
     }
@@ -244,9 +213,9 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
      */
     public function clearParameters()
     {
-        $this->params       = $this->defaults;
-        $this->log          = '';
-        $this->lineItems    = null;
+        $this->params    = $this->defaults;
+        $this->log       = '';
+        $this->lineItems = null;
 
         return $this;
     }
@@ -303,7 +272,7 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
                     if (in_array($val, $this->fields[ $key ]['enum'])) {
                         $this->params[ $key ] = $val;
                     } else {
-                        throw new \Magento\Payment\Gateway\Command\CommandException(
+                        throw new CommandException(
                             __(sprintf("Payment Gateway: Invalid value for '%s': '%s'", $key, $val))
                         );
                     }
@@ -311,12 +280,12 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
                     $this->params[ $key ] = $val;
                 }
             } else {
-                throw new \Magento\Payment\Gateway\Command\CommandException(
+                throw new CommandException(
                     __(sprintf("Payment Gateway: Unknown parameter '%s'", $key))
                 );
             }
         } elseif ($val === null) {
-            unset($this->params[$key]);
+            unset($this->params[ $key ]);
         }
 
         return $this;
@@ -344,7 +313,7 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
      */
     public function getParameter($key, $default = '')
     {
-        return (isset($this->params[ $key ]) ? $this->params[ $key ] : $default);
+        return ($this->params[ $key ] ?? $default);
     }
 
     /**
@@ -402,7 +371,7 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
      */
     public static function formatAmount($amount)
     {
-        return sprintf('%01.2f', (float) $amount);
+        return sprintf('%01.2f', (float)$amount);
     }
 
     /**
@@ -441,7 +410,7 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
     {
         try {
             return $this->xml->createArray($xml);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->helper->log($this->code, $e->getMessage() . "\n" . $this->sanitizeLog($xml));
 
             throw $e;
@@ -454,7 +423,7 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
      * @param \ParadoxLabs\TokenBase\Api\Data\CardInterface $card
      * @return $this
      */
-    public function setCard(\ParadoxLabs\TokenBase\Api\Data\CardInterface $card)
+    public function setCard(CardInterface $card)
     {
         parent::setData('card', $card);
 
@@ -537,7 +506,7 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
      * @param float $amount
      * @return \ParadoxLabs\TokenBase\Model\Gateway\Response
      */
-    abstract public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount);
+    abstract public function authorize(InfoInterface $payment, $amount);
 
     /**
      * Run a capture transaction for $amount with the given payment info
@@ -547,7 +516,7 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
      * @param string $transactionId
      * @return \ParadoxLabs\TokenBase\Model\Gateway\Response
      */
-    abstract public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount, $transactionId = null);
+    abstract public function capture(InfoInterface $payment, $amount, $transactionId = null);
 
     /**
      * Run a refund transaction for $amount with the given payment info
@@ -557,7 +526,7 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
      * @param string $transactionId
      * @return \ParadoxLabs\TokenBase\Model\Gateway\Response
      */
-    abstract public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount, $transactionId = null);
+    abstract public function refund(InfoInterface $payment, $amount, $transactionId = null);
 
     /**
      * Run a void transaction for the given payment info
@@ -566,7 +535,7 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
      * @param string $transactionId
      * @return \ParadoxLabs\TokenBase\Model\Gateway\Response
      */
-    abstract public function void(\Magento\Payment\Model\InfoInterface $payment, $transactionId = null);
+    abstract public function void(InfoInterface $payment, $transactionId = null);
 
     /**
      * Fetch a transaction status update
@@ -575,5 +544,5 @@ abstract class AbstractGateway extends \Magento\Framework\DataObject implements 
      * @param string $transactionId
      * @return \ParadoxLabs\TokenBase\Model\Gateway\Response
      */
-    abstract public function fraudUpdate(\Magento\Payment\Model\InfoInterface $payment, $transactionId);
+    abstract public function fraudUpdate(InfoInterface $payment, $transactionId);
 }

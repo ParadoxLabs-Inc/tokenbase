@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,36 +15,36 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Observer;
 
+use Magento\Framework\DataObject;
+use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\StateException;
+use Magento\Payment\Model\InfoInterface;
+use Magento\Payment\Model\MethodInterface;
 use Magento\Quote\Api\Data\PaymentExtensionInterface;
 use Magento\Sales\Api\Data\OrderPaymentExtensionInterface;
+use ParadoxLabs\TokenBase\Api\CardRepositoryInterface;
+use ParadoxLabs\TokenBase\Api\Data\CardInterface;
+use ParadoxLabs\TokenBase\Helper\Data;
+use Throwable;
 
-class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\ObserverInterface
+class PaymentMethodAssignDataObserver implements ObserverInterface
 {
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Api\CardRepositoryInterface
-     */
-    protected $cardRepository;
-
     /**
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
      */
     public function __construct(
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
+        protected Data $helper,
+        protected CardRepositoryInterface $cardRepository
     ) {
-        $this->helper = $helper;
-        $this->cardRepository = $cardRepository;
     }
 
     /**
@@ -53,7 +53,7 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
      * @param \Magento\Framework\Event\Observer $observer
      * @return void
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         /** @var \Magento\Payment\Model\MethodInterface $method */
         $method = $observer->getData('method');
@@ -89,9 +89,9 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
      * @return void
      */
     protected function assignStandardData(
-        \Magento\Payment\Model\InfoInterface $payment,
-        \Magento\Framework\DataObject $data,
-        \Magento\Payment\Model\MethodInterface $method
+        InfoInterface $payment,
+        DataObject $data,
+        MethodInterface $method
     ) {
         /** @var \Magento\Sales\Model\Order\Payment $payment */
 
@@ -135,9 +135,9 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
      * @return void
      */
     protected function assignTokenbaseData(
-        \Magento\Payment\Model\InfoInterface $payment,
-        \Magento\Framework\DataObject $data,
-        \Magento\Payment\Model\MethodInterface $method
+        InfoInterface $payment,
+        DataObject $data,
+        MethodInterface $method
     ) {
         /** @var \Magento\Sales\Model\Order\Payment $payment */
 
@@ -200,7 +200,7 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function loadAndSetCard(
-        \Magento\Payment\Model\InfoInterface $payment,
+        InfoInterface $payment,
         $cardId,
         $byHash = false
     ) {
@@ -219,10 +219,10 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
 
                 return $card;
             }
-        } catch (\Magento\Framework\Exception\StateException $e) {
+        } catch (StateException $e) {
             $this->helper->log($payment->getMethod(), $e->getMessage());
             throw $e;
-        } catch (\Exception $e) {
+        } catch (Throwable) {
             // Any error is inability to load card -- handle same as auth failure.
         }
 
@@ -234,7 +234,7 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
             sprintf('Unable to load payment data. Please check the form and try again.')
         );
 
-        throw new \Magento\Framework\Exception\LocalizedException(
+        throw new LocalizedException(
             __('Unable to load payment data. Please check the form and try again.')
         );
     }
@@ -247,8 +247,8 @@ class PaymentMethodAssignDataObserver implements \Magento\Framework\Event\Observ
      * @return $this
      */
     protected function setCardOnPayment(
-        \Magento\Payment\Model\InfoInterface $payment,
-        \ParadoxLabs\TokenBase\Api\Data\CardInterface $card
+        InfoInterface $payment,
+        CardInterface $card
     ) {
         /** @var \Magento\Sales\Model\Order\Payment $payment */
 

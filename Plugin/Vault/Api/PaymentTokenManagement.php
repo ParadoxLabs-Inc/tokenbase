@@ -13,7 +13,15 @@
 
 namespace ParadoxLabs\TokenBase\Plugin\Vault\Api;
 
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Api\SortOrderBuilder;
+use Magento\Framework\Event\ManagerInterface;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Sales\Api\OrderPaymentRepositoryInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
+use Magento\Vault\Api\PaymentTokenManagementInterface;
+use ParadoxLabs\TokenBase\Api\CardRepositoryInterface;
+use ParadoxLabs\TokenBase\Helper\Data;
 
 class PaymentTokenManagement
 {
@@ -58,19 +66,19 @@ class PaymentTokenManagement
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      */
     public function __construct(
-        \Magento\Framework\Event\ManagerInterface $eventManager,
-        \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository,
-        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
-        \Magento\Framework\Api\SortOrderBuilder $sortOrderBuilder,
-        \Magento\Sales\Api\OrderPaymentRepositoryInterface $orderPaymentRepository,
-        \ParadoxLabs\TokenBase\Helper\Data $helper
+        ManagerInterface $eventManager,
+        CardRepositoryInterface $cardRepository,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        SortOrderBuilder $sortOrderBuilder,
+        OrderPaymentRepositoryInterface $orderPaymentRepository,
+        Data $helper
     ) {
-        $this->eventManager = $eventManager;
-        $this->cardRepository = $cardRepository;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-        $this->sortOrderBuilder = $sortOrderBuilder;
+        $this->eventManager           = $eventManager;
+        $this->cardRepository         = $cardRepository;
+        $this->searchCriteriaBuilder  = $searchCriteriaBuilder;
+        $this->sortOrderBuilder       = $sortOrderBuilder;
         $this->orderPaymentRepository = $orderPaymentRepository;
-        $this->helper = $helper;
+        $this->helper                 = $helper;
     }
 
     /**
@@ -82,7 +90,7 @@ class PaymentTokenManagement
      * @return \Magento\Vault\Api\Data\PaymentTokenInterface[] Payment tokens search result interface.
      */
     public function afterGetListByCustomerId(
-        \Magento\Vault\Api\PaymentTokenManagementInterface $subject,
+        PaymentTokenManagementInterface $subject,
         array $results,
         $customerId
     ): array {
@@ -109,7 +117,7 @@ class PaymentTokenManagement
      * @return \Magento\Vault\Api\Data\PaymentTokenInterface[] Payment tokens search result interface.
      */
     public function afterGetVisibleAvailableTokens(
-        \Magento\Vault\Api\PaymentTokenManagementInterface $subject,
+        PaymentTokenManagementInterface $subject,
         array $results,
         $customerId
     ): array {
@@ -144,7 +152,7 @@ class PaymentTokenManagement
      * @return PaymentTokenInterface|null Payment token interface.
      */
     public function afterGetByPaymentId(
-        \Magento\Vault\Api\PaymentTokenManagementInterface $subject,
+        PaymentTokenManagementInterface $subject,
         $result,
         $paymentId
     ) {
@@ -174,7 +182,7 @@ class PaymentTokenManagement
      * @return PaymentTokenInterface|null Payment token interface.
      */
     public function afterGetByGatewayToken(
-        \Magento\Vault\Api\PaymentTokenManagementInterface $subject,
+        PaymentTokenManagementInterface $subject,
         $result,
         $token,
         $paymentMethodCode,
@@ -189,7 +197,6 @@ class PaymentTokenManagement
                                                         ->addFilter('payment_id', $token)
                                                         ->setPageSize(1)
                                                         ->create();
-
 
             $cards = $this->cardRepository->getList($cardCriteria);
 
@@ -212,7 +219,7 @@ class PaymentTokenManagement
      * @return PaymentTokenInterface|null Payment token interface.
      */
     public function afterGetByPublicHash(
-        \Magento\Vault\Api\PaymentTokenManagementInterface $subject,
+        PaymentTokenManagementInterface $subject,
         $result,
         $hash,
         $customerId
@@ -224,7 +231,7 @@ class PaymentTokenManagement
                     /** @var \ParadoxLabs\TokenBase\Model\Card $result */
                     $result = $card;
                 }
-            } catch (\Magento\Framework\Exception\LocalizedException $e) {
+            } catch (LocalizedException $e) {
                 // NO-OP: If we can't find the card in TB, ignore and let Vault continue.
             }
         }

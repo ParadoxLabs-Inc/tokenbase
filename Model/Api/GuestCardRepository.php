@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,23 +15,25 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Model\Api;
 
-class GuestCardRepository implements \ParadoxLabs\TokenBase\Api\GuestCardRepositoryInterface
+use Magento\Customer\Api\Data\AddressInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Exception\AuthorizationException;
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Store\Model\ScopeInterface;
+use ParadoxLabs\TokenBase\Api\CardRepositoryInterface;
+use ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface;
+use ParadoxLabs\TokenBase\Api\Data\CardInterface;
+use ParadoxLabs\TokenBase\Api\GuestCardRepositoryInterface;
+
+class GuestCardRepository implements GuestCardRepositoryInterface
 {
-    /**
-     * @var \ParadoxLabs\TokenBase\Api\CardRepositoryInterface
-     */
-    protected $cardRepository;
-
-    /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    protected $scopeConfig;
-
     /**
      * GuestCardRepository constructor.
      *
@@ -39,11 +41,9 @@ class GuestCardRepository implements \ParadoxLabs\TokenBase\Api\GuestCardReposit
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-        \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+        protected CardRepositoryInterface $cardRepository,
+        protected ScopeConfigInterface $scopeConfig
     ) {
-        $this->cardRepository = $cardRepository;
-        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -57,9 +57,9 @@ class GuestCardRepository implements \ParadoxLabs\TokenBase\Api\GuestCardReposit
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function saveExtended(
-        \ParadoxLabs\TokenBase\Api\Data\CardInterface $card,
-        \Magento\Customer\Api\Data\AddressInterface $address,
-        \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface $additional
+        CardInterface $card,
+        AddressInterface $address,
+        CardAdditionalInterface $additional
     ) {
         $this->validateEnabled();
 
@@ -68,7 +68,7 @@ class GuestCardRepository implements \ParadoxLabs\TokenBase\Api\GuestCardReposit
             try {
                 $originalCard = $this->getByHash($card->getHash());
                 $this->validateGuestCard($originalCard);
-            } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
+            } catch (NoSuchEntityException) {
                 // No-op: Ignore card hash does not exist
             }
         } elseif ($card->getId()) {
@@ -110,10 +110,10 @@ class GuestCardRepository implements \ParadoxLabs\TokenBase\Api\GuestCardReposit
      * @return void
      * @throws \Magento\Framework\Exception\InputException
      */
-    protected function validateGuestCard(\ParadoxLabs\TokenBase\Api\Data\CardInterface $card)
+    protected function validateGuestCard(CardInterface $card)
     {
         if ((int)$card->getCustomerId() > 0) {
-            throw new \Magento\Framework\Exception\InputException(__('You do not have permission for this action.'));
+            throw new InputException(__('You do not have permission for this action.'));
         }
     }
 
@@ -127,11 +127,11 @@ class GuestCardRepository implements \ParadoxLabs\TokenBase\Api\GuestCardReposit
     {
         $isEnabled = (bool)$this->scopeConfig->getValue(
             'checkout/tokenbase/enable_public_api',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
 
         if ($isEnabled !== true) {
-            throw new \Magento\Framework\Exception\AuthorizationException(
+            throw new AuthorizationException(
                 __('The public TokenBase API is not enabled.')
             );
         }

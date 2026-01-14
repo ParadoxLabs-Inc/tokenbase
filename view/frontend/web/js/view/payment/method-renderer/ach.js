@@ -31,7 +31,7 @@ define(
     ],
     function (ko, $, _, Component, $t, placeOrderAction, additionalValidators, alert, quote) {
         'use strict';
-        var config=null;
+        var config = null;
         return Component.extend({
             defaults: {
                 template: 'ParadoxLabs_TokenBase/payment/ach',
@@ -50,12 +50,12 @@ define(
             initObservable: function () {
                 this.initVars();
                 this.observe([
-                        'echeckAccountName',
-                        'echeckBankName',
-                        'echeckRoutingNumber',
-                        'echeckAccountNumber',
-                        'echeckAccountType'
-                    ])
+                    'echeckAccountName',
+                    'echeckBankName',
+                    'echeckRoutingNumber',
+                    'echeckAccountNumber',
+                    'echeckAccountType'
+                ])
                 this._super();
 
                 return this;
@@ -108,8 +108,8 @@ define(
                 };
             },
 
-            getAchAccountTypes: function() {
-                return _.map(this.achAccountTypes, function(value, key) {
+            getAchAccountTypes: function () {
+                return _.map(this.achAccountTypes, function (value, key) {
                     return {
                         'value': key,
                         'label': value
@@ -117,11 +117,11 @@ define(
                 });
             },
 
-            getAchImage: function() {
+            getAchImage: function () {
                 return this.achImage;
             },
 
-            getAchTypeTitleByCode: function(code) {
+            getAchTypeTitleByCode: function (code) {
                 var title = '';
                 _.each(this.getAchAccountTypes(), function (value) {
                     if (value['value'] === code) {
@@ -131,7 +131,7 @@ define(
                 return title;
             },
 
-            getInfo: function() {
+            getInfo: function () {
                 return [
                     {'name': $t('Name on Account'), value: this.echeckAccountName()},
                     {'name': $t('Type'), value: $t(this.getAchTypeTitleByCode(this.echeckAccountType()))}
@@ -147,10 +147,10 @@ define(
                 }
 
                 return $.validator.validateSingleElement('#' + this.item.method + '-echeck-account-name')
-                    && $.validator.validateSingleElement('#' + this.item.method + '-echeck-bank-name')
-                    && $.validator.validateSingleElement('#' + this.item.method + '-echeck-routing-number')
-                    && $.validator.validateSingleElement('#' + this.item.method + '-echeck-account-number')
-                    && $.validator.validateSingleElement('#' + this.item.method + '-echeck-account-type');
+                       && $.validator.validateSingleElement('#' + this.item.method + '-echeck-bank-name')
+                       && $.validator.validateSingleElement('#' + this.item.method + '-echeck-routing-number')
+                       && $.validator.validateSingleElement('#' + this.item.method + '-echeck-account-number')
+                       && $.validator.validateSingleElement('#' + this.item.method + '-echeck-account-type');
             }
         });
     }

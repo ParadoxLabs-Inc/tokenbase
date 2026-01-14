@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,31 +15,23 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Model\Api\GraphQL;
+
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\GraphQl\Config\Element\Field;
+use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
+use ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface;
+use ParadoxLabs\TokenBase\Model\Api\GraphQL;
 
 /**
  * Card Class
  */
 class GetCards implements \Magento\Framework\GraphQl\Query\ResolverInterface
 {
-    /**
-     * @var \ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface
-     */
-    private $customerCardRepository;
-
-    /**
-     * @var \Magento\Framework\Api\SearchCriteriaBuilder
-     */
-    private $searchCriteriaBuilder;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Model\Api\GraphQL
-     */
-    private $graphQL;
-
     /**
      * Card constructor.
      *
@@ -48,13 +40,10 @@ class GetCards implements \Magento\Framework\GraphQl\Query\ResolverInterface
      * @param \ParadoxLabs\TokenBase\Model\Api\GraphQL $graphQL
      */
     public function __construct(
-        \ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface $customerCardRepository,
-        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
-        \ParadoxLabs\TokenBase\Model\Api\GraphQL $graphQL
+        private CustomerCardRepositoryInterface $customerCardRepository,
+        private SearchCriteriaBuilder $searchCriteriaBuilder,
+        private GraphQL $graphQL
     ) {
-        $this->customerCardRepository = $customerCardRepository;
-        $this->searchCriteriaBuilder  = $searchCriteriaBuilder;
-        $this->graphQL                = $graphQL;
     }
 
     /**
@@ -65,22 +54,22 @@ class GetCards implements \Magento\Framework\GraphQl\Query\ResolverInterface
      * @param \Magento\Framework\GraphQl\Schema\Type\ResolveInfo $info
      * @param array|null $value
      * @param array|null $args
-     * @throws \Exception
      * @return mixed|\Magento\Framework\GraphQl\Query\Resolver\Value
+     * @throws \Exception
      */
     public function resolve(
-        \Magento\Framework\GraphQl\Config\Element\Field $field,
+        Field $field,
         $context,
-        \Magento\Framework\GraphQl\Schema\Type\ResolveInfo $info,
+        ResolveInfo $info,
         ?array $value = null,
         ?array $args = null
     ) {
         $this->graphQL->authenticate($context, true);
 
         /** @var \ParadoxLabs\TokenBase\Model\Card[] $cards */
-        $cards  = $this->getCards(
+        $cards = $this->getCards(
             $context->getUserId(),
-            isset($args['hash']) ? $args['hash'] : null
+            $args['hash'] ?? null
         );
         $output = [];
         foreach ($cards as $card) {

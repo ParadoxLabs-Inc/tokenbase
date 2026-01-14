@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,10 +15,17 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Block\Info;
+
+use Magento\Framework\App\Area;
+use Magento\Framework\View\Element\Template\Context;
+use Magento\Payment\Block\Info;
+use Magento\Payment\Model\Config;
+use ParadoxLabs\TokenBase\Helper\Data;
 
 /**
  * Credit card info block for TokenBase methods.
@@ -31,24 +38,17 @@ class Cc extends \Magento\Payment\Block\Info\Cc
     protected $isEcheck = false;
 
     /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
      * @param \Magento\Framework\View\Element\Template\Context $context
      * @param \Magento\Payment\Model\Config $paymentConfig
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param array $data
      */
     public function __construct(
-        \Magento\Framework\View\Element\Template\Context $context,
-        \Magento\Payment\Model\Config $paymentConfig,
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
+        Context $context,
+        Config $paymentConfig,
+        protected Data $helper,
         array $data = []
     ) {
-        $this->helper = $helper;
-
         parent::__construct($context, $paymentConfig, $data);
     }
 
@@ -63,54 +63,54 @@ class Cc extends \Magento\Payment\Block\Info\Cc
         if (null !== $this->_paymentSpecificInformation) {
             return $this->_paymentSpecificInformation;
         }
-        $transport = \Magento\Payment\Block\Info::_prepareSpecificInformation($transport);
-        $data = [];
+        $transport = Info::_prepareSpecificInformation($transport);
+        $data      = [];
 
         /** @var \Magento\Sales\Model\Order\Payment $info */
         $info = $this->getInfo();
 
         $this->_eventManager->dispatch('tokenbase_before_load_payment_info', [
-            'method'    => $info->getMethod(),
-            'customer'  => $this->helper->getCurrentCustomer(),
+            'method' => $info->getMethod(),
+            'customer' => $this->helper->getCurrentCustomer(),
             'transport' => $transport,
-            'info'      => $info,
+            'info' => $info,
         ]);
 
         // If this is an eCheck, show different info.
         if ($this->isEcheck() === true) {
             if ($info->getData('echeck_bank_name') != '') {
-                $data[(string)__('Bank Name')] = $info->getData('echeck_bank_name');
+                $data[ (string)__('Bank Name') ] = $info->getData('echeck_bank_name');
             } elseif ($info->getAdditionalInformation('echeck_bank_name') != '') {
-                $data[(string)__('Bank Name')] = $info->getAdditionalInformation('echeck_bank_name');
+                $data[ (string)__('Bank Name') ] = $info->getAdditionalInformation('echeck_bank_name');
             }
 
-            $data[(string)__('Account Number')] = sprintf(
+            $data[ (string)__('Account Number') ] = sprintf(
                 'x-%s',
                 $info->getAdditionalInformation('echeck_account_number_last4')
             );
         } else {
             $ccType = $this->getCcTypeName();
             if (!empty($ccType) && $ccType !== 'N/A') {
-                $data[(string)__('Credit Card Type')] = $ccType;
+                $data[ (string)__('Credit Card Type') ] = $ccType;
             }
 
             if ($info->getCcLast4()) {
-                $data[(string)__('Credit Card Number')] = sprintf('XXXX-%s', $info->getCcLast4());
+                $data[ (string)__('Credit Card Number') ] = sprintf('XXXX-%s', $info->getCcLast4());
             }
         }
 
         // If this is admin, show different info.
         if ($this->getIsSecureMode() === false && $info->getAdditionalInformation('transaction_id') != null) {
-            $data[(string)__('Transaction ID')] = $info->getAdditionalInformation('transaction_id');
+            $data[ (string)__('Transaction ID') ] = $info->getAdditionalInformation('transaction_id');
         }
 
         $transport->setData(array_merge($data, $transport->getData()));
 
         $this->_eventManager->dispatch('tokenbase_after_load_payment_info', [
-            'method'    => $info->getMethod(),
-            'customer'  => $this->helper->getCurrentCustomer(),
+            'method' => $info->getMethod(),
+            'customer' => $this->helper->getCurrentCustomer(),
             'transport' => $transport,
-            'info'      => $info,
+            'info' => $info,
         ]);
 
         return $transport;
@@ -140,6 +140,6 @@ class Cc extends \Magento\Payment\Block\Info\Cc
             return (bool)(int)$this->_getData('is_secure_mode');
         }
 
-        return $this->_appState->getAreaCode() !== \Magento\Framework\App\Area::AREA_ADMINHTML;
+        return $this->_appState->getAreaCode() !== Area::AREA_ADMINHTML;
     }
 }

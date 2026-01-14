@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,46 +15,29 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Model\Api\GraphQL;
 
 use Magento\Authorization\Model\UserContextInterface;
+use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Customer\Api\Data\AddressInterface;
+use Magento\Framework\Api\DataObjectHelper;
+use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
+use Magento\Framework\GraphQl\Query\Resolver\ContextInterface;
+use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
+use ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface;
+use ParadoxLabs\TokenBase\Api\Data\CardInterface;
+use ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory;
+use ParadoxLabs\TokenBase\Api\GuestCardRepositoryInterface;
+use ParadoxLabs\TokenBase\Model\Api\GraphQL;
+use ParadoxLabs\TokenBase\Model\Card;
 
 class UpdateCard implements \Magento\Framework\GraphQl\Query\ResolverInterface
 {
-    /**
-     * @var \ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface
-     */
-    protected $customerCardRepository;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Api\GuestCardRepositoryInterface
-     */
-    protected $guestCardRepository;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Model\Api\GraphQL
-     */
-    protected $graphQL;
-
-    /**
-     * @var \Magento\Framework\Api\DataObjectHelper
-     */
-    protected $dataObjectHelper;
-
-    /**
-     * @var \Magento\Customer\Api\CustomerRepositoryInterface
-     */
-    protected $customerRepository;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory
-     */
-    protected $cardFactory;
-
     /**
      * Card constructor.
      *
@@ -66,19 +49,13 @@ class UpdateCard implements \Magento\Framework\GraphQl\Query\ResolverInterface
      * @param \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $cardFactory
      */
     public function __construct(
-        \ParadoxLabs\TokenBase\Api\CustomerCardRepositoryInterface $customerCardRepository,
-        \ParadoxLabs\TokenBase\Api\GuestCardRepositoryInterface $guestCardRepository,
-        \ParadoxLabs\TokenBase\Model\Api\GraphQL $graphQL,
-        \Magento\Framework\Api\DataObjectHelper $dataObjectHelper,
-        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
-        \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $cardFactory
+        protected CustomerCardRepositoryInterface $customerCardRepository,
+        protected GuestCardRepositoryInterface $guestCardRepository,
+        protected GraphQL $graphQL,
+        protected DataObjectHelper $dataObjectHelper,
+        protected CustomerRepositoryInterface $customerRepository,
+        protected CardInterfaceFactory $cardFactory
     ) {
-        $this->customerCardRepository = $customerCardRepository;
-        $this->guestCardRepository = $guestCardRepository;
-        $this->graphQL = $graphQL;
-        $this->dataObjectHelper = $dataObjectHelper;
-        $this->customerRepository = $customerRepository;
-        $this->cardFactory = $cardFactory;
     }
 
     /**
@@ -89,13 +66,13 @@ class UpdateCard implements \Magento\Framework\GraphQl\Query\ResolverInterface
      * @param \Magento\Framework\GraphQl\Schema\Type\ResolveInfo $info
      * @param array|null $value
      * @param array|null $args
-     * @throws \Exception
      * @return mixed|\Magento\Framework\GraphQl\Query\Resolver\Value
+     * @throws \Exception
      */
     public function resolve(
-        \Magento\Framework\GraphQl\Config\Element\Field $field,
+        Field $field,
         $context,
-        \Magento\Framework\GraphQl\Schema\Type\ResolveInfo $info,
+        ResolveInfo $info,
         ?array $value = null,
         ?array $args = null
     ) {
@@ -120,7 +97,7 @@ class UpdateCard implements \Magento\Framework\GraphQl\Query\ResolverInterface
         $this->updatePaymentInfo($card, $cardData);
 
         /** @var \Magento\Customer\Model\Data\Address $address */
-        $address    = $this->updateAddressData($card, $cardData);
+        $address = $this->updateAddressData($card, $cardData);
         $additional = $card->getAdditionalObject();
         $card = $card->getTypeInstance();
 
@@ -148,7 +125,7 @@ class UpdateCard implements \Magento\Framework\GraphQl\Query\ResolverInterface
      * @throws \Magento\Framework\Exception\InputException
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getCard(\Magento\Framework\GraphQl\Query\Resolver\ContextInterface $context, array $cardData)
+    public function getCard(ContextInterface $context, array $cardData)
     {
         /** @var \ParadoxLabs\TokenBase\Model\Card $card */
         if (isset($cardData['hash'])) {
@@ -176,8 +153,8 @@ class UpdateCard implements \Magento\Framework\GraphQl\Query\ResolverInterface
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function updateCardData(
-        \Magento\Framework\GraphQl\Query\Resolver\ContextInterface $context,
-        \ParadoxLabs\TokenBase\Model\Card $card,
+        ContextInterface $context,
+        Card $card,
         array $cardData
     ) {
         // Associate customer
@@ -201,7 +178,7 @@ class UpdateCard implements \Magento\Framework\GraphQl\Query\ResolverInterface
         $this->dataObjectHelper->populateWithArray(
             $card,
             $settableValues,
-            \ParadoxLabs\TokenBase\Api\Data\CardInterface::class
+            CardInterface::class
         );
     }
 
@@ -212,14 +189,14 @@ class UpdateCard implements \Magento\Framework\GraphQl\Query\ResolverInterface
      * @param array $cardData
      * @return \Magento\Customer\Api\Data\AddressInterface
      */
-    public function updateAddressData(\ParadoxLabs\TokenBase\Model\Card $card, array $cardData)
+    public function updateAddressData(Card $card, array $cardData)
     {
         $address = $card->getAddressObject();
         if (isset($cardData['address'])) {
             $this->dataObjectHelper->populateWithArray(
                 $address,
                 $cardData['address'],
-                \Magento\Customer\Api\Data\AddressInterface::class
+                AddressInterface::class
             );
 
             if (isset($cardData['address']['region']['region_id'])) {
@@ -238,7 +215,7 @@ class UpdateCard implements \Magento\Framework\GraphQl\Query\ResolverInterface
      * @return void
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    protected function updatePaymentInfo(\ParadoxLabs\TokenBase\Model\Card $card, array $cardData)
+    protected function updatePaymentInfo(Card $card, array $cardData)
     {
         if (!isset($cardData['additional']) || empty($cardData['additional'])) {
             return;

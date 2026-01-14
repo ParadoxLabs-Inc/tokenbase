@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,25 +15,20 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Controller\Adminhtml\Index;
+
+use Throwable;
 
 /**
  * TokenbaseCardsDelete Class
  */
 class PaymentinfoDelete extends Paymentinfo
 {
-    /**
-     * @var bool
-     */
-    protected $skipCardLoad = true;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Api\CardRepositoryInterface
-     */
-    protected $cardRepository;
+    protected bool $skipCardLoad = true;
 
     /**
      * View customer's stored cards list (active view)
@@ -68,7 +63,7 @@ class PaymentinfoDelete extends Paymentinfo
                 } else {
                     $response['message'] = __('Unable to load card for deletion.');
                 }
-            } catch (\Exception $e) {
+            } catch (Throwable $e) {
                 $this->helper->log($method, (string)$e);
 
                 $response['message'] = __($e->getMessage());
@@ -79,6 +74,7 @@ class PaymentinfoDelete extends Paymentinfo
 
         /** @var \Magento\Framework\Controller\Result\Json $resultJson */
         $resultJson = $this->resultJsonFactory->create();
+
         return $resultJson->setData($response);
     }
 }

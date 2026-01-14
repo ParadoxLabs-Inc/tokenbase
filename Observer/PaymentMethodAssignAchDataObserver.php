@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,38 +15,37 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Observer;
 
+use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
 use Magento\Quote\Api\Data\PaymentExtensionInterface;
 use Magento\Sales\Api\Data\OrderPaymentExtensionInterface;
+use ParadoxLabs\TokenBase\Helper\Data;
 
-class PaymentMethodAssignAchDataObserver implements \Magento\Framework\Event\ObserverInterface
+class PaymentMethodAssignAchDataObserver implements ObserverInterface
 {
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
     /**
      * @var array
      */
-    protected $achFields = [
-        'echeck_account_name',
-        'echeck_bank_name',
-        'echeck_routing_no',
-        'echeck_account_no',
-        'echeck_account_type',
-    ];
+    protected $achFields
+        = [
+            'echeck_account_name',
+            'echeck_bank_name',
+            'echeck_routing_no',
+            'echeck_account_no',
+            'echeck_account_type',
+        ];
 
     /**
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      */
-    public function __construct(\ParadoxLabs\TokenBase\Helper\Data $helper)
+    public function __construct(protected Data $helper)
     {
-        $this->helper = $helper;
     }
 
     /**
@@ -55,7 +54,7 @@ class PaymentMethodAssignAchDataObserver implements \Magento\Framework\Event\Obs
      * @param \Magento\Framework\Event\Observer $observer
      * @return void
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         /** @var \Magento\Payment\Model\MethodInterface $method */
         $method = $observer->getData('method');

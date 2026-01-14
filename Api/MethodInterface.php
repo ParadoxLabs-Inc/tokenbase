@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,11 +15,16 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
+
 namespace ParadoxLabs\TokenBase\Api;
 
+use Magento\Customer\Api\Data\CustomerInterface;
+use Magento\Payment\Model\InfoInterface;
 use Magento\Vault\Model\VaultPaymentInterface;
+use ParadoxLabs\TokenBase\Api\Data\CardInterface;
 
 /**
  * Common actions and behavior for TokenBase payment methods
@@ -49,7 +54,7 @@ interface MethodInterface extends VaultPaymentInterface
      * @param \Magento\Customer\Api\Data\CustomerInterface $customer
      * @return $this
      */
-    public function setCustomer(\Magento\Customer\Api\Data\CustomerInterface $customer);
+    public function setCustomer(CustomerInterface $customer);
 
     /**
      * Initialize/return the API gateway class.
@@ -71,7 +76,7 @@ interface MethodInterface extends VaultPaymentInterface
      * @param \ParadoxLabs\TokenBase\Api\Data\CardInterface $card
      * @return $this
      */
-    public function setCard(\ParadoxLabs\TokenBase\Api\Data\CardInterface $card);
+    public function setCard(CardInterface $card);
 
     /**
      * @return \Magento\Payment\Model\Info
@@ -82,7 +87,7 @@ interface MethodInterface extends VaultPaymentInterface
      * @param \Magento\Payment\Model\InfoInterface $info
      * @return $this
      */
-    public function setInfoInstance(\Magento\Payment\Model\InfoInterface $info);
+    public function setInfoInstance(InfoInterface $info);
 
     /**
      * Order payment abstract method
@@ -92,7 +97,7 @@ interface MethodInterface extends VaultPaymentInterface
      * @return $this
      *
      */
-    public function order(\Magento\Payment\Model\InfoInterface $payment, $amount);
+    public function order(InfoInterface $payment, $amount);
 
     /**
      * Authorize payment abstract method
@@ -102,7 +107,7 @@ interface MethodInterface extends VaultPaymentInterface
      * @return $this
      *
      */
-    public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount);
+    public function authorize(InfoInterface $payment, $amount);
 
     /**
      * Capture payment abstract method
@@ -112,7 +117,7 @@ interface MethodInterface extends VaultPaymentInterface
      * @return $this
      *
      */
-    public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount);
+    public function capture(InfoInterface $payment, $amount);
 
     /**
      * Refund specified amount for payment
@@ -122,7 +127,7 @@ interface MethodInterface extends VaultPaymentInterface
      * @return $this
      *
      */
-    public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount);
+    public function refund(InfoInterface $payment, $amount);
 
     /**
      * Cancel payment abstract method
@@ -131,7 +136,7 @@ interface MethodInterface extends VaultPaymentInterface
      * @return $this
      *
      */
-    public function cancel(\Magento\Payment\Model\InfoInterface $payment);
+    public function cancel(InfoInterface $payment);
 
     /**
      * Void payment abstract method
@@ -140,7 +145,7 @@ interface MethodInterface extends VaultPaymentInterface
      * @return $this
      *
      */
-    public function void(\Magento\Payment\Model\InfoInterface $payment);
+    public function void(InfoInterface $payment);
 
     /**
      * Fetch transaction info
@@ -151,7 +156,7 @@ interface MethodInterface extends VaultPaymentInterface
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      *
      */
-    public function fetchTransactionInfo(\Magento\Payment\Model\InfoInterface $payment, $transactionId);
+    public function fetchTransactionInfo(InfoInterface $payment, $transactionId);
 
     /**
      * Retrieve information from payment configuration

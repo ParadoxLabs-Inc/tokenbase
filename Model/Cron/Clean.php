@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,10 +15,19 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Model\Cron;
+
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\ScopeInterface;
+use ParadoxLabs\TokenBase\Api\CardRepositoryInterface;
+use ParadoxLabs\TokenBase\Helper\Data;
+use ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection;
+use ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory;
+use Throwable;
 
 /**
  * Perform scheduled maintenance actions
@@ -28,26 +37,6 @@ namespace ParadoxLabs\TokenBase\Model\Cron;
 class Clean
 {
     /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    protected $scopeConfig;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory
-     */
-    protected $cardCollectionFactory;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Api\CardRepositoryInterface
-     */
-    protected $cardRepository;
-
-    /**
      * Constructor, yeah!
      *
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
@@ -56,15 +45,11 @@ class Clean
      * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
      */
     public function __construct(
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory,
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
+        protected ScopeConfigInterface $scopeConfig,
+        protected CollectionFactory $cardCollectionFactory,
+        protected Data $helper,
+        protected CardRepositoryInterface $cardRepository
     ) {
-        $this->helper = $helper;
-        $this->scopeConfig = $scopeConfig;
-        $this->cardCollectionFactory = $cardCollectionFactory;
-        $this->cardRepository = $cardRepository;
     }
 
     /**
@@ -74,7 +59,7 @@ class Clean
     {
         $cleanOldCards = $this->scopeConfig->getValue(
             'checkout/tokenbase/clean_old_cards',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
 
         if ($cleanOldCards != 1) {
@@ -86,13 +71,13 @@ class Clean
          */
         $cutoff = $this->scopeConfig->getValue(
             'checkout/tokenbase/clean_old_cards_after',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         ) ?: '180 days';
 
         /** @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection $cards */
         $cards = $this->cardCollectionFactory->create();
         $cards->addFieldToFilter('active', '0')
-              ->addFieldToFilter('updated_at', [ 'lt' => date('c', (int)strtotime('-' . $cutoff)), 'date' => true ])
+              ->addFieldToFilter('updated_at', ['lt' => date('c', (int)strtotime('-' . $cutoff)), 'date' => true])
               ->addFieldToFilter(
                   [
                       'last_use',
@@ -104,8 +89,8 @@ class Clean
                   ]
               );
 
-        $affectedCount    = 0;
-        $affectedCount   += $this->deleteCards($cards);
+        $affectedCount = 0;
+        $affectedCount += $this->deleteCards($cards);
 
         unset($cards);
 
@@ -119,7 +104,7 @@ class Clean
               ->addFieldToFilter('payment_id', ['null' => true])
               ->addFieldToFilter('updated_at', ['lt' => date('c', (int)strtotime('-7 days')), 'date' => true]);
 
-        $affectedCount   += $this->deleteCards($cards);
+        $affectedCount += $this->deleteCards($cards);
 
         if ($affectedCount > 0) {
             $this->helper->log('tokenbase', sprintf('Deleted %s queued cards.', $affectedCount));
@@ -132,13 +117,13 @@ class Clean
      * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection $cards
      * @return int
      */
-    public function deleteCards(\ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection $cards)
+    public function deleteCards(Collection $cards)
     {
         $affectedCount = 0;
 
         /** @var \ParadoxLabs\TokenBase\Model\Card $card */
         foreach ($cards as $card) {
-            $card       = $card->getTypeInstance();
+            $card = $card->getTypeInstance();
             $cardMethod = $card->getMethod();
 
             try {
@@ -149,7 +134,7 @@ class Clean
                 $this->cardRepository->delete($card);
 
                 $affectedCount++;
-            } catch (\Exception $e) {
+            } catch (Throwable $e) {
                 $this->helper->log($cardMethod, sprintf('Error deleting card: %s', (string)$e));
             }
         }

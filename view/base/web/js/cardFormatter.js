@@ -21,7 +21,7 @@
 define([
     "jquery",
     'Magento_Payment/js/model/credit-card-validation/credit-card-number-validator'
-], function($, cardNumberValidator) {
+], function ($, cardNumberValidator) {
     "use strict";
 
     /**
@@ -36,12 +36,12 @@ define([
             ccTypeContainer: ''
         },
 
-        _create: function() {
+        _create: function () {
             var ccInput = this.element.find(this.options.ccInputSelector);
 
             if (ccInput.length > 0) {
                 ccInput.on('keydown', this.handleKeydown.bind(this))
-                       .on('input paste', this.formatCc.bind(this));
+                    .on('input paste', this.formatCc.bind(this));
             }
 
             if (this.options.ccTypeSelector !== '' && this.options.ccTypeContainer !== '') {
@@ -52,7 +52,7 @@ define([
         /**
          * Track cursor through the separator for deletes, etc.
          */
-        handleKeydown: function(e) {
+        handleKeydown: function (e) {
             var ccInput = this.element.find(this.options.ccInputSelector)[0];
             var cursor = ccInput.selectionStart;
 
@@ -70,12 +70,12 @@ define([
         /**
          * Format the CC number element with nice separators.
          */
-        formatCc: function() {
+        formatCc: function () {
             var ccInput = this.element.find(this.options.ccInputSelector)[0];
-            var value   = ccInput.value;
-            var cursor  = ccInput.selectionStart;
+            var value = ccInput.value;
+            var cursor = ccInput.selectionStart;
 
-            if (value.substring(0,4) === "XXXX") {
+            if (value.substring(0, 4) === "XXXX") {
                 return;
             }
 
@@ -88,12 +88,12 @@ define([
 
             // AmEx cards get separated different, because they're special.
             var typeIsAmEx = false;
-            if (value.substring(0,2) === "34" || value.substring(0,2) === "37") {
+            if (value.substring(0, 2) === "34" || value.substring(0, 2) === "37") {
                 typeIsAmEx = true;
             }
 
             var formatted = "";
-            for (var i=0, n=value.length; i<n; i++) {
+            for (var i = 0, n = value.length; i < n; i++) {
                 if (this.shouldSeparate(i, typeIsAmEx)) {
                     if (formatted.length <= cursor) {
                         cursor++;
@@ -120,7 +120,7 @@ define([
          * @param bool isAmEx
          * @returns bool
          */
-        shouldSeparate: function(i, isAmEx) {
+        shouldSeparate: function (i, isAmEx) {
             // Separate AmEx cards at 4 and 10 rather than quadruplets.
             if (isAmEx === true) {
                 return i === 4 || i === 10;
@@ -132,10 +132,10 @@ define([
         /**
          * Detect CC type as number is entered, and update active type.
          */
-        detectCcType: function() {
+        detectCcType: function () {
             this.updateCcType(null);
 
-            var cc_no = this.element.find(this.options.ccInputSelector).val().replace(/\D/g,'');
+            var cc_no = this.element.find(this.options.ccInputSelector).val().replace(/\D/g, '');
             var result = cardNumberValidator(cc_no);
 
             if ((result.isPotentiallyValid || result.isValid) && result.card !== null) {

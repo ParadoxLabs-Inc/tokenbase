@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,47 +15,51 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Observer;
 
-class ValidatePaymentObserver implements \Magento\Framework\Event\ObserverInterface
-{
-    /**
-     * @var \Magento\Payment\Gateway\Validator\ValidatorPoolInterface|null
-     */
-    protected $validatorPool;
+use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Exception\NotFoundException;
+use Magento\Payment\Gateway\Command\CommandException;
+use Magento\Payment\Gateway\Validator\ValidatorPoolInterface;
+use Magento\Payment\Model\InfoInterface;
+use Magento\Quote\Api\Data\CartInterface;
+use Magento\Sales\Api\Data\OrderInterface;
 
+class ValidatePaymentObserver implements ObserverInterface
+{
     /**
      * ValidatePaymentObserver constructor.
      *
      * @param \Magento\Payment\Gateway\Validator\ValidatorPoolInterface|null $validatorPool
      */
     public function __construct(
-        ?\Magento\Payment\Gateway\Validator\ValidatorPoolInterface $validatorPool = null
+        protected ?ValidatorPoolInterface $validatorPool = null
     ) {
-        $this->validatorPool = $validatorPool;
     }
 
     /**
      * @param \Magento\Framework\Event\Observer $observer
      * @return void
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         /** @var \Magento\Sales\Api\Data\OrderInterface $order */
         /** @var \Magento\Quote\Api\Data\CartInterface $quote */
         $order = $observer->getData('order');
         $quote = $observer->getData('quote');
 
-        if ($order instanceof \Magento\Sales\Api\Data\OrderInterface) {
+        if ($order instanceof OrderInterface) {
             $model = $order;
-        } elseif ($quote instanceof \Magento\Quote\Api\Data\CartInterface) {
+        } elseif ($quote instanceof CartInterface) {
             $model = $quote;
         }
 
-        if ($model->getPayment() instanceof \Magento\Payment\Model\InfoInterface === false) {
+        if ($model->getPayment() instanceof InfoInterface === false) {
             return;
         }
 
@@ -68,11 +72,11 @@ class ValidatePaymentObserver implements \Magento\Framework\Event\ObserverInterf
             ]);
 
             if (!$result->isValid()) {
-                throw new \Magento\Payment\Gateway\Command\CommandException(
+                throw new CommandException(
                     __(implode("\n", $result->getFailsDescription()))
                 );
             }
-        } catch (\Magento\Framework\Exception\NotFoundException $exception) {
+        } catch (NotFoundException) {
             // No validator pool for this payment method -- nothing to validate
             return;
         }

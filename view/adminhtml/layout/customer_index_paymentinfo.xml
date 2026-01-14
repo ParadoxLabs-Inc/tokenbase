@@ -3,6 +3,6 @@
     <update handle="formkey"/>
     <container name="root" label="Root">
         <!-- The active payment method can inject itself into this wrapper with handle customer_index_paymentinfo_{method}. -->
-        <block class="ParadoxLabs\TokenBase\Block\Adminhtml\Customer\Wrapper" name="tokenbase_customer_wrapper" template="ParadoxLabs_TokenBase::customer/wrapper.phtml" cacheable="false" />
+        <block class="ParadoxLabs\TokenBase\Block\Adminhtml\Customer\Wrapper" name="tokenbase_customer_wrapper" template="ParadoxLabs_TokenBase::customer/wrapper.phtml" cacheable="false"/>
     </container>
 </layout>

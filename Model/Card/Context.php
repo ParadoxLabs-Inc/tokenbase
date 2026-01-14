@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright © 2015-present ParadoxLabs, Inc.
  *
@@ -15,10 +15,27 @@
  * limitations under the License.
  *
  * Need help? Try our knowledgebase and support system:
+ *
  * @link https://support.paradoxlabs.com
  */
 
 namespace ParadoxLabs\TokenBase\Model\Card;
+
+use Magento\Checkout\Model\Session;
+use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Customer\Api\Data\AddressInterfaceFactory;
+use Magento\Customer\Api\Data\CustomerInterfaceFactory;
+use Magento\Customer\Api\Data\RegionInterfaceFactory;
+use Magento\Framework\Api\DataObjectHelper;
+use Magento\Framework\HTTP\PhpEnvironment\RemoteAddress;
+use Magento\Framework\Reflection\DataObjectProcessor;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
+use ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterfaceFactory;
+use ParadoxLabs\TokenBase\Helper\Data;
+use ParadoxLabs\TokenBase\Model\Card\Factory as CardFactory;
+use ParadoxLabs\TokenBase\Model\Method\Factory as MethodFactory;
+use ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory as CardCollectionFactory;
 
 /**
  * Context Class -- this reduces the DI argument list for Card itself.
@@ -26,86 +43,11 @@ namespace ParadoxLabs\TokenBase\Model\Card;
 class Context
 {
     /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    private $helper;
-
-    /**
-     * @var Factory
-     */
-    private $cardFactory;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory
-     */
-    private $cardCollectionFactory;
-
-    /**
-     * @var \Magento\Customer\Api\Data\CustomerInterfaceFactory
-     */
-    private $customerFactory;
-
-    /**
-     * @var \Magento\Customer\Api\Data\AddressInterfaceFactory
-     */
-    private $addressFactory;
-
-    /**
-     * @var \Magento\Customer\Api\Data\RegionInterfaceFactory
-     */
-    private $addressRegionFactory;
-
-    /**
-     * @var \Magento\Sales\Model\ResourceModel\Order\CollectionFactory
-     */
-    private $orderCollectionFactory;
-
-    /**
-     * @var \Magento\Checkout\Model\Session
-     */
-    private $checkoutSession;
-
-    /**
-     * @var \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress
-     */
-    private $remoteAddress;
-
-    /**
-     * @var \Magento\Framework\Reflection\DataObjectProcessor
-     */
-    private $dataObjectProcessor;
-
-    /**
-     * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
-     */
-    private $dateProcessor;
-
-    /**
-     * @var \Magento\Customer\Api\CustomerRepositoryInterface
-     */
-    private $customerRepository;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Model\Method\Factory
-     */
-    private $methodFactory;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterfaceFactory
-     */
-    private $cardAdditionalFactory;
-
-    /**
-     * @var \Magento\Framework\Api\DataObjectHelper
-     */
-    private $dataObjectHelper;
-
-    /**
      * Context constructor.
      *
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \ParadoxLabs\TokenBase\Model\Method\Factory $methodFactory
-     * @param \ParadoxLabs\TokenBase\Model\Card\Factory $cardFactory
+     * @param MethodFactory $methodFactory
+     * @param CardFactory $cardFactory
      * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
      * @param \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterfaceFactory $cardAdditionalFactory
      * @param \Magento\Customer\Api\Data\CustomerInterfaceFactory $customerFactory
@@ -120,37 +62,22 @@ class Context
      * @param \Magento\Framework\Api\DataObjectHelper $dataObjectHelper
      */
     public function __construct(
-        \ParadoxLabs\TokenBase\Helper\Data $helper,
-        \ParadoxLabs\TokenBase\Model\Method\Factory $methodFactory,
-        \ParadoxLabs\TokenBase\Model\Card\Factory $cardFactory,
-        \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory,
-        \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterfaceFactory $cardAdditionalFactory,
-        \Magento\Customer\Api\Data\CustomerInterfaceFactory $customerFactory,
-        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
-        \Magento\Customer\Api\Data\AddressInterfaceFactory $addressFactory,
-        \Magento\Customer\Api\Data\RegionInterfaceFactory $addressRegionFactory,
-        \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
-        \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress,
-        \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor,
-        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $dateProcessor,
-        \Magento\Framework\Api\DataObjectHelper $dataObjectHelper
+        private Data $helper,
+        private MethodFactory $methodFactory,
+        private CardFactory $cardFactory,
+        private CardCollectionFactory $cardCollectionFactory,
+        private CardAdditionalInterfaceFactory $cardAdditionalFactory,
+        private CustomerInterfaceFactory $customerFactory,
+        private CustomerRepositoryInterface $customerRepository,
+        private AddressInterfaceFactory $addressFactory,
+        private RegionInterfaceFactory $addressRegionFactory,
+        private CollectionFactory $orderCollectionFactory,
+        private Session $checkoutSession,
+        private RemoteAddress $remoteAddress,
+        private DataObjectProcessor $dataObjectProcessor,
+        private TimezoneInterface $dateProcessor,
+        private DataObjectHelper $dataObjectHelper
     ) {
-        $this->helper = $helper;
-        $this->methodFactory = $methodFactory;
-        $this->cardFactory = $cardFactory;
-        $this->cardCollectionFactory = $cardCollectionFactory;
-        $this->customerFactory = $customerFactory;
-        $this->addressFactory = $addressFactory;
-        $this->addressRegionFactory = $addressRegionFactory;
-        $this->orderCollectionFactory = $orderCollectionFactory;
-        $this->checkoutSession = $checkoutSession;
-        $this->remoteAddress = $remoteAddress;
-        $this->dataObjectProcessor = $dataObjectProcessor;
-        $this->dateProcessor = $dateProcessor;
-        $this->customerRepository = $customerRepository;
-        $this->cardAdditionalFactory = $cardAdditionalFactory;
-        $this->dataObjectHelper = $dataObjectHelper;
     }
 
     /**
@@ -166,7 +93,7 @@ class Context
     /**
      * Get methodFactory
      *
-     * @return \ParadoxLabs\TokenBase\Model\Method\Factory
+     * @return MethodFactory
      */
     public function getMethodFactory()
     {
