@@ -9,8 +9,8 @@
                 <ul class="ui-tabs-nav tabs-horiz">
                     <?php foreach ($activeMethods as $method): ?>
                         <li class="ui-state-default <?php if ($block->getCurrentMethod() == $method): ?>ui-state-active<?php endif; ?>">
-                            <a href="<?= $block->escapeUrl($block->getUrl('*/*/paymentinfo', [ 'method' => $method, 'id' => $block->getRequest()->getParam('id'), 'form_key' => $block->getFormKey() ])); ?>" class="ui-tabs-anchor">
-                                <?= $block->escapeHtml($block->getMethodTitle($method)); ?>
+                            <a href="<?= $escaper->escapeUrl($block->getUrl('*/*/paymentinfo', [ 'method' => $method, 'id' => $block->getRequest()->getParam('id'), 'form_key' => $block->getFormKey() ])); ?>" class="ui-tabs-anchor">
+                                <?= $escaper->escapeHtml($block->getMethodTitle($method)); ?>
                             </a>
                         </li>
                     <?php endforeach; ?>
@@ -23,7 +23,7 @@
             <?php if (!empty($activeMethods)): ?>
                 <?= /* @noEscape */ $block->getChildHtml(); ?>
             <?php else: ?>
-                <?= $block->escapeHtml(__('There are currently no active TokenBase payment methods.')); ?>
+                <?= $escaper->escapeHtml(__('There are currently no active TokenBase payment methods.')); ?>
             <?php endif; ?>
         </div>
     </div>

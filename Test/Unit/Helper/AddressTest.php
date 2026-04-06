@@ -527,8 +527,14 @@ class AddressTest extends TestCase
         // Create a mock that has getRenderer method
         $formatMock = new class($renderer) {
             private $renderer;
-            public function __construct($renderer) { $this->renderer = $renderer; }
-            public function getRenderer() { return $this->renderer; }
+            public function __construct($renderer)
+            {
+                $this->renderer = $renderer;
+            }
+            public function getRenderer()
+            {
+                return $this->renderer;
+            }
         };
 
         $this->addressConfig->method('getFormatByCode')

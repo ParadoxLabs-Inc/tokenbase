@@ -62,21 +62,21 @@ class Context
      * @param \Magento\Framework\Api\DataObjectHelper $dataObjectHelper
      */
     public function __construct(
-        private Data $helper,
-        private MethodFactory $methodFactory,
-        private CardFactory $cardFactory,
-        private CardCollectionFactory $cardCollectionFactory,
-        private CardAdditionalInterfaceFactory $cardAdditionalFactory,
-        private CustomerInterfaceFactory $customerFactory,
-        private CustomerRepositoryInterface $customerRepository,
-        private AddressInterfaceFactory $addressFactory,
-        private RegionInterfaceFactory $addressRegionFactory,
-        private CollectionFactory $orderCollectionFactory,
-        private Session $checkoutSession,
-        private RemoteAddress $remoteAddress,
-        private DataObjectProcessor $dataObjectProcessor,
-        private TimezoneInterface $dateProcessor,
-        private DataObjectHelper $dataObjectHelper
+        private readonly Data $helper,
+        private readonly MethodFactory $methodFactory,
+        private readonly CardFactory $cardFactory,
+        private readonly CardCollectionFactory $cardCollectionFactory,
+        private readonly CardAdditionalInterfaceFactory $cardAdditionalFactory,
+        private readonly CustomerInterfaceFactory $customerFactory,
+        private readonly CustomerRepositoryInterface $customerRepository,
+        private readonly AddressInterfaceFactory $addressFactory,
+        private readonly RegionInterfaceFactory $addressRegionFactory,
+        private readonly CollectionFactory $orderCollectionFactory,
+        private readonly Session $checkoutSession,
+        private readonly RemoteAddress $remoteAddress,
+        private readonly DataObjectProcessor $dataObjectProcessor,
+        private readonly TimezoneInterface $dateProcessor,
+        private readonly DataObjectHelper $dataObjectHelper
     ) {
     }
 

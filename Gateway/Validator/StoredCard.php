@@ -37,8 +37,8 @@ class StoredCard extends AbstractValidator
      */
     public function __construct(
         ResultInterfaceFactory $resultFactory,
-        private \ParadoxLabs\TokenBase\Gateway\Validator\CreditCard $ccValidator,
-        private ConfigInterface $config
+        private readonly \ParadoxLabs\TokenBase\Gateway\Validator\CreditCard $ccValidator,
+        private readonly ConfigInterface $config
     ) {
         parent::__construct($resultFactory);
     }

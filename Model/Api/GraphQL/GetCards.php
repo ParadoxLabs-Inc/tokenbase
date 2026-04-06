@@ -40,9 +40,9 @@ class GetCards implements \Magento\Framework\GraphQl\Query\ResolverInterface
      * @param \ParadoxLabs\TokenBase\Model\Api\GraphQL $graphQL
      */
     public function __construct(
-        private CustomerCardRepositoryInterface $customerCardRepository,
-        private SearchCriteriaBuilder $searchCriteriaBuilder,
-        private GraphQL $graphQL
+        private readonly CustomerCardRepositoryInterface $customerCardRepository,
+        private readonly SearchCriteriaBuilder $searchCriteriaBuilder,
+        private readonly GraphQL $graphQL
     ) {
     }
 

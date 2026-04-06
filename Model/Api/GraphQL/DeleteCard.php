@@ -37,8 +37,8 @@ class DeleteCard implements \Magento\Framework\GraphQl\Query\ResolverInterface
      * @param \ParadoxLabs\TokenBase\Model\Api\GraphQL $graphQL
      */
     public function __construct(
-        private CustomerCardRepositoryInterface $customerCardRepository,
-        private GraphQL $graphQL
+        private readonly CustomerCardRepositoryInterface $customerCardRepository,
+        private readonly GraphQL $graphQL
     ) {
     }
 

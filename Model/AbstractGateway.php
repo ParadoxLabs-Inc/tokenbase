@@ -249,8 +249,8 @@ abstract class AbstractGateway extends DataObject implements GatewayInterface
                         '$1',
                         $val
                     );
-                    $val = preg_replace(['/[^0-9a-z \.\-]/i', '/\s{2,}/'], ' ', $val);
-                    $val = trim($val);
+                    $val = preg_replace(['/[^0-9a-z \.\-]/i', '/\s{2,}/'], ' ', (string) $val);
+                    $val = trim((string) $val);
                 }
 
                 if (isset($this->fields[ $key ]['charMask'])) {

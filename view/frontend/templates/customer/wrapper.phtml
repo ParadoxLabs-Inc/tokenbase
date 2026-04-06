@@ -5,8 +5,8 @@
     <ul class="links">
         <?php foreach ($block->getActiveMethods() as $method): ?>
             <li <?php if ($block->getCurrentMethod() == $method): ?>class="active"<?php endif; ?>>
-                <a href="<?= $block->escapeUrl($block->getUrl('*/*/*', ['method' => $method])); ?>">
-                    <?= $block->escapeHtml($block->getMethodTitle($method)); ?>
+                <a href="<?= $escaper->escapeUrl($block->getUrl('*/*/*', ['method' => $method])); ?>">
+                    <?= $escaper->escapeHtml($block->getMethodTitle($method)); ?>
                 </a>
             </li>
         <?php endforeach; ?>

@@ -42,8 +42,8 @@ class Factory
         /**
          * Object manager
          */
-        private ObjectManagerInterface $objectManager,
-        private ScopeConfigInterface $scopeConfig
+        private readonly ObjectManagerInterface $objectManager,
+        private readonly ScopeConfigInterface $scopeConfig
     ) {
     }
 

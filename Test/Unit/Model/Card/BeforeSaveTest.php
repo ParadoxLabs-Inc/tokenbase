@@ -159,7 +159,7 @@ class BeforeSaveTest extends TestCase
 
         $hash = $this->card->getData('hash');
         $this->assertNotEmpty($hash);
-        $this->assertSame(40, strlen($hash));
+        $this->assertSame(40, strlen((string) $hash));
     }
 
     public function testBeforeSaveRecordsIpOnFrontend(): void

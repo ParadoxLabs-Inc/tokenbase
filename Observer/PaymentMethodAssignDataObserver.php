@@ -124,7 +124,7 @@ class PaymentMethodAssignDataObserver implements ObserverInterface
         $payment->setData('cc_ss_start_year', $data->getData('cc_ss_start_year'));
 
         if ($method->getConfigData('can_store_bin') == 1) {
-            $payment->setAdditionalInformation('cc_bin', substr($ccNumber, 0, 6));
+            $payment->setAdditionalInformation('cc_bin', substr((string) $ccNumber, 0, 6));
         }
     }
 

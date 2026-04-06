@@ -38,7 +38,7 @@ class GetCheckoutConfig implements \Magento\Framework\GraphQl\Query\ResolverInte
      * @param array $configProviders
      */
     public function __construct(
-        private GraphQL $graphQL,
+        private readonly GraphQL $graphQL,
         private array $configProviders = []
     ) {
     }

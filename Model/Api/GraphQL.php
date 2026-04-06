@@ -94,7 +94,7 @@ class GraphQL
         $cardData                      = $card->toArray();
         $cardData['additional']        = $card->getAdditional();
         $cardData['address']           = $card->getAddress();
-        $cardData['address']['street'] = explode("\n", $cardData['address']['street']);
+        $cardData['address']['street'] = explode("\n", (string) $cardData['address']['street']);
         $cardData['address']['region'] = [
             'region_code' => $cardData['address']['region_code'] ?? null,
             'region' => $cardData['address']['region'] ?? null,
