@@ -22,7 +22,7 @@ class TokenFormatter extends SimplePaymentTokenFormatter
     /**
      * Creates string presentation of payment token.
      *
-     * @param \Magento\Vault\Api\Data\PaymentTokenInterface $paymentToken
+     * @param PaymentTokenInterface $paymentToken
      * @return string
      * @since 100.2.0
      */

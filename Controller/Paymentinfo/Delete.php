@@ -21,6 +21,10 @@
 
 namespace ParadoxLabs\TokenBase\Controller\Paymentinfo;
 
+use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Controller\Result\Json;
+use Magento\Framework\Controller\Result\Redirect;
+use ParadoxLabs\TokenBase\Model\Card;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\ResultFactory;
@@ -40,20 +44,20 @@ use Throwable;
 class Delete extends Paymentinfo
 {
     /**
-     * @var \Magento\Framework\Controller\Result\JsonFactory
+     * @var JsonFactory
      */
     protected $resultJsonFactory;
 
     /**
-     * @param \Magento\Framework\App\Action\Context $context
-     * @param \Magento\Customer\Model\Session $customerSession
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
-     * @param \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator
-     * @param \Magento\Framework\Registry $registry
+     * @param Context $context
+     * @param Session $customerSession
+     * @param PageFactory $resultPageFactory
+     * @param Validator $formKeyValidator
+     * @param Registry $registry
      * @param \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory
-     * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \ParadoxLabs\TokenBase\Helper\Address $addressHelper
+     * @param CardRepositoryInterface $cardRepository
+     * @param Data $helper
+     * @param Address $addressHelper
      */
     public function __construct(
         Context $context,
@@ -82,7 +86,7 @@ class Delete extends Paymentinfo
     /**
      * Delete action
      *
-     * @return \Magento\Framework\Controller\Result\Json|\Magento\Framework\Controller\Result\Redirect
+     * @return Json|Redirect
      */
     public function execute()
     {
@@ -96,7 +100,7 @@ class Delete extends Paymentinfo
                 /**
                  * Load the card and verify we are actually the cardholder before doing anything.
                  */
-                /** @var \ParadoxLabs\TokenBase\Model\Card $card */
+                /** @var Card $card */
                 $card = $this->cardRepository->getByHash($id);
                 $card = $card->getTypeInstance();
                 if ($card && $card->getHash() == $id && $card->hasOwner($this->helper->getCurrentCustomer()->getId())) {

@@ -21,6 +21,9 @@
 
 namespace ParadoxLabs\TokenBase\Controller\Paymentinfo;
 
+use Magento\Framework\Controller\Result\Redirect;
+use ParadoxLabs\TokenBase\Model\Card;
+use Magento\Quote\Model\Quote\Payment;
 use Exception;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Action\Context;
@@ -45,15 +48,15 @@ class Save extends Paymentinfo
      * @param Context $context
      * @param Session $customerSession *Proxy
      * @param PageFactory $resultPageFactory
-     * @param \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator
-     * @param \Magento\Framework\Registry $registry
+     * @param Validator $formKeyValidator
+     * @param Registry $registry
      * @param \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory
-     * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
+     * @param CardRepositoryInterface $cardRepository
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \ParadoxLabs\TokenBase\Helper\Address $addressHelper
-     * @param \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory
+     * @param Address $addressHelper
+     * @param PaymentFactory $paymentFactory
      * @param \Magento\Checkout\Model\Session $checkoutSession *Proxy
-     * @param \Magento\Payment\Helper\Data $paymentHelper
+     * @param Data $paymentHelper
      */
     public function __construct(
         Context $context,
@@ -65,9 +68,9 @@ class Save extends Paymentinfo
         CardRepositoryInterface $cardRepository,
         \ParadoxLabs\TokenBase\Helper\Data $helper,
         Address $addressHelper,
-        protected PaymentFactory $paymentFactory,
-        protected \Magento\Checkout\Model\Session $checkoutSession,
-        protected Data $paymentHelper
+        protected readonly PaymentFactory $paymentFactory,
+        protected readonly \Magento\Checkout\Model\Session $checkoutSession,
+        protected readonly Data $paymentHelper
     ) {
         parent::__construct(
             $context,
@@ -85,11 +88,11 @@ class Save extends Paymentinfo
     /**
      * Save action
      *
-     * @return \Magento\Framework\Controller\Result\Redirect
+     * @return Redirect
      */
     public function execute()
     {
-        /** @var \Magento\Framework\Controller\Result\Redirect $resultRedirect */
+        /** @var Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
 
         $id     = $this->getRequest()->getParam('id');
@@ -103,8 +106,7 @@ class Save extends Paymentinfo
                 /**
                  * Load the card and verify we are actually the cardholder before doing anything.
                  */
-
-                /** @var \ParadoxLabs\TokenBase\Model\Card $card */
+                /** @var Card $card */
                 if (!empty($id)) {
                     $card = $this->cardRepository->getByHash($id);
                 } else {
@@ -149,7 +151,7 @@ class Save extends Paymentinfo
                         $cardData['cc_bin']   = substr((string)$cardData['cc_number'], 0, 6);
                     }
 
-                    /** @var \Magento\Quote\Model\Quote\Payment $newPayment */
+                    /** @var Payment $newPayment */
                     $newPayment = $this->paymentFactory->create();
                     $newPayment->setQuote($this->checkoutSession->getQuote());
                     $newPayment->getQuote()->getBillingAddress()->setCountryId($newAddr->getCountryId());

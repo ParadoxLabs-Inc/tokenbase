@@ -42,9 +42,9 @@ class GraphQL
      * @param \Magento\Quote\Model\MaskedQuoteIdToQuoteIdInterface $maskedQuoteIdToQuoteId
      */
     public function __construct(
-        protected ScopeConfigInterface $scopeConfig,
-        protected CartRepositoryInterface $cartRepository,
-        protected MaskedQuoteIdToQuoteIdInterface $maskedQuoteIdToQuoteId,
+        protected readonly ScopeConfigInterface $scopeConfig,
+        protected readonly CartRepositoryInterface $cartRepository,
+        protected readonly MaskedQuoteIdToQuoteIdInterface $maskedQuoteIdToQuoteId,
     ) {
     }
 

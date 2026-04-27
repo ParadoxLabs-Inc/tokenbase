@@ -31,9 +31,9 @@ use ParadoxLabs\TokenBase\Helper\Data;
 class ProcessRefundObserver implements ObserverInterface
 {
     /**
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
+     * @param Data $helper
      */
-    public function __construct(protected Data $helper)
+    public function __construct(protected readonly Data $helper)
     {
     }
 
@@ -41,7 +41,7 @@ class ProcessRefundObserver implements ObserverInterface
      * If we're doing a partial refund, don't mark it as fully refunded
      * unless the full amount is done.
      *
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      * @return void
      */
     public function execute(Observer $observer)

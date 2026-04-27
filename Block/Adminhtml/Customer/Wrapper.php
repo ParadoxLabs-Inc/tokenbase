@@ -32,15 +32,15 @@ class Wrapper extends Template
     /**
      * Wrapper constructor.
      *
-     * @param \Magento\Backend\Block\Template\Context $context
-     * @param \Magento\Framework\Registry $registry
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
+     * @param Context $context
+     * @param Registry $registry
+     * @param Data $helper
      * @param array $data
      */
     public function __construct(
         Context $context,
-        protected Registry $registry,
-        protected Data $helper,
+        protected readonly Registry $registry,
+        protected readonly Data $helper,
         array $data = []
     ) {
         parent::__construct($context, $data);

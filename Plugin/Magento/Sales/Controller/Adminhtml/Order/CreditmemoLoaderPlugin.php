@@ -21,6 +21,7 @@
 
 namespace ParadoxLabs\TokenBase\Plugin\Magento\Sales\Controller\Adminhtml\Order;
 
+use Magento\Sales\Api\Data\InvoiceInterface;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -37,16 +38,16 @@ class CreditmemoLoaderPlugin
     /**
      * CreditmemoLoaderPlugin constructor.
      *
-     * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
-     * @param \ParadoxLabs\TokenBase\Helper\Data $tokenbaseHelper
-     * @param \Magento\Sales\Model\ResourceModel\Order\Invoice\CollectionFactory $invoiceCollectionFactory
-     * @param \Magento\Framework\Message\ManagerInterface $messageManager
+     * @param OrderRepositoryInterface $orderRepository
+     * @param Data $tokenbaseHelper
+     * @param CollectionFactory $invoiceCollectionFactory
+     * @param ManagerInterface $messageManager
      */
     public function __construct(
-        protected OrderRepositoryInterface $orderRepository,
-        protected Data $tokenbaseHelper,
-        protected CollectionFactory $invoiceCollectionFactory,
-        protected ManagerInterface $messageManager
+        protected readonly OrderRepositoryInterface $orderRepository,
+        protected readonly Data $tokenbaseHelper,
+        protected readonly CollectionFactory $invoiceCollectionFactory,
+        protected readonly ManagerInterface $messageManager
     ) {
     }
 
@@ -69,7 +70,7 @@ class CreditmemoLoaderPlugin
     /**
      * Check whether we should process the credit memo being loaded
      *
-     * @param \Magento\Sales\Controller\Adminhtml\Order\CreditmemoLoader $subject
+     * @param CreditmemoLoader $subject
      * @return bool
      */
     protected function isEligibleForProcessing(CreditmemoLoader $subject): bool
@@ -92,7 +93,7 @@ class CreditmemoLoaderPlugin
     /**
      * Assign an invoice to the credit memo if there's exactly one eligible; notify the admin of status
      *
-     * @param \Magento\Sales\Controller\Adminhtml\Order\CreditmemoLoader $subject
+     * @param CreditmemoLoader $subject
      * @return void
      */
     protected function assignInvoiceToCreditMemo(CreditmemoLoader $subject): void
@@ -115,7 +116,7 @@ class CreditmemoLoaderPlugin
         );
 
         if ($invoiceCollection->getSize() === 1) {
-            /** @var \Magento\Sales\Api\Data\InvoiceInterface $invoice */
+            /** @var InvoiceInterface $invoice */
             $invoice = $invoiceCollection->getFirstItem();
             $subject->setInvoiceId($invoice->getId());
 
@@ -140,7 +141,7 @@ class CreditmemoLoaderPlugin
      * Get an order by ID
      *
      * @param int $orderId
-     * @return \Magento\Sales\Api\Data\OrderInterface
+     * @return OrderInterface
      */
     protected function getOrder(int $orderId): OrderInterface
     {

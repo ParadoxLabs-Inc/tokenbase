@@ -37,27 +37,27 @@ class ConvertGuestToCustomerObserver implements ObserverInterface
     /**
      * ConvertGuestToCustomerObserver constructor.
      *
-     * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
+     * @param CardRepositoryInterface $cardRepository
      * @param \Magento\Sales\Model\Order\PaymentFactory $paymentFactory
-     * @param \Magento\Sales\Model\ResourceModel\Order\Payment $paymentResource
-     * @param \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param Payment $paymentResource
+     * @param RemoteAddress $remoteAddress
+     * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-        protected CardRepositoryInterface $cardRepository,
-        protected PaymentFactory $paymentFactory,
-        protected Payment $paymentResource,
-        protected RemoteAddress $remoteAddress,
-        protected ScopeConfigInterface $scopeConfig
+        protected readonly CardRepositoryInterface $cardRepository,
+        protected readonly PaymentFactory $paymentFactory,
+        protected readonly Payment $paymentResource,
+        protected readonly RemoteAddress $remoteAddress,
+        protected readonly ScopeConfigInterface $scopeConfig
     ) {
     }
 
     /**
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      */
     public function execute(Observer $observer)
     {
-        /** @var \Magento\Customer\Api\Data\CustomerInterface $customer */
+        /** @var CustomerInterface $customer */
         $customer = $observer->getData('customer_data_object');
         /** @var array $delegateData */
         $delegateData = $observer->getData('delegate_data');

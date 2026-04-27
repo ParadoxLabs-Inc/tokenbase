@@ -35,8 +35,8 @@ class Factory
     /**
      * Construct
      *
-     * @param \Magento\Framework\ObjectManagerInterface $objectManager
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param ObjectManagerInterface $objectManager
+     * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
         /**
@@ -52,8 +52,8 @@ class Factory
      *
      * @param string $className
      * @param array $data
-     * @return \ParadoxLabs\TokenBase\Api\MethodInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return MethodInterface
+     * @throws LocalizedException
      */
     public function create($className, array $data = [])
     {
@@ -72,8 +72,8 @@ class Factory
      * Get a method instance by code. Pulls the model from configuration.
      *
      * @param string $methodCode
-     * @return \ParadoxLabs\TokenBase\Api\MethodInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return MethodInterface
+     * @throws LocalizedException
      */
     public function getMethodInstance($methodCode)
     {

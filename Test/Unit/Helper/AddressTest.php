@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace ParadoxLabs\TokenBase\Test\Unit\Helper;
 
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Customer\Block\Address\Renderer\RendererInterface;
+use Magento\Customer\Model\Address\Config\Reader;
 use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Api\Data\AddressInterface;
 use Magento\Customer\Api\Data\AddressInterfaceFactory;
@@ -450,7 +453,7 @@ class AddressTest extends TestCase
         $form->method('extractData')->willReturn([]);
         $form->method('validateData')->willReturn(['City is required', 'Street is required']);
 
-        $this->expectException(\Magento\Framework\Exception\LocalizedException::class);
+        $this->expectException(LocalizedException::class);
         $this->expectExceptionMessage('City is required Street is required');
 
         $this->helper->buildAddressFromInput([], [], true);
@@ -520,16 +523,14 @@ class AddressTest extends TestCase
     {
         $address = $this->createMock(AddressInterface::class);
 
-        $renderer = $this->createMock(\Magento\Customer\Block\Address\Renderer\RendererInterface::class);
+        $renderer = $this->createMock(RendererInterface::class);
         $renderer->method('renderArray')->willReturn('<p>123 Main St</p>');
 
-        $format = $this->createMock(\Magento\Customer\Model\Address\Config\Reader::class);
+        $format = $this->createMock(Reader::class);
         // Create a mock that has getRenderer method
         $formatMock = new class($renderer) {
-            private $renderer;
-            public function __construct($renderer)
+            public function __construct(private $renderer)
             {
-                $this->renderer = $renderer;
             }
             public function getRenderer()
             {

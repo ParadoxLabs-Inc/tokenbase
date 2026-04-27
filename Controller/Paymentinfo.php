@@ -41,23 +41,23 @@ abstract class Paymentinfo extends AbstractAccount
      * @param Context $context
      * @param Session $session *Proxy
      * @param PageFactory $resultPageFactory
-     * @param \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator
-     * @param \Magento\Framework\Registry $registry
+     * @param Validator $formKeyValidator
+     * @param Registry $registry
      * @param \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory
      * @param CardRepositoryInterface $cardRepository
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \ParadoxLabs\TokenBase\Helper\Address $addressHelper
+     * @param Data $helper
+     * @param Address $addressHelper
      */
     public function __construct(
         Context $context,
-        protected Session $session,
-        protected PageFactory $resultPageFactory,
-        protected Validator $formKeyValidator,
-        protected Registry $registry,
-        protected CardFactory $cardFactory,
-        protected CardRepositoryInterface $cardRepository,
-        protected Data $helper,
-        protected Address $addressHelper
+        protected readonly Session $session,
+        protected readonly PageFactory $resultPageFactory,
+        protected readonly Validator $formKeyValidator,
+        protected readonly Registry $registry,
+        protected readonly CardFactory $cardFactory,
+        protected readonly CardRepositoryInterface $cardRepository,
+        protected readonly Data $helper,
+        protected readonly Address $addressHelper
     ) {
         parent::__construct(
             $context

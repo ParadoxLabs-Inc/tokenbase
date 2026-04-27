@@ -21,6 +21,7 @@
 
 namespace ParadoxLabs\TokenBase\Plugin\QuoteGraphQl\Model\Resolver;
 
+use Magento\Quote\Model\Quote\Payment;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Query\Resolver\Value;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
@@ -36,12 +37,12 @@ class SelectedPaymentMethod
     /**
      * SelectedPaymentMethod constructor.
      *
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
+     * @param Data $helper
+     * @param CardRepositoryInterface $cardRepository
      */
     public function __construct(
-        protected Data $helper,
-        protected CardRepositoryInterface $cardRepository
+        protected readonly Data $helper,
+        protected readonly CardRepositoryInterface $cardRepository
     ) {
     }
 
@@ -71,9 +72,9 @@ class SelectedPaymentMethod
             return $resolvedValue;
         }
 
-        /** @var \Magento\Quote\Model\Quote $quote */
+        /** @var Quote $quote */
         $quote = $value['model'];
-        /** @var \Magento\Quote\Model\Quote\Payment $payment */
+        /** @var Payment $payment */
         $payment = $quote->getPayment();
 
         if (in_array($payment->getMethod(), $this->helper->getAllMethods(), true)) {

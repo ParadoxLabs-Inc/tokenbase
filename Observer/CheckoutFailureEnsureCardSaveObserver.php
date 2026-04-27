@@ -32,14 +32,14 @@ use Throwable;
 class CheckoutFailureEnsureCardSaveObserver implements ObserverInterface
 {
     /**
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \Magento\Framework\Registry $registry
-     * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
+     * @param Data $helper
+     * @param Registry $registry
+     * @param CardRepositoryInterface $cardRepository
      */
     public function __construct(
-        protected Data $helper,
-        protected Registry $registry,
-        protected CardRepositoryInterface $cardRepository
+        protected readonly Data $helper,
+        protected readonly Registry $registry,
+        protected readonly CardRepositoryInterface $cardRepository
     ) {
     }
 
@@ -47,7 +47,7 @@ class CheckoutFailureEnsureCardSaveObserver implements ObserverInterface
      * If we're doing a partial refund, don't mark it as fully refunded
      * unless the full amount is done.
      *
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      * @return void
      */
     public function execute(Observer $observer)

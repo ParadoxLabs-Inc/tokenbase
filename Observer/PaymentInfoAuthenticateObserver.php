@@ -21,6 +21,7 @@
 
 namespace ParadoxLabs\TokenBase\Observer;
 
+use Magento\Framework\App\Response\Http;
 use Magento\Customer\Model\Session;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\App\Action\Action;
@@ -41,34 +42,34 @@ class PaymentInfoAuthenticateObserver implements ObserverInterface
     /**
      * PaymentInfoAuthenticateObserver constructor.
      *
-     * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
-     * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
-     * @param \Magento\Customer\Model\Session $customerSession *Proxy
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \Magento\Framework\UrlInterface $urlBuilder
-     * @param \Magento\Framework\Message\ManagerInterface $messageManager
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param OrderRepositoryInterface $orderRepository
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param Session $customerSession *Proxy
+     * @param Data $helper
+     * @param UrlInterface $urlBuilder
+     * @param ManagerInterface $messageManager
+     * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-        protected OrderRepositoryInterface $orderRepository,
-        protected SearchCriteriaBuilder $searchCriteriaBuilder,
-        protected Session $customerSession,
-        protected Data $helper,
-        protected UrlInterface $urlBuilder,
-        protected ManagerInterface $messageManager,
-        protected ScopeConfigInterface $scopeConfig
+        protected readonly OrderRepositoryInterface $orderRepository,
+        protected readonly SearchCriteriaBuilder $searchCriteriaBuilder,
+        protected readonly Session $customerSession,
+        protected readonly Data $helper,
+        protected readonly UrlInterface $urlBuilder,
+        protected readonly ManagerInterface $messageManager,
+        protected readonly ScopeConfigInterface $scopeConfig
     ) {
     }
 
     /**
      * Try to stop CC validation abuse by requiring a valid order before giving access to the 'My Payment Data' section.
      *
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      * @return void
      */
     public function execute(Observer $observer)
     {
-        /** @var \Magento\Framework\App\Action\Action $action */
+        /** @var Action $action */
         $action = $observer->getEvent()->getData('controller_action');
         if ($action instanceof Action) {
             $preventAccess = false;
@@ -92,7 +93,7 @@ class PaymentInfoAuthenticateObserver implements ObserverInterface
                 $actionFlag = $action->getActionFlag();
                 $actionFlag->set('', ActionInterface::FLAG_NO_DISPATCH, true);
 
-                /** @var \Magento\Framework\App\Response\Http $response */
+                /** @var Http $response */
                 $response = $action->getResponse();
                 $response->setRedirect(
                     $this->urlBuilder->getUrl('customer/account')

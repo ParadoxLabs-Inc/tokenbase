@@ -21,6 +21,8 @@
 
 namespace ParadoxLabs\TokenBase\Observer;
 
+use Magento\Quote\Model\Quote;
+use Magento\Sales\Model\Order;
 use Magento\Framework\App\Area;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\App\State;
@@ -38,29 +40,29 @@ class ConvertQuoteToOrderObserver extends ConvertAbstract implements ObserverInt
     /**
      * ConvertQuoteToOrderObserver constructor.
      *
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \Magento\Framework\App\State $appState
-     * @param \Magento\Framework\App\ResourceConnection $resource
+     * @param Data $helper
+     * @param State $appState
+     * @param ResourceConnection $resource
      */
     public function __construct(
-        protected Data $helper,
-        protected State $appState,
-        protected ResourceConnection $resource
+        protected readonly Data $helper,
+        protected readonly State $appState,
+        protected readonly ResourceConnection $resource
     ) {
     }
 
     /**
      * Perform pre-order-placement actions.
      *
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      * @return void
      */
     public function execute(Observer $observer)
     {
-        /** @var \Magento\Quote\Model\Quote $quote */
+        /** @var Quote $quote */
         $quote = $observer->getEvent()->getData('quote');
 
-        /** @var \Magento\Sales\Model\Order $order */
+        /** @var Order $order */
         $order = $observer->getEvent()->getData('order');
 
         if (in_array($order->getPayment()->getMethod(), $this->helper->getAllMethods(), true) !== true) {

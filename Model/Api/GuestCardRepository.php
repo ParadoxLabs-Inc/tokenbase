@@ -41,8 +41,8 @@ class GuestCardRepository implements GuestCardRepositoryInterface
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-        protected CardRepositoryInterface $cardRepository,
-        protected ScopeConfigInterface $scopeConfig
+        protected readonly CardRepositoryInterface $cardRepository,
+        protected readonly ScopeConfigInterface $scopeConfig
     ) {
     }
 

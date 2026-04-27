@@ -46,8 +46,8 @@ abstract class ConvertAbstract
     /**
      * Copy payment data fields from A to B
      *
-     * @param \Magento\Framework\DataObject $from
-     * @param \Magento\Framework\DataObject $to
+     * @param DataObject $from
+     * @param DataObject $to
      * @return void
      */
     protected function copyData(DataObject $from, DataObject $to)

@@ -13,6 +13,7 @@
 
 namespace ParadoxLabs\TokenBase\Plugin\InstantPurchase\Model\PaymentMethodChoose;
 
+use ParadoxLabs\TokenBase\Model\Card;
 use Magento\Customer\Model\Customer;
 use Magento\InstantPurchase\Model\PaymentMethodChoose\PaymentTokenChooserInterface;
 use Magento\Store\Model\Store;
@@ -22,25 +23,18 @@ use Magento\Vault\Model\PaymentTokenManagement;
 class PaymentTokenChooser
 {
     /**
-     * @var \Magento\Vault\Model\PaymentTokenManagement
-     */
-    protected $paymentTokenManagement;
-
-    /**
      * PaymentTokenChooser constructor.
      *
-     * @param \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
+     * @param PaymentTokenManagement $paymentTokenManagement
      */
-    public function __construct(
-        PaymentTokenManagement $paymentTokenManagement
-    ) {
-        $this->paymentTokenManagement = $paymentTokenManagement;
+    public function __construct(protected readonly PaymentTokenManagement $paymentTokenManagement)
+    {
     }
 
     /**
      * Add TokenBase cards to the available options for Instant Purchase.
      *
-     * @param \Magento\InstantPurchase\Model\PaymentMethodChoose\PaymentTokenChooserInterface $subject
+     * @param PaymentTokenChooserInterface $subject
      * @param PaymentTokenInterface|null $result
      * @param Store $store
      * @param Customer $customer
@@ -58,7 +52,7 @@ class PaymentTokenChooser
              */
             $tokens = $this->paymentTokenManagement->getVisibleAvailableTokens($customer->getId());
 
-            /** @var \ParadoxLabs\TokenBase\Model\Card $result */
+            /** @var Card $result */
             $result = current($tokens) ?: null;
         }
 

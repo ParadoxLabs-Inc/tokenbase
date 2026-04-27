@@ -21,6 +21,7 @@
 
 namespace ParadoxLabs\TokenBase\Plugin;
 
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\NotFoundException;
 use Magento\Payment\Gateway\Command\CommandException;
@@ -33,12 +34,12 @@ class ValidateCardSave
     /**
      * ValidatePaymentObserver constructor.
      *
-     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param \Magento\Payment\Gateway\Validator\ValidatorPoolInterface|null $validatorPool
+     * @param StoreManagerInterface $storeManager
+     * @param ValidatorPoolInterface|null $validatorPool
      */
     public function __construct(
-        protected StoreManagerInterface $storeManager,
-        protected ?ValidatorPoolInterface $validatorPool = null
+        protected readonly StoreManagerInterface $storeManager,
+        protected readonly ?ValidatorPoolInterface $validatorPool = null
     ) {
     }
 
@@ -48,9 +49,9 @@ class ValidateCardSave
      * Note: Implemented in plugin because tokenbase_card_save_before helpfully runs _after_ gateway sync. This hooks
      * in reliably before gateway syncing occurs, without major refactoring or BC breaks.
      *
-     * @param \ParadoxLabs\TokenBase\Api\Data\CardInterface $subject
+     * @param CardInterface $subject
      * @return void
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function beforeBeforeSave(
         CardInterface $subject

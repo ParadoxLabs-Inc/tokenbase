@@ -13,6 +13,8 @@
 
 namespace ParadoxLabs\TokenBase\Block\Adminhtml\Config;
 
+use Magento\Framework\View\Helper\SecureHtmlRenderer;
+use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Backend\Block\Context;
 use Magento\Backend\Model\Auth\Session;
 use Magento\Cms\Model\Template\FilterProvider;
@@ -22,23 +24,18 @@ use Magento\Framework\View\Helper\Js;
 class FilterComment extends Fieldset
 {
     /**
-     * @var \Magento\Cms\Model\Template\FilterProvider
-     */
-    protected $filterProvider;
-
-    /**
-     * @param \Magento\Backend\Block\Context $context
-     * @param \Magento\Backend\Model\Auth\Session $authSession
-     * @param \Magento\Framework\View\Helper\Js $jsHelper
-     * @param \Magento\Cms\Model\Template\FilterProvider $filterProvider
+     * @param Context $context
+     * @param Session $authSession
+     * @param Js $jsHelper
+     * @param FilterProvider $filterProvider
      * @param array $data
-     * @param \Magento\Framework\View\Helper\SecureHtmlRenderer|null $secureRenderer
+     * @param SecureHtmlRenderer|null $secureRenderer
      */
     public function __construct(
         Context $context,
         Session $authSession,
         Js $jsHelper,
-        FilterProvider $filterProvider,
+        protected readonly FilterProvider $filterProvider,
         array $data = [],
         $secureRenderer = null
     ) {
@@ -47,14 +44,12 @@ class FilterComment extends Fieldset
         unset($args[3]);
 
         parent::__construct(...array_filter($args));
-
-        $this->filterProvider = $filterProvider;
     }
 
     /**
      * Return header comment part of html for fieldset
      *
-     * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
+     * @param AbstractElement $element
      * @return string
      */
     protected function _getHeaderCommentHtml($element)

@@ -21,6 +21,7 @@
 
 namespace ParadoxLabs\TokenBase\Observer;
 
+use Magento\Sales\Model\Order\Payment;
 use Magento\Framework\DataObject;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
@@ -38,30 +39,30 @@ use Throwable;
 class PaymentMethodAssignDataObserver implements ObserverInterface
 {
     /**
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
+     * @param Data $helper
+     * @param CardRepositoryInterface $cardRepository
      */
     public function __construct(
-        protected Data $helper,
-        protected CardRepositoryInterface $cardRepository
+        protected readonly Data $helper,
+        protected readonly CardRepositoryInterface $cardRepository
     ) {
     }
 
     /**
      * Assign data to the payment instance for our methods.
      *
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      * @return void
      */
     public function execute(Observer $observer)
     {
-        /** @var \Magento\Payment\Model\MethodInterface $method */
+        /** @var MethodInterface $method */
         $method = $observer->getData('method');
 
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
+        /** @var Payment $payment */
         $payment = $observer->getData('payment_model');
 
-        /** @var \Magento\Framework\DataObject $data */
+        /** @var DataObject $data */
         $data = $observer->getData('data');
 
         /**
@@ -83,9 +84,9 @@ class PaymentMethodAssignDataObserver implements ObserverInterface
     }
 
     /**
-     * @param \Magento\Payment\Model\InfoInterface $payment
-     * @param \Magento\Framework\DataObject $data
-     * @param \Magento\Payment\Model\MethodInterface $method
+     * @param InfoInterface $payment
+     * @param DataObject $data
+     * @param MethodInterface $method
      * @return void
      */
     protected function assignStandardData(
@@ -93,8 +94,7 @@ class PaymentMethodAssignDataObserver implements ObserverInterface
         DataObject $data,
         MethodInterface $method
     ) {
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
-
+        /** @var Payment $payment */
         $ccNumber = preg_replace('/[^X\d]/', '', (string)$data->getData('cc_number'));
 
         if (!empty($ccNumber)) {
@@ -129,9 +129,9 @@ class PaymentMethodAssignDataObserver implements ObserverInterface
     }
 
     /**
-     * @param \Magento\Payment\Model\InfoInterface $payment
-     * @param \Magento\Framework\DataObject $data
-     * @param \Magento\Payment\Model\MethodInterface $method
+     * @param InfoInterface $payment
+     * @param DataObject $data
+     * @param MethodInterface $method
      * @return void
      */
     protected function assignTokenbaseData(
@@ -139,8 +139,7 @@ class PaymentMethodAssignDataObserver implements ObserverInterface
         DataObject $data,
         MethodInterface $method
     ) {
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
-
+        /** @var Payment $payment */
         if ($data->hasData('card_id') && $data->getData('card_id') != '') {
             /**
              * Load and validate the chosen card.
@@ -193,19 +192,18 @@ class PaymentMethodAssignDataObserver implements ObserverInterface
     /**
      * Load the given card by ID, authenticate, and store with the object.
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @param int|string $cardId
      * @param bool $byHash
-     * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return CardInterface
+     * @throws LocalizedException
      */
     protected function loadAndSetCard(
         InfoInterface $payment,
         $cardId,
         $byHash = false
     ) {
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
-
+        /** @var Payment $payment */
         $this->helper->log(
             $payment->getMethod(),
             sprintf('observer::loadAndSetCard(%s, %s)', $cardId, var_export($byHash, true))
@@ -242,16 +240,15 @@ class PaymentMethodAssignDataObserver implements ObserverInterface
     /**
      * Set the current payment card
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
-     * @param \ParadoxLabs\TokenBase\Api\Data\CardInterface $card
+     * @param InfoInterface $payment
+     * @param CardInterface $card
      * @return $this
      */
     protected function setCardOnPayment(
         InfoInterface $payment,
         CardInterface $card
     ) {
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
-
+        /** @var Payment $payment */
         $this->helper->log(
             $payment->getMethod(),
             sprintf('observer::setCard(%s)', $card->getId())

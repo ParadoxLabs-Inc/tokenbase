@@ -21,6 +21,8 @@
 
 namespace ParadoxLabs\TokenBase\Block\Info;
 
+use Magento\Framework\DataObject;
+use Magento\Sales\Model\Order\Payment;
 use Magento\Framework\App\Area;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Payment\Block\Info;
@@ -38,15 +40,15 @@ class Cc extends \Magento\Payment\Block\Info\Cc
     protected $isEcheck = false;
 
     /**
-     * @param \Magento\Framework\View\Element\Template\Context $context
-     * @param \Magento\Payment\Model\Config $paymentConfig
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
+     * @param Context $context
+     * @param Config $paymentConfig
+     * @param Data $helper
      * @param array $data
      */
     public function __construct(
         Context $context,
         Config $paymentConfig,
-        protected Data $helper,
+        protected readonly Data $helper,
         array $data = []
     ) {
         parent::__construct($context, $paymentConfig, $data);
@@ -55,8 +57,8 @@ class Cc extends \Magento\Payment\Block\Info\Cc
     /**
      * Prepare credit card related payment info
      *
-     * @param \Magento\Framework\DataObject|array $transport
-     * @return \Magento\Framework\DataObject
+     * @param DataObject|array $transport
+     * @return DataObject
      */
     protected function _prepareSpecificInformation($transport = null)
     {
@@ -66,7 +68,7 @@ class Cc extends \Magento\Payment\Block\Info\Cc
         $transport = Info::_prepareSpecificInformation($transport);
         $data      = [];
 
-        /** @var \Magento\Sales\Model\Order\Payment $info */
+        /** @var Payment $info */
         $info = $this->getInfo();
 
         $this->_eventManager->dispatch('tokenbase_before_load_payment_info', [

@@ -21,6 +21,7 @@
 
 namespace ParadoxLabs\TokenBase\Observer;
 
+use Magento\Quote\Model\Quote;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\DataObject;
 use Magento\Framework\Event\ManagerInterface;
@@ -31,14 +32,14 @@ use ParadoxLabs\TokenBase\Helper\Data;
 class MultishippingAssignACHDataObserver implements ObserverInterface
 {
     /**
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \Magento\Framework\App\RequestInterface $request
-     * @param \Magento\Framework\Event\ManagerInterface $eventManager
+     * @param Data $helper
+     * @param RequestInterface $request
+     * @param ManagerInterface $eventManager
      */
     public function __construct(
-        protected Data $helper,
-        protected RequestInterface $request,
-        protected ManagerInterface $eventManager
+        protected readonly Data $helper,
+        protected readonly RequestInterface $request,
+        protected readonly ManagerInterface $eventManager
     ) {
     }
 
@@ -46,12 +47,12 @@ class MultishippingAssignACHDataObserver implements ObserverInterface
      * On multishipping checkout, Magento explicitly carries across cc_number/cc_cid but nothing else. We need to
      * persist ACH fields as well.
      *
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      * @return void
      */
     public function execute(Observer $observer)
     {
-        /** @var \Magento\Quote\Model\Quote $quote */
+        /** @var Quote $quote */
         $quote = $observer->getEvent()->getData('quote');
         $post  = $this->request->getPost();
 

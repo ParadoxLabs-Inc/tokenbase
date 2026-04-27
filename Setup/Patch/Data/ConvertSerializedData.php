@@ -29,25 +29,13 @@ use Magento\Framework\Unserialize\Unserialize;
 class ConvertSerializedData implements DataPatchInterface, PatchVersionInterface
 {
     /**
-     * @var \Magento\Framework\Unserialize\Unserialize
-     */
-    private $unserialize;
-
-    /**
-     * @var ModuleDataSetupInterface
-     */
-    private $moduleDataSetup;
-
-    /**
      * @param ModuleDataSetupInterface $moduleDataSetup
-     * @param \Magento\Framework\Unserialize\Unserialize $unserialize
+     * @param Unserialize $unserialize
      */
     public function __construct(
-        ModuleDataSetupInterface $moduleDataSetup,
-        Unserialize $unserialize
+        private readonly ModuleDataSetupInterface $moduleDataSetup,
+        private readonly Unserialize $unserialize,
     ) {
-        $this->moduleDataSetup = $moduleDataSetup;
-        $this->unserialize     = $unserialize;
     }
 
     /**

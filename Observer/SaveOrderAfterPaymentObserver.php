@@ -21,6 +21,7 @@
 
 namespace ParadoxLabs\TokenBase\Observer;
 
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Event\Observer;
@@ -35,57 +36,27 @@ use ParadoxLabs\TokenBase\Helper\Data;
 class SaveOrderAfterPaymentObserver implements ObserverInterface
 {
     /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    protected $scopeConfig;
-
-    /**
-     * @var \Magento\Sales\Api\OrderRepositoryInterface
-     */
-    protected $orderRepository;
-
-    /**
-     * @var \Magento\Quote\Api\CartRepositoryInterface
-     */
-    protected $cartRepository;
-
-    /**
-     * @var \Magento\Checkout\Model\Session
-     */
-    protected $checkoutSession;
-
-    /**
      * Plugin constructor
      *
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
-     * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
-     * @param \Magento\Checkout\Model\Session $checkoutSession *Proxy
+     * @param ScopeConfigInterface $scopeConfig
+     * @param Data $helper
+     * @param OrderRepositoryInterface $orderRepository
+     * @param CartRepositoryInterface $cartRepository
+     * @param Session $checkoutSession *Proxy
      */
     public function __construct(
-        ScopeConfigInterface $scopeConfig,
-        Data $helper,
-        OrderRepositoryInterface $orderRepository,
-        CartRepositoryInterface $cartRepository,
-        Session $checkoutSession
+        protected readonly ScopeConfigInterface $scopeConfig,
+        protected readonly Data $helper,
+        protected readonly OrderRepositoryInterface $orderRepository,
+        protected readonly CartRepositoryInterface $cartRepository,
+        protected readonly Session $checkoutSession,
     ) {
-        $this->helper          = $helper;
-        $this->scopeConfig     = $scopeConfig;
-        $this->orderRepository = $orderRepository;
-        $this->cartRepository  = $cartRepository;
-        $this->checkoutSession = $checkoutSession;
     }
 
     /**
      * Save order/quote after successful payment processing, if enabled
      *
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      * @return void
      */
     public function execute(Observer $observer)
@@ -95,7 +66,7 @@ class SaveOrderAfterPaymentObserver implements ObserverInterface
         }
 
         /** @var \Magento\Sales\Model\Order\Payment $payment */
-        /** @var \Magento\Sales\Model\Order $order */
+        /** @var Order $order */
         $payment = $observer->getData('payment');
         $order   = $payment->getOrder();
 
@@ -124,7 +95,7 @@ class SaveOrderAfterPaymentObserver implements ObserverInterface
     /**
      * Is the data we received good for processing? Must be the right models and a Tokenbase payment.
      *
-     * @param \Magento\Sales\Model\Order $order
+     * @param Order $order
      * @return bool
      */
     protected function isCheckoutSaveEligible($order): bool
@@ -137,9 +108,9 @@ class SaveOrderAfterPaymentObserver implements ObserverInterface
     /**
      * Perform the order saving.
      *
-     * @param \Magento\Sales\Model\Order $order
+     * @param Order $order
      * @return void
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     protected function saveOrder(Order $order): void
     {

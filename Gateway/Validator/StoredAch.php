@@ -21,6 +21,8 @@
 
 namespace ParadoxLabs\TokenBase\Gateway\Validator;
 
+use Magento\Payment\Gateway\Validator\ResultInterface;
+use Magento\Payment\Model\Info;
 use Magento\Payment\Gateway\Validator\AbstractValidator;
 
 class StoredAch extends AbstractValidator
@@ -29,13 +31,13 @@ class StoredAch extends AbstractValidator
      * Performs domain-related validation for business object
      *
      * @param array $validationSubject
-     * @return \Magento\Payment\Gateway\Validator\ResultInterface
+     * @return ResultInterface
      */
     public function validate(array $validationSubject)
     {
         $fails = [];
 
-        /** @var \Magento\Payment\Model\Info $payment */
+        /** @var Info $payment */
         $payment = $validationSubject['payment'];
 
         /**

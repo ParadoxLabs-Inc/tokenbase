@@ -41,31 +41,19 @@ class CheckoutFailureVoidTransactionObserver implements ObserverInterface
         ];
 
     /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Model\Method\Factory
-     */
-    protected $methodFactory;
-
-    /**
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \ParadoxLabs\TokenBase\Model\Method\Factory $methodFactory
+     * @param Data $helper
+     * @param Factory $methodFactory
      */
     public function __construct(
-        Data $helper,
-        Factory $methodFactory
+        protected readonly Data $helper,
+        protected readonly Factory $methodFactory,
     ) {
-        $this->helper        = $helper;
-        $this->methodFactory = $methodFactory;
     }
 
     /**
      * If checkout failed, void any transaction that went through.
      *
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      * @return void
      */
     public function execute(Observer $observer)

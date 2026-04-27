@@ -21,6 +21,7 @@
 
 namespace ParadoxLabs\TokenBase\Observer;
 
+use Magento\Framework\App\RequestInterface;
 use Magento\Backend\Model\Session\Quote;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Api\Data\CustomerInterface;
@@ -35,12 +36,12 @@ class FixAdminEmailAlreadyExistsObserver implements ObserverInterface
     /**
      * FixAdminEmailAlreadyExistsObserver constructor.
      *
-     * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
-     * @param \Magento\Store\Api\StoreRepositoryInterface $storeRepository
+     * @param CustomerRepositoryInterface $customerRepository
+     * @param StoreRepositoryInterface $storeRepository
      */
     public function __construct(
-        protected CustomerRepositoryInterface $customerRepository,
-        protected StoreRepositoryInterface $storeRepository
+        protected readonly CustomerRepositoryInterface $customerRepository,
+        protected readonly StoreRepositoryInterface $storeRepository
     ) {
     }
 
@@ -48,15 +49,15 @@ class FixAdminEmailAlreadyExistsObserver implements ObserverInterface
      * Prevent "Email already exists" error after hitting a payment error when placing an order for a new customer.
      * In this situation, Magento erroneously rolls back the quote changes but not the newly registered customer.
      *
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      */
     public function execute(Observer $observer)
     {
-        /** @var \Magento\Sales\Model\AdminOrder\Create $orderCreateModel */
+        /** @var Create $orderCreateModel */
         $orderCreateModel = $observer->getData('order_create_model');
-        /** @var \Magento\Framework\App\RequestInterface $request */
+        /** @var RequestInterface $request */
         $request = $observer->getData('request_model');
-        /** @var \Magento\Backend\Model\Session\Quote $session */
+        /** @var Quote $session */
         $session = $observer->getData('session');
 
         $params = $request->getParams();
@@ -91,8 +92,8 @@ class FixAdminEmailAlreadyExistsObserver implements ObserverInterface
     }
 
     /**
-     * @param \Magento\Backend\Model\Session\Quote $session
-     * @param \Magento\Sales\Model\AdminOrder\Create $orderCreateModel
+     * @param Quote $session
+     * @param Create $orderCreateModel
      * @return void
      */
     protected function resetCustomer(
@@ -110,9 +111,9 @@ class FixAdminEmailAlreadyExistsObserver implements ObserverInterface
     }
 
     /**
-     * @param \Magento\Backend\Model\Session\Quote $session
-     * @param \Magento\Sales\Model\AdminOrder\Create $orderCreateModel
-     * @param \Magento\Customer\Api\Data\CustomerInterface $customer
+     * @param Quote $session
+     * @param Create $orderCreateModel
+     * @param CustomerInterface $customer
      * @return void
      */
     protected function assignCustomer(

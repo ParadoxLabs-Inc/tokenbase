@@ -34,17 +34,17 @@ use ParadoxLabs\TokenBase\Helper\Data;
 class OrderPaymentLoadTokenbaseId
 {
     /**
-     * @param \Magento\Sales\Api\Data\OrderPaymentExtensionFactory $orderPaymentExtensionFactory
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
+     * @param OrderPaymentExtensionFactory $orderPaymentExtensionFactory
+     * @param Data $helper
      */
     public function __construct(
-        protected OrderPaymentExtensionFactory $orderPaymentExtensionFactory,
-        protected Data $helper
+        protected readonly OrderPaymentExtensionFactory $orderPaymentExtensionFactory,
+        protected readonly Data $helper
     ) {
     }
 
     /**
-     * @param \Magento\Sales\Model\Order\Payment $subject
+     * @param Payment $subject
      * @param OrderPaymentExtensionInterface|null $result
      * @return OrderPaymentExtensionInterface|null
      */
@@ -63,7 +63,7 @@ class OrderPaymentLoadTokenbaseId
     }
 
     /**
-     * @param \Magento\Sales\Model\Order\Payment $subject
+     * @param Payment $subject
      * @param array|null|mixed $result
      * @return array|null|mixed
      */

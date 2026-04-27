@@ -32,7 +32,7 @@ class CaptureAddInvoiceObserver implements ObserverInterface
     /**
      * Add invoice to payment info instance on capture
      *
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      * @return void
      */
     public function execute(Observer $observer)

@@ -21,6 +21,27 @@
 
 namespace ParadoxLabs\TokenBase\Model;
 
+use ParadoxLabs\TokenBase\Helper\Data;
+use ParadoxLabs\TokenBase\Model\Method\Factory;
+use Magento\Customer\Api\Data\CustomerInterfaceFactory;
+use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
+use Magento\Checkout\Model\Session;
+use Magento\Framework\App\State;
+use Magento\Framework\HTTP\PhpEnvironment\RemoteAddress;
+use Magento\Customer\Api\Data\AddressInterfaceFactory;
+use Magento\Customer\Api\Data\RegionInterfaceFactory;
+use Magento\Framework\Reflection\DataObjectProcessor;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use Magento\Framework\Api\DataObjectHelper;
+use ParadoxLabs\TokenBase\Api\MethodInterface;
+use Magento\Payment\Gateway\Command\CommandException;
+use Magento\Sales\Model\Order\Payment;
+use Magento\Quote\Model\Quote;
+use Magento\Sales\Model\Order;
+use Magento\Payment\Model\Info;
+use Magento\Customer\Api\Data\RegionInterface;
+use Magento\Framework\Phrase;
 use Magento\Customer\Api\Data\AddressInterface;
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Framework\Api\AttributeValueFactory;
@@ -72,17 +93,17 @@ class Card extends AbstractExtensibleModel implements CardInterface
     protected $additional;
 
     /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
+     * @var Data
      */
     protected $helper;
 
     /**
-     * @var \ParadoxLabs\TokenBase\Model\Method\Factory
+     * @var Factory
      */
     protected $methodFactory;
 
     /**
-     * @var \ParadoxLabs\TokenBase\Model\AbstractMethod
+     * @var AbstractMethod
      */
     protected $method;
 
@@ -92,37 +113,37 @@ class Card extends AbstractExtensibleModel implements CardInterface
     protected $cardCollectionFactory;
 
     /**
-     * @var \Magento\Customer\Api\Data\CustomerInterfaceFactory
+     * @var CustomerInterfaceFactory
      */
     protected $customerFactory;
 
     /**
-     * @var \Magento\Customer\Api\CustomerRepositoryInterface
+     * @var CustomerRepositoryInterface
      */
     protected $customerRepository;
 
     /**
-     * @var \Magento\Sales\Model\ResourceModel\Order\CollectionFactory
+     * @var CollectionFactory
      */
     protected $orderCollectionFactory;
 
     /**
-     * @var \Magento\Checkout\Model\Session
+     * @var Session
      */
     protected $checkoutSession;
 
     /**
-     * @var \Magento\Framework\App\State
+     * @var State
      */
     protected $appState;
 
     /**
-     * @var \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress
+     * @var RemoteAddress
      */
     protected $remoteAddress;
 
     /**
-     * @var \ParadoxLabs\TokenBase\Model\Card
+     * @var Card
      */
     protected $instance;
 
@@ -132,22 +153,22 @@ class Card extends AbstractExtensibleModel implements CardInterface
     protected $cardFactory;
 
     /**
-     * @var \Magento\Customer\Api\Data\AddressInterfaceFactory
+     * @var AddressInterfaceFactory
      */
     protected $addressFactory;
 
     /**
-     * @var \Magento\Customer\Api\Data\RegionInterfaceFactory
+     * @var RegionInterfaceFactory
      */
     protected $addressRegionFactory;
 
     /**
-     * @var \Magento\Framework\Reflection\DataObjectProcessor
+     * @var DataObjectProcessor
      */
     protected $dataProcessor;
 
     /**
-     * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
+     * @var TimezoneInterface
      */
     protected $dateProcessor;
 
@@ -157,18 +178,18 @@ class Card extends AbstractExtensibleModel implements CardInterface
     protected $cardAdditionalFactory;
 
     /**
-     * @var \Magento\Framework\Api\DataObjectHelper
+     * @var DataObjectHelper
      */
     protected $dataObjectHelper;
 
     /**
      * @param \Magento\Framework\Model\Context $context
-     * @param \Magento\Framework\Registry $registry
-     * @param \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory
-     * @param \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory
+     * @param Registry $registry
+     * @param ExtensionAttributesFactory $extensionFactory
+     * @param AttributeValueFactory $customAttributeFactory
      * @param Card\Context $cardContext
-     * @param \Magento\Framework\Model\ResourceModel\AbstractResource|null $resource
-     * @param \Magento\Framework\Data\Collection\AbstractDb|null $resourceCollection
+     * @param AbstractResource|null $resource
+     * @param AbstractDb|null $resourceCollection
      * @param array $data
      */
     public function __construct(
@@ -221,7 +242,7 @@ class Card extends AbstractExtensibleModel implements CardInterface
     /**
      * Set the method instance for this card. This is often necessary to route card data properly.
      *
-     * @param \ParadoxLabs\TokenBase\Api\MethodInterface|\Magento\Payment\Model\MethodInterface $method
+     * @param MethodInterface|\Magento\Payment\Model\MethodInterface $method
      * @return $this
      */
     public function setMethodInstance($method)
@@ -234,9 +255,9 @@ class Card extends AbstractExtensibleModel implements CardInterface
     /**
      * Get the arbitrary method instance.
      *
-     * @return \ParadoxLabs\TokenBase\Api\MethodInterface|\Magento\Payment\Model\MethodInterface Gateway-specific
+     * @return MethodInterface|\Magento\Payment\Model\MethodInterface Gateway-specific
      * payment method
-     * @throws \Magento\Payment\Gateway\Command\CommandException
+     * @throws CommandException
      */
     public function getMethodInstance()
     {
@@ -254,7 +275,7 @@ class Card extends AbstractExtensibleModel implements CardInterface
     /**
      * Get the specific type implementation for this card.
      *
-     * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface|$this
+     * @return CardInterface|$this
      */
     public function getTypeInstance()
     {
@@ -270,8 +291,8 @@ class Card extends AbstractExtensibleModel implements CardInterface
     /**
      * Set the customer account (if any) for the card.
      *
-     * @param \Magento\Customer\Api\Data\CustomerInterface $customer
-     * @param \Magento\Payment\Model\InfoInterface|null $payment
+     * @param CustomerInterface $customer
+     * @param InfoInterface|null $payment
      * @return $this
      */
     public function setCustomer(
@@ -289,26 +310,24 @@ class Card extends AbstractExtensibleModel implements CardInterface
             /**
              * If we have no email, try to find it from current scope data.
              */
-
-            /** @var \Magento\Sales\Model\Order\Payment $payment */
-
+            /** @var Payment $payment */
             if ($payment->getQuote() != null
                 && $payment->getQuote()->getBillingAddress() != null
                 && $payment->getQuote()->getBillingAddress()->getCustomerEmail() != '') {
-                /** @var \Magento\Quote\Model\Quote $model */
+                /** @var Quote $model */
                 $model = $payment->getQuote();
             } elseif ($payment->getOrder() != null
                 && ($payment->getOrder()->getCustomerEmail() != ''
                     || ($payment->getOrder()->getBillingAddress() != null
                         && $payment->getOrder()->getBillingAddress()->getCustomerEmail() != ''))) {
-                /** @var \Magento\Sales\Model\Order $model */
+                /** @var Order $model */
                 $model = $payment->getOrder();
             } else {
                 /**
                  * This will fall back to checkout/session if onepage has no quote loaded.
                  * Should work for all checkouts that use normal Magento processes.
                  */
-                /** @var \Magento\Quote\Model\Quote $model */
+                /** @var Quote $model */
                 $model = $this->checkoutSession->getQuote();
             }
 
@@ -335,7 +354,7 @@ class Card extends AbstractExtensibleModel implements CardInterface
     /**
      * Get the customer object (if any) for the card.
      *
-     * @return \Magento\Customer\Api\Data\CustomerInterface
+     * @return CustomerInterface
      */
     public function getCustomer()
     {
@@ -359,13 +378,13 @@ class Card extends AbstractExtensibleModel implements CardInterface
     /**
      * Set card payment data from a quote or order payment instance.
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @return $this
      */
     public function importPaymentInfo(InfoInterface $payment)
     {
         if ($payment instanceof InfoInterface) {
-            /** @var \Magento\Payment\Model\Info $payment */
+            /** @var Info $payment */
             if ($payment->getAdditionalInformation('save') === 0) {
                 $this->setData('active', 0);
             } elseif ($payment->getAdditionalInformation('save') === 1) {
@@ -449,7 +468,7 @@ class Card extends AbstractExtensibleModel implements CardInterface
 
         if ($orders instanceof Collection && $orders->getSize() > 0) {
             foreach ($orders as $order) {
-                /** @var \Magento\Sales\Model\Order $order */
+                /** @var Order $order */
                 $payment = $order->getPayment();
 
                 if ($payment->getMethod() == $this->getData('method')
@@ -518,13 +537,13 @@ class Card extends AbstractExtensibleModel implements CardInterface
     /**
      * Return a customer address object containing the card address data.
      *
-     * @return \Magento\Customer\Api\Data\AddressInterface
+     * @return AddressInterface
      */
     public function getAddressObject()
     {
-        /** @var \Magento\Customer\Api\Data\AddressInterface $address */
+        /** @var AddressInterface $address */
         $address = $this->addressFactory->create();
-        /** @var \Magento\Customer\Api\Data\RegionInterface $region */
+        /** @var RegionInterface $region */
         $region = $this->addressRegionFactory->create();
 
         // ffs.
@@ -585,7 +604,7 @@ class Card extends AbstractExtensibleModel implements CardInterface
      * Can pass in a key-value pair to set one value,
      * or a single parameter (associative array or CardAdditional instance) to overwrite all data.
      *
-     * @param string|array|\ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface $key
+     * @param string|array|CardAdditionalInterface $key
      * @param string|null $value
      * @return $this
      */
@@ -620,7 +639,7 @@ class Card extends AbstractExtensibleModel implements CardInterface
     /**
      * Set the billing address for the card.
      *
-     * @param \Magento\Customer\Api\Data\AddressInterface $address
+     * @param AddressInterface $address
      * @return $this
      */
     public function setAddress(AddressInterface $address)
@@ -920,7 +939,7 @@ class Card extends AbstractExtensibleModel implements CardInterface
     /**
      * Get payment info instance (if any)
      *
-     * @return \Magento\Payment\Model\InfoInterface|null
+     * @return InfoInterface|null
      */
     public function getInfoInstance()
     {
@@ -930,7 +949,7 @@ class Card extends AbstractExtensibleModel implements CardInterface
     /**
      * Set payment info instance
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @return $this
      */
     public function setInfoInstance(InfoInterface $payment)
@@ -942,7 +961,7 @@ class Card extends AbstractExtensibleModel implements CardInterface
      * Get card label (formatted number).
      *
      * @param bool $includeType
-     * @return string|\Magento\Framework\Phrase
+     * @return string|Phrase
      */
     public function getLabel($includeType = true)
     {
@@ -1009,7 +1028,7 @@ class Card extends AbstractExtensibleModel implements CardInterface
                  * This will remove any duplicates that we can't simply merge over and just save the new card.
                  */
                 if ($collection->getSize() > 1) {
-                    /** @var \ParadoxLabs\TokenBase\Model\Card $card */
+                    /** @var Card $card */
                     foreach ($collection as $card) {
                         /**
                          * Don't delete the card we're using, just its duplicates.
@@ -1044,7 +1063,7 @@ class Card extends AbstractExtensibleModel implements CardInterface
                 }
             }
 
-            /** @var \ParadoxLabs\TokenBase\Model\Card $dupe */
+            /** @var Card $dupe */
             $dupe = $collection->getFirstItem();
 
             /**
@@ -1089,7 +1108,7 @@ class Card extends AbstractExtensibleModel implements CardInterface
      * @param Card $card Card to merge current data onto.
      * @return $this
      */
-    protected function mergeCardOnto(\ParadoxLabs\TokenBase\Model\Card $card)
+    protected function mergeCardOnto(Card $card)
     {
         $this->helper->log(
             $this->getData('method'),
@@ -1301,7 +1320,7 @@ class Card extends AbstractExtensibleModel implements CardInterface
     /**
      * Get additional card data, in object form. Used to expose keys to API.
      *
-     * @return \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface
+     * @return CardAdditionalInterface
      */
     public function getAdditionalObject()
     {

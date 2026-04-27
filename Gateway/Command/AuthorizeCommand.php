@@ -21,6 +21,10 @@
 
 namespace ParadoxLabs\TokenBase\Gateway\Command;
 
+use Magento\Payment\Gateway\Command\ResultInterface;
+use Magento\Payment\Gateway\Command\CommandException;
+use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
+use Magento\Sales\Model\Order\Payment;
 use Magento\Payment\Gateway\CommandInterface;
 use ParadoxLabs\TokenBase\Api\MethodInterface;
 
@@ -30,9 +34,9 @@ use ParadoxLabs\TokenBase\Api\MethodInterface;
 class AuthorizeCommand implements CommandInterface
 {
     /**
-     * @param \ParadoxLabs\TokenBase\Api\MethodInterface $method
+     * @param MethodInterface $method
      */
-    public function __construct(protected MethodInterface $method)
+    public function __construct(protected readonly MethodInterface $method)
     {
     }
 
@@ -40,18 +44,18 @@ class AuthorizeCommand implements CommandInterface
      * Run an authorization transaction on the given subject.
      *
      * @param array $commandSubject
-     * @return null|\Magento\Payment\Gateway\Command\ResultInterface
-     * @throws \Magento\Payment\Gateway\Command\CommandException
+     * @return null|ResultInterface
+     * @throws CommandException
      */
     public function execute(array $commandSubject)
     {
         /** @var double $amount */
         $amount = $commandSubject['amount'];
 
-        /** @var \Magento\Payment\Gateway\Data\PaymentDataObjectInterface $paymentDataObject */
+        /** @var PaymentDataObjectInterface $paymentDataObject */
         $paymentDataObject = $commandSubject['payment'];
 
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
+        /** @var Payment $payment */
         $payment = $paymentDataObject->getPayment();
 
         $this->method->setInfoInstance($payment);

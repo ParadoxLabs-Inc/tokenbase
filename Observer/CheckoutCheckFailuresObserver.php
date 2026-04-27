@@ -36,14 +36,14 @@ class CheckoutCheckFailuresObserver implements ObserverInterface
     /**
      * CheckoutCheckFailuresObserver constructor.
      *
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \Magento\Customer\Model\Session $customerSession *Proxy
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param Data $helper
+     * @param Session $customerSession *Proxy
+     * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-        protected Data $helper,
-        protected Session $customerSession,
-        protected ScopeConfigInterface $scopeConfig
+        protected readonly Data $helper,
+        protected readonly Session $customerSession,
+        protected readonly ScopeConfigInterface $scopeConfig
     ) {
     }
 
@@ -51,13 +51,13 @@ class CheckoutCheckFailuresObserver implements ObserverInterface
      * If customer has failed checkout more than X times within the last Y seconds, block them from further checkout
      * attempts. This is to prevent credit card testing on checkout, runaway txn charges, and an unhappy gateway.
      *
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      * @return void
-     * @throws \Magento\Framework\Exception\AuthorizationException
+     * @throws AuthorizationException
      */
     public function execute(Observer $observer)
     {
-        /** @var \Magento\Sales\Model\Order $order */
+        /** @var Order $order */
         $order = $observer->getData('order');
 
         if ($order instanceof Order

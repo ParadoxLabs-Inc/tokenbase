@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ParadoxLabs\TokenBase\Test\Unit\Model\Card;
 
+use Magento\Framework\Event\ManagerInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Api\Data\CustomerInterfaceFactory;
@@ -90,7 +91,7 @@ class BeforeSaveTest extends TestCase
         $customer = $this->createMock(CustomerInterface::class);
         $customerFactory->method('create')->willReturn($customer);
 
-        $eventManager = $this->createMock(\Magento\Framework\Event\ManagerInterface::class);
+        $eventManager = $this->createMock(ManagerInterface::class);
         $this->context->method('getEventDispatcher')->willReturn($eventManager);
 
         // Set up default date mock

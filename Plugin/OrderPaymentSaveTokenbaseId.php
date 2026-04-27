@@ -21,6 +21,9 @@
 
 namespace ParadoxLabs\TokenBase\Plugin;
 
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Sales\Model\Order\Payment;
+use Magento\Sales\Api\Data\OrderPaymentExtensionInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -34,29 +37,29 @@ use ParadoxLabs\TokenBase\Helper\Data;
 class OrderPaymentSaveTokenbaseId
 {
     /**
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
+     * @param Data $helper
      */
-    public function __construct(protected Data $helper)
+    public function __construct(protected readonly Data $helper)
     {
     }
 
     /**
-     * @param \Magento\Sales\Api\OrderRepositoryInterface $subject
-     * @param \Magento\Sales\Api\Data\OrderInterface $order
+     * @param OrderRepositoryInterface $subject
+     * @param OrderInterface $order
      * @return array
-     * @throws \Magento\Framework\Exception\CouldNotSaveException
+     * @throws CouldNotSaveException
      */
     public function beforeSave(
         OrderRepositoryInterface $subject,
         OrderInterface $order
     ) {
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
+        /** @var Payment $payment */
         $payment = $order->getPayment();
         if ($payment instanceof OrderPaymentInterface === false) {
             return [$order];
         }
 
-        /** @var \Magento\Sales\Api\Data\OrderPaymentExtensionInterface $extendedAttributes */
+        /** @var OrderPaymentExtensionInterface $extendedAttributes */
         $extendedAttributes = $payment->getExtensionAttributes();
         if ($extendedAttributes === null) {
             $tokenbaseId = $payment->getData('tokenbase_id');

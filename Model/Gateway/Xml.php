@@ -92,7 +92,7 @@ class Xml
      * @param string $node_name - name of the root node to be converted
      * @param array|string $arr - array to be converterd
      * @return \DOMNode
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     private static function &convertArrayToXml($node_name, $arr = [])
     {
@@ -149,7 +149,7 @@ class Xml
      *
      * @param $input_xml
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public static function &createArray($input_xml)
     {
@@ -254,7 +254,7 @@ class Xml
      * @param array|string $arr
      * @param \DOMNode $node
      * @return void
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     private static function convertArraySubnodesToXml($node_name, &$arr, &$node)
     {

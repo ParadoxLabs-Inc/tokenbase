@@ -21,6 +21,8 @@
 
 namespace ParadoxLabs\TokenBase\Observer;
 
+use Magento\Quote\Model\Quote;
+use Magento\Sales\Model\Order;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 
@@ -32,15 +34,15 @@ class ConvertOrderToQuoteObserver extends ConvertAbstract implements ObserverInt
     /**
      * Copy fields from order payment to quote payment
      *
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      * @return void
      */
     public function execute(Observer $observer)
     {
-        /** @var \Magento\Quote\Model\Quote $quote */
+        /** @var Quote $quote */
         $quote = $observer->getEvent()->getData('quote');
 
-        /** @var \Magento\Sales\Model\Order $order */
+        /** @var Order $order */
         $order = $observer->getEvent()->getData('order');
 
         // Do the magic. Yeah, this is it.

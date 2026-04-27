@@ -21,6 +21,7 @@
 
 namespace ParadoxLabs\TokenBase\Observer;
 
+use Magento\Sales\Model\Order\Payment;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
@@ -35,12 +36,12 @@ class SetInitialOrderStatusObserver implements ObserverInterface
     /**
      * Plugin constructor
      *
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
+     * @param ScopeConfigInterface $scopeConfig
+     * @param Data $helper
      */
     public function __construct(
-        protected ScopeConfigInterface $scopeConfig,
-        protected Data $helper
+        protected readonly ScopeConfigInterface $scopeConfig,
+        protected readonly Data $helper
     ) {
     }
 
@@ -49,15 +50,15 @@ class SetInitialOrderStatusObserver implements ObserverInterface
      *
      * All of this just to allow 'pending' and other off-state statuses to be chosen...
      *
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      * @return void
      */
     public function execute(Observer $observer)
     {
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
+        /** @var Payment $payment */
         $payment = $observer->getData('payment');
 
-        /** @var \Magento\Sales\Model\Order $order */
+        /** @var Order $order */
         $order = $payment->getOrder();
 
         // If we're setting the order state to default processing on order placement, inject our status.
@@ -74,8 +75,8 @@ class SetInitialOrderStatusObserver implements ObserverInterface
     /**
      * Determine whether order is in the right state for status override.
      *
-     * @param \Magento\Sales\Api\Data\OrderInterface $order
-     * @param \Magento\Sales\Api\Data\OrderPaymentInterface $payment
+     * @param OrderInterface $order
+     * @param OrderPaymentInterface $payment
      * @return bool
      */
     public function canSetOrderStatus(

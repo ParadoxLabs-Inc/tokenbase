@@ -21,6 +21,11 @@
 
 namespace ParadoxLabs\TokenBase\Model;
 
+use Magento\Payment\Model\Info;
+use ParadoxLabs\TokenBase\Api\GatewayInterface;
+use Magento\Sales\Model\Order\Creditmemo;
+use Magento\Customer\Api\Data\AddressInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Model\Address\AddressModelInterface;
 use Magento\Framework\App\ScopeInterface;
@@ -53,43 +58,43 @@ use Throwable;
 abstract class AbstractMethod extends DataObject implements MethodInterface
 {
     /**
-     * @var \Magento\Payment\Model\Info
+     * @var Info
      */
     protected $infoInstance;
 
     /**
-     * @var \Magento\Customer\Api\Data\CustomerInterface|null
+     * @var CustomerInterface|null
      */
     protected $customer;
 
     /**
-     * @var \ParadoxLabs\TokenBase\Model\Card
+     * @var Card
      */
     protected $card;
 
     /**
-     * @param \Magento\Sales\Model\Order\Payment\Transaction\Repository $transactionRepository
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \ParadoxLabs\TokenBase\Model\AbstractGateway $gateway
+     * @param Repository $transactionRepository
+     * @param Data $helper
+     * @param AbstractGateway $gateway
      * @param \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $cardFactory
-     * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
-     * @param \ParadoxLabs\TokenBase\Helper\Address $addressHelper *Proxy
-     * @param \Magento\Payment\Gateway\ConfigInterface $config
-     * @param \Magento\Framework\Registry $registry
+     * @param CardRepositoryInterface $cardRepository
+     * @param Address $addressHelper *Proxy
+     * @param ConfigInterface $config
+     * @param Registry $registry
      * @param string $methodCode
      * @param array $data
-     * @throws \Magento\Payment\Gateway\Command\CommandException
+     * @throws CommandException
      */
     public function __construct(
-        protected Repository $transactionRepository,
-        protected Data $helper,
-        protected AbstractGateway $gateway,
-        protected CardInterfaceFactory $cardFactory,
-        protected CardRepositoryInterface $cardRepository,
-        protected Address $addressHelper,
-        protected ConfigInterface $config,
-        protected Registry $registry,
-        protected string $methodCode = '',
+        protected readonly Repository $transactionRepository,
+        protected readonly Data $helper,
+        protected readonly AbstractGateway $gateway,
+        protected readonly CardInterfaceFactory $cardFactory,
+        protected readonly CardRepositoryInterface $cardRepository,
+        protected readonly Address $addressHelper,
+        protected readonly ConfigInterface $config,
+        protected readonly Registry $registry,
+        protected readonly string $methodCode = '',
         array $data = []
     ) {
         if (empty($this->methodCode)) {
@@ -126,7 +131,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     /**
      * Set the customer to use for payment/card operations.
      *
-     * @param \Magento\Customer\Api\Data\CustomerInterface $customer
+     * @param CustomerInterface $customer
      * @return $this
      */
     public function setCustomer(CustomerInterface $customer)
@@ -139,7 +144,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     /**
      * Get the current customer; fetch from session if necessary.
      *
-     * @return \Magento\Customer\Api\Data\CustomerInterface
+     * @return CustomerInterface
      */
     public function getCustomer()
     {
@@ -167,7 +172,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     }
 
     /**
-     * @param \Magento\Payment\Model\InfoInterface $info
+     * @param InfoInterface $info
      * @return $this
      */
     public function setInfoInstance(InfoInterface $info)
@@ -178,7 +183,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     }
 
     /**
-     * @return \Magento\Payment\Model\InfoInterface
+     * @return InfoInterface
      */
     public function getInfoInstance()
     {
@@ -188,9 +193,8 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     /**
      * Initialize/return the API gateway class.
      *
-     * @return \ParadoxLabs\TokenBase\Api\GatewayInterface
+     * @return GatewayInterface
      * @api
-     *
      */
     public function gateway()
     {
@@ -212,8 +216,8 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
      *
      * @param int|string $cardId
      * @param bool $byHash
-     * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
-     * @throws \Magento\Payment\Gateway\Command\CommandException
+     * @return CardInterface
+     * @throws CommandException
      */
     public function loadAndSetCard($cardId, $byHash = false)
     {
@@ -260,7 +264,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     /**
      * Get the current card
      *
-     * @return \ParadoxLabs\TokenBase\Model\Card
+     * @return Card
      */
     public function getCard()
     {
@@ -270,14 +274,14 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     /**
      * Set the current payment card
      *
-     * @param \ParadoxLabs\TokenBase\Api\Data\CardInterface $card
+     * @param CardInterface $card
      * @return $this
      */
     public function setCard(CardInterface $card)
     {
         $this->log(sprintf('setCard(%s)', $card->getId()));
 
-        /** @var \ParadoxLabs\TokenBase\Model\Card $card */
+        /** @var Card $card */
         $card = $card->getTypeInstance();
         $card->setMethodInstance($this);
 
@@ -307,7 +311,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     /**
      * Run an 'order' transaction
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @param float $amount
      * @return $this
      */
@@ -353,7 +357,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     /**
      * Authorize a transaction
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @param float $amount
      * @return $this
      */
@@ -428,7 +432,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     /**
      * Capture a transaction [authorize if necessary]
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @param float $amount
      * @return $this
      */
@@ -525,7 +529,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     /**
      * Refund a transaction
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @param float $amount
      * @return $this
      */
@@ -541,7 +545,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
             return $this;
         }
 
-        /** @var \Magento\Sales\Model\Order\Creditmemo $creditmemo */
+        /** @var Creditmemo $creditmemo */
         $creditmemo = $payment->getData('creditmemo');
 
         /**
@@ -620,7 +624,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     /**
      * Void a payment
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @return $this
      */
     public function void(InfoInterface $payment)
@@ -689,7 +693,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     /**
      * Cancel a payment
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @return $this
      */
     public function cancel(InfoInterface $payment)
@@ -704,7 +708,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     /**
      * Fetch transaction info -- fraud detection
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @param string $transactionId
      * @return array
      */
@@ -744,7 +748,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     /**
      * Get invoice info on capture.
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @return $this
      */
     protected function captureGetInvoiceInfo(InfoInterface $payment)
@@ -778,7 +782,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     /**
      * We can't have two transactions with the same ID. Make sure that doesn't happen.
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @param string $transactionId
      * @return string
      */
@@ -815,9 +819,9 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
      * Given the current object/payment, load the paying card, or create
      * one if none exists.
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
-     * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
-     * @throws \Magento\Payment\Gateway\Command\CommandException
+     * @param InfoInterface $payment
+     * @return CardInterface
+     * @throws CommandException
      */
     protected function loadOrCreateCard(InfoInterface $payment)
     {
@@ -874,7 +878,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
                     str_replace("\r", '', (string)$billingAddressData['street'])
                 );
 
-                /** @var \Magento\Customer\Api\Data\AddressInterface $billingAddress */
+                /** @var AddressInterface $billingAddress */
                 $billingAddress = $this->addressHelper->buildAddressFromInput($billingAddressData);
 
                 $card->setAddress($billingAddress);
@@ -904,7 +908,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     /**
      * Return boolean whether given payment object includes new card info.
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @return bool
      */
     protected function paymentContainsCard(InfoInterface $payment)
@@ -921,7 +925,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     /**
      * Resync billing address et al. before auth/capture.
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @return $this
      */
     protected function resyncStoredCard(InfoInterface $payment)
@@ -1009,7 +1013,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     }
 
     /**
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @param float $amount
      * @return void
      */
@@ -1019,9 +1023,9 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     }
 
     /**
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @param float $amount
-     * @param \ParadoxLabs\TokenBase\Model\Gateway\Response $response
+     * @param Response $response
      * @return void
      */
     protected function afterAuthorize(
@@ -1033,7 +1037,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     }
 
     /**
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @param float $amount
      * @return void
      */
@@ -1043,9 +1047,9 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     }
 
     /**
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @param float $amount
-     * @param \ParadoxLabs\TokenBase\Model\Gateway\Response $response
+     * @param Response $response
      * @return void
      */
     protected function afterCapture(
@@ -1127,7 +1131,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     }
 
     /**
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @param float $amount
      * @return void
      */
@@ -1136,9 +1140,9 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     }
 
     /**
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @param float $amount
-     * @param \ParadoxLabs\TokenBase\Model\Gateway\Response $response
+     * @param Response $response
      * @return void
      */
     protected function afterRefund(
@@ -1149,7 +1153,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     }
 
     /**
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @return void
      */
     protected function beforeVoid(InfoInterface $payment)
@@ -1157,8 +1161,8 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     }
 
     /**
-     * @param \Magento\Payment\Model\InfoInterface $payment
-     * @param \ParadoxLabs\TokenBase\Model\Gateway\Response $response
+     * @param InfoInterface $payment
+     * @param Response $response
      * @return void
      */
     protected function afterVoid(
@@ -1168,7 +1172,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     }
 
     /**
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @param string $transactionId
      * @return void
      */
@@ -1177,9 +1181,9 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     }
 
     /**
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @param string $transactionId
-     * @param \ParadoxLabs\TokenBase\Model\Gateway\Response $response
+     * @param Response $response
      * @return void
      */
     protected function afterFraudUpdate(
@@ -1192,7 +1196,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     /**
      * Set shipping address on the gateway before running the transaction.
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @return $this
      */
     protected function handleShippingAddress(InfoInterface $payment)
@@ -1203,9 +1207,9 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     /**
      * Store response statuses persistently.
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
-     * @param \ParadoxLabs\TokenBase\Model\Gateway\Response $response
-     * @return \Magento\Payment\Model\InfoInterface
+     * @param InfoInterface $payment
+     * @param Response $response
+     * @return InfoInterface
      */
     protected function storeTransactionStatuses(
         InfoInterface $payment,
@@ -1491,7 +1495,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
      * Validate payment method information object
      *
      * @return $this
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      * @deprecated
      */
     public function validate()
@@ -1507,9 +1511,9 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     /**
      * Attempt to accept a payment that us under review
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @return bool
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function acceptPayment(InfoInterface $payment)
     {
@@ -1523,9 +1527,9 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     /**
      * Attempt to deny a payment that us under review
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @return bool
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function denyPayment(InfoInterface $payment)
     {
@@ -1539,7 +1543,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
     /**
      * Assign data to info model instance
      *
-     * @param \Magento\Framework\DataObject $data
+     * @param DataObject $data
      * @return $this
      * @deprecated
      */

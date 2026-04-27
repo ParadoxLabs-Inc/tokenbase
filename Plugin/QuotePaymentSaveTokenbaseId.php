@@ -21,6 +21,9 @@
 
 namespace ParadoxLabs\TokenBase\Plugin;
 
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Quote\Model\Quote\Payment;
+use Magento\Quote\Api\Data\PaymentExtensionInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Api\Data\PaymentInterface;
@@ -34,29 +37,29 @@ use ParadoxLabs\TokenBase\Helper\Data;
 class QuotePaymentSaveTokenbaseId
 {
     /**
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
+     * @param Data $helper
      */
-    public function __construct(protected Data $helper)
+    public function __construct(protected readonly Data $helper)
     {
     }
 
     /**
-     * @param \Magento\Quote\Api\CartRepositoryInterface $subject
-     * @param \Magento\Quote\Api\Data\CartInterface $quote
+     * @param CartRepositoryInterface $subject
+     * @param CartInterface $quote
      * @return array
-     * @throws \Magento\Framework\Exception\CouldNotSaveException
+     * @throws CouldNotSaveException
      */
     public function beforeSave(
         CartRepositoryInterface $subject,
         CartInterface $quote
     ) {
-        /** @var \Magento\Quote\Model\Quote\Payment $payment */
+        /** @var Payment $payment */
         $payment = $quote->getPayment();
         if ($payment instanceof PaymentInterface === false) {
             return [$quote];
         }
 
-        /** @var \Magento\Quote\Api\Data\PaymentExtensionInterface $extendedAttributes */
+        /** @var PaymentExtensionInterface $extendedAttributes */
         $extendedAttributes = $payment->getExtensionAttributes();
         if ($extendedAttributes === null) {
             $tokenbaseId = $payment->getData('tokenbase_id');

@@ -21,6 +21,8 @@
 
 namespace ParadoxLabs\TokenBase\Gateway\Validator;
 
+use Magento\Payment\Gateway\Validator\ResultInterface;
+use Magento\Payment\Model\Info;
 use Magento\Payment\Gateway\Validator\AbstractValidator;
 use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
 
@@ -42,7 +44,7 @@ class NewAch extends AbstractValidator
         ];
 
     /**
-     * @param \Magento\Payment\Gateway\Validator\ResultInterfaceFactory $resultFactory
+     * @param ResultInterfaceFactory $resultFactory
      */
     public function __construct(
         ResultInterfaceFactory $resultFactory
@@ -54,13 +56,13 @@ class NewAch extends AbstractValidator
      * Performs domain-related validation for business object
      *
      * @param array $validationSubject
-     * @return \Magento\Payment\Gateway\Validator\ResultInterface
+     * @return ResultInterface
      */
     public function validate(array $validationSubject)
     {
         $fails = [];
 
-        /** @var \Magento\Payment\Model\Info $payment */
+        /** @var Info $payment */
         $payment = $validationSubject['payment'];
 
         /**

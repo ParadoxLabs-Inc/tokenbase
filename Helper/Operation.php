@@ -35,12 +35,12 @@ class Operation extends AbstractHelper
     /**
      * Data constructor.
      *
-     * @param \Magento\Framework\App\Helper\Context $context
-     * @param \Monolog\Logger $tokenbaseLogger
+     * @param Context $context
+     * @param Logger $tokenbaseLogger
      */
     public function __construct(
         Context $context,
-        protected Logger $tokenbaseLogger
+        protected readonly Logger $tokenbaseLogger
     ) {
         parent::__construct($context);
     }

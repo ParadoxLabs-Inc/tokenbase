@@ -35,21 +35,21 @@ class ValidatePaymentObserver implements ObserverInterface
     /**
      * ValidatePaymentObserver constructor.
      *
-     * @param \Magento\Payment\Gateway\Validator\ValidatorPoolInterface|null $validatorPool
+     * @param ValidatorPoolInterface|null $validatorPool
      */
     public function __construct(
-        protected ?ValidatorPoolInterface $validatorPool = null
+        protected readonly ?ValidatorPoolInterface $validatorPool = null
     ) {
     }
 
     /**
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      * @return void
      */
     public function execute(Observer $observer)
     {
         /** @var \Magento\Sales\Api\Data\OrderInterface $order */
-        /** @var \Magento\Quote\Api\Data\CartInterface $quote */
+        /** @var CartInterface $quote */
         $order = $observer->getData('order');
         $quote = $observer->getData('quote');
 

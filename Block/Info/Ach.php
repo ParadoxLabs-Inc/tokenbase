@@ -21,6 +21,8 @@
 
 namespace ParadoxLabs\TokenBase\Block\Info;
 
+use Magento\Framework\DataObject;
+use Magento\Sales\Model\Order\Payment\Info;
 use Magento\Framework\View\Element\Template;
 
 /**
@@ -36,8 +38,8 @@ class Ach extends Cc
     /**
      * Prepare payment info
      *
-     * @param \Magento\Framework\DataObject|array $transport
-     * @return \Magento\Framework\DataObject
+     * @param DataObject|array $transport
+     * @return DataObject
      */
     protected function _prepareSpecificInformation($transport = null)
     {
@@ -45,7 +47,7 @@ class Ach extends Cc
         $data      = [];
 
         if ($this->getIsSecureMode() === false && $this->isEcheck() === true) {
-            /** @var \Magento\Sales\Model\Order\Payment\Info $info */
+            /** @var Info $info */
             $info = $this->getInfo();
 
             $accName = $info->getData('echeck_account_name');
@@ -70,7 +72,7 @@ class Ach extends Cc
         if (!empty($this->getRequest()->getParam('payment'))) {
             // On multishipping checkout, persist ACH payment values (if any) onto the review step for final submit.
             // We have to do this because we don't want to save them to the DB or session, but can't lose them entirely.
-            /** @var \Magento\Framework\View\Element\Template $childBlock */
+            /** @var Template $childBlock */
             $childBlock = $this->getLayout()->createBlock(
                 Template::class,
                 $this->getNameInLayout() . '.multiship'

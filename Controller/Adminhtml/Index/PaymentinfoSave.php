@@ -21,6 +21,12 @@
 
 namespace ParadoxLabs\TokenBase\Controller\Adminhtml\Index;
 
+use Magento\Framework\Controller\ResultInterface;
+use ParadoxLabs\TokenBase\Model\Card;
+use Magento\Quote\Model\Quote;
+use Magento\Quote\Model\Quote\Payment;
+use Magento\Framework\Controller\Result\Json;
+use Magento\Framework\Controller\Result\Forward;
 use Magento\Backend\App\Action\Context;
 use Magento\Backend\Model\View\Result\ForwardFactory;
 use Magento\Customer\Api\AccountManagementInterface;
@@ -66,36 +72,36 @@ class PaymentinfoSave extends Paymentinfo
     /**
      * PaymentinfoDelete constructor.
      *
-     * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\Framework\Registry $coreRegistry
-     * @param \Magento\Framework\App\Response\Http\FileFactory $fileFactory
-     * @param \Magento\Customer\Model\CustomerFactory $customerFactory
-     * @param \Magento\Customer\Model\AddressFactory $addressFactory
-     * @param \Magento\Customer\Model\Metadata\FormFactory $formFactory
-     * @param \Magento\Newsletter\Model\SubscriberFactory $subscriberFactory
-     * @param \Magento\Customer\Helper\View $viewHelper
-     * @param \Magento\Framework\Math\Random $random
+     * @param Context $context
+     * @param Registry $coreRegistry
+     * @param FileFactory $fileFactory
+     * @param CustomerFactory $customerFactory
+     * @param AddressFactory $addressFactory
+     * @param FormFactory $formFactory
+     * @param SubscriberFactory $subscriberFactory
+     * @param View $viewHelper
+     * @param Random $random
      * @param CustomerRepositoryInterface $customerRepository
-     * @param \Magento\Framework\Api\ExtensibleDataObjectConverter $extensibleDataObjectConverter
+     * @param ExtensibleDataObjectConverter $extensibleDataObjectConverter
      * @param Mapper $addressMapper
      * @param AccountManagementInterface $customerAccountManagement
      * @param AddressRepositoryInterface $addressRepository
      * @param CustomerInterfaceFactory $customerDataFactory
      * @param AddressInterfaceFactory $addressDataFactory
      * @param \Magento\Customer\Model\Customer\Mapper $customerMapper
-     * @param \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor
+     * @param DataObjectProcessor $dataObjectProcessor
      * @param DataObjectHelper $dataObjectHelper
      * @param ObjectFactory $objectFactory
      * @param \Magento\Framework\View\LayoutFactory $layoutFactory
      * @param \Magento\Framework\View\Result\LayoutFactory $resultLayoutFactory
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
-     * @param \Magento\Backend\Model\View\Result\ForwardFactory $resultForwardFactory
-     * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
-     * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
+     * @param PageFactory $resultPageFactory
+     * @param ForwardFactory $resultForwardFactory
+     * @param JsonFactory $resultJsonFactory
+     * @param CardRepositoryInterface $cardRepository
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \ParadoxLabs\TokenBase\Helper\Address $addressHelper
-     * @param \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory
-     * @param \Magento\Quote\Api\Data\CartInterfaceFactory $quoteFactory
+     * @param Address $addressHelper
+     * @param PaymentFactory $paymentFactory
+     * @param CartInterfaceFactory $quoteFactory
      * @param \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $cardFactory
      * @param \Magento\Payment\Helper\Data $paymentHelper
      */
@@ -128,10 +134,10 @@ class PaymentinfoSave extends Paymentinfo
         CardRepositoryInterface $cardRepository,
         TokenbaseHelper $helper,
         Address $addressHelper,
-        protected PaymentFactory $paymentFactory,
-        protected CartInterfaceFactory $quoteFactory,
-        protected CardInterfaceFactory $cardFactory,
-        protected Data $paymentHelper
+        protected readonly PaymentFactory $paymentFactory,
+        protected readonly CartInterfaceFactory $quoteFactory,
+        protected readonly CardInterfaceFactory $cardFactory,
+        protected readonly Data $paymentHelper
     ) {
         parent::__construct(
             $context,
@@ -168,7 +174,7 @@ class PaymentinfoSave extends Paymentinfo
     /**
      * View customer's stored cards list (active view)
      *
-     * @return \Magento\Framework\Controller\ResultInterface
+     * @return ResultInterface
      */
     public function execute()
     {
@@ -190,8 +196,7 @@ class PaymentinfoSave extends Paymentinfo
                 /**
                  * Load the card before doing anything.
                  */
-
-                /** @var \ParadoxLabs\TokenBase\Model\Card $card */
+                /** @var Card $card */
                 if (!empty($id)) {
                     $card = $this->cardRepository->getByHash($id);
                 } else {
@@ -235,11 +240,11 @@ class PaymentinfoSave extends Paymentinfo
                         $cardData['cc_bin']   = substr((string) $cardData['cc_number'], 0, 6);
                     }
 
-                    /** @var \Magento\Quote\Model\Quote $quote */
+                    /** @var Quote $quote */
                     $quote = $this->quoteFactory->create();
                     $quote->setCustomer($customer);
 
-                    /** @var \Magento\Quote\Model\Quote\Payment $newPayment */
+                    /** @var Payment $newPayment */
                     $newPayment = $this->paymentFactory->create();
                     $newPayment->setQuote($quote);
                     $newPayment->getQuote()->getBillingAddress()->setCountryId($newAddr->getCountryId());
@@ -278,14 +283,13 @@ class PaymentinfoSave extends Paymentinfo
         }
 
         if ($response['success'] === false) {
-            /** @var \Magento\Framework\Controller\Result\Json $resultJson */
+            /** @var Json $resultJson */
             $resultJson = $this->resultJsonFactory->create();
 
             return $resultJson->setData($response);
         } else {
             // If successful, rebuild and output the entire tab.
-
-            /** @var \Magento\Framework\Controller\Result\Forward $resultForward */
+            /** @var Forward $resultForward */
             $resultForward = $this->resultForwardFactory->create();
             $resultForward->forward('paymentinfo');
 

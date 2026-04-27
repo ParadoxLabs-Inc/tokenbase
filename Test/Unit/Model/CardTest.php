@@ -4,23 +4,17 @@ declare(strict_types=1);
 
 namespace ParadoxLabs\TokenBase\Test\Unit\Model;
 
+use Magento\Framework\Event\ManagerInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
-use Magento\Customer\Api\Data\AddressInterface;
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Api\Data\CustomerInterfaceFactory;
 use Magento\Framework\Api\AttributeValueFactory;
 use Magento\Framework\Api\ExtensionAttributesFactory;
 use Magento\Framework\App\ObjectManager;
-use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Model\Context as ModelContext;
-use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
-use Magento\Payment\Model\InfoInterface;
-use Magento\Sales\Model\Order;
-use Magento\Sales\Model\Order\Payment;
-use Magento\Sales\Model\ResourceModel\Order\Collection;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
 use ParadoxLabs\TokenBase\Helper\Data;
 use ParadoxLabs\TokenBase\Model\AbstractMethod;
@@ -90,7 +84,7 @@ class CardTest extends TestCase
         $customer = $this->createMock(CustomerInterface::class);
         $customerFactory->method('create')->willReturn($customer);
 
-        $eventManager = $this->createMock(\Magento\Framework\Event\ManagerInterface::class);
+        $eventManager = $this->createMock(ManagerInterface::class);
         $this->context->method('getEventDispatcher')->willReturn($eventManager);
 
         $this->card = new Card(

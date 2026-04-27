@@ -21,6 +21,8 @@
 
 namespace ParadoxLabs\TokenBase\Gateway\Validator;
 
+use Magento\Payment\Gateway\Validator\ResultInterface;
+use Magento\Payment\Model\Info;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Payment\Gateway\Validator\AbstractValidator;
@@ -31,16 +33,16 @@ use ParadoxLabs\TokenBase\Gateway\Validator\CreditCard\Types;
 class CreditCard extends AbstractValidator
 {
     /**
-     * @param \Magento\Payment\Gateway\Validator\ResultInterfaceFactory $resultFactory
-     * @param \Magento\Payment\Gateway\ConfigInterface $config
-     * @param \ParadoxLabs\TokenBase\Gateway\Validator\CreditCard\Types $ccTypes
-     * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $dateProcessor
+     * @param ResultInterfaceFactory $resultFactory
+     * @param ConfigInterface $config
+     * @param Types $ccTypes
+     * @param TimezoneInterface $dateProcessor
      */
     public function __construct(
         ResultInterfaceFactory $resultFactory,
-        protected ConfigInterface $config,
-        protected Types $ccTypes,
-        protected TimezoneInterface $dateProcessor
+        protected readonly ConfigInterface $config,
+        protected readonly Types $ccTypes,
+        protected readonly TimezoneInterface $dateProcessor
     ) {
         parent::__construct($resultFactory);
     }
@@ -49,14 +51,14 @@ class CreditCard extends AbstractValidator
      * Performs domain-related validation for business object
      *
      * @param array $validationSubject
-     * @return \Magento\Payment\Gateway\Validator\ResultInterface
+     * @return ResultInterface
      */
     public function validate(array $validationSubject)
     {
         $isValid = true;
         $fails   = [];
 
-        /** @var \Magento\Payment\Model\Info $payment */
+        /** @var Info $payment */
         $payment = $validationSubject['payment'];
 
         $tokenbaseId = $payment->getData('tokenbase_id');
@@ -171,7 +173,7 @@ class CreditCard extends AbstractValidator
     /**
      * Accessor for CC Types object.
      *
-     * @return \ParadoxLabs\TokenBase\Gateway\Validator\CreditCard\Types
+     * @return Types
      */
     public function getCcTypes()
     {

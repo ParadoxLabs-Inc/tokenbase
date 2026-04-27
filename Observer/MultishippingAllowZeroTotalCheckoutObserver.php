@@ -30,12 +30,12 @@ use ParadoxLabs\TokenBase\Helper\Data;
 class MultishippingAllowZeroTotalCheckoutObserver implements ObserverInterface
 {
     /**
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param Data $helper
+     * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-        protected Data $helper,
-        protected ScopeConfigInterface $scopeConfig
+        protected readonly Data $helper,
+        protected readonly ScopeConfigInterface $scopeConfig
     ) {
     }
 
@@ -43,7 +43,7 @@ class MultishippingAllowZeroTotalCheckoutObserver implements ObserverInterface
      * On multishipping checkout, Magento forces the payment method to 'free' if grand total is $0. If the order payment
      * is 'free' and the quote payment is not, overwrite it back to the quote payment method.
      *
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      * @return void
      */
     public function execute(Observer $observer)

@@ -35,8 +35,8 @@ class Factory
     /**
      * Construct
      *
-     * @param \Magento\Framework\ObjectManagerInterface $objectManager
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param ObjectManagerInterface $objectManager
+     * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
         /**
@@ -52,8 +52,8 @@ class Factory
      *
      * @param string $className
      * @param array $data
-     * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return CardInterface
+     * @throws LocalizedException
      */
     public function create($className, array $data = [])
     {
@@ -73,8 +73,8 @@ class Factory
      *
      * This allows us to go from a generic collection/instance to the card's specific implementation.
      *
-     * @param \ParadoxLabs\TokenBase\Api\Data\CardInterface $card
-     * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
+     * @param CardInterface $card
+     * @return CardInterface
      */
     public function getTypeInstance(CardInterface $card)
     {

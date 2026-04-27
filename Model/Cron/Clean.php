@@ -21,6 +21,7 @@
 
 namespace ParadoxLabs\TokenBase\Model\Cron;
 
+use ParadoxLabs\TokenBase\Model\Card;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
 use ParadoxLabs\TokenBase\Api\CardRepositoryInterface;
@@ -39,16 +40,16 @@ class Clean
     /**
      * Constructor, yeah!
      *
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param ScopeConfigInterface $scopeConfig
      * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
+     * @param Data $helper
+     * @param CardRepositoryInterface $cardRepository
      */
     public function __construct(
-        protected ScopeConfigInterface $scopeConfig,
-        protected CollectionFactory $cardCollectionFactory,
-        protected Data $helper,
-        protected CardRepositoryInterface $cardRepository
+        protected readonly ScopeConfigInterface $scopeConfig,
+        protected readonly CollectionFactory $cardCollectionFactory,
+        protected readonly Data $helper,
+        protected readonly CardRepositoryInterface $cardRepository
     ) {
     }
 
@@ -74,7 +75,7 @@ class Clean
             ScopeInterface::SCOPE_STORE
         ) ?: '180 days';
 
-        /** @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection $cards */
+        /** @var Collection $cards */
         $cards = $this->cardCollectionFactory->create();
         $cards->addFieldToFilter('active', '0')
               ->addFieldToFilter('updated_at', ['lt' => date('c', (int)strtotime('-' . $cutoff)), 'date' => true])
@@ -97,8 +98,7 @@ class Clean
         /**
          * Prune any cards missing tokens after 7 days (invalid/unusable)
          */
-
-        /** @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection $cards */
+        /** @var Collection $cards */
         $cards = $this->cardCollectionFactory->create();
         $cards->addFieldToFilter('profile_id', ['null' => true])
               ->addFieldToFilter('payment_id', ['null' => true])
@@ -114,14 +114,14 @@ class Clean
     /**
      * Permanently delete cards from the given collection, return the number affected.
      *
-     * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection $cards
+     * @param Collection $cards
      * @return int
      */
     public function deleteCards(Collection $cards)
     {
         $affectedCount = 0;
 
-        /** @var \ParadoxLabs\TokenBase\Model\Card $card */
+        /** @var Card $card */
         foreach ($cards as $card) {
             $card = $card->getTypeInstance();
             $cardMethod = $card->getMethod();

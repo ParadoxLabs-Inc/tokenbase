@@ -21,6 +21,7 @@
 
 namespace ParadoxLabs\TokenBase\Plugin\Sales\Model\Order\Payment\Transaction\Repository;
 
+use Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\Collection;
 use Closure;
 use Magento\Framework\Api\SearchCriteria;
 use Magento\Framework\Api\SortOrder;
@@ -35,10 +36,10 @@ class Plugin
      *
      * Around plugin because we need both the input (sort orders) and the result (collection).
      *
-     * @param \Magento\Sales\Model\Order\Payment\Transaction\Repository $subject
+     * @param Repository $subject
      * @param \Closure $proceed
-     * @param \Magento\Framework\Api\SearchCriteria $searchCriteria
-     * @return \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\Collection
+     * @param SearchCriteria $searchCriteria
+     * @return Collection
      * @throws \Zend_Db_Select_Exception
      */
     public function aroundGetList(
@@ -46,7 +47,7 @@ class Plugin
         Closure $proceed,
         SearchCriteria $searchCriteria
     ) {
-        /** @var \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\Collection $collection */
+        /** @var Collection $collection */
         $collection = $proceed($searchCriteria);
 
         $sort = $collection->getSelect()->getPart(Select::ORDER);

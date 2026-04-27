@@ -21,6 +21,10 @@
 
 namespace ParadoxLabs\TokenBase\Model\ResourceModel;
 
+use ParadoxLabs\TokenBase\Api\Data\CardSearchResultsInterfaceFactory;
+use ParadoxLabs\TokenBase\Api\Data\CardSearchResultsInterface;
+use Magento\Quote\Model\Quote;
+use Magento\Quote\Model\Quote\Payment;
 use Magento\Customer\Api\Data\AddressInterface;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Api\Search\FilterGroup;
@@ -53,29 +57,29 @@ class CardRepository implements CardRepositoryInterface
      * @param Data\CardSearchResultsInterfaceFactory $searchResultsFactory
      * @param DataObjectHelper $dataObjectHelper
      * @param DataObjectProcessor $dataObjectProcessor
-     * @param \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory
-     * @param \Magento\Quote\Api\Data\CartInterfaceFactory $quoteFactory
+     * @param PaymentFactory $paymentFactory
+     * @param CartInterfaceFactory $quoteFactory
      * @param \Magento\Payment\Helper\Data $paymentHelper
      */
     public function __construct(
-        protected CardResource $resource,
-        protected CardFactory $cardFactory,
-        protected CardInterfaceFactory $dataCardFactory,
-        protected CollectionFactory $cardCollectionFactory,
-        protected Data\CardSearchResultsInterfaceFactory $searchResultsFactory,
-        protected DataObjectHelper $dataObjectHelper,
-        protected DataObjectProcessor $dataObjectProcessor,
-        protected PaymentFactory $paymentFactory,
-        protected CartInterfaceFactory $quoteFactory,
-        protected \Magento\Payment\Helper\Data $paymentHelper
+        protected readonly CardResource $resource,
+        protected readonly CardFactory $cardFactory,
+        protected readonly CardInterfaceFactory $dataCardFactory,
+        protected readonly CollectionFactory $cardCollectionFactory,
+        protected readonly CardSearchResultsInterfaceFactory $searchResultsFactory,
+        protected readonly DataObjectHelper $dataObjectHelper,
+        protected readonly DataObjectProcessor $dataObjectProcessor,
+        protected readonly PaymentFactory $paymentFactory,
+        protected readonly CartInterfaceFactory $quoteFactory,
+        protected readonly \Magento\Payment\Helper\Data $paymentHelper
     ) {
     }
 
     /**
      * Save Card data
      *
-     * @param \ParadoxLabs\TokenBase\Api\Data\CardInterface $card
-     * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
+     * @param CardInterface $card
+     * @return CardInterface
      * @throws LocalizedException
      */
     public function save(CardInterface $card)
@@ -97,10 +101,10 @@ class CardRepository implements CardRepositoryInterface
     /**
      * Save card with extended objects.
      *
-     * @param \ParadoxLabs\TokenBase\Api\Data\CardInterface $card
-     * @param \Magento\Customer\Api\Data\AddressInterface $address
-     * @param \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterface $additional
-     * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
+     * @param CardInterface $card
+     * @param AddressInterface $address
+     * @param CardAdditionalInterface $additional
+     * @return CardInterface
      */
     public function saveExtended(
         CardInterface $card,
@@ -119,8 +123,8 @@ class CardRepository implements CardRepositoryInterface
      * Load Card data by given ID
      *
      * @param string $cardId
-     * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @return CardInterface
+     * @throws NoSuchEntityException
      */
     public function getById($cardId)
     {
@@ -143,8 +147,8 @@ class CardRepository implements CardRepositoryInterface
      * Retrieve card. Will accept hash only.
      *
      * @param string $cardHash
-     * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return CardInterface
+     * @throws LocalizedException
      */
     public function getByHash($cardHash)
     {
@@ -163,8 +167,8 @@ class CardRepository implements CardRepositoryInterface
      * Load Card data by given Card Identity
      *
      * @param string $cardId
-     * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @return CardInterface
+     * @throws NoSuchEntityException
      */
     public function load($cardId)
     {
@@ -177,11 +181,11 @@ class CardRepository implements CardRepositoryInterface
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @param SearchCriteriaInterface $criteria
-     * @return \ParadoxLabs\TokenBase\Api\Data\CardSearchResultsInterface
+     * @return CardSearchResultsInterface
      */
     public function getList(SearchCriteriaInterface $criteria)
     {
-        /** @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection $collection */
+        /** @var Collection $collection */
         $collection = $this->cardCollectionFactory->create();
 
         // Add filters from root filter group to the collection
@@ -205,7 +209,7 @@ class CardRepository implements CardRepositoryInterface
 
         $collection->load();
 
-        /** @var \ParadoxLabs\TokenBase\Api\Data\CardSearchResultsInterface $searchResults */
+        /** @var CardSearchResultsInterface $searchResults */
         $searchResults = $this->searchResultsFactory->create();
         $searchResults->setSearchCriteria($criteria);
         $searchResults->setTotalCount($collection->getSize());
@@ -221,7 +225,7 @@ class CardRepository implements CardRepositoryInterface
      * - If the card is active, this will mark it inactive and queue for later removal (typically 180 days later).
      * - If the card is already inactive, this will delete it entirely.
      *
-     * @param \ParadoxLabs\TokenBase\Api\Data\CardInterface $card
+     * @param CardInterface $card
      * @return bool
      * @throws CouldNotDeleteException
      */
@@ -262,8 +266,8 @@ class CardRepository implements CardRepositoryInterface
     /**
      * Helper function that adds a FilterGroup to the collection.
      *
-     * @param \Magento\Framework\Api\Search\FilterGroup $filterGroup
-     * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection $collection
+     * @param FilterGroup $filterGroup
+     * @param Collection $collection
      * @return void
      */
     protected function addFilterGroupToCollection(
@@ -289,7 +293,7 @@ class CardRepository implements CardRepositoryInterface
      *
      * @param \ParadoxLabs\TokenBase\Model\Card $card
      * @return void
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     protected function updatePaymentInfo(
         \ParadoxLabs\TokenBase\Model\Card $card
@@ -312,10 +316,10 @@ class CardRepository implements CardRepositoryInterface
             $paymentData['cc_bin']   = substr((string)$paymentData['cc_number'], 0, 6);
         }
 
-        /** @var \Magento\Quote\Model\Quote $quote */
+        /** @var Quote $quote */
         $quote = $this->quoteFactory->create();
 
-        /** @var \Magento\Quote\Model\Quote\Payment $payment */
+        /** @var Payment $payment */
         $payment = $this->paymentFactory->create();
         $payment->setQuote($quote);
         $payment->getQuote()->getBillingAddress()->setCountryId($card->getAddress('country_id'));

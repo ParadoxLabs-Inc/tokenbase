@@ -21,6 +21,8 @@
 
 namespace ParadoxLabs\TokenBase\Helper;
 
+use Magento\Customer\Model\Metadata\Form;
+use Magento\Customer\Block\Address\Renderer\RendererInterface;
 use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Api\Data\AddressInterface;
 use Magento\Customer\Api\Data\AddressInterfaceFactory;
@@ -48,30 +50,30 @@ class Address extends AbstractHelper
     /**
      * Address constructor.
      *
-     * @param \Magento\Framework\App\Helper\Context $context
-     * @param \Magento\Customer\Model\Metadata\FormFactory $formFactory
-     * @param \Magento\Customer\Api\Data\AddressInterfaceFactory $addressDataFactory
-     * @param \Magento\Framework\Api\DataObjectHelper $dataObjectHelper
-     * @param \Magento\Customer\Api\Data\RegionInterfaceFactory $regionDataFactory
-     * @param \Magento\Directory\Model\RegionFactory $regionFactory
+     * @param Context $context
+     * @param FormFactory $formFactory
+     * @param AddressInterfaceFactory $addressDataFactory
+     * @param DataObjectHelper $dataObjectHelper
+     * @param RegionInterfaceFactory $regionDataFactory
+     * @param RegionFactory $regionFactory
      * @param Region $regionResource
-     * @param \Magento\Customer\Api\AddressRepositoryInterface $addressRepository
-     * @param \Magento\Framework\Api\ExtensibleDataObjectConverter $extensibleDataObjectConverter
-     * @param \Magento\Customer\Model\Address\Mapper $addressMapper
-     * @param \Magento\Customer\Model\Address\Config $addressConfig
+     * @param AddressRepositoryInterface $addressRepository
+     * @param ExtensibleDataObjectConverter $extensibleDataObjectConverter
+     * @param Mapper $addressMapper
+     * @param Config $addressConfig
      */
     public function __construct(
         Context $context,
-        protected FormFactory $formFactory,
-        protected AddressInterfaceFactory $addressDataFactory,
-        protected DataObjectHelper $dataObjectHelper,
-        protected RegionInterfaceFactory $regionDataFactory,
-        protected RegionFactory $regionFactory,
-        protected RegionResource $regionResource,
-        protected AddressRepositoryInterface $addressRepository,
-        protected ExtensibleDataObjectConverter $extensibleDataObjectConverter,
-        protected Mapper $addressMapper,
-        protected Config $addressConfig
+        protected readonly FormFactory $formFactory,
+        protected readonly AddressInterfaceFactory $addressDataFactory,
+        protected readonly DataObjectHelper $dataObjectHelper,
+        protected readonly RegionInterfaceFactory $regionDataFactory,
+        protected readonly RegionFactory $regionFactory,
+        protected readonly RegionResource $regionResource,
+        protected readonly AddressRepositoryInterface $addressRepository,
+        protected readonly ExtensibleDataObjectConverter $extensibleDataObjectConverter,
+        protected readonly Mapper $addressMapper,
+        protected readonly Config $addressConfig
     ) {
         parent::__construct($context);
     }
@@ -91,7 +93,7 @@ class Address extends AbstractHelper
             $origAddressData = [];
         }
 
-        /** @var \Magento\Customer\Model\Metadata\Form $addressForm */
+        /** @var Form $addressForm */
         $addressForm = $this->formFactory->create('customer_address', 'customer_address_edit', $origAddressData);
 
         if (isset($addressData['street']) && is_string($addressData['street'])) {
@@ -171,7 +173,7 @@ class Address extends AbstractHelper
     /**
      * Expose address repository
      *
-     * @return \Magento\Customer\Api\AddressRepositoryInterface
+     * @return AddressRepositoryInterface
      */
     public function repository()
     {
@@ -223,15 +225,15 @@ class Address extends AbstractHelper
     /**
      * Get HTML-formatted card address. This is silly, but it's how the core says to do it.
      *
-     * @param \Magento\Customer\Api\Data\AddressInterface $address
+     * @param AddressInterface $address
      * @param string $format
      * @return string
      * @see \Magento\Customer\Model\Address\AbstractAddress::format()
      */
-    public function getFormattedAddress(\Magento\Customer\Api\Data\AddressInterface $address, $format = 'html')
+    public function getFormattedAddress(AddressInterface $address, $format = 'html')
     {
         try {
-            /** @var \Magento\Customer\Block\Address\Renderer\RendererInterface $renderer */
+            /** @var RendererInterface $renderer */
             $renderer    = $this->addressConfig->getFormatByCode($format)->getRenderer();
             $addressData = $this->addressMapper->toFlatArray($address);
 

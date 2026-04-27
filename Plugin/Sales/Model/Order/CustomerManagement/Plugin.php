@@ -21,6 +21,7 @@
 
 namespace ParadoxLabs\TokenBase\Plugin\Sales\Model\Order\CustomerManagement;
 
+use ParadoxLabs\TokenBase\Api\Data\CardInterface;
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Sales\Api\OrderCustomerManagementInterface;
@@ -34,22 +35,22 @@ class Plugin
      * Plugin constructor.
      *
      * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
-     * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param CardRepositoryInterface $cardRepository
+     * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-        protected CollectionFactory $cardCollectionFactory,
-        protected CardRepositoryInterface $cardRepository,
-        protected ScopeConfigInterface $scopeConfig
+        protected readonly CollectionFactory $cardCollectionFactory,
+        protected readonly CardRepositoryInterface $cardRepository,
+        protected readonly ScopeConfigInterface $scopeConfig
     ) {
     }
 
     /**
      * Associate customer cards after post-checkout register.
      *
-     * @param \Magento\Sales\Api\OrderCustomerManagementInterface $subject
-     * @param \Magento\Customer\Api\Data\CustomerInterface $customer
-     * @return \Magento\Customer\Api\Data\CustomerInterface
+     * @param OrderCustomerManagementInterface $subject
+     * @param CustomerInterface $customer
+     * @return CustomerInterface
      */
     public function afterCreate(
         OrderCustomerManagementInterface $subject,
@@ -73,7 +74,7 @@ class Plugin
         $cardCollection->setPageSize(1);
 
         if ($cardCollection->getSize() > 0) {
-            /** @var \ParadoxLabs\TokenBase\Api\Data\CardInterface $card */
+            /** @var CardInterface $card */
             foreach ($cardCollection as $card) {
                 $card->setCustomerId($customer->getId());
 

@@ -34,17 +34,17 @@ use ParadoxLabs\TokenBase\Helper\Data;
 class QuotePaymentLoadTokenbaseId
 {
     /**
-     * @param \Magento\Quote\Api\Data\PaymentExtensionFactory $quotePaymentExtensionFactory
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
+     * @param PaymentExtensionFactory $quotePaymentExtensionFactory
+     * @param Data $helper
      */
     public function __construct(
-        protected PaymentExtensionFactory $quotePaymentExtensionFactory,
-        protected Data $helper
+        protected readonly PaymentExtensionFactory $quotePaymentExtensionFactory,
+        protected readonly Data $helper
     ) {
     }
 
     /**
-     * @param \Magento\Quote\Model\Quote $quote
+     * @param Quote $quote
      * @return void
      */
     private function setExtensionAttributeValue(Quote $quote)
@@ -64,9 +64,9 @@ class QuotePaymentLoadTokenbaseId
     }
 
     /**
-     * @param \Magento\Quote\Model\Quote $subject
-     * @param \Magento\Quote\Model\Quote $result
-     * @return \Magento\Quote\Model\Quote
+     * @param Quote $subject
+     * @param Quote $result
+     * @return Quote
      */
     public function afterLoad(
         Quote $subject,
@@ -78,9 +78,9 @@ class QuotePaymentLoadTokenbaseId
     }
 
     /**
-     * @param \Magento\Quote\Model\Quote $subject
-     * @param \Magento\Quote\Model\Quote $result
-     * @return \Magento\Quote\Model\Quote
+     * @param Quote $subject
+     * @param Quote $result
+     * @return Quote
      */
     public function afterLoadActive(
         Quote $subject,
@@ -92,9 +92,9 @@ class QuotePaymentLoadTokenbaseId
     }
 
     /**
-     * @param \Magento\Quote\Model\Quote $subject
-     * @param \Magento\Quote\Model\Quote $result
-     * @return \Magento\Quote\Model\Quote
+     * @param Quote $subject
+     * @param Quote $result
+     * @return Quote
      */
     public function afterLoadByCustomer(
         Quote $subject,
@@ -106,9 +106,9 @@ class QuotePaymentLoadTokenbaseId
     }
 
     /**
-     * @param \Magento\Quote\Model\Quote $subject
-     * @param \Magento\Quote\Model\Quote $result
-     * @return \Magento\Quote\Model\Quote
+     * @param Quote $subject
+     * @param Quote $result
+     * @return Quote
      */
     public function afterLoadByIdWithoutStore(
         Quote $subject,

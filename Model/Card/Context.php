@@ -45,21 +45,21 @@ class Context
     /**
      * Context constructor.
      *
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
+     * @param Data $helper
      * @param MethodFactory $methodFactory
      * @param CardFactory $cardFactory
      * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
      * @param \ParadoxLabs\TokenBase\Api\Data\CardAdditionalInterfaceFactory $cardAdditionalFactory
-     * @param \Magento\Customer\Api\Data\CustomerInterfaceFactory $customerFactory
-     * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
-     * @param \Magento\Customer\Api\Data\AddressInterfaceFactory $addressFactory
-     * @param \Magento\Customer\Api\Data\RegionInterfaceFactory $addressRegionFactory
+     * @param CustomerInterfaceFactory $customerFactory
+     * @param CustomerRepositoryInterface $customerRepository
+     * @param AddressInterfaceFactory $addressFactory
+     * @param RegionInterfaceFactory $addressRegionFactory
      * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
-     * @param \Magento\Checkout\Model\Session $checkoutSession *Proxy
-     * @param \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress
-     * @param \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor
-     * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $dateProcessor
-     * @param \Magento\Framework\Api\DataObjectHelper $dataObjectHelper
+     * @param Session $checkoutSession *Proxy
+     * @param RemoteAddress $remoteAddress
+     * @param DataObjectProcessor $dataObjectProcessor
+     * @param TimezoneInterface $dateProcessor
+     * @param DataObjectHelper $dataObjectHelper
      */
     public function __construct(
         private readonly Data $helper,
@@ -83,7 +83,7 @@ class Context
     /**
      * Get helper
      *
-     * @return \ParadoxLabs\TokenBase\Helper\Data
+     * @return Data
      */
     public function getHelper()
     {
@@ -123,7 +123,7 @@ class Context
     /**
      * Get customerFactory
      *
-     * @return \Magento\Customer\Api\Data\CustomerInterfaceFactory
+     * @return CustomerInterfaceFactory
      */
     public function getCustomerFactory()
     {
@@ -133,7 +133,7 @@ class Context
     /**
      * Get addressFactory
      *
-     * @return \Magento\Customer\Api\Data\AddressInterfaceFactory
+     * @return AddressInterfaceFactory
      */
     public function getAddressFactory()
     {
@@ -143,7 +143,7 @@ class Context
     /**
      * Get addressRegionFactory
      *
-     * @return \Magento\Customer\Api\Data\RegionInterfaceFactory
+     * @return RegionInterfaceFactory
      */
     public function getAddressRegionFactory()
     {
@@ -163,7 +163,7 @@ class Context
     /**
      * Get checkoutSession
      *
-     * @return \Magento\Checkout\Model\Session
+     * @return Session
      */
     public function getCheckoutSession()
     {
@@ -173,7 +173,7 @@ class Context
     /**
      * Get remoteAddress
      *
-     * @return \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress
+     * @return RemoteAddress
      */
     public function getRemoteAddress()
     {
@@ -183,7 +183,7 @@ class Context
     /**
      * Get dataObjectProcessor
      *
-     * @return \Magento\Framework\Reflection\DataObjectProcessor
+     * @return DataObjectProcessor
      */
     public function getDataObjectProcessor()
     {
@@ -193,7 +193,7 @@ class Context
     /**
      * Get dateProcessor
      *
-     * @return \Magento\Framework\Stdlib\DateTime\TimezoneInterface
+     * @return TimezoneInterface
      */
     public function getDateProcessor()
     {
@@ -203,7 +203,7 @@ class Context
     /**
      * Get customerRepository
      *
-     * @return \Magento\Customer\Api\CustomerRepositoryInterface
+     * @return CustomerRepositoryInterface
      */
     public function getCustomerRepository()
     {
@@ -223,7 +223,7 @@ class Context
     /**
      * Get dataObjectHelper
      *
-     * @return \Magento\Framework\Api\DataObjectHelper
+     * @return DataObjectHelper
      */
     public function getDataObjectHelper()
     {

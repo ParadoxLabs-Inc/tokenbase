@@ -21,6 +21,9 @@
 
 namespace ParadoxLabs\TokenBase\Controller\Adminhtml\Index;
 
+use Magento\Framework\View\Result\Layout;
+use ParadoxLabs\TokenBase\Model\Card;
+use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Backend\App\Action\Context;
 use Magento\Backend\Model\View\Result\ForwardFactory;
 use Magento\Customer\Api\AccountManagementInterface;
@@ -61,34 +64,34 @@ class Paymentinfo extends Index
     /**
      * Paymentinfo constructor.
      *
-     * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\Framework\Registry $coreRegistry
-     * @param \Magento\Framework\App\Response\Http\FileFactory $fileFactory
-     * @param \Magento\Customer\Model\CustomerFactory $customerFactory
-     * @param \Magento\Customer\Model\AddressFactory $addressFactory
-     * @param \Magento\Customer\Model\Metadata\FormFactory $formFactory
-     * @param \Magento\Newsletter\Model\SubscriberFactory $subscriberFactory
-     * @param \Magento\Customer\Helper\View $viewHelper
-     * @param \Magento\Framework\Math\Random $random
+     * @param Context $context
+     * @param Registry $coreRegistry
+     * @param FileFactory $fileFactory
+     * @param CustomerFactory $customerFactory
+     * @param AddressFactory $addressFactory
+     * @param FormFactory $formFactory
+     * @param SubscriberFactory $subscriberFactory
+     * @param View $viewHelper
+     * @param Random $random
      * @param CustomerRepositoryInterface $customerRepository
-     * @param \Magento\Framework\Api\ExtensibleDataObjectConverter $extensibleDataObjectConverter
+     * @param ExtensibleDataObjectConverter $extensibleDataObjectConverter
      * @param Mapper $addressMapper
      * @param AccountManagementInterface $customerAccountManagement
      * @param AddressRepositoryInterface $addressRepository
      * @param CustomerInterfaceFactory $customerDataFactory
      * @param AddressInterfaceFactory $addressDataFactory
      * @param \Magento\Customer\Model\Customer\Mapper $customerMapper
-     * @param \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor
+     * @param DataObjectProcessor $dataObjectProcessor
      * @param DataObjectHelper $dataObjectHelper
      * @param ObjectFactory $objectFactory
      * @param \Magento\Framework\View\LayoutFactory $layoutFactory
      * @param \Magento\Framework\View\Result\LayoutFactory $resultLayoutFactory
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
-     * @param \Magento\Backend\Model\View\Result\ForwardFactory $resultForwardFactory
-     * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
-     * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \ParadoxLabs\TokenBase\Helper\Address $addressHelper
+     * @param PageFactory $resultPageFactory
+     * @param ForwardFactory $resultForwardFactory
+     * @param JsonFactory $resultJsonFactory
+     * @param CardRepositoryInterface $cardRepository
+     * @param Data $helper
+     * @param Address $addressHelper
      */
     public function __construct(
         Context $context,
@@ -116,9 +119,9 @@ class Paymentinfo extends Index
         PageFactory $resultPageFactory,
         ForwardFactory $resultForwardFactory,
         JsonFactory $resultJsonFactory,
-        protected CardRepositoryInterface $cardRepository,
-        protected Data $helper,
-        protected Address $addressHelper
+        protected readonly CardRepositoryInterface $cardRepository,
+        protected readonly Data $helper,
+        protected readonly Address $addressHelper
     ) {
         parent::__construct(
             $context,
@@ -152,7 +155,7 @@ class Paymentinfo extends Index
     /**
      * View customer's stored cards list (active view)
      *
-     * @return \Magento\Framework\View\Result\Layout
+     * @return Layout
      */
     public function execute()
     {
@@ -195,7 +198,7 @@ class Paymentinfo extends Index
         }
 
         if (!empty($id) && $this->skipCardLoad !== true) {
-            /** @var \ParadoxLabs\TokenBase\Model\Card $card */
+            /** @var Card $card */
             $card = $this->cardRepository->getByHash($id);
             $card = $card->getTypeInstance();
 
@@ -245,7 +248,7 @@ class Paymentinfo extends Index
     /**
      * Get current customer model.
      *
-     * @return \Magento\Customer\Api\Data\CustomerInterface
+     * @return CustomerInterface
      */
     protected function getCustomer()
     {

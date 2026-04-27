@@ -46,10 +46,10 @@ class CustomerCardRepository implements CustomerCardRepositoryInterface
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-        protected CardRepositoryInterface $cardRepository,
-        protected FilterGroupBuilder $filterGroupBuilder,
-        protected FilterBuilder $filterBuilder,
-        protected ScopeConfigInterface $scopeConfig
+        protected readonly CardRepositoryInterface $cardRepository,
+        protected readonly FilterGroupBuilder $filterGroupBuilder,
+        protected readonly FilterBuilder $filterBuilder,
+        protected readonly ScopeConfigInterface $scopeConfig
     ) {
     }
 

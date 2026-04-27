@@ -35,15 +35,15 @@ class Link extends Current implements SortLinkInterface
     /**
      * Constructor
      *
-     * @param \Magento\Framework\View\Element\Template\Context $context
-     * @param \Magento\Framework\App\DefaultPathInterface $defaultPath
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
+     * @param Context $context
+     * @param DefaultPathInterface $defaultPath
+     * @param Data $helper
      * @param array $data
      */
     public function __construct(
         Context $context,
         DefaultPathInterface $defaultPath,
-        protected Data $helper,
+        protected readonly Data $helper,
         array $data = []
     ) {
         parent::__construct($context, $defaultPath, $data);

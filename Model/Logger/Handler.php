@@ -43,7 +43,7 @@ class Handler extends Base
 
     /**
      * @param DriverInterface $filesystem
-     * @param \Monolog\Formatter\LineFormatter $lineFormatter
+     * @param LineFormatter $lineFormatter
      * @param string $filePath
      */
     public function __construct(

@@ -21,6 +21,7 @@
 
 namespace ParadoxLabs\TokenBase\Model;
 
+use ParadoxLabs\TokenBase\Model\Gateway\Response;
 use Magento\Framework\DataObject;
 use Magento\Framework\HTTP\ClientInterfaceFactory;
 use Magento\Payment\Gateway\Command\CommandException;
@@ -131,17 +132,17 @@ abstract class AbstractGateway extends DataObject implements GatewayInterface
     /**
      * Constructor, yeah!
      *
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \ParadoxLabs\TokenBase\Model\Gateway\Xml $xml
+     * @param Data $helper
+     * @param Xml $xml
      * @param \ParadoxLabs\TokenBase\Model\Gateway\ResponseFactory $responseFactory
      * @param array $data
      * @param \Magento\Framework\HTTP\ClientInterfaceFactory $communicatorFactory
      */
     public function __construct(
-        protected Data $helper,
-        protected Xml $xml,
-        protected ResponseFactory $responseFactory,
-        protected ClientInterfaceFactory $communicatorFactory,
+        protected readonly Data $helper,
+        protected readonly Xml $xml,
+        protected readonly ResponseFactory $responseFactory,
+        protected readonly ClientInterfaceFactory $communicatorFactory,
         array $data = [],
     ) {
         parent::__construct($data);
@@ -226,7 +227,7 @@ abstract class AbstractGateway extends DataObject implements GatewayInterface
      * @param string $key
      * @param mixed $val
      * @return $this
-     * @throws \Magento\Payment\Gateway\Command\CommandException
+     * @throws CommandException
      */
     public function setParameter($key, $val)
     {
@@ -420,7 +421,7 @@ abstract class AbstractGateway extends DataObject implements GatewayInterface
     /**
      * These should be implemented by the child gateway.
      *
-     * @param \ParadoxLabs\TokenBase\Api\Data\CardInterface $card
+     * @param CardInterface $card
      * @return $this
      */
     public function setCard(CardInterface $card)
@@ -433,7 +434,7 @@ abstract class AbstractGateway extends DataObject implements GatewayInterface
     /**
      * Return the card set on the gateway (if any).
      *
-     * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface
+     * @return CardInterface
      */
     public function getCard()
     {
@@ -502,47 +503,47 @@ abstract class AbstractGateway extends DataObject implements GatewayInterface
     /**
      * Run an auth transaction for $amount with the given payment info
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @param float $amount
-     * @return \ParadoxLabs\TokenBase\Model\Gateway\Response
+     * @return Response
      */
     abstract public function authorize(InfoInterface $payment, $amount);
 
     /**
      * Run a capture transaction for $amount with the given payment info
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @param float $amount
      * @param string $transactionId
-     * @return \ParadoxLabs\TokenBase\Model\Gateway\Response
+     * @return Response
      */
     abstract public function capture(InfoInterface $payment, $amount, $transactionId = null);
 
     /**
      * Run a refund transaction for $amount with the given payment info
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @param float $amount
      * @param string $transactionId
-     * @return \ParadoxLabs\TokenBase\Model\Gateway\Response
+     * @return Response
      */
     abstract public function refund(InfoInterface $payment, $amount, $transactionId = null);
 
     /**
      * Run a void transaction for the given payment info
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @param string $transactionId
-     * @return \ParadoxLabs\TokenBase\Model\Gateway\Response
+     * @return Response
      */
     abstract public function void(InfoInterface $payment, $transactionId = null);
 
     /**
      * Fetch a transaction status update
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @param string $transactionId
-     * @return \ParadoxLabs\TokenBase\Model\Gateway\Response
+     * @return Response
      */
     abstract public function fraudUpdate(InfoInterface $payment, $transactionId);
 }

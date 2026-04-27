@@ -21,6 +21,8 @@
 
 namespace ParadoxLabs\TokenBase\Block\Adminhtml\Config;
 
+use Magento\Store\Model\Store;
+use Magento\Store\Model\Website;
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
@@ -40,19 +42,19 @@ abstract class ApiTest extends Field
     protected $storeId;
 
     /**
-     * @param \Magento\Backend\Block\Template\Context $context
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \Magento\Store\Model\StoreFactory $storeFactory
-     * @param \Magento\Store\Model\WebsiteFactory $websiteFactory
-     * @param \ParadoxLabs\TokenBase\Model\Method\Factory $methodFactory
+     * @param Context $context
+     * @param Data $helper
+     * @param StoreFactory $storeFactory
+     * @param WebsiteFactory $websiteFactory
+     * @param Factory $methodFactory
      * @param array $data
      */
     public function __construct(
         Context $context,
-        protected Data $helper,
-        protected StoreFactory $storeFactory,
-        protected WebsiteFactory $websiteFactory,
-        protected Factory $methodFactory,
+        protected readonly Data $helper,
+        protected readonly StoreFactory $storeFactory,
+        protected readonly WebsiteFactory $websiteFactory,
+        protected readonly Factory $methodFactory,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -67,13 +69,13 @@ abstract class ApiTest extends Field
     {
         if ($this->storeId === null) {
             if ($this->_request->getParam('store') != '') {
-                /** @var \Magento\Store\Model\Store $store */
+                /** @var Store $store */
                 $store = $this->storeFactory->create();
                 $store->load($this->_request->getParam('store'));
 
                 $this->storeId = (int)$store->getId();
             } elseif ($this->_request->getParam('website') != '') {
-                /** @var \Magento\Store\Model\Website $website */
+                /** @var Website $website */
                 $website = $this->websiteFactory->create();
                 $website->load($this->_request->getParam('website'));
 
@@ -89,7 +91,7 @@ abstract class ApiTest extends Field
     /**
      * Before rendering html, but after trying to load cache
      *
-     * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
+     * @param AbstractElement $element
      * @return string
      */
     protected function _getElementHtml(AbstractElement $element)

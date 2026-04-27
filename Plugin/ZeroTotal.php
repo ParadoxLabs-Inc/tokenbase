@@ -43,12 +43,12 @@ class ZeroTotal
         ];
 
     /**
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param Data $helper
+     * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-        protected Data $helper,
-        protected ScopeConfigInterface $scopeConfig
+        protected readonly Data $helper,
+        protected readonly ScopeConfigInterface $scopeConfig
     ) {
     }
 
@@ -57,8 +57,8 @@ class ZeroTotal
      *
      * @param \Magento\Payment\Model\Checks\ZeroTotal $subject
      * @param \Closure $proceed
-     * @param \Magento\Payment\Model\MethodInterface $paymentMethod
-     * @param \Magento\Quote\Model\Quote $quote
+     * @param MethodInterface $paymentMethod
+     * @param Quote $quote
      * @return bool
      */
     public function aroundIsApplicable(

@@ -33,24 +33,24 @@ use ParadoxLabs\TokenBase\Helper\Data;
 class CheckoutFailureRecordIncidentObserver implements ObserverInterface
 {
     /**
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \Magento\Customer\Model\Session $customerSession *Proxy
+     * @param Data $helper
+     * @param Session $customerSession *Proxy
      */
     public function __construct(
-        protected Data $helper,
-        protected Session $customerSession
+        protected readonly Data $helper,
+        protected readonly Session $customerSession
     ) {
     }
 
     /**
      * On checkoutfailure, record the error if it's a TokenBase method.
      *
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      * @return void
      */
     public function execute(Observer $observer)
     {
-        /** @var \Magento\Quote\Model\Quote $quote */
+        /** @var Quote $quote */
         $quote = $observer->getData('quote');
         /** @var \Exception $exception */
         $exception = $observer->getData('exception');

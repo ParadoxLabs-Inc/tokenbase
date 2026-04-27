@@ -21,6 +21,7 @@
 
 namespace ParadoxLabs\TokenBase\Plugin\Checkout\Model\GuestPaymentInformationManagement;
 
+use Magento\Sales\Api\Data\OrderInterface;
 use Closure;
 use Magento\Checkout\Api\GuestPaymentInformationManagementInterface;
 use Magento\Checkout\Model\Session;
@@ -38,67 +39,37 @@ use Throwable;
 class Plugin
 {
     /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    protected $scopeConfig;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
-     * @var \Magento\Checkout\Model\Session
-     */
-    protected $checkoutSession;
-
-    /**
-     * @var \Magento\Sales\Api\OrderRepositoryInterface
-     */
-    protected $orderRepository;
-
-    /**
-     * @var \Magento\Sales\Api\Data\OrderInterface
+     * @var OrderInterface
      */
     protected $order;
 
     /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    protected $logger;
-
-    /**
      * Plugin constructor.
      *
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \Magento\Checkout\Model\Session $checkoutSession *Proxy
-     * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
-     * @param \Psr\Log\LoggerInterface $logger
+     * @param ScopeConfigInterface $scopeConfig
+     * @param Data $helper
+     * @param Session $checkoutSession *Proxy
+     * @param OrderRepositoryInterface $orderRepository
+     * @param LoggerInterface $logger
      */
     public function __construct(
-        ScopeConfigInterface $scopeConfig,
-        Data $helper,
-        Session $checkoutSession,
-        OrderRepositoryInterface $orderRepository,
-        LoggerInterface $logger
+        protected readonly ScopeConfigInterface $scopeConfig,
+        protected readonly Data $helper,
+        protected readonly Session $checkoutSession,
+        protected readonly OrderRepositoryInterface $orderRepository,
+        protected readonly LoggerInterface $logger,
     ) {
-        $this->scopeConfig     = $scopeConfig;
-        $this->helper          = $helper;
-        $this->checkoutSession = $checkoutSession;
-        $this->orderRepository = $orderRepository;
-        $this->logger          = $logger;
     }
 
     /**
      * If "Save new order immediately after payment" is enabled, silence any post-processing exceptions, so that the
      * customer gets a success page and knows the order was received.
      *
-     * @param \Magento\Checkout\Api\GuestPaymentInformationManagementInterface $subject
+     * @param GuestPaymentInformationManagementInterface $subject
      * @param \Closure $proceed
      * @param $cartId
-     * @param \Magento\Quote\Api\Data\PaymentInterface $paymentMethod
-     * @param \Magento\Quote\Api\Data\AddressInterface|null $billingAddress
+     * @param PaymentInterface $paymentMethod
+     * @param AddressInterface|null $billingAddress
      * @return mixed
      */
     public function aroundSavePaymentInformationAndPlaceOrder(
@@ -184,7 +155,7 @@ class Plugin
     /**
      * Get the order from the checkout session, if possible
      *
-     * @return \Magento\Sales\Api\Data\OrderInterface|null
+     * @return OrderInterface|null
      */
     protected function getOrder()
     {

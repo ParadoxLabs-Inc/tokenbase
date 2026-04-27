@@ -21,6 +21,7 @@
 
 namespace ParadoxLabs\TokenBase\Observer;
 
+use ParadoxLabs\TokenBase\Model\Card;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Registry;
@@ -33,12 +34,12 @@ use Throwable;
 class CardLoadProcessDeleteQueueObserver implements ObserverInterface
 {
     /**
-     * @param \Magento\Framework\Registry $registry
-     * @param \ParadoxLabs\TokenBase\Api\CardRepositoryInterface $cardRepository
+     * @param Registry $registry
+     * @param CardRepositoryInterface $cardRepository
      */
     public function __construct(
-        protected Registry $registry,
-        protected CardRepositoryInterface $cardRepository
+        protected readonly Registry $registry,
+        protected readonly CardRepositoryInterface $cardRepository
     ) {
     }
 
@@ -47,13 +48,13 @@ class CardLoadProcessDeleteQueueObserver implements ObserverInterface
      * This will happen if there is a failure during order submit. We can't
      * actually save it there, so we register and do it here instead. Magic.
      *
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      * @return void
      */
     public function execute(Observer $observer)
     {
         try {
-            /** @var \ParadoxLabs\TokenBase\Model\Card $card */
+            /** @var Card $card */
             $card = $this->registry->registry('queue_card_deletion');
 
             if ($card && $card->getId() > 0) {

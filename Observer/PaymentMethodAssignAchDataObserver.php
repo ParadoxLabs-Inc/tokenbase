@@ -21,6 +21,9 @@
 
 namespace ParadoxLabs\TokenBase\Observer;
 
+use Magento\Payment\Model\MethodInterface;
+use Magento\Sales\Model\Order\Payment;
+use Magento\Framework\DataObject;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Quote\Api\Data\PaymentExtensionInterface;
@@ -42,27 +45,27 @@ class PaymentMethodAssignAchDataObserver implements ObserverInterface
         ];
 
     /**
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
+     * @param Data $helper
      */
-    public function __construct(protected Data $helper)
+    public function __construct(protected readonly Data $helper)
     {
     }
 
     /**
      * Assign data to the payment instance for our methods.
      *
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      * @return void
      */
     public function execute(Observer $observer)
     {
-        /** @var \Magento\Payment\Model\MethodInterface $method */
+        /** @var MethodInterface $method */
         $method = $observer->getData('method');
 
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
+        /** @var Payment $payment */
         $payment = $observer->getData('payment_model');
 
-        /** @var \Magento\Framework\DataObject $data */
+        /** @var DataObject $data */
         $data = $observer->getData('data');
 
         /**

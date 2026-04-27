@@ -21,35 +21,17 @@ use ParadoxLabs\TokenBase\Model\Method\Factory;
 class IntegrationsManager
 {
     /**
-     * @var \ParadoxLabs\TokenBase\Helper\Data
-     */
-    protected $helper;
-
-    /**
-     * @var \Magento\InstantPurchase\PaymentMethodIntegration\IntegrationFactory
-     */
-    protected $integrationFactory;
-
-    /**
-     * @var \ParadoxLabs\TokenBase\Model\Method\Factory
-     */
-    protected $methodFactory;
-
-    /**
      * IntegrationsManager constructor.
      *
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
-     * @param \Magento\InstantPurchase\PaymentMethodIntegration\IntegrationFactory $integrationFactory
-     * @param \ParadoxLabs\TokenBase\Model\Method\Factory $methodFactory
+     * @param Data $helper
+     * @param IntegrationFactory $integrationFactory
+     * @param Factory $methodFactory
      */
     public function __construct(
-        Data $helper,
-        IntegrationFactory $integrationFactory,
-        Factory $methodFactory
+        protected readonly Data $helper,
+        protected readonly IntegrationFactory $integrationFactory,
+        protected readonly Factory $methodFactory,
     ) {
-        $this->helper             = $helper;
-        $this->integrationFactory = $integrationFactory;
-        $this->methodFactory      = $methodFactory;
     }
 
     /**

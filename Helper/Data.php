@@ -21,6 +21,15 @@
 
 namespace ParadoxLabs\TokenBase\Helper;
 
+use ParadoxLabs\TokenBase\Model\Card;
+use ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection;
+use Magento\Payment\Model\MethodInterface;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Store\Model\Website;
+use Magento\Store\Api\Data\StoreInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Quote\Model\Quote\Payment;
+use Magento\Framework\Phrase;
 use Magento\Backend\Model\Session\Quote;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Customer\Api\CustomerRepositoryInterface;
@@ -51,17 +60,17 @@ use Throwable;
 class Data extends \Magento\Payment\Helper\Data
 {
     /**
-     * @var \ParadoxLabs\TokenBase\Model\Card
+     * @var Card
      */
     protected $card;
 
     /**
-     * @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection[]
+     * @var Collection[]
      */
     protected $cards = [];
 
     /**
-     * @var \Magento\Customer\Api\Data\CustomerInterface
+     * @var CustomerInterface
      */
     protected $currentCustomer;
 
@@ -93,23 +102,23 @@ class Data extends \Magento\Payment\Helper\Data
     /**
      * Construct
      *
-     * @param \Magento\Framework\App\Helper\Context $context
-     * @param \Magento\Framework\View\LayoutFactory $layoutFactory
-     * @param \Magento\Payment\Model\Method\Factory $paymentMethodFactory
-     * @param \Magento\Store\Model\App\Emulation $appEmulation
-     * @param \Magento\Payment\Model\Config $paymentConfig
-     * @param \Magento\Framework\App\Config\Initial $initialConfig
-     * @param \Magento\Framework\App\State $appState
-     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param \Magento\Framework\Registry $registry
-     * @param \Magento\Store\Model\WebsiteFactory $websiteFactory
-     * @param \Magento\Customer\Api\Data\CustomerInterfaceFactory $customerFactory
-     * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
-     * @param \Magento\Quote\Model\Quote\PaymentFactory $paymentFactory
-     * @param \Magento\Backend\Model\Session\Quote $backendSession *Proxy
+     * @param Context $context
+     * @param LayoutFactory $layoutFactory
+     * @param Factory $paymentMethodFactory
+     * @param Emulation $appEmulation
+     * @param Config $paymentConfig
+     * @param Initial $initialConfig
+     * @param State $appState
+     * @param StoreManagerInterface $storeManager
+     * @param Registry $registry
+     * @param WebsiteFactory $websiteFactory
+     * @param CustomerInterfaceFactory $customerFactory
+     * @param CustomerRepositoryInterface $customerRepository
+     * @param PaymentFactory $paymentFactory
+     * @param Quote $backendSession *Proxy
      * @param \Magento\Checkout\Model\Session $checkoutSession *Proxy
      * @param \Magento\Customer\Model\Session $customerSession *Proxy
-     * @param \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomerSession *Proxy
+     * @param CurrentCustomer $currentCustomerSession *Proxy
      * @param \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory
      * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
      * @param AddressHelper $addressHelper *Proxy
@@ -122,21 +131,21 @@ class Data extends \Magento\Payment\Helper\Data
         Emulation $appEmulation,
         Config $paymentConfig,
         Initial $initialConfig,
-        protected State $appState,
-        protected StoreManagerInterface $storeManager,
-        protected Registry $registry,
-        protected WebsiteFactory $websiteFactory,
-        protected CustomerInterfaceFactory $customerFactory,
-        protected CustomerRepositoryInterface $customerRepository,
-        protected PaymentFactory $paymentFactory,
-        protected Quote $backendSession,
-        protected CheckoutSession $checkoutSession,
-        protected Session $customerSession,
-        protected CurrentCustomer $currentCustomerSession,
-        protected CardFactory $cardFactory,
-        protected CollectionFactory $cardCollectionFactory,
-        protected AddressHelper $addressHelper,
-        protected OperationHelper $operationHelper
+        protected readonly State $appState,
+        protected readonly StoreManagerInterface $storeManager,
+        protected readonly Registry $registry,
+        protected readonly WebsiteFactory $websiteFactory,
+        protected readonly CustomerInterfaceFactory $customerFactory,
+        protected readonly CustomerRepositoryInterface $customerRepository,
+        protected readonly PaymentFactory $paymentFactory,
+        protected readonly Quote $backendSession,
+        protected readonly CheckoutSession $checkoutSession,
+        protected readonly Session $customerSession,
+        protected readonly CurrentCustomer $currentCustomerSession,
+        protected readonly CardFactory $cardFactory,
+        protected readonly CollectionFactory $cardCollectionFactory,
+        protected readonly AddressHelper $addressHelper,
+        protected readonly OperationHelper $operationHelper
     ) {
         parent::__construct(
             $context,
@@ -201,8 +210,8 @@ class Data extends \Magento\Payment\Helper\Data
      * Get payment method instance
      *
      * @param string $code
-     * @return \Magento\Payment\Model\MethodInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return MethodInterface
+     * @throws LocalizedException
      */
     public function getMethodInstance($code)
     {
@@ -232,8 +241,7 @@ class Data extends \Magento\Payment\Helper\Data
 
                 // Customers registered through the admin will have store_id=0 with a valid website_id. Try to use that.
                 if ($storeId < 1) {
-                    /** @var \Magento\Store\Model\Website $website */
-
+                    /** @var Website $website */
                     $websiteId = $this->registry->registry('current_customer')->getWebsiteId();
                     $website   = $this->websiteFactory->create();
                     $store     = $website->load($websiteId)->getDefaultStore();
@@ -263,8 +271,8 @@ class Data extends \Magento\Payment\Helper\Data
     /**
      * Return the current store object based on available info.
      *
-     * @return \Magento\Store\Api\Data\StoreInterface
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @return StoreInterface
+     * @throws NoSuchEntityException
      */
     public function getCurrentStore()
     {
@@ -276,7 +284,7 @@ class Data extends \Magento\Payment\Helper\Data
     /**
      * Return current customer based on the available info. Caches value per-request.
      *
-     * @return \Magento\Customer\Api\Data\CustomerInterface
+     * @return CustomerInterface
      */
     public function getCurrentCustomer()
     {
@@ -308,7 +316,7 @@ class Data extends \Magento\Payment\Helper\Data
     /**
      * Get current customer in the adminhtml scope. Looks at order, quote, invoice, credit memo.
      *
-     * @return \Magento\Customer\Api\Data\CustomerInterface
+     * @return CustomerInterface
      */
     protected function getCurrentBackendCustomer()
     {
@@ -346,7 +354,7 @@ class Data extends \Magento\Payment\Helper\Data
      * Return active card model for edit (if any).
      *
      * @param string|null $method
-     * @return \ParadoxLabs\TokenBase\Model\Card
+     * @return Card
      */
     public function getActiveCard($method = null)
     {
@@ -389,7 +397,7 @@ class Data extends \Magento\Payment\Helper\Data
 
                     unset($cardData['cc_number'], $cardData['echeck_account_no'], $cardData['echeck_routing_no']);
 
-                    /** @var \Magento\Quote\Model\Quote\Payment $newPayment */
+                    /** @var Payment $newPayment */
                     $newPayment = $this->paymentFactory->create();
                     $newPayment->setQuote($this->checkoutSession->getQuote());
                     $newPayment->getQuote()->getBillingAddress()->setCountryId(
@@ -415,7 +423,7 @@ class Data extends \Magento\Payment\Helper\Data
      * Get stored cards for the currently-active method.
      *
      * @param string|null $method
-     * @return \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection|array
+     * @return Collection|array
      */
     public function getActiveCustomerCardsByMethod($method = null)
     {
@@ -526,9 +534,8 @@ class Data extends \Magento\Payment\Helper\Data
      * Turn the given internal card type ID into a proper translated label.
      *
      * @param $type
-     * @return \Magento\Framework\Phrase
+     * @return Phrase
      * @api
-     *
      */
     public function translateCardType($type)
     {

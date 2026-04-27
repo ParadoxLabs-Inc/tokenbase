@@ -21,6 +21,8 @@
 
 namespace ParadoxLabs\TokenBase\Block\Form;
 
+use ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection;
+use ParadoxLabs\TokenBase\Api\MethodInterface;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Payment\Model\Config;
@@ -45,31 +47,31 @@ class Cc extends \Magento\Payment\Block\Form\Cc
     protected $brandingImage = '';
 
     /**
-     * @var \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection|array
+     * @var Collection|array
      */
     protected $cards;
 
     /**
-     * @var \ParadoxLabs\TokenBase\Api\MethodInterface
+     * @var MethodInterface
      */
     protected $tokenbaseMethod;
 
     /**
-     * @param \Magento\Framework\View\Element\Template\Context $context
-     * @param \Magento\Payment\Model\Config $paymentConfig
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
+     * @param Context $context
+     * @param Config $paymentConfig
+     * @param Data $helper
      * @param \Magento\Customer\Model\Session $customerSession *Proxy
-     * @param \Magento\Checkout\Model\Session $checkoutSession *Proxy
-     * @param \ParadoxLabs\TokenBase\Model\Method\Factory $tokenbaseMethodFactory
+     * @param Session $checkoutSession *Proxy
+     * @param Factory $tokenbaseMethodFactory
      * @param array $data
      */
     public function __construct(
         Context $context,
         Config $paymentConfig,
-        protected Data $helper,
-        protected \Magento\Customer\Model\Session $customerSession,
-        protected Session $checkoutSession,
-        protected Factory $tokenbaseMethodFactory,
+        protected readonly Data $helper,
+        protected readonly \Magento\Customer\Model\Session $customerSession,
+        protected readonly Session $checkoutSession,
+        protected readonly Factory $tokenbaseMethodFactory,
         array $data = []
     ) {
         parent::__construct($context, $paymentConfig, $data);
@@ -78,7 +80,7 @@ class Cc extends \Magento\Payment\Block\Form\Cc
     /**
      * Get/load stored cards for the current customer and method.
      *
-     * @return \ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection|array
+     * @return Collection|array
      */
     public function getStoredCards()
     {
@@ -145,7 +147,7 @@ class Cc extends \Magento\Payment\Block\Form\Cc
     /**
      * Expose helper to the template.
      *
-     * @return \ParadoxLabs\TokenBase\Helper\Data
+     * @return Data
      */
     public function getHelper()
     {
@@ -155,7 +157,7 @@ class Cc extends \Magento\Payment\Block\Form\Cc
     /**
      * Get Tokenbase payment method instance.
      *
-     * @return \ParadoxLabs\TokenBase\Api\MethodInterface
+     * @return MethodInterface
      */
     public function getTokenbaseMethod()
     {

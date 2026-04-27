@@ -21,6 +21,8 @@
 
 namespace ParadoxLabs\TokenBase\Controller\Adminhtml\Index;
 
+use Magento\Framework\Controller\Result\Json;
+use ParadoxLabs\TokenBase\Model\Card;
 use Throwable;
 
 /**
@@ -33,7 +35,7 @@ class PaymentinfoDelete extends Paymentinfo
     /**
      * View customer's stored cards list (active view)
      *
-     * @return \Magento\Framework\Controller\Result\Json
+     * @return Json
      */
     public function execute()
     {
@@ -47,7 +49,7 @@ class PaymentinfoDelete extends Paymentinfo
 
         if ($this->formKeyIsValid() === true && $this->methodIsValid() === true && !empty($id)) {
             try {
-                /** @var \ParadoxLabs\TokenBase\Model\Card $card */
+                /** @var Card $card */
                 $card = $this->cardRepository->getById($id);
                 $card = $card->getTypeInstance();
 
@@ -72,7 +74,7 @@ class PaymentinfoDelete extends Paymentinfo
             $response['message'] = __('Invalid Request.');
         }
 
-        /** @var \Magento\Framework\Controller\Result\Json $resultJson */
+        /** @var Json $resultJson */
         $resultJson = $this->resultJsonFactory->create();
 
         return $resultJson->setData($response);

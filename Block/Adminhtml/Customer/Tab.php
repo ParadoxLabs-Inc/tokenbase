@@ -21,6 +21,7 @@
 
 namespace ParadoxLabs\TokenBase\Block\Adminhtml\Customer;
 
+use Magento\Framework\Phrase;
 use Magento\Backend\Block\Template\Context;
 use Magento\Customer\Controller\RegistryConstants;
 use Magento\Framework\Registry;
@@ -39,7 +40,7 @@ class Tab extends TabWrapper
      *
      * @param Context $context
      * @param Registry $coreRegistry
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
+     * @param Data $helper
      * @param array $data
      */
     public function __construct(
@@ -47,8 +48,8 @@ class Tab extends TabWrapper
         /**
          * Core registry
          */
-        protected Registry $coreRegistry,
-        protected Data $helper,
+        protected readonly Registry $coreRegistry,
+        protected readonly Data $helper,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -71,7 +72,7 @@ class Tab extends TabWrapper
     /**
      * Return Tab label
      *
-     * @return \Magento\Framework\Phrase
+     * @return Phrase
      */
     public function getTabLabel()
     {

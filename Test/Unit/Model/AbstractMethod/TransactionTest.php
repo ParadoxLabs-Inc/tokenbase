@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ParadoxLabs\TokenBase\Test\Unit\Model\AbstractMethod;
 
 use Magento\Customer\Api\Data\AddressInterface;
-use Magento\Customer\Model\Address\AddressModelInterface;
 use Magento\Framework\Registry;
 use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Sales\Api\Data\TransactionInterface;

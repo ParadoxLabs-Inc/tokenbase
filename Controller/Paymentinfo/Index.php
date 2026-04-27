@@ -21,6 +21,10 @@
 
 namespace ParadoxLabs\TokenBase\Controller\Paymentinfo;
 
+use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Controller\Result\Redirect;
+use ParadoxLabs\TokenBase\Model\Card;
+use Magento\Framework\View\Result\Page;
 use ParadoxLabs\TokenBase\Controller\Paymentinfo;
 
 /**
@@ -31,7 +35,7 @@ class Index extends Paymentinfo
     /**
      * Payment data index page
      *
-     * @return \Magento\Framework\Controller\ResultInterface
+     * @return ResultInterface
      */
     public function execute()
     {
@@ -46,7 +50,7 @@ class Index extends Paymentinfo
 
                 $this->registry->register('tokenbase_method', $methods[0]);
             } else {
-                /** @var \Magento\Framework\Controller\Result\Redirect $resultRedirect */
+                /** @var Redirect $resultRedirect */
                 $resultRedirect = $this->resultRedirectFactory->create();
 
                 $this->messageManager->addErrorMessage(__('No payment methods are currently available.'));
@@ -75,7 +79,7 @@ class Index extends Paymentinfo
         }
 
         if (!empty($id)) {
-            /** @var \ParadoxLabs\TokenBase\Model\Card $card */
+            /** @var Card $card */
             $card = $this->cardRepository->getByHash($id);
             $card = $card->getTypeInstance();
 
@@ -84,7 +88,7 @@ class Index extends Paymentinfo
             }
         }
 
-        /** @var \Magento\Framework\View\Result\Page $resultPage */
+        /** @var Page $resultPage */
         $resultPage = $this->resultPageFactory->create();
         $resultPage->addHandle('customer_paymentinfo_index_' . $this->registry->registry('tokenbase_method'));
         $resultPage->getConfig()->getTitle()->set(__('My Payment Options'));

@@ -49,12 +49,12 @@ class UpdateCard implements \Magento\Framework\GraphQl\Query\ResolverInterface
      * @param \ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory $cardFactory
      */
     public function __construct(
-        protected CustomerCardRepositoryInterface $customerCardRepository,
-        protected GuestCardRepositoryInterface $guestCardRepository,
-        protected GraphQL $graphQL,
-        protected DataObjectHelper $dataObjectHelper,
-        protected CustomerRepositoryInterface $customerRepository,
-        protected CardInterfaceFactory $cardFactory
+        protected readonly CustomerCardRepositoryInterface $customerCardRepository,
+        protected readonly GuestCardRepositoryInterface $guestCardRepository,
+        protected readonly GraphQL $graphQL,
+        protected readonly DataObjectHelper $dataObjectHelper,
+        protected readonly CustomerRepositoryInterface $customerRepository,
+        protected readonly CardInterfaceFactory $cardFactory
     ) {
     }
 

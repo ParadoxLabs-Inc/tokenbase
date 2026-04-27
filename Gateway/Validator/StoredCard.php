@@ -21,6 +21,8 @@
 
 namespace ParadoxLabs\TokenBase\Gateway\Validator;
 
+use Magento\Payment\Gateway\Validator\ResultInterface;
+use Magento\Payment\Model\Info;
 use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Payment\Gateway\Validator\AbstractValidator;
 use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
@@ -31,13 +33,13 @@ use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
 class StoredCard extends AbstractValidator
 {
     /**
-     * @param \Magento\Payment\Gateway\Validator\ResultInterfaceFactory $resultFactory
-     * @param \ParadoxLabs\TokenBase\Gateway\Validator\CreditCard $ccValidator
-     * @param \Magento\Payment\Gateway\ConfigInterface $config
+     * @param ResultInterfaceFactory $resultFactory
+     * @param CreditCard $ccValidator
+     * @param ConfigInterface $config
      */
     public function __construct(
         ResultInterfaceFactory $resultFactory,
-        private readonly \ParadoxLabs\TokenBase\Gateway\Validator\CreditCard $ccValidator,
+        private readonly CreditCard $ccValidator,
         private readonly ConfigInterface $config
     ) {
         parent::__construct($resultFactory);
@@ -47,14 +49,14 @@ class StoredCard extends AbstractValidator
      * Performs domain-related validation for business object
      *
      * @param array $validationSubject
-     * @return \Magento\Payment\Gateway\Validator\ResultInterface
+     * @return ResultInterface
      */
     public function validate(array $validationSubject)
     {
         $isValid = true;
         $fails   = [];
 
-        /** @var \Magento\Payment\Model\Info $payment */
+        /** @var Info $payment */
         $payment = $validationSubject['payment'];
 
         /**

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ParadoxLabs\TokenBase\Test\Unit\Model;
 
-use Magento\Framework\HTTP\ClientInterface;
 use Magento\Framework\HTTP\ClientInterfaceFactory;
 use Magento\Payment\Gateway\Command\CommandException;
 use Magento\Payment\Model\InfoInterface;

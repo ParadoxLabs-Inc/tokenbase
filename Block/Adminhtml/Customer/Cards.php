@@ -21,6 +21,12 @@
 
 namespace ParadoxLabs\TokenBase\Block\Adminhtml\Customer;
 
+use Magento\Backend\Block\Template\Context;
+use Magento\Payment\Model\MethodInterface;
+use ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection;
+use ParadoxLabs\TokenBase\Api\Data\CardInterface;
+use Magento\Customer\Block\Address\Renderer\RendererInterface;
+use Magento\Framework\Phrase;
 use Magento\Backend\Block\Template;
 use Magento\Customer\Api\Data\AddressInterface;
 use Magento\Customer\Model\Address\Config;
@@ -33,7 +39,7 @@ use Throwable;
 class Cards extends Template
 {
     /**
-     * @var \Magento\Payment\Model\MethodInterface
+     * @var MethodInterface
      */
     protected $method;
 
@@ -41,18 +47,18 @@ class Cards extends Template
      * Constructor
      *
      * @param Template\Context $context
-     * @param \Magento\Framework\Registry $registry
-     * @param \Magento\Customer\Model\Address\Mapper $addressMapper
-     * @param \Magento\Customer\Model\Address\Config $addressConfig
-     * @param \ParadoxLabs\TokenBase\Helper\Data $helper
+     * @param Registry $registry
+     * @param Mapper $addressMapper
+     * @param Config $addressConfig
+     * @param Data $helper
      * @param array $data
      */
     public function __construct(
-        Template\Context $context,
-        protected Registry $registry,
-        protected Mapper $addressMapper,
-        protected Config $addressConfig,
-        protected Data $helper,
+        Context $context,
+        protected readonly Registry $registry,
+        protected readonly Mapper $addressMapper,
+        protected readonly Config $addressConfig,
+        protected readonly Data $helper,
         array $data = []
     ) {
         $this->method = $this->helper->getMethodInstance($this->registry->registry('tokenbase_method'));
@@ -63,7 +69,7 @@ class Cards extends Template
     /**
      * Get stored cards for the currently-active method.
      *
-     * @return array|\ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection
+     * @return array|Collection
      */
     public function getCards()
     {
@@ -73,7 +79,7 @@ class Cards extends Template
     /**
      * Get currently-active card (if any)
      *
-     * @return \ParadoxLabs\TokenBase\Api\Data\CardInterface|null
+     * @return CardInterface|null
      */
     public function getCurrentCard()
     {
@@ -93,14 +99,14 @@ class Cards extends Template
     /**
      * Get HTML-formatted card address. This is silly, but it's how the core says to do it.
      *
-     * @param \Magento\Customer\Api\Data\AddressInterface $address
+     * @param AddressInterface $address
      * @return string
      * @see \Magento\Customer\Model\Address\AbstractAddress::format()
      */
     public function getFormattedCardAddress(AddressInterface $address)
     {
         try {
-            /** @var \Magento\Customer\Block\Address\Renderer\RendererInterface $renderer */
+            /** @var RendererInterface $renderer */
             $renderer    = $this->addressConfig->getFormatByCode('html')->getRenderer();
             $addressData = $this->addressMapper->toFlatArray($address);
 
@@ -113,8 +119,8 @@ class Cards extends Template
     /**
      * Get CC type label (if applicable).
      *
-     * @param \ParadoxLabs\TokenBase\Model\Card $card
-     * @return \Magento\Framework\Phrase|null
+     * @param Card $card
+     * @return Phrase|null
      */
     public function getCcTypeLabel(Card $card)
     {

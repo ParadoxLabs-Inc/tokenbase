@@ -21,6 +21,10 @@
 
 namespace ParadoxLabs\TokenBase\Block\Customer;
 
+use ParadoxLabs\TokenBase\Model\Card;
+use ParadoxLabs\TokenBase\Api\MethodInterface;
+use Magento\Customer\Api\Data\AddressInterface;
+use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Api\Data\AddressInterfaceFactory;
 use Magento\Customer\Block\Address\Edit;
@@ -44,38 +48,38 @@ use Throwable;
 class Form extends Edit
 {
     /**
-     * @var \ParadoxLabs\TokenBase\Model\Card
+     * @var Card
      */
     protected $card;
 
     /**
-     * @var \ParadoxLabs\TokenBase\Api\MethodInterface
+     * @var MethodInterface
      */
     protected $method;
 
     /**
-     * @var \Magento\Payment\Block\Form\Cc
+     * @var Cc
      */
     protected $ccBlock;
 
     /**
      * Constructor
      *
-     * @param \Magento\Framework\View\Element\Template\Context $context
+     * @param Context $context
      * @param \Magento\Directory\Helper\Data $directoryHelper
-     * @param \Magento\Framework\Json\EncoderInterface $jsonEncoder
-     * @param \Magento\Framework\App\Cache\Type\Config $configCacheType
+     * @param EncoderInterface $jsonEncoder
+     * @param Config $configCacheType
      * @param \Magento\Directory\Model\ResourceModel\Region\CollectionFactory $regionCollectionFactory
      * @param \Magento\Directory\Model\ResourceModel\Country\CollectionFactory $countryCollectionFactory
-     * @param \Magento\Customer\Model\Session $customerSession *Proxy
-     * @param \Magento\Customer\Api\AddressRepositoryInterface $addressRepository
-     * @param \Magento\Customer\Api\Data\AddressInterfaceFactory $addressDataFactory
-     * @param \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer *Proxy
-     * @param \Magento\Framework\Api\DataObjectHelper $dataObjectHelper
-     * @param \Magento\Framework\Registry $registry
+     * @param Session $customerSession *Proxy
+     * @param AddressRepositoryInterface $addressRepository
+     * @param AddressInterfaceFactory $addressDataFactory
+     * @param CurrentCustomer $currentCustomer *Proxy
+     * @param DataObjectHelper $dataObjectHelper
+     * @param Registry $registry
      * @param \ParadoxLabs\TokenBase\Helper\Data $helper
      * @param \ParadoxLabs\TokenBase\Model\CardFactory $cardFactory
-     * @param \ParadoxLabs\TokenBase\Model\Method\Factory $tokenbaseMethodFactory
+     * @param Factory $tokenbaseMethodFactory
      * @param array $data
      *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
@@ -92,10 +96,10 @@ class Form extends Edit
         AddressInterfaceFactory $addressDataFactory,
         CurrentCustomer $currentCustomer,
         DataObjectHelper $dataObjectHelper,
-        protected Registry $registry,
-        protected Data $helper,
-        protected CardFactory $cardFactory,
-        protected Factory $tokenbaseMethodFactory,
+        protected readonly Registry $registry,
+        protected readonly Data $helper,
+        protected readonly CardFactory $cardFactory,
+        protected readonly Factory $tokenbaseMethodFactory,
         array $data = []
     ) {
         $this->method = $this->tokenbaseMethodFactory->getMethodInstance($this->getCode());
@@ -129,7 +133,7 @@ class Form extends Edit
     /**
      * Get the active payment method.
      *
-     * @return \ParadoxLabs\TokenBase\Api\MethodInterface
+     * @return MethodInterface
      */
     public function getMethod()
     {
@@ -149,7 +153,7 @@ class Form extends Edit
     /**
      * Return active card model (or an empty card)
      *
-     * @return \ParadoxLabs\TokenBase\Model\Card
+     * @return Card
      */
     public function getCard()
     {
@@ -167,7 +171,7 @@ class Form extends Edit
     /**
      * Return the associated address.
      *
-     * @return \Magento\Customer\Api\Data\AddressInterface
+     * @return AddressInterface
      */
     public function getAddress()
     {
@@ -194,7 +198,7 @@ class Form extends Edit
      */
     public function getNameBlockHtml()
     {
-        /** @var \Magento\Customer\Block\Widget\Name $nameBlock */
+        /** @var Name $nameBlock */
         $nameBlock = $this->getLayout()
                           ->createBlock(Name::class);
 
@@ -235,7 +239,7 @@ class Form extends Edit
     }
 
     /**
-     * @return \Magento\Payment\Block\Form\Cc
+     * @return Cc
      */
     public function getCcBlock()
     {
@@ -250,7 +254,7 @@ class Form extends Edit
     /**
      * Retrieve the Customer Data using the customer Id from the customer session.
      *
-     * @return \Magento\Customer\Api\Data\CustomerInterface
+     * @return CustomerInterface
      */
     public function getCustomer()
     {
