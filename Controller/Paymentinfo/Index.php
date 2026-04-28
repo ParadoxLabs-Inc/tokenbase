@@ -53,7 +53,7 @@ class Index extends Paymentinfo
                 /** @var Redirect $resultRedirect */
                 $resultRedirect = $this->resultRedirectFactory->create();
 
-                $this->messageManager->addErrorMessage(__('No payment methods are currently available.'));
+                $this->messageManager->addErrorMessage((string)__('No payment methods are currently available.'));
 
                 $resultRedirect->setPath('*/account');
 
@@ -91,7 +91,7 @@ class Index extends Paymentinfo
         /** @var Page $resultPage */
         $resultPage = $this->resultPageFactory->create();
         $resultPage->addHandle('customer_paymentinfo_index_' . $this->registry->registry('tokenbase_method'));
-        $resultPage->getConfig()->getTitle()->set(__('My Payment Options'));
+        $resultPage->getConfig()->getTitle()->set((string)__('My Payment Options'));
 
         return $resultPage;
     }

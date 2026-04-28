@@ -24,7 +24,6 @@ namespace ParadoxLabs\TokenBase\Controller\Paymentinfo;
 use Magento\Framework\Controller\Result\Redirect;
 use ParadoxLabs\TokenBase\Model\Card;
 use Magento\Quote\Model\Quote\Payment;
-use Exception;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Data\Form\FormKey\Validator;
@@ -176,20 +175,20 @@ class Save extends Paymentinfo
 
                     $this->session->unsData('tokenbase_form_data');
 
-                    $this->messageManager->addSuccessMessage(__('Payment data saved successfully.'));
+                    $this->messageManager->addSuccessMessage((string)__('Payment data saved successfully.'));
                 } else {
-                    $this->messageManager->addErrorMessage(__('Invalid Request.'));
+                    $this->messageManager->addErrorMessage((string)__('Invalid Request.'));
                 }
             } catch (Throwable $e) {
                 $this->session->setData('tokenbase_form_data', $this->getRequest()->getParams());
 
                 $this->helper->log($method, (string)$e);
-                $this->messageManager->addErrorMessage(__($e->getMessage()));
+                $this->messageManager->addErrorMessage((string)__($e->getMessage()));
 
                 $this->recordSessionFailure($e);
             }
         } else {
-            $this->messageManager->addErrorMessage(__('Invalid Request.'));
+            $this->messageManager->addErrorMessage((string)__('Invalid Request.'));
         }
 
         $resultRedirect->setPath('*/*', ['method' => $method, '_secure' => true]);
@@ -201,10 +200,10 @@ class Save extends Paymentinfo
      * Record each save failure on their session. If they fail too many times in a given period, block access. This is
      * to help prevent credit card validation abuse, trying to store CCs until one works.
      *
-     * @param \Exception $e
+     * @param \Throwable $e
      * @return void
      */
-    protected function recordSessionFailure(Exception $e)
+    protected function recordSessionFailure(Throwable $e)
     {
         $failures = $this->session->getData('tokenbase_failures');
         if (is_array($failures) === false) {

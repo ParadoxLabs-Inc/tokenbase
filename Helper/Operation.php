@@ -71,7 +71,7 @@ class Operation extends AbstractHelper
      *
      * @param array $data source array
      * @param string $path path to pull, separated by slashes
-     * @param string $default default response (if key DNE)
+     * @param mixed $default default response (if key DNE)
      * @return mixed           target value or default
      */
     public function getArrayValue($data, $path, $default = '')

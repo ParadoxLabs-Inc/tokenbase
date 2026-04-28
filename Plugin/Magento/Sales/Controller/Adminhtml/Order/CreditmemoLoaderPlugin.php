@@ -121,7 +121,7 @@ class CreditmemoLoaderPlugin
             $subject->setInvoiceId($invoice->getId());
 
             $this->messageManager->addNoticeMessage(
-                __(
+                (string)__(
                     'Creating credit memo for invoice #%1 on order #%2',
                     $invoice->getIncrementId(),
                     $order->getIncrementId()
@@ -129,7 +129,7 @@ class CreditmemoLoaderPlugin
             );
         } elseif ($invoiceCollection->getSize() > 1) {
             $this->messageManager->addWarningMessage(
-                __(
+                (string)__(
                     'Order #%1 has multiple invoices. To do an online refund, please select a specific invoice.',
                     $order->getIncrementId()
                 )

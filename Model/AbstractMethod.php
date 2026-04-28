@@ -344,7 +344,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
         $payment->setAdditionalInformation(
             array_replace_recursive($payment->getAdditionalInformation(), $paymentData)
         );
-        $payment->setIsTransactionClosed(0);
+        $payment->setIsTransactionClosed(false);
 
         $this->getCard()->updateLastUse();
         $this->card = $this->cardRepository->save($this->getCard());
@@ -418,7 +418,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
                 ->setAdditionalInformation(
                     array_replace_recursive($payment->getAdditionalInformation(), $response->getData())
                 )
-                ->setIsTransactionClosed(0);
+                ->setIsTransactionClosed(false);
 
         $this->getCard()->updateLastUse();
         $this->getCard()->setData('no_sync', true);
@@ -510,7 +510,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
             $payment->setTransactionId($this->getValidTransactionId($payment, $response->getTransactionId()));
         }
 
-        $payment->setIsTransactionClosed(0);
+        $payment->setIsTransactionClosed(false);
         $payment->setShouldCloseParentTransaction(1);
 
         $payment->setAdditionalInformation(
@@ -591,7 +591,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
             array_replace_recursive($payment->getAdditionalInformation(), $response->getData())
         );
 
-        $payment->setIsTransactionClosed(1);
+        $payment->setIsTransactionClosed(true);
 
         $payment->setTransactionAdditionalInfo(
             Transaction::RAW_DETAILS,
@@ -679,7 +679,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
         }
 
         $payment->setShouldCloseParentTransaction(1)
-                ->setIsTransactionClosed(1);
+                ->setIsTransactionClosed(true);
 
         if ($this->getCard() instanceof CardInterface) {
             $this->getCard()->updateLastUse();
@@ -1111,7 +1111,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
             }
 
             $payment->setData('parent_transaction_id', null);
-            $payment->setIsTransactionClosed(0);
+            $payment->setIsTransactionClosed(false);
 
             $transaction = $payment->addTransaction(
                 Transaction::TYPE_AUTH,

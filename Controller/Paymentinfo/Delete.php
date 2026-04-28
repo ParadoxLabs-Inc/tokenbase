@@ -109,17 +109,17 @@ class Delete extends Paymentinfo
                     if ($isAjax) {
                         $resultData = ['success' => true];
                     } else {
-                        $this->messageManager->addSuccessMessage(__('Payment record deleted.'));
+                        $this->messageManager->addSuccessMessage((string)__('Payment record deleted.'));
                     }
                 } else {
-                    $this->messageManager->addErrorMessage(__('Invalid Request.'));
+                    $this->messageManager->addErrorMessage((string)__('Invalid Request.'));
                 }
             } catch (Throwable $e) {
                 $this->helper->log($method, (string)$e);
                 $this->messageManager->addErrorMessage($e->getMessage());
             }
         } else {
-            $this->messageManager->addErrorMessage(__('Invalid Request.'));
+            $this->messageManager->addErrorMessage((string)__('Invalid Request.'));
         }
 
         if ($isAjax) {
