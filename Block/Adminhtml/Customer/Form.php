@@ -174,6 +174,7 @@ class Form extends Edit
      *
      * @return AddressInterface
      */
+    #[\Override]
     public function getAddress()
     {
         return $this->getCard()->getAddressObject();
@@ -185,6 +186,7 @@ class Form extends Edit
      * @param int $lineNumber
      * @return string
      */
+    #[\Override]
     public function getStreetLine($lineNumber)
     {
         $street = $this->getAddress()->getStreet();
@@ -197,6 +199,7 @@ class Form extends Edit
      *
      * @return string
      */
+    #[\Override]
     public function getNameBlockHtml()
     {
         /** @var Name $nameBlock */
@@ -253,6 +256,7 @@ class Form extends Edit
      *
      * @return CustomerInterface
      */
+    #[\Override]
     public function getCustomer()
     {
         return $this->helper->getCurrentCustomer();
@@ -263,6 +267,7 @@ class Form extends Edit
      *
      * @return string
      */
+    #[\Override]
     public function getBackUrl()
     {
         return $this->getUrl(

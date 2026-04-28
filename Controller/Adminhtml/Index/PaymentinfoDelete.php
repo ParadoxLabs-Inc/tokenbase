@@ -37,6 +37,7 @@ class PaymentinfoDelete extends Paymentinfo
      *
      * @return Json
      */
+    #[\Override]
     public function execute()
     {
         $id     = $this->getRequest()->getParam('card_id');

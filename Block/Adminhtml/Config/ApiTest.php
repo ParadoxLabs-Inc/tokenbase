@@ -94,6 +94,7 @@ abstract class ApiTest extends Field
      * @param AbstractElement $element
      * @return string
      */
+    #[\Override]
     protected function _getElementHtml(AbstractElement $element)
     {
         $html = (string)$this->testApi();

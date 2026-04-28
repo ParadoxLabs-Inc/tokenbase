@@ -41,6 +41,7 @@ class Ach extends Cc
      * @param DataObject|array $transport
      * @return DataObject
      */
+    #[\Override]
     protected function _prepareSpecificInformation($transport = null)
     {
         $transport = parent::_prepareSpecificInformation($transport);
@@ -67,6 +68,7 @@ class Ach extends Cc
      *
      * @return $this
      */
+    #[\Override]
     protected function _beforeToHtml()
     {
         if (!empty($this->getRequest()->getParam('payment'))) {

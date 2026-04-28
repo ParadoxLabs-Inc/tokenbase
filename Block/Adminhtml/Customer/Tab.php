@@ -58,6 +58,7 @@ class Tab extends TabWrapper
     /**
      * @inheritdoc
      */
+    #[\Override]
     public function canShowTab()
     {
         $activeMethods = $this->helper->getActiveMethods();
@@ -74,6 +75,7 @@ class Tab extends TabWrapper
      *
      * @return Phrase
      */
+    #[\Override]
     public function getTabLabel()
     {
         return __('Payment Options');
@@ -84,6 +86,7 @@ class Tab extends TabWrapper
      *
      * @return string
      */
+    #[\Override]
     public function getTabUrl()
     {
         return $this->getUrl('customer/*/paymentinfo', ['_current' => true]);

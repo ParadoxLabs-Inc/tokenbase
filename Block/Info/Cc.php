@@ -60,6 +60,7 @@ class Cc extends \Magento\Payment\Block\Info\Cc
      * @param DataObject|array $transport
      * @return DataObject
      */
+    #[\Override]
     protected function _prepareSpecificInformation($transport = null)
     {
         if (null !== $this->_paymentSpecificInformation) {
@@ -136,6 +137,7 @@ class Cc extends \Magento\Payment\Block\Info\Cc
      * @return bool
      * @SuppressWarnings(PHPMD.BooleanGetMethodName)
      */
+    #[\Override]
     public function getIsSecureMode()
     {
         if ($this->hasIsSecureMode()) {

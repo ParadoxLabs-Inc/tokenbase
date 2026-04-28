@@ -26,6 +26,7 @@ class TokenFormatter extends SimplePaymentTokenFormatter
      * @return string
      * @since 100.2.0
      */
+    #[\Override]
     public function formatPaymentToken(PaymentTokenInterface $paymentToken): string
     {
         $methodTitle = parent::formatPaymentToken($paymentToken);

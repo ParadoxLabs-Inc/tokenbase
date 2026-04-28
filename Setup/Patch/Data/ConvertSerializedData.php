@@ -131,7 +131,7 @@ class ConvertSerializedData implements DataPatchInterface, PatchVersionInterface
         // We're using serialize for array storage--all valid data will start with 'a:'.
         // If our string starts with 'a', attempt to decode, otherwise pass through as-is.
         if ($string[0] === 'a') {
-            if (strpos($string, 'O:27:"Mage_Customer_Model_Address"') !== false) {
+            if (str_contains($string, 'O:27:"Mage_Customer_Model_Address"')) {
                 // Sometimes addresses from M1 were legitimately stored with customer object. Codepath unclear.
                 // Can't skip them entirely, can't easily clean, but try to look for it specifically.
                 $array = [];

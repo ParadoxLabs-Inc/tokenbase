@@ -92,6 +92,7 @@ class Feed extends \Magento\AdminNotification\Model\Feed
      *
      * @return string
      */
+    #[\Override]
     public function getFeedUrl()
     {
         $methods   = $this->helper->getAllMethods();
@@ -125,6 +126,7 @@ class Feed extends \Magento\AdminNotification\Model\Feed
      *
      * @return int
      */
+    #[\Override]
     public function getFrequency()
     {
         // If frequency is 0 (or AdminNotification is disabled), default to checking daily.

@@ -998,6 +998,7 @@ class Card extends AbstractExtensibleModel implements CardInterface
      *
      * @return $this
      */
+    #[\Override]
     public function beforeSave()
     {
         parent::beforeSave();

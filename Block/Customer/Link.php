@@ -54,6 +54,7 @@ class Link extends Current implements SortLinkInterface
      *
      * @return string
      */
+    #[\Override]
     public function getHref()
     {
         return $this->getUrl($this->getPath(), ['_secure' => true]);
@@ -64,6 +65,7 @@ class Link extends Current implements SortLinkInterface
      *
      * @return string
      */
+    #[\Override]
     protected function _toHtml()
     {
         $activeMethods = $this->helper->getActiveMethods();

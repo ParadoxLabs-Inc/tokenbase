@@ -147,6 +147,7 @@ class Response extends DataObject
      * @param string|int $index
      * @return mixed
      */
+    #[\Override]
     public function getData($key = '', $index = null)
     {
         $data = parent::getData(

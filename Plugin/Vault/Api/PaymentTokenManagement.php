@@ -231,7 +231,7 @@ class PaymentTokenManagement
                     /** @var \ParadoxLabs\TokenBase\Model\Card $result */
                     $result = $card;
                 }
-            } catch (LocalizedException $e) {
+            } catch (LocalizedException) {
                 // NO-OP: If we can't find the card in TB, ignore and let Vault continue.
             }
         }

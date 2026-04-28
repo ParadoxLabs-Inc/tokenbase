@@ -213,6 +213,7 @@ class Data extends \Magento\Payment\Helper\Data
      * @return MethodInterface
      * @throws LocalizedException
      */
+    #[\Override]
     public function getMethodInstance($code)
     {
         /**

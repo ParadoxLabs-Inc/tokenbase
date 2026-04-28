@@ -52,6 +52,7 @@ class FilterComment extends Fieldset
      * @param AbstractElement $element
      * @return string
      */
+    #[\Override]
     protected function _getHeaderCommentHtml($element)
     {
         if (empty($element->getComment())) {
