@@ -1,5 +1,6 @@
 <?php
 /** @var \ParadoxLabs\TokenBase\Block\Form\Ach $block */
+/** @var \Magento\Framework\Escaper $escaper */
 
 $code           = $escaper->escapeHtmlAttr($block->getMethodCode());
 $image          = $block->getBrandingImage();
