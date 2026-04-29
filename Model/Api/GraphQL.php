@@ -93,8 +93,8 @@ class GraphQL
         /** @var \ParadoxLabs\TokenBase\Model\Card $card */
         $cardData                      = $card->toArray();
         $cardData['additional']        = $card->getAdditional();
-        $cardData['address']           = $card->getAddress();
-        $cardData['address']['street'] = explode("\n", (string) $cardData['address']['street']);
+        $cardData['address']           = (array)$card->getAddress();
+        $cardData['address']['street'] = explode("\n", (string)($cardData['address']['street'] ?? ''));
         $cardData['address']['region'] = [
             'region_code' => $cardData['address']['region_code'] ?? null,
             'region' => $cardData['address']['region'] ?? null,

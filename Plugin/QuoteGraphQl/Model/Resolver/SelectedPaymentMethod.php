@@ -68,7 +68,12 @@ class SelectedPaymentMethod
         ?array $value = null,
         ?array $args = null
     ) {
-        if (empty($resolvedValue) || $value['model'] instanceof Quote === false) {
+        if (empty($resolvedValue)
+            || !is_array($resolvedValue)
+            || !is_array($value)
+            || !isset($value['model'])
+            || !($value['model'] instanceof Quote)
+        ) {
             return $resolvedValue;
         }
 

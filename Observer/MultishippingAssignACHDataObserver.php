@@ -54,7 +54,7 @@ class MultishippingAssignACHDataObserver implements ObserverInterface
     {
         /** @var Quote $quote */
         $quote = $observer->getEvent()->getData('quote');
-        $post  = $this->request->getPost();
+        $post  = (array)$this->request->getPost();
 
         if (in_array($quote->getPayment()->getMethod(), $this->helper->getActiveMethods(), true)
             && !empty($post['payment']['echeck_account_no'])) {
@@ -63,7 +63,7 @@ class MultishippingAssignACHDataObserver implements ObserverInterface
                 [
                     'method' => $this->helper->getMethodInstance($quote->getPayment()->getMethod()),
                     'payment_model' => $quote->getPayment(),
-                    'data' => new DataObject($post['payment']),
+                    'data' => new DataObject((array)$post['payment']),
                 ]
             );
         }

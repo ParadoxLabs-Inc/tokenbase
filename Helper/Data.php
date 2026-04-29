@@ -392,7 +392,7 @@ class Data extends \Magento\Payment\Helper\Data
                 if (isset($data['payment']) && !empty($data['payment'])) {
                     $cardData            = $data['payment'];
                     $cardData['method']  = $method;
-                    $cardData['card_id'] = $data['id'];
+                    $cardData['card_id'] = $data['id'] ?? null;
                     // This bypasses the validation check in importData below. Does not matter otherwise.
                     $cardData['cc_cid'] = '000';
 
@@ -428,9 +428,11 @@ class Data extends \Magento\Payment\Helper\Data
      */
     public function getActiveCustomerCardsByMethod($method = null)
     {
-        $method ??= $this->registry->registry('tokenbase_method');
+        $registryMethod = $this->registry->registry('tokenbase_method');
+        $method ??= is_string($registryMethod) ? $registryMethod : null;
+        $cacheKey = $method ?? '';
 
-        if (!isset($this->cards[ $method ])) {
+        if (!isset($this->cards[$cacheKey])) {
             $this->_eventManager->dispatch(
                 'tokenbase_before_load_active_cards',
                 [
@@ -439,7 +441,7 @@ class Data extends \Magento\Payment\Helper\Data
                 ]
             );
 
-            $this->cards[ $method ] = $this->cardCollectionFactory->create();
+            $this->cards[$cacheKey] = $this->cardCollectionFactory->create();
 
             if (!$this->getIsFrontend()) {
                 if ($this->backendSession->getData('quote_id')
@@ -449,8 +451,8 @@ class Data extends \Magento\Payment\Helper\Data
                     $tokenbaseId = $this->backendSession->getQuote()->getPayment()->getData('tokenbase_id');
 
                     if ($this->getCurrentCustomer()->getId() > 0) {
-                        $this->cards[ $method ]->addFieldToFilter('customer_id', $this->getCurrentCustomer()->getId());
-                        $this->cards[ $method ]->addFieldToFilter(
+                        $this->cards[$cacheKey]->addFieldToFilter('customer_id', $this->getCurrentCustomer()->getId());
+                        $this->cards[$cacheKey]->addFieldToFilter(
                             [
                                 'id',
                                 'active',
@@ -461,27 +463,27 @@ class Data extends \Magento\Payment\Helper\Data
                             ]
                         );
                     } else {
-                        $this->cards[ $method ]->addFieldToFilter('id', $tokenbaseId);
+                        $this->cards[$cacheKey]->addFieldToFilter('id', $tokenbaseId);
                     }
                 } elseif ($this->getCurrentCustomer()->getId() > 0) {
                     // Case where we want to show a customer's stored cards (if any)
-                    $this->cards[ $method ]->addFieldToFilter('active', 1)
+                    $this->cards[$cacheKey]->addFieldToFilter('active', 1)
                                            ->addFieldToFilter('customer_id', $this->getCurrentCustomer()->getId());
                 } else {
                     // Guest
                     return [];
                 }
             } elseif ($this->getCurrentCustomer()->getId() > 0) {
-                $this->cards[ $method ]->addFieldToFilter('active', 1)
+                $this->cards[$cacheKey]->addFieldToFilter('active', 1)
                                        ->addFieldToFilter('customer_id', $this->getCurrentCustomer()->getId());
             } else {
                 return [];
             }
 
             if ($method !== null) {
-                $this->cards[ $method ]->addFieldToFilter('method', $method);
-                $this->cards[ $method ]->addFieldToFilter('payment_id', ['notnull' => true]);
-                $this->cards[ $method ]->addFieldToFilter('payment_id', ['neq' => '']);
+                $this->cards[$cacheKey]->addFieldToFilter('method', $method);
+                $this->cards[$cacheKey]->addFieldToFilter('payment_id', ['notnull' => true]);
+                $this->cards[$cacheKey]->addFieldToFilter('payment_id', ['neq' => '']);
             }
 
             $this->_eventManager->dispatch(
@@ -489,12 +491,12 @@ class Data extends \Magento\Payment\Helper\Data
                 [
                     'method' => $method,
                     'customer' => $this->getCurrentCustomer(),
-                    'cards' => $this->cards[ $method ],
+                    'cards' => $this->cards[$cacheKey],
                 ]
             );
         }
 
-        return $this->cards[ $method ];
+        return $this->cards[$cacheKey];
     }
 
     /**
@@ -544,8 +546,10 @@ class Data extends \Magento\Payment\Helper\Data
             $this->cardTypeTranslationMap = $this->_paymentConfig->getCcTypes();
         }
 
-        if (isset($this->cardTypeTranslationMap[ $type ])) {
-            return __($this->cardTypeTranslationMap[ $type ]);
+        $key = (string)$type;
+
+        if (isset($this->cardTypeTranslationMap[$key])) {
+            return __($this->cardTypeTranslationMap[$key]);
         }
 
         return __($type);

@@ -151,21 +151,21 @@ class CreditCard extends AbstractValidator
     {
         // Double every other number minus the last, and all them all together.
         // This sum must be a multiple of 10 to be a valid credit card number.
-        $number   = preg_replace('/[^\d]/', '', (string)$ccNumber);
+        $digits   = (string)preg_replace('/[^\d]/', '', (string)$ccNumber);
         $sumTable = [
             [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
             [0, 2, 4, 6, 8, 1, 3, 5, 7, 9],
         ];
 
-        $length = strlen((string)$number);
+        $length = strlen($digits);
         $sum    = 0;
         $flip   = 1;
 
         for ($i = $length - 2; $i >= 0; --$i) {
-            $sum += $sumTable[ $flip++ & 0x1 ][ $number[ $i ] ];
+            $sum += $sumTable[ $flip++ & 0x1 ][ $digits[ $i ] ];
         }
 
-        $sum += (int)substr((string)$number, -1);
+        $sum += (int)substr($digits, -1);
 
         return $sum % 10 === 0;
     }

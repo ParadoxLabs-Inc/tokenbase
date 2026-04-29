@@ -298,7 +298,7 @@ class CardRepository implements CardRepositoryInterface
     protected function updatePaymentInfo(
         \ParadoxLabs\TokenBase\Model\Card $card
     ) {
-        $paymentData            = $card->getAdditional();
+        $paymentData            = (array)$card->getAdditional();
         $paymentData['method']  = $card->getMethod();
         $paymentData['card_id'] = $card->getId() > 0 ? $card->getHash() : '';
 

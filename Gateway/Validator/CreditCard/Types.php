@@ -30,7 +30,10 @@ namespace ParadoxLabs\TokenBase\Gateway\Validator\CreditCard;
  */
 class Types
 {
-    private $types = [
+    /**
+     * @var array<int, array{title:string, type:string, pattern:string, gaps:array<int,int>, lengths:array<int,int>, luhn:bool, code:array{name:string, size:int}}>
+     */
+    private array $types = [
         [
             'title'   => 'Visa',
             'type'    => 'VI',

@@ -612,6 +612,10 @@ class Card extends AbstractExtensibleModel implements CardInterface
     {
         if ($this->additional === null) {
             $this->getAdditional();
+
+            if (!is_array($this->additional)) {
+                $this->additional = [];
+            }
         }
 
         if ($value !== null) {

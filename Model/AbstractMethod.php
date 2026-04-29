@@ -870,12 +870,12 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
             if ($payment->getOrder()) {
                 /** @var \Magento\Sales\Model\Order\Address $billingAddress */
                 $billingAddress     = $payment->getOrder()->getBillingAddress();
-                $billingAddressData = $billingAddress->getData();
+                $billingAddressData = (array)$billingAddress->getData();
 
                 // AddressInterface requires an array for street
                 $billingAddressData['street'] = explode(
                     "\n",
-                    str_replace("\r", '', (string)$billingAddressData['street'])
+                    str_replace("\r", '', (string)($billingAddressData['street'] ?? ''))
                 );
 
                 /** @var AddressInterface $billingAddress */
