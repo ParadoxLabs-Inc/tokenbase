@@ -15,6 +15,7 @@ namespace ParadoxLabs\TokenBase\Model\InstantPurchase;
 
 use Magento\InstantPurchase\PaymentMethodIntegration\SimplePaymentTokenFormatter;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
+use Override;
 use ParadoxLabs\TokenBase\Api\Data\CardInterface;
 
 class TokenFormatter extends SimplePaymentTokenFormatter
@@ -26,7 +27,7 @@ class TokenFormatter extends SimplePaymentTokenFormatter
      * @return string
      * @since 100.2.0
      */
-    #[\Override]
+    #[Override]
     public function formatPaymentToken(PaymentTokenInterface $paymentToken): string
     {
         $methodTitle = parent::formatPaymentToken($paymentToken);

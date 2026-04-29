@@ -20,6 +20,7 @@ use Magento\Backend\Model\Auth\Session;
 use Magento\Cms\Model\Template\FilterProvider;
 use Magento\Config\Block\System\Config\Form\Fieldset;
 use Magento\Framework\View\Helper\Js;
+use Override;
 
 class FilterComment extends Fieldset
 {
@@ -52,7 +53,7 @@ class FilterComment extends Fieldset
      * @param AbstractElement $element
      * @return string
      */
-    #[\Override]
+    #[Override]
     protected function _getHeaderCommentHtml($element)
     {
         if (empty($element->getComment())) {

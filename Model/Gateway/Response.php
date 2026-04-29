@@ -22,6 +22,7 @@
 namespace ParadoxLabs\TokenBase\Model\Gateway;
 
 use Magento\Framework\DataObject;
+use Override;
 
 /**
  * Response object: Container for various response data (txn ID, status, etc.)
@@ -147,7 +148,7 @@ class Response extends DataObject
      * @param string|int $index
      * @return mixed
      */
-    #[\Override]
+    #[Override]
     public function getData($key = '', $index = null)
     {
         $data = parent::getData(

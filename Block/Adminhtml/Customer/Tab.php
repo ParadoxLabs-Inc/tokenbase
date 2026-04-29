@@ -26,6 +26,7 @@ use Magento\Backend\Block\Template\Context;
 use Magento\Customer\Controller\RegistryConstants;
 use Magento\Framework\Registry;
 use Magento\Ui\Component\Layout\Tabs\TabWrapper;
+use Override;
 use ParadoxLabs\TokenBase\Helper\Data;
 
 class Tab extends TabWrapper
@@ -58,7 +59,7 @@ class Tab extends TabWrapper
     /**
      * @inheritdoc
      */
-    #[\Override]
+    #[Override]
     public function canShowTab()
     {
         $activeMethods = $this->helper->getActiveMethods();
@@ -75,7 +76,7 @@ class Tab extends TabWrapper
      *
      * @return Phrase
      */
-    #[\Override]
+    #[Override]
     public function getTabLabel()
     {
         return __('Payment Options');
@@ -86,7 +87,7 @@ class Tab extends TabWrapper
      *
      * @return string
      */
-    #[\Override]
+    #[Override]
     public function getTabUrl()
     {
         return $this->getUrl('customer/*/paymentinfo', ['_current' => true]);

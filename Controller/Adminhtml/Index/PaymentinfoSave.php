@@ -22,6 +22,7 @@
 namespace ParadoxLabs\TokenBase\Controller\Adminhtml\Index;
 
 use Magento\Framework\Controller\ResultInterface;
+use Override;
 use ParadoxLabs\TokenBase\Model\Card;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Payment;
@@ -176,7 +177,7 @@ class PaymentinfoSave extends Paymentinfo
      *
      * @return ResultInterface
      */
-    #[\Override]
+    #[Override]
     public function execute()
     {
         $id     = $this->getRequest()->getParam('card_id');

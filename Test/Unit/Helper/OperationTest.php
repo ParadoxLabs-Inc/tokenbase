@@ -12,6 +12,7 @@ use Monolog\Logger;
 use ParadoxLabs\TokenBase\Helper\Operation;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 /**
  * Unit tests for Operation helper
@@ -39,7 +40,7 @@ class OperationTest extends TestCase
 
     public function testCleanupArrayRemovesObjects(): void
     {
-        $object = new \stdClass();
+        $object = new stdClass();
         $object->foo = 'bar';
 
         $array = [
@@ -59,7 +60,7 @@ class OperationTest extends TestCase
 
     public function testCleanupArrayRemovesNestedObjects(): void
     {
-        $object = new \stdClass();
+        $object = new stdClass();
 
         $array = [
             'level1' => [
@@ -272,7 +273,7 @@ class OperationTest extends TestCase
 
     public function testLogHandlesStdClassObject(): void
     {
-        $object = new \stdClass();
+        $object = new stdClass();
         $object->property = 'value';
 
         $this->logger->expects($this->once())

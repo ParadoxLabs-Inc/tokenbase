@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ParadoxLabs\TokenBase\Test\Unit\Model\Card;
 
+use ArrayIterator;
+use DateTime;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Api\Data\CustomerInterface;
@@ -27,6 +29,7 @@ use ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection;
 use ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 /**
  * Unit tests for Card::beforeSave() and related methods
@@ -95,7 +98,7 @@ class BeforeSaveTest extends TestCase
         $this->context->method('getEventDispatcher')->willReturn($eventManager);
 
         // Set up default date mock
-        $dateMock = $this->createMock(\DateTime::class);
+        $dateMock = $this->createMock(DateTime::class);
         $dateMock->method('format')->willReturn('2025-01-14 12:00:00');
         $this->dateProcessor->method('date')->willReturn($dateMock);
 
@@ -111,7 +114,7 @@ class BeforeSaveTest extends TestCase
 
     protected function tearDown(): void
     {
-        $reflection = new \ReflectionClass(ObjectManager::class);
+        $reflection = new ReflectionClass(ObjectManager::class);
         $property = $reflection->getProperty('_instance');
         $property->setAccessible(true);
         $property->setValue(null, null);
@@ -334,7 +337,7 @@ class BeforeSaveTest extends TestCase
         $collection = $this->createMock(Collection::class);
         $collection->method('getSize')->willReturn(3);
         $collection->method('addFieldToFilter')->willReturnSelf();
-        $collection->method('getIterator')->willReturn(new \ArrayIterator([$this->card, $dupe1, $dupe2]));
+        $collection->method('getIterator')->willReturn(new ArrayIterator([$this->card, $dupe1, $dupe2]));
         $collection->method('getFirstItem')->willReturn($this->createMock(Card::class));
         $this->cardCollectionFactory->method('create')->willReturn($collection);
 
@@ -371,7 +374,7 @@ class BeforeSaveTest extends TestCase
         ]);
 
         // Access protected method via reflection
-        $reflection = new \ReflectionClass($this->card);
+        $reflection = new ReflectionClass($this->card);
         $method = $reflection->getMethod('cleanAdditionalData');
         $method->setAccessible(true);
         $method->invoke($this->card);

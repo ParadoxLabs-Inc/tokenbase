@@ -33,6 +33,7 @@ use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Module\Dir;
 use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
+use Override;
 use ParadoxLabs\TokenBase\Helper\Data;
 
 /**
@@ -92,7 +93,7 @@ class Feed extends \Magento\AdminNotification\Model\Feed
      *
      * @return string
      */
-    #[\Override]
+    #[Override]
     public function getFeedUrl()
     {
         $methods   = $this->helper->getAllMethods();
@@ -126,7 +127,7 @@ class Feed extends \Magento\AdminNotification\Model\Feed
      *
      * @return int
      */
-    #[\Override]
+    #[Override]
     public function getFrequency()
     {
         // If frequency is 0 (or AdminNotification is disabled), default to checking daily.

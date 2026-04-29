@@ -21,6 +21,7 @@
 
 namespace ParadoxLabs\TokenBase\Block\Customer;
 
+use Override;
 use ParadoxLabs\TokenBase\Model\Card;
 use ParadoxLabs\TokenBase\Api\MethodInterface;
 use Magento\Customer\Api\Data\AddressInterface;
@@ -173,7 +174,7 @@ class Form extends Edit
      *
      * @return AddressInterface
      */
-    #[\Override]
+    #[Override]
     public function getAddress()
     {
         return $this->getCard()->getAddressObject();
@@ -185,7 +186,7 @@ class Form extends Edit
      * @param int $lineNumber
      * @return string
      */
-    #[\Override]
+    #[Override]
     public function getStreetLine($lineNumber)
     {
         $street = $this->getAddress()->getStreet();
@@ -198,7 +199,7 @@ class Form extends Edit
      *
      * @return string
      */
-    #[\Override]
+    #[Override]
     public function getNameBlockHtml()
     {
         /** @var Name $nameBlock */
@@ -226,7 +227,7 @@ class Form extends Edit
      *
      * @return string
      */
-    #[\Override]
+    #[Override]
     public function getBackUrl()
     {
         return $this->getUrl('*/*/index', ['_secure' => true, 'method' => $this->getCode()]);
@@ -260,7 +261,7 @@ class Form extends Edit
      *
      * @return CustomerInterface
      */
-    #[\Override]
+    #[Override]
     public function getCustomer()
     {
         return $this->helper->getCurrentCustomer();

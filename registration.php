@@ -18,14 +18,16 @@
  * @link https://support.paradoxlabs.com
  */
 
+use Magento\Framework\Component\ComponentRegistrar;
+
 $dir = __DIR__;
 $ds  = DIRECTORY_SEPARATOR;
 if (isset($file) && strpos((string)$file, $ds . 'vendor' . $ds . 'composer' . $ds . '..') === false) {
     $dir = dirname((string)$file);
 }
 
-\Magento\Framework\Component\ComponentRegistrar::register(
-    \Magento\Framework\Component\ComponentRegistrar::MODULE,
+ComponentRegistrar::register(
+    ComponentRegistrar::MODULE,
     'ParadoxLabs_TokenBase',
     $dir
 );

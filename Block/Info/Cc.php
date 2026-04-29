@@ -27,6 +27,7 @@ use Magento\Framework\App\Area;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Payment\Block\Info;
 use Magento\Payment\Model\Config;
+use Override;
 use ParadoxLabs\TokenBase\Helper\Data;
 
 /**
@@ -60,7 +61,7 @@ class Cc extends \Magento\Payment\Block\Info\Cc
      * @param DataObject|array $transport
      * @return DataObject
      */
-    #[\Override]
+    #[Override]
     protected function _prepareSpecificInformation($transport = null)
     {
         if (null !== $this->_paymentSpecificInformation) {
@@ -137,7 +138,7 @@ class Cc extends \Magento\Payment\Block\Info\Cc
      * @return bool
      * @SuppressWarnings(PHPMD.BooleanGetMethodName)
      */
-    #[\Override]
+    #[Override]
     public function getIsSecureMode()
     {
         if ($this->hasIsSecureMode()) {

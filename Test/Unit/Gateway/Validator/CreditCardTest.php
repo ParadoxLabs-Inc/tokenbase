@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ParadoxLabs\TokenBase\Test\Unit\Gateway\Validator;
 
+use DateTime;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Payment\Gateway\Validator\ResultInterface;
@@ -91,7 +92,7 @@ class CreditCardTest extends TestCase
 
     public function testIsDateExpiredReturnsTrueForPastYear(): void
     {
-        $dateMock = $this->createMock(\DateTime::class);
+        $dateMock = $this->createMock(DateTime::class);
         $dateMock->method('format')
             ->willReturnMap([
                 ['Y', '2025'],
@@ -106,7 +107,7 @@ class CreditCardTest extends TestCase
 
     public function testIsDateExpiredReturnsTrueForPastMonth(): void
     {
-        $dateMock = $this->createMock(\DateTime::class);
+        $dateMock = $this->createMock(DateTime::class);
         $dateMock->method('format')
             ->willReturnMap([
                 ['Y', '2025'],
@@ -121,7 +122,7 @@ class CreditCardTest extends TestCase
 
     public function testIsDateExpiredReturnsFalseForCurrentMonth(): void
     {
-        $dateMock = $this->createMock(\DateTime::class);
+        $dateMock = $this->createMock(DateTime::class);
         $dateMock->method('format')
             ->willReturnMap([
                 ['Y', '2025'],
@@ -136,7 +137,7 @@ class CreditCardTest extends TestCase
 
     public function testIsDateExpiredReturnsFalseForFutureMonth(): void
     {
-        $dateMock = $this->createMock(\DateTime::class);
+        $dateMock = $this->createMock(DateTime::class);
         $dateMock->method('format')
             ->willReturnMap([
                 ['Y', '2025'],
@@ -151,7 +152,7 @@ class CreditCardTest extends TestCase
 
     public function testIsDateExpiredReturnsFalseForFutureYear(): void
     {
-        $dateMock = $this->createMock(\DateTime::class);
+        $dateMock = $this->createMock(DateTime::class);
         $dateMock->method('format')
             ->willReturnMap([
                 ['Y', '2025'],
@@ -166,7 +167,7 @@ class CreditCardTest extends TestCase
 
     public function testIsDateExpiredReturnsTrueForInvalidYear(): void
     {
-        $dateMock = $this->createMock(\DateTime::class);
+        $dateMock = $this->createMock(DateTime::class);
         $dateMock->method('format')
             ->willReturnMap([
                 ['Y', '2025'],
@@ -181,7 +182,7 @@ class CreditCardTest extends TestCase
 
     public function testIsDateExpiredReturnsTrueForInvalidMonth(): void
     {
-        $dateMock = $this->createMock(\DateTime::class);
+        $dateMock = $this->createMock(DateTime::class);
         $dateMock->method('format')
             ->willReturnMap([
                 ['Y', '2025'],
@@ -240,7 +241,7 @@ class CreditCardTest extends TestCase
                 'code' => ['name' => 'CVV', 'size' => 3],
             ]);
 
-        $dateMock = $this->createMock(\DateTime::class);
+        $dateMock = $this->createMock(DateTime::class);
         $dateMock->method('format')
             ->willReturnMap([
                 ['Y', '2025'],
@@ -288,7 +289,7 @@ class CreditCardTest extends TestCase
                 'code' => ['name' => 'CVV', 'size' => 3],
             ]);
 
-        $dateMock = $this->createMock(\DateTime::class);
+        $dateMock = $this->createMock(DateTime::class);
         $dateMock->method('format')
             ->willReturn('2025');
         $this->dateProcessor->method('date')
@@ -332,7 +333,7 @@ class CreditCardTest extends TestCase
                 'code' => ['name' => 'CVV', 'size' => 3],
             ]);
 
-        $dateMock = $this->createMock(\DateTime::class);
+        $dateMock = $this->createMock(DateTime::class);
         $dateMock->method('format')
             ->willReturn('2025');
         $this->dateProcessor->method('date')
@@ -376,7 +377,7 @@ class CreditCardTest extends TestCase
                 'code' => ['name' => 'CVV', 'size' => 3],
             ]);
 
-        $dateMock = $this->createMock(\DateTime::class);
+        $dateMock = $this->createMock(DateTime::class);
         $dateMock->method('format')
             ->willReturnMap([
                 ['Y', '2025'],
@@ -421,7 +422,7 @@ class CreditCardTest extends TestCase
                 'code' => ['name' => 'CVV', 'size' => 3],
             ]);
 
-        $dateMock = $this->createMock(\DateTime::class);
+        $dateMock = $this->createMock(DateTime::class);
         $dateMock->method('format')
             ->willReturnMap([
                 ['Y', '2025'],
@@ -506,7 +507,7 @@ class CreditCardTest extends TestCase
                 'code' => ['name' => 'CVV', 'size' => 3],
             ]);
 
-        $dateMock = $this->createMock(\DateTime::class);
+        $dateMock = $this->createMock(DateTime::class);
         $dateMock->method('format')
             ->willReturn('2025');
         $this->dateProcessor->method('date')
@@ -544,7 +545,7 @@ class CreditCardTest extends TestCase
                 'code' => ['name' => 'CVN', 'size' => 3],
             ]);
 
-        $dateMock = $this->createMock(\DateTime::class);
+        $dateMock = $this->createMock(DateTime::class);
         $dateMock->method('format')
             ->willReturn('2025');
         $this->dateProcessor->method('date')
@@ -587,7 +588,7 @@ class CreditCardTest extends TestCase
                 'code' => ['name' => 'CID', 'size' => 4],
             ]);
 
-        $dateMock = $this->createMock(\DateTime::class);
+        $dateMock = $this->createMock(DateTime::class);
         $dateMock->method('format')
             ->willReturn('2025');
         $this->dateProcessor->method('date')

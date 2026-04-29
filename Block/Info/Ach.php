@@ -24,6 +24,7 @@ namespace ParadoxLabs\TokenBase\Block\Info;
 use Magento\Framework\DataObject;
 use Magento\Sales\Model\Order\Payment\Info;
 use Magento\Framework\View\Element\Template;
+use Override;
 
 /**
  * ACH info block for TokenBase methods.
@@ -41,7 +42,7 @@ class Ach extends Cc
      * @param DataObject|array $transport
      * @return DataObject
      */
-    #[\Override]
+    #[Override]
     protected function _prepareSpecificInformation($transport = null)
     {
         $transport = parent::_prepareSpecificInformation($transport);
@@ -68,7 +69,7 @@ class Ach extends Cc
      *
      * @return $this
      */
-    #[\Override]
+    #[Override]
     protected function _beforeToHtml()
     {
         if (!empty($this->getRequest()->getParam('payment'))) {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ParadoxLabs\TokenBase\Test\Unit\Model\ResourceModel;
 
+use Exception;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Exception\CouldNotDeleteException;
@@ -255,7 +256,7 @@ class CardRepositoryTest extends TestCase
         $card->method('getActive')->willReturn(0);
 
         $this->resource->method('delete')
-            ->willThrowException(new \Exception('Delete failed'));
+            ->willThrowException(new Exception('Delete failed'));
 
         $this->expectException(CouldNotDeleteException::class);
         $this->expectExceptionMessage('Delete failed');

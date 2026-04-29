@@ -22,6 +22,7 @@
 namespace ParadoxLabs\TokenBase\Controller\Adminhtml\Index;
 
 use Magento\Framework\Controller\Result\Json;
+use Override;
 use ParadoxLabs\TokenBase\Model\Card;
 use Throwable;
 
@@ -37,7 +38,7 @@ class PaymentinfoDelete extends Paymentinfo
      *
      * @return Json
      */
-    #[\Override]
+    #[Override]
     public function execute()
     {
         $id     = $this->getRequest()->getParam('card_id');

@@ -21,6 +21,7 @@
 
 namespace ParadoxLabs\TokenBase\Helper;
 
+use Override;
 use ParadoxLabs\TokenBase\Model\Card;
 use ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection;
 use Magento\Payment\Model\MethodInterface;
@@ -213,7 +214,7 @@ class Data extends \Magento\Payment\Helper\Data
      * @return MethodInterface
      * @throws LocalizedException
      */
-    #[\Override]
+    #[Override]
     public function getMethodInstance($code)
     {
         /**

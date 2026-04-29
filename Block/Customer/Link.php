@@ -25,6 +25,7 @@ use Magento\Customer\Block\Account\SortLinkInterface;
 use Magento\Framework\App\DefaultPathInterface;
 use Magento\Framework\View\Element\Html\Link\Current;
 use Magento\Framework\View\Element\Template\Context;
+use Override;
 use ParadoxLabs\TokenBase\Helper\Data;
 
 /**
@@ -54,7 +55,7 @@ class Link extends Current implements SortLinkInterface
      *
      * @return string
      */
-    #[\Override]
+    #[Override]
     public function getHref()
     {
         return $this->getUrl($this->getPath(), ['_secure' => true]);
@@ -65,7 +66,7 @@ class Link extends Current implements SortLinkInterface
      *
      * @return string
      */
-    #[\Override]
+    #[Override]
     protected function _toHtml()
     {
         $activeMethods = $this->helper->getActiveMethods();

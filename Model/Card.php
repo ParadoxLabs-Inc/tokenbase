@@ -21,6 +21,7 @@
 
 namespace ParadoxLabs\TokenBase\Model;
 
+use Override;
 use ParadoxLabs\TokenBase\Helper\Data;
 use ParadoxLabs\TokenBase\Model\Method\Factory;
 use Magento\Customer\Api\Data\CustomerInterfaceFactory;
@@ -1002,7 +1003,7 @@ class Card extends AbstractExtensibleModel implements CardInterface
      *
      * @return $this
      */
-    #[\Override]
+    #[Override]
     public function beforeSave()
     {
         parent::beforeSave();

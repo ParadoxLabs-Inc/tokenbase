@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ParadoxLabs\TokenBase\Test\Unit\Helper;
 
+use Exception;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Customer\Block\Address\Renderer\RendererInterface;
 use Magento\Customer\Model\Address\Config\Reader;
@@ -556,7 +557,7 @@ class AddressTest extends TestCase
         $address = $this->createMock(AddressInterface::class);
 
         $this->addressConfig->method('getFormatByCode')
-            ->willThrowException(new \Exception('Format not found'));
+            ->willThrowException(new Exception('Format not found'));
 
         $result = $this->helper->getFormattedAddress($address);
 

@@ -21,6 +21,7 @@ use ParadoxLabs\TokenBase\Model\AbstractMethod;
 use ParadoxLabs\TokenBase\Model\Card;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 /**
  * Unit tests for AbstractMethod transaction-related methods
@@ -75,7 +76,7 @@ class TransactionTest extends TestCase
         $this->transactionRepository->method('getByTransactionId')
             ->willReturn(false);
 
-        $reflection = new \ReflectionClass($this->method);
+        $reflection = new ReflectionClass($this->method);
         $getValidTxnMethod = $reflection->getMethod('getValidTransactionId');
         $getValidTxnMethod->setAccessible(true);
 
@@ -102,7 +103,7 @@ class TransactionTest extends TestCase
                 return false;
             });
 
-        $reflection = new \ReflectionClass($this->method);
+        $reflection = new ReflectionClass($this->method);
         $getValidTxnMethod = $reflection->getMethod('getValidTransactionId');
         $getValidTxnMethod->setAccessible(true);
 
@@ -129,7 +130,7 @@ class TransactionTest extends TestCase
                 return false;
             });
 
-        $reflection = new \ReflectionClass($this->method);
+        $reflection = new ReflectionClass($this->method);
         $getValidTxnMethod = $reflection->getMethod('getValidTransactionId');
         $getValidTxnMethod->setAccessible(true);
 
@@ -148,7 +149,7 @@ class TransactionTest extends TestCase
         $this->cardRepository->expects($this->never())
             ->method('save');
 
-        $reflection = new \ReflectionClass($this->method);
+        $reflection = new ReflectionClass($this->method);
         $resyncMethod = $reflection->getMethod('resyncStoredCard');
         $resyncMethod->setAccessible(true);
 
@@ -168,7 +169,7 @@ class TransactionTest extends TestCase
         $this->cardRepository->expects($this->never())
             ->method('save');
 
-        $reflection = new \ReflectionClass($this->method);
+        $reflection = new ReflectionClass($this->method);
         $resyncMethod = $reflection->getMethod('resyncStoredCard');
         $resyncMethod->setAccessible(true);
 
@@ -198,7 +199,7 @@ class TransactionTest extends TestCase
             ->with($card)
             ->willReturn($card);
 
-        $reflection = new \ReflectionClass($this->method);
+        $reflection = new ReflectionClass($this->method);
         $resyncMethod = $reflection->getMethod('resyncStoredCard');
         $resyncMethod->setAccessible(true);
 
@@ -256,7 +257,7 @@ class TransactionTest extends TestCase
             ->with($card)
             ->willReturn($card);
 
-        $reflection = new \ReflectionClass($this->method);
+        $reflection = new ReflectionClass($this->method);
         $resyncMethod = $reflection->getMethod('resyncStoredCard');
         $resyncMethod->setAccessible(true);
 
@@ -301,7 +302,7 @@ class TransactionTest extends TestCase
         $this->cardRepository->expects($this->never())
             ->method('save');
 
-        $reflection = new \ReflectionClass($this->method);
+        $reflection = new ReflectionClass($this->method);
         $resyncMethod = $reflection->getMethod('resyncStoredCard');
         $resyncMethod->setAccessible(true);
 
@@ -334,7 +335,7 @@ class TransactionTest extends TestCase
             ->method('register')
             ->with('tokenbase_ensure_checkout_card_save', $card);
 
-        $reflection = new \ReflectionClass($this->method);
+        $reflection = new ReflectionClass($this->method);
         $resyncMethod = $reflection->getMethod('resyncStoredCard');
         $resyncMethod->setAccessible(true);
 
@@ -406,7 +407,7 @@ class TransactionTest extends TestCase
             $this->addressHelper->method('buildAddressFromInput')->willReturn($newAddress);
             $this->cardRepository->method('save')->willReturn($card);
 
-            $reflection = new \ReflectionClass($methodInstance);
+            $reflection = new ReflectionClass($methodInstance);
             $resyncMethod = $reflection->getMethod('resyncStoredCard');
             $resyncMethod->setAccessible(true);
 

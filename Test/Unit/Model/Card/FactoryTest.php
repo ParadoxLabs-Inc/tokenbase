@@ -12,6 +12,7 @@ use ParadoxLabs\TokenBase\Model\Card;
 use ParadoxLabs\TokenBase\Model\Card\Factory;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 /**
  * Unit tests for Card Factory
@@ -64,7 +65,7 @@ class FactoryTest extends TestCase
 
     public function testCreateThrowsForNonCardInterface(): void
     {
-        $notACard = new \stdClass();
+        $notACard = new stdClass();
 
         $this->objectManager->method('create')
             ->willReturn($notACard);
@@ -72,7 +73,7 @@ class FactoryTest extends TestCase
         $this->expectException(LocalizedException::class);
         $this->expectExceptionMessage("class doesn't implement");
 
-        $this->factory->create(\stdClass::class);
+        $this->factory->create(stdClass::class);
     }
 
     public function testGetTypeInstanceReturnsOriginalWhenNoMethod(): void

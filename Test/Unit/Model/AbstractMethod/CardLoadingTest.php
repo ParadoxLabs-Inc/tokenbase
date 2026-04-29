@@ -20,6 +20,7 @@ use ParadoxLabs\TokenBase\Model\AbstractMethod;
 use ParadoxLabs\TokenBase\Model\Card;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 /**
  * Unit tests for AbstractMethod card loading methods
@@ -187,7 +188,7 @@ class CardLoadingTest extends TestCase
         $card = $this->createCardMock(123, 456, 'testmethod', 'hash123');
 
         // Set card via reflection
-        $reflection = new \ReflectionClass($this->method);
+        $reflection = new ReflectionClass($this->method);
         $property = $reflection->getProperty('card');
         $property->setAccessible(true);
         $property->setValue($this->method, $card);
@@ -223,7 +224,7 @@ class CardLoadingTest extends TestCase
 
         $this->method->method('getInfoInstance')->willReturn($payment);
 
-        $reflection = new \ReflectionClass($this->method);
+        $reflection = new ReflectionClass($this->method);
         $loadOrCreateMethod = $reflection->getMethod('loadOrCreateCard');
         $loadOrCreateMethod->setAccessible(true);
 
@@ -253,7 +254,7 @@ class CardLoadingTest extends TestCase
 
         $this->method->method('getInfoInstance')->willReturn($payment);
 
-        $reflection = new \ReflectionClass($this->method);
+        $reflection = new ReflectionClass($this->method);
         $loadOrCreateMethod = $reflection->getMethod('loadOrCreateCard');
         $loadOrCreateMethod->setAccessible(true);
 
@@ -272,7 +273,7 @@ class CardLoadingTest extends TestCase
                 ['cc_exp_month', true],
             ]);
 
-        $reflection = new \ReflectionClass($this->method);
+        $reflection = new ReflectionClass($this->method);
         $method = $reflection->getMethod('paymentContainsCard');
         $method->setAccessible(true);
 
@@ -291,7 +292,7 @@ class CardLoadingTest extends TestCase
                 ['cc_exp_month', true],
             ]);
 
-        $reflection = new \ReflectionClass($this->method);
+        $reflection = new ReflectionClass($this->method);
         $method = $reflection->getMethod('paymentContainsCard');
         $method->setAccessible(true);
 
@@ -310,7 +311,7 @@ class CardLoadingTest extends TestCase
                 ['cc_exp_month', true],
             ]);
 
-        $reflection = new \ReflectionClass($this->method);
+        $reflection = new ReflectionClass($this->method);
         $method = $reflection->getMethod('paymentContainsCard');
         $method->setAccessible(true);
 
@@ -329,7 +330,7 @@ class CardLoadingTest extends TestCase
                 ['cc_exp_month', false],
             ]);
 
-        $reflection = new \ReflectionClass($this->method);
+        $reflection = new ReflectionClass($this->method);
         $method = $reflection->getMethod('paymentContainsCard');
         $method->setAccessible(true);
 
@@ -359,7 +360,7 @@ class CardLoadingTest extends TestCase
 
         $this->method->method('getInfoInstance')->willReturn($payment);
 
-        $reflection = new \ReflectionClass($this->method);
+        $reflection = new ReflectionClass($this->method);
         $loadOrCreateMethod = $reflection->getMethod('loadOrCreateCard');
         $loadOrCreateMethod->setAccessible(true);
 

@@ -28,6 +28,7 @@ use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Store\Model\StoreFactory;
 use Magento\Store\Model\WebsiteFactory;
+use Override;
 use ParadoxLabs\TokenBase\Helper\Data;
 use ParadoxLabs\TokenBase\Model\Method\Factory;
 
@@ -94,7 +95,7 @@ abstract class ApiTest extends Field
      * @param AbstractElement $element
      * @return string
      */
-    #[\Override]
+    #[Override]
     protected function _getElementHtml(AbstractElement $element)
     {
         $html = (string)$this->testApi();
