@@ -218,17 +218,22 @@ class Xml
     }
 
     /**
-     * Get string representation of boolean value
+     * Get string representation of a scalar value for use in a DOM text/attribute node.
      *
-     * @param bool $v
+     * @param bool|int|float|string|null $v
      * @return string
      */
-    private static function bool2str($v)
+    private static function bool2str($v): string
     {
-        $v = $v === true ? 'true' : $v;
-        $v = $v === false ? 'false' : $v;
+        if ($v === true) {
+            return 'true';
+        }
 
-        return $v;
+        if ($v === false) {
+            return 'false';
+        }
+
+        return (string)$v;
     }
 
     /**
