@@ -863,6 +863,7 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
                  ->setMethodInstance($this);
 
             $card = $card->getTypeInstance();
+            $card->setMethodInstance($this);
 
             $card->setCustomer($this->getCustomer(), $payment)
                  ->importPaymentInfo($payment);
