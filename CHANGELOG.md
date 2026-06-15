@@ -1,5 +1,16 @@
 # ParadoxLabs_TokenBase Changelog
 
+## 5.0.0 - Jun 17, 2026: PHP 8.1–8.5 compatibility
+
+**WARNING: PHP 8.1 is now the minimum. `AbstractGateway::__construct` no longer takes
+`ZendClientFactory` — gateways extending it must update their constructors.**
+
+- Added support up to PHP 8.5; PHP 8.1+ is now required.
+- Added unit test coverage.
+- Changed `AbstractGateway` constructor signature (removed `ZendClientFactory` dependency).
+- Fixed payment method instance not being re-applied to the card type instance before importing payment info.
+- Refactored for PHP 8.1+: constructor property promotion, readonly properties, strict types, import cleanup, and `$escaper` usage in templates.
+
 ## 4.8.0 - Jan 7, 2026
 - Added confirmation prompt before deleting stored payment cards.
 - Added feature to auto-load invoice when clicking 'Credit Memo' from an order.
