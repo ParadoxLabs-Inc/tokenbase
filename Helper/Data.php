@@ -557,6 +557,29 @@ class Data extends \Magento\Payment\Helper\Data
     }
 
     /**
+     * Resolve the view-file path for a card type's brand icon, falling back to a generic card icon.
+     *
+     * Magento_Payment only ships brand images for the codes below; anything else (wallet types such as Stripe
+     * 'link', or an unmapped brand) would resolve to a missing image. Those get a generic card icon instead.
+     *
+     * @param string $type
+     * @return string
+     * @api
+     */
+    public function getCardTypeIconPath($type)
+    {
+        $type = strtolower((string)$type);
+
+        $brandIcons = ['ae', 'au', 'di', 'dn', 'elo', 'hc', 'jcb', 'mc', 'md', 'mi', 'sm', 'so', 'un', 'vi'];
+
+        if (in_array($type, $brandIcons, true)) {
+            return 'Magento_Payment::images/cc/' . $type . '.png';
+        }
+
+        return 'ParadoxLabs_TokenBase::images/cc/generic.svg';
+    }
+
+    /**
      * Return valid ACH account types.
      *
      * @param string $code

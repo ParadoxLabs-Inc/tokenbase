@@ -20,7 +20,7 @@
                 </div>
                 <address>
                     <?php if (!empty($card->getType())): ?>
-                        <img class="credit-card-type payment-icon" src="<?= $escaper->escapeUrl($block->getViewFileUrl('Magento_Payment::images/cc/' . strtolower((string)$card->getType()) . '.png')); ?>" alt="<?= $escaper->escapeHtmlAttr($block->getCcTypeLabel($card)); ?>" />
+                        <img class="credit-card-type payment-icon" src="<?= $escaper->escapeUrl($block->getCardIconUrl($card)); ?>" alt="<?= $escaper->escapeHtmlAttr($block->getCcTypeLabel($card)); ?>" />
                     <?php endif; ?>
                     <span><?= $escaper->escapeHtml($card->getLabel(empty($card->getType()))); ?></span>
                     <?php if (strtotime((string)$card->getExpires()) > time()): ?>

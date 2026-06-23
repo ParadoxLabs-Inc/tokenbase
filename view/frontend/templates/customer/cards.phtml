@@ -15,7 +15,7 @@
                 <fieldset class="box-address-billing payment-method-title fieldset<?php if ($card->getExpires() != '' && strtotime((string)$card->getExpires()) < time()): ?> expired<?php endif; ?>">
                     <legend class="box-title legend">
                         <?php if (!empty($card->getType())): ?>
-                            <img class="credit-card-type payment-icon" src="<?= $escaper->escapeUrl($block->getViewFileUrl('Magento_Payment::images/cc/' . strtolower((string)$card->getType()) . '.png')); ?>" alt="<?= $escaper->escapeHtmlAttr($block->getCcTypeLabel($card)); ?>" />
+                            <img class="credit-card-type payment-icon" src="<?= $escaper->escapeUrl($block->getCardIconUrl($card)); ?>" alt="<?= $escaper->escapeHtmlAttr($block->getCcTypeLabel($card)); ?>" />
                         <?php endif; ?>
                         <strong class="payment-icon">
                             <span>

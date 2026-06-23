@@ -126,4 +126,15 @@ class Cards extends Template
     {
         return $card->getType() ? $this->helper->translateCardType($card->getType()) : null;
     }
+
+    /**
+     * Get the brand icon URL for the given card, falling back to a generic card icon for unmapped types.
+     *
+     * @param Card $card
+     * @return string
+     */
+    public function getCardIconUrl(Card $card)
+    {
+        return $this->getViewFileUrl($this->helper->getCardTypeIconPath($card->getType()));
+    }
 }
