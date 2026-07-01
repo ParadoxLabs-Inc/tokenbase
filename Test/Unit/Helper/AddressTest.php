@@ -7,6 +7,7 @@ namespace ParadoxLabs\TokenBase\Test\Unit\Helper;
 use Exception;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Customer\Block\Address\Renderer\RendererInterface;
+use Magento\Customer\Model\Address as CustomerAddressModel;
 use Magento\Customer\Model\Address\Config\Reader;
 use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Api\Data\AddressInterface;
@@ -250,9 +251,12 @@ class AddressTest extends TestCase
     {
         $addressData = $this->createMock(AddressInterface::class);
 
-        $addressModel = $this->getMockBuilder(AddressModelInterface::class)
-            ->addMethods(['getDataModel'])
-            ->getMockForAbstractClass();
+        // getDataModel() is declared on the concrete Address model, not on AddressModelInterface,
+        // so it must be mocked via the concrete class (onlyMethods requires a declared method).
+        $addressModel = $this->getMockBuilder(CustomerAddressModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getDataModel'])
+            ->getMock();
 
         $addressModel->expects($this->once())
             ->method('getDataModel')
@@ -274,10 +278,13 @@ class AddressTest extends TestCase
     {
         $region = $this->getMockBuilder(Region::class)
             ->disableOriginalConstructor()
-            ->addMethods(['getCode', 'getDefaultName'])
+            ->onlyMethods(['getData'])
             ->getMock();
-        $region->method('getCode')->willReturn('CA');
-        $region->method('getDefaultName')->willReturn('California');
+        // getCode() and getDefaultName() are magic; they route through DataObject::__call to getData().
+        $region->method('getData')->willReturnMap([
+            ['code', null, 'CA'],
+            ['default_name', null, 'California'],
+        ]);
 
         $this->regionFactory->method('create')->willReturn($region);
 
@@ -299,11 +306,13 @@ class AddressTest extends TestCase
     {
         $region = $this->getMockBuilder(Region::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['getId'])
-            ->addMethods(['getDefaultName'])
+            ->onlyMethods(['getId', 'getData'])
             ->getMock();
         $region->method('getId')->willReturn(12);
-        $region->method('getDefaultName')->willReturn('California');
+        // getDefaultName() is magic; it routes through DataObject::__call to getData().
+        $region->method('getData')->willReturnMap([
+            ['default_name', null, 'California'],
+        ]);
 
         $this->regionFactory->method('create')->willReturn($region);
 
@@ -325,11 +334,13 @@ class AddressTest extends TestCase
     {
         $region = $this->getMockBuilder(Region::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['getId'])
-            ->addMethods(['getDefaultName'])
+            ->onlyMethods(['getId', 'getData'])
             ->getMock();
         $region->method('getId')->willReturn(12);
-        $region->method('getDefaultName')->willReturn('California');
+        // getDefaultName() is magic; it routes through DataObject::__call to getData().
+        $region->method('getData')->willReturnMap([
+            ['default_name', null, 'California'],
+        ]);
 
         $this->regionFactory->method('create')->willReturn($region);
 

@@ -12,6 +12,7 @@ use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
 use Magento\Payment\Model\Info;
 use ParadoxLabs\TokenBase\Gateway\Validator\CreditCard;
 use ParadoxLabs\TokenBase\Gateway\Validator\CreditCard\Types;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -49,6 +50,7 @@ class CreditCardTest extends TestCase
     /**
      * @dataProvider validLuhnNumbersProvider
      */
+    #[DataProvider('validLuhnNumbersProvider')]
     public function testIsCcNumberMod10ValidReturnsTrueForValidNumbers(string $ccNumber): void
     {
         $this->assertTrue($this->validator->isCcNumberMod10Valid($ccNumber));
@@ -69,6 +71,7 @@ class CreditCardTest extends TestCase
     /**
      * @dataProvider invalidLuhnNumbersProvider
      */
+    #[DataProvider('invalidLuhnNumbersProvider')]
     public function testIsCcNumberMod10ValidReturnsFalseForInvalidNumbers(string $ccNumber): void
     {
         $this->assertFalse($this->validator->isCcNumberMod10Valid($ccNumber));

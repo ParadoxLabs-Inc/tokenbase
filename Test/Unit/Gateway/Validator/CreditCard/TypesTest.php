@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ParadoxLabs\TokenBase\Test\Unit\Gateway\Validator\CreditCard;
 
 use ParadoxLabs\TokenBase\Gateway\Validator\CreditCard\Types;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -22,6 +23,7 @@ class TypesTest extends TestCase
     /**
      * @dataProvider visaCardNumbersProvider
      */
+    #[DataProvider('visaCardNumbersProvider')]
     public function testDetectsVisaCards(string $cardNumber): void
     {
         $result = $this->types->getTypeForCard($cardNumber);
@@ -46,6 +48,7 @@ class TypesTest extends TestCase
     /**
      * @dataProvider masterCardNumbersProvider
      */
+    #[DataProvider('masterCardNumbersProvider')]
     public function testDetectsMasterCardCards(string $cardNumber): void
     {
         $result = $this->types->getTypeForCard($cardNumber);
@@ -73,6 +76,7 @@ class TypesTest extends TestCase
     /**
      * @dataProvider amexCardNumbersProvider
      */
+    #[DataProvider('amexCardNumbersProvider')]
     public function testDetectsAmexCards(string $cardNumber): void
     {
         $result = $this->types->getTypeForCard($cardNumber);
@@ -95,6 +99,7 @@ class TypesTest extends TestCase
     /**
      * @dataProvider discoverCardNumbersProvider
      */
+    #[DataProvider('discoverCardNumbersProvider')]
     public function testDetectsDiscoverCards(string $cardNumber): void
     {
         $result = $this->types->getTypeForCard($cardNumber);
@@ -119,6 +124,7 @@ class TypesTest extends TestCase
     /**
      * @dataProvider jcbCardNumbersProvider
      */
+    #[DataProvider('jcbCardNumbersProvider')]
     public function testDetectsJcbCards(string $cardNumber): void
     {
         $result = $this->types->getTypeForCard($cardNumber);
@@ -140,6 +146,7 @@ class TypesTest extends TestCase
     /**
      * @dataProvider dinersCardNumbersProvider
      */
+    #[DataProvider('dinersCardNumbersProvider')]
     public function testDetectsDinersCards(string $cardNumber): void
     {
         $result = $this->types->getTypeForCard($cardNumber);
@@ -163,6 +170,7 @@ class TypesTest extends TestCase
     /**
      * @dataProvider unionPayCardNumbersProvider
      */
+    #[DataProvider('unionPayCardNumbersProvider')]
     public function testDetectsUnionPayCards(string $cardNumber): void
     {
         $result = $this->types->getTypeForCard($cardNumber);

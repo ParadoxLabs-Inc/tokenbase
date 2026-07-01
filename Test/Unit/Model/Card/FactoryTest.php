@@ -119,16 +119,21 @@ class FactoryTest extends TestCase
 
     public function testGetTypeInstanceCreatesNewTypeInstance(): void
     {
-        $originalCard = $this->getMockBuilder(CardInterface::class)
-            ->addMethods(['getData', 'getOrigData'])
-            ->getMockForAbstractClass();
+        // getData()/getOrigData()/setData()/setOrigData() are declared on the concrete Card
+        // model (via AbstractModel/DataObject), not on CardInterface, so they must be mocked
+        // via the concrete class (onlyMethods requires a declared method).
+        $originalCard = $this->getMockBuilder(Card::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getMethod', 'getData', 'getOrigData'])
+            ->getMock();
         $originalCard->method('getMethod')->willReturn('authnetcim');
         $originalCard->method('getData')->willReturn(['customer_id' => 123]);
         $originalCard->method('getOrigData')->willReturn(['customer_id' => 123]);
 
-        $typeInstance = $this->getMockBuilder(CardInterface::class)
-            ->addMethods(['setData', 'setOrigData'])
-            ->getMockForAbstractClass();
+        $typeInstance = $this->getMockBuilder(Card::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['setData', 'setOrigData'])
+            ->getMock();
         $typeInstance->expects($this->once())
             ->method('setData')
             ->with(['customer_id' => 123]);
