@@ -116,7 +116,6 @@ class BeforeSaveTest extends TestCase
     {
         $reflection = new ReflectionClass(ObjectManager::class);
         $property = $reflection->getProperty('_instance');
-        $property->setAccessible(true);
         $property->setValue(null, null);
     }
 
@@ -376,7 +375,6 @@ class BeforeSaveTest extends TestCase
         // Access protected method via reflection
         $reflection = new ReflectionClass($this->card);
         $method = $reflection->getMethod('cleanAdditionalData');
-        $method->setAccessible(true);
         $method->invoke($this->card);
 
         $additional = $this->card->getAdditional();

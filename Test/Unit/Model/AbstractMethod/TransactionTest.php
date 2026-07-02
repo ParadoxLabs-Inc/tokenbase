@@ -78,7 +78,6 @@ class TransactionTest extends TestCase
 
         $reflection = new ReflectionClass($this->method);
         $getValidTxnMethod = $reflection->getMethod('getValidTransactionId');
-        $getValidTxnMethod->setAccessible(true);
 
         $result = $getValidTxnMethod->invoke($this->method, $payment, 'txn123');
 
@@ -105,7 +104,6 @@ class TransactionTest extends TestCase
 
         $reflection = new ReflectionClass($this->method);
         $getValidTxnMethod = $reflection->getMethod('getValidTransactionId');
-        $getValidTxnMethod->setAccessible(true);
 
         $result = $getValidTxnMethod->invoke($this->method, $payment, 'txn123');
 
@@ -132,7 +130,6 @@ class TransactionTest extends TestCase
 
         $reflection = new ReflectionClass($this->method);
         $getValidTxnMethod = $reflection->getMethod('getValidTransactionId');
-        $getValidTxnMethod->setAccessible(true);
 
         $result = $getValidTxnMethod->invoke($this->method, $payment, 'txn123');
 
@@ -151,7 +148,6 @@ class TransactionTest extends TestCase
 
         $reflection = new ReflectionClass($this->method);
         $resyncMethod = $reflection->getMethod('resyncStoredCard');
-        $resyncMethod->setAccessible(true);
 
         $result = $resyncMethod->invoke($this->method, $payment);
 
@@ -171,7 +167,6 @@ class TransactionTest extends TestCase
 
         $reflection = new ReflectionClass($this->method);
         $resyncMethod = $reflection->getMethod('resyncStoredCard');
-        $resyncMethod->setAccessible(true);
 
         $result = $resyncMethod->invoke($this->method, $payment);
 
@@ -201,7 +196,6 @@ class TransactionTest extends TestCase
 
         $reflection = new ReflectionClass($this->method);
         $resyncMethod = $reflection->getMethod('resyncStoredCard');
-        $resyncMethod->setAccessible(true);
 
         $resyncMethod->invoke($this->method, $payment);
     }
@@ -259,7 +253,6 @@ class TransactionTest extends TestCase
 
         $reflection = new ReflectionClass($this->method);
         $resyncMethod = $reflection->getMethod('resyncStoredCard');
-        $resyncMethod->setAccessible(true);
 
         $resyncMethod->invoke($this->method, $payment);
     }
@@ -304,7 +297,6 @@ class TransactionTest extends TestCase
 
         $reflection = new ReflectionClass($this->method);
         $resyncMethod = $reflection->getMethod('resyncStoredCard');
-        $resyncMethod->setAccessible(true);
 
         $resyncMethod->invoke($this->method, $payment);
     }
@@ -337,7 +329,6 @@ class TransactionTest extends TestCase
 
         $reflection = new ReflectionClass($this->method);
         $resyncMethod = $reflection->getMethod('resyncStoredCard');
-        $resyncMethod->setAccessible(true);
 
         $resyncMethod->invoke($this->method, $payment);
     }
@@ -409,7 +400,6 @@ class TransactionTest extends TestCase
 
             $reflection = new ReflectionClass($methodInstance);
             $resyncMethod = $reflection->getMethod('resyncStoredCard');
-            $resyncMethod->setAccessible(true);
 
             // Should detect change and save
             $resyncMethod->invoke($methodInstance, $payment);

@@ -190,7 +190,6 @@ class CardLoadingTest extends TestCase
         // Set card via reflection
         $reflection = new ReflectionClass($this->method);
         $property = $reflection->getProperty('card');
-        $property->setAccessible(true);
         $property->setValue($this->method, $card);
 
         $payment = $this->createOrderPaymentMock(456);
@@ -198,7 +197,6 @@ class CardLoadingTest extends TestCase
 
         // Access protected method
         $loadOrCreateMethod = $reflection->getMethod('loadOrCreateCard');
-        $loadOrCreateMethod->setAccessible(true);
 
         $result = $loadOrCreateMethod->invoke($this->method, $payment);
 
@@ -226,7 +224,6 @@ class CardLoadingTest extends TestCase
 
         $reflection = new ReflectionClass($this->method);
         $loadOrCreateMethod = $reflection->getMethod('loadOrCreateCard');
-        $loadOrCreateMethod->setAccessible(true);
 
         $result = $loadOrCreateMethod->invoke($this->method, $payment);
 
@@ -256,7 +253,6 @@ class CardLoadingTest extends TestCase
 
         $reflection = new ReflectionClass($this->method);
         $loadOrCreateMethod = $reflection->getMethod('loadOrCreateCard');
-        $loadOrCreateMethod->setAccessible(true);
 
         $result = $loadOrCreateMethod->invoke($this->method, $payment);
 
@@ -275,7 +271,6 @@ class CardLoadingTest extends TestCase
 
         $reflection = new ReflectionClass($this->method);
         $method = $reflection->getMethod('paymentContainsCard');
-        $method->setAccessible(true);
 
         $result = $method->invoke($this->method, $payment);
 
@@ -294,7 +289,6 @@ class CardLoadingTest extends TestCase
 
         $reflection = new ReflectionClass($this->method);
         $method = $reflection->getMethod('paymentContainsCard');
-        $method->setAccessible(true);
 
         $result = $method->invoke($this->method, $payment);
 
@@ -313,7 +307,6 @@ class CardLoadingTest extends TestCase
 
         $reflection = new ReflectionClass($this->method);
         $method = $reflection->getMethod('paymentContainsCard');
-        $method->setAccessible(true);
 
         $result = $method->invoke($this->method, $payment);
 
@@ -332,7 +325,6 @@ class CardLoadingTest extends TestCase
 
         $reflection = new ReflectionClass($this->method);
         $method = $reflection->getMethod('paymentContainsCard');
-        $method->setAccessible(true);
 
         $result = $method->invoke($this->method, $payment);
 
@@ -362,7 +354,6 @@ class CardLoadingTest extends TestCase
 
         $reflection = new ReflectionClass($this->method);
         $loadOrCreateMethod = $reflection->getMethod('loadOrCreateCard');
-        $loadOrCreateMethod->setAccessible(true);
 
         $this->expectException(CommandException::class);
         $this->expectExceptionMessage('Invalid payment data provided');
