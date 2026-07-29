@@ -21,6 +21,7 @@
 
 namespace ParadoxLabs\TokenBase\Observer;
 
+use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Payment;
 use Magento\Framework\DataObject;
 use Magento\Framework\Event\Observer;
@@ -29,7 +30,9 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\StateException;
 use Magento\Payment\Model\InfoInterface;
 use Magento\Payment\Model\MethodInterface;
+use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Api\Data\PaymentExtensionInterface;
+use Magento\Quote\Model\Quote\Payment as QuotePayment;
 use Magento\Sales\Api\Data\OrderPaymentExtensionInterface;
 use ParadoxLabs\TokenBase\Api\CardRepositoryInterface;
 use ParadoxLabs\TokenBase\Api\Data\CardInterface;
@@ -185,8 +188,61 @@ class PaymentMethodAssignDataObserver implements ObserverInterface
         }
 
         if ($data->hasData('save')) {
-            $payment->setAdditionalInformation('save', (int)$data->getData('save'));
+            $payment->setAdditionalInformation('save', $this->getSaveValue($payment, $data, $method));
         }
+    }
+
+    /**
+     * Get the 'save this card' value to store, honoring forced-save configuration.
+     *
+     * With allow_unsaved off, the customer has no say: the card must be stored. The savecard_opt_out setting
+     * that checkout renderers derive their default from is hidden (and arbitrary) in that mode, so checkout
+     * can submit save=0 anyway. Storing that would deactivate the card on import, hiding the card the
+     * customer just saved from their stored cards everywhere.
+     *
+     * Guests cannot vault, so their cards stay inactive until the account is created
+     * (see ConvertGuestToCustomerObserver); forcing save for them would change that behavior.
+     *
+     * @param InfoInterface $payment
+     * @param DataObject $data
+     * @param MethodInterface $method
+     * @return int
+     */
+    protected function getSaveValue(InfoInterface $payment, DataObject $data, MethodInterface $method)
+    {
+        $save = (int)$data->getData('save');
+
+        if ($save === 0
+            && (int)$method->getConfigData('allow_unsaved') === 0
+            && $this->getPaymentCustomerId($payment) > 0) {
+            $this->helper->log(
+                (string)$payment->getMethod(),
+                'assignData: forcing save=1; allow_unsaved is off for this method.'
+            );
+
+            return 1;
+        }
+
+        return $save;
+    }
+
+    /**
+     * Get the customer ID owning the given payment's quote or order, if any.
+     *
+     * @param InfoInterface $payment
+     * @return int
+     */
+    protected function getPaymentCustomerId(InfoInterface $payment)
+    {
+        if ($payment instanceof QuotePayment && $payment->getQuote() instanceof CartInterface) {
+            return (int)$payment->getQuote()->getCustomerId();
+        }
+
+        if ($payment instanceof Payment && $payment->getOrder() instanceof Order) {
+            return (int)$payment->getOrder()->getCustomerId();
+        }
+
+        return 0;
     }
 
     /**

@@ -85,6 +85,12 @@ define(
                         'creditCardNumberFormatted'
                     ]);
 
+                if (this.canSaveCard && this.forceSaveCard) {
+                    // Saving is forced (allow_unsaved off), so the option is hidden. The default is derived
+                    // from savecard_opt_out, which does not apply in this mode -- make sure we still save.
+                    this.save(true);
+                }
+
                 this.placeOrderFailure = ko.observable(false);
                 this.placeOrderAllowedFlag = ko.observable(true);
 
