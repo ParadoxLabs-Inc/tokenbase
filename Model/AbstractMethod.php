@@ -21,6 +21,7 @@
 
 namespace ParadoxLabs\TokenBase\Model;
 
+use Exception;
 use Magento\Payment\Model\Info;
 use ParadoxLabs\TokenBase\Api\GatewayInterface;
 use Magento\Sales\Model\Order\Creditmemo;
@@ -30,6 +31,7 @@ use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Model\Address\AddressModelInterface;
 use Magento\Framework\App\ScopeInterface;
 use Magento\Framework\DataObject;
+use Magento\Framework\Exception\PaymentException;
 use Magento\Framework\Exception\StateException;
 use Magento\Framework\Registry;
 use Magento\Payment\Gateway\Command\CommandException;
@@ -47,6 +49,7 @@ use ParadoxLabs\TokenBase\Api\CardRepositoryInterface;
 use ParadoxLabs\TokenBase\Api\Data\CardInterface;
 use ParadoxLabs\TokenBase\Api\Data\CardInterfaceFactory;
 use ParadoxLabs\TokenBase\Api\MethodInterface;
+use ParadoxLabs\TokenBase\Exception\VoidNotNeededException;
 use ParadoxLabs\TokenBase\Helper\Address;
 use ParadoxLabs\TokenBase\Helper\Data;
 use ParadoxLabs\TokenBase\Model\Gateway\Response;
@@ -633,6 +636,40 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
 
         $this->log(sprintf('void(%s %s)', $payment::class, $payment->getId()));
 
+        return $this->processVoid($payment, true);
+    }
+
+    /**
+     * Cancel a payment
+     *
+     * @param InfoInterface $payment
+     * @return $this
+     */
+    public function cancel(InfoInterface $payment)
+    {
+        /** @var OrderPayment $payment */
+
+        $this->log(sprintf('cancel(%s %s)', $payment::class, $payment->getId()));
+
+        /**
+         * Order cancellation must not be blocked by a gateway error, so failures are reported on the order
+         * rather than thrown. See processVoid().
+         */
+        return $this->processVoid($payment, false);
+    }
+
+    /**
+     * Run a void/reversal for the given payment, and record the outcome.
+     *
+     * @param InfoInterface $payment
+     * @param bool $throwOnFailure Whether to throw on an unexpected gateway failure, or only report it.
+     * @return $this
+     * @throws PaymentException
+     */
+    protected function processVoid(InfoInterface $payment, bool $throwOnFailure)
+    {
+        /** @var OrderPayment $payment */
+
         try {
             $this->loadOrCreateCard($payment);
 
@@ -675,34 +712,87 @@ abstract class AbstractMethod extends DataObject implements MethodInterface
             $this->log(json_encode($response->getData()));
         } catch (Throwable $exception) {
             $this->log($exception->getMessage());
-            // Ignore void errors, let Magento proceed like it happened. Most likely the auth already expired.
+
+            if ($this->isExpectedVoidFailure($exception) !== true) {
+                return $this->handleFailedVoid($payment, $exception, $throwOnFailure);
+            }
+
+            /**
+             * Expected no-op: the authorization is already expired, reversed, or gone. Nothing was reversed,
+             * but nothing needed to be, so let Magento proceed like the void happened.
+             */
         }
 
         $payment->setShouldCloseParentTransaction(1)
                 ->setIsTransactionClosed(true);
 
-        if ($this->getCard() instanceof CardInterface) {
-            $this->getCard()->updateLastUse();
-            $this->getCard()->setData('no_sync', true);
-            $this->card = $this->cardRepository->save($this->getCard());
-        }
+        $this->updateCardAfterVoid();
 
         return $this;
     }
 
     /**
-     * Cancel a payment
+     * Handle a void that the gateway rejected for reasons we cannot treat as a no-op.
      *
-     * @param InfoInterface $payment
+     * Nothing was reversed at the processor, so the transaction must not be closed as if it had been.
+     *
+     * @param OrderPayment $payment
+     * @param Throwable $exception
+     * @param bool $throwOnFailure
      * @return $this
+     * @throws PaymentException
      */
-    public function cancel(InfoInterface $payment)
+    protected function handleFailedVoid(OrderPayment $payment, Throwable $exception, bool $throwOnFailure)
     {
-        /** @var OrderPayment $payment */
+        $payment->setShouldCloseParentTransaction(0)
+                ->setIsTransactionClosed(false);
 
-        $this->log(sprintf('cancel(%s %s)', $payment::class, $payment->getId()));
+        $this->updateCardAfterVoid();
 
-        return $this->void($payment);
+        $message = __(
+            'Unable to void payment: %1 The authorization may still be open at the payment gateway.',
+            $exception->getMessage()
+        );
+
+        if ($throwOnFailure === true) {
+            throw new PaymentException($message, $exception instanceof Exception ? $exception : null);
+        }
+
+        /**
+         * Record the failure on the order rather than throwing, so order cancellation can still complete.
+         */
+        $existingMessage = $payment->hasMessage() ? (string)$payment->getMessage() . ' ' : '';
+        $payment->setMessage($existingMessage . $message);
+
+        return $this;
+    }
+
+    /**
+     * Determine whether the given void failure can be treated as a successful no-op.
+     *
+     * The base method cannot know gateway-specific error codes, so it only recognizes gateways explicitly
+     * saying so. Gateways should override this to classify their own expired/not-found responses.
+     *
+     * @param Throwable $exception
+     * @return bool
+     */
+    protected function isExpectedVoidFailure(Throwable $exception)
+    {
+        return $exception instanceof VoidNotNeededException;
+    }
+
+    /**
+     * Touch the card after a void attempt, if we have one.
+     *
+     * @return void
+     */
+    protected function updateCardAfterVoid()
+    {
+        if ($this->getCard() instanceof CardInterface) {
+            $this->getCard()->updateLastUse();
+            $this->getCard()->setData('no_sync', true);
+            $this->card = $this->cardRepository->save($this->getCard());
+        }
     }
 
     /**
