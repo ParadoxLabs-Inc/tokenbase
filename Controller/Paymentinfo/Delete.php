@@ -90,10 +90,11 @@ class Delete extends Paymentinfo
      */
     public function execute()
     {
-        $id         = $this->getRequest()->getParam('id');
-        $method     = $this->getRequest()->getParam('method');
-        $isAjax     = $this->getRequest()->isAjax();
-        $resultData = ['success' => false];
+        $id           = $this->getRequest()->getParam('id');
+        $method       = $this->getRequest()->getParam('method');
+        $isAjax       = $this->getRequest()->isAjax();
+        $resultData   = ['success' => false];
+        $errorMessage = null;
 
         if ($this->formKeyIsValid() === true && $this->methodIsValid() === true && !empty($id)) {
             try {
@@ -112,14 +113,27 @@ class Delete extends Paymentinfo
                         $this->messageManager->addSuccessMessage((string)__('Payment record deleted.'));
                     }
                 } else {
-                    $this->messageManager->addErrorMessage((string)__('Invalid Request.'));
+                    $errorMessage = (string)__('Invalid Request.');
                 }
             } catch (Throwable $e) {
                 $this->helper->log($method, (string)$e);
-                $this->messageManager->addErrorMessage($e->getMessage());
+                $errorMessage = $e->getMessage();
             }
         } else {
-            $this->messageManager->addErrorMessage((string)__('Invalid Request.'));
+            $errorMessage = (string)__('Invalid Request.');
+        }
+
+        if ($errorMessage !== null) {
+            /**
+             * On AJAX, hand the reason back to the caller so it can be shown in place. Adding it to the message
+             * queue instead would only surface on the next page load, which is why deletion failures used to
+             * look like a blind page reload.
+             */
+            if ($isAjax) {
+                $resultData['message'] = $errorMessage;
+            } else {
+                $this->messageManager->addErrorMessage($errorMessage);
+            }
         }
 
         if ($isAjax) {

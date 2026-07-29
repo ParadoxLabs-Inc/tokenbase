@@ -32,7 +32,7 @@
                         </address>
                         <div class="item actions box-actions">
                             <?php if ($card->isInUse()): ?>
-                                <abbr title="<?= $escaper->escapeHtmlAttr(__('This payment record cannot be modified while associated with pending orders.')); ?>"><?= $escaper->escapeHtml(__('Card In Use')); ?></abbr>
+                                <abbr title="<?= $escaper->escapeHtmlAttr(__('This payment record cannot be modified while it is in use.')); ?>"><?= $escaper->escapeHtml(__('Card In Use')); ?></abbr>
                             <?php else: ?>
                                 <a class="action edit" href="<?= $escaper->escapeUrl($block->getUrl('*/*', ['_secure' => true, 'form_key' => $block->getFormKey(), 'method' => $card->getMethod(), 'id' => $card->getHash()])) ?>"><span><?= $escaper->escapeHtml(__('Edit')) ?></span></a>
                                 <a class="action delete" href="<?= $escaper->escapeUrl($block->getUrl('*/*/delete', ['_secure' => true, 'form_key' => $block->getFormKey(), 'method' => $card->getMethod(), 'id' => $card->getHash()])) ?>"><span><?= $escaper->escapeHtml(__('Delete')) ?></span></a>

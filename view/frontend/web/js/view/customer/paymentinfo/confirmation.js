@@ -20,13 +20,15 @@
 /*jshint jquery:true*/
 define([
     "jquery",
-    'Magento_Ui/js/modal/confirm'
-], function ($, confirmation) {
+    'Magento_Ui/js/modal/confirm',
+    'Magento_Ui/js/modal/alert'
+], function ($, confirmation, alert) {
     $.widget('mage.tokenbaseConfirmation', {
         options: {
             deleteSelector: '.action.delete',
             confirmTitle: 'Delete payment option',
-            confirmMessage: 'Are you sure you want to remove this card?'
+            confirmMessage: 'Are you sure you want to remove this card?',
+            errorTitle: 'Unable to delete payment option'
         },
 
         _create: function () {
@@ -80,9 +82,22 @@ define([
         handleDeleteResponse: function (item, data) {
             if (data.success) {
                 item.remove();
-            } else {
-                location.assign(location.href);
+
+                return;
             }
+
+            if (data.message) {
+                // Show why the card could not be removed (in use by a subscription, etc).
+                alert({
+                    title: $.mage.__(this.options.errorTitle),
+                    content: data.message
+                });
+
+                return;
+            }
+
+            // No reason given: fall back to reloading so any queued message is displayed.
+            location.assign(location.href);
         },
 
         /**
