@@ -90,6 +90,13 @@
                 type="ParadoxLabs\TokenBase\Plugin\Sales\Model\Order\Payment\Transaction\Repository\Plugin"/>
     </type>
 
+    <!-- Fix a core bug: 2.4.8 makes an order's authorization its own parent, and close() then recurses
+         on itself until the process runs out of memory. See the plugin docblock. -->
+    <type name="Magento\Sales\Model\Order\Payment\Transaction">
+        <plugin name="tokenbaseTransactionSelfParentGuard"
+                type="ParadoxLabs\TokenBase\Plugin\Sales\Model\Order\Payment\Transaction\SelfParentGuard"/>
+    </type>
+
     <!-- Payment validation (because core borked it 2.3.5-2.4.2+) -->
     <type name="ParadoxLabs\TokenBase\Api\Data\CardInterface">
         <plugin name="tokenbase_validate_payment" type="ParadoxLabs\TokenBase\Plugin\ValidateCardSave"/>
