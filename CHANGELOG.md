@@ -1,5 +1,13 @@
 # ParadoxLabs_TokenBase Changelog
 
+## 5.1.0 - Aug 12, 2026
+- Added a generic card icon fallback for card types Magento_Payment ships no brand image for (wallet types such as Stripe 'link', and OT/DC), which previously rendered a broken image.
+- Changed stored card deletion to show why a delete was refused (e.g. a subscription still using the card) instead of reloading the page.
+- Changed the unit test suite to run on PHPUnit 9.6–12.
+- Fixed checkout being able to un-save a card when 'Allow customers to not save' is off, which hid the just-saved card from the customer's stored cards.
+- Fixed failed voids being reported as successful and closing the transaction with nothing reversed at the processor.
+- Fixed Magento 2.4.8 self-parenting order transactions causing unbounded recursion (out of memory) on capture, void, or refund.
+
 ## 5.0.0 - Jun 17, 2026: PHP 8.1–8.5 compatibility
 
 **WARNING: PHP 8.1 is now the minimum. `AbstractGateway::__construct` no longer takes
