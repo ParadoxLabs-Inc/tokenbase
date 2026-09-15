@@ -111,7 +111,7 @@ class PaymentMethodAssignDataObserver implements ObserverInterface
                 || $paymentAttributes instanceof OrderPaymentExtensionInterface) {
                 $paymentAttributes->setTokenbaseId(null);
             }
-        } elseif ($payment->getData('tokenbase_id') === null) {
+        } elseif ($payment->getData('tokenbase_id') === null && !$this->isReimportedPaymentData($data)) {
             // If the card number and id are both not set, ensure additional data is also removed/set correctly.
             $payment->setData('cc_last_4', null);
             $payment->setData('cc_number', null);
@@ -126,9 +126,24 @@ class PaymentMethodAssignDataObserver implements ObserverInterface
         $payment->setData('cc_ss_start_month', $data->getData('cc_ss_start_month'));
         $payment->setData('cc_ss_start_year', $data->getData('cc_ss_start_year'));
 
-        if ($method->getConfigData('can_store_bin') == 1) {
+        if ($method->getConfigData('can_store_bin') == 1 && !$this->isReimportedPaymentData($data)) {
             $payment->setAdditionalInformation('cc_bin', substr((string) $ccNumber, 0, 6));
         }
+    }
+
+    /**
+     * Whether the data is the payment's own state fed back through importData(), rather than a new assignment.
+     *
+     * QuoteManagement::placeOrder() re-imports $payment->getData() when given a payment (GraphQL placeOrder,
+     * Hyvä checkout). Client input never carries additional_information; only that round-trip does. On a
+     * re-import there is no new card input, so a new card's last4/bin must be kept rather than cleared.
+     *
+     * @param DataObject $data
+     * @return bool
+     */
+    protected function isReimportedPaymentData(DataObject $data): bool
+    {
+        return is_array($data->getData('additional_information'));
     }
 
     /**
