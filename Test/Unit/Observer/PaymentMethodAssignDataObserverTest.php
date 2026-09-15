@@ -18,7 +18,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Unit tests for the payment assignData observer's 'save this card' handling
+ * Unit tests for the payment assignData observer's 'save this card' and re-imported-data handling
  */
 class PaymentMethodAssignDataObserverTest extends TestCase
 {
@@ -117,6 +117,50 @@ class PaymentMethodAssignDataObserverTest extends TestCase
     }
 
     /**
+     * QuoteManagement::placeOrder() re-imports the payment's own data (GraphQL placeOrder). With no new card
+     * input on that re-import, a new card's last4 and bin must survive it.
+     *
+     * @return void
+     */
+    public function testReimportedDataKeepsNewCardLast4AndBin(): void
+    {
+        $payment = $this->createQuotePayment(5);
+        $payment->setData('cc_last_4', '1111');
+        $payment->setData('cc_type', 'VI');
+        $payment->setAdditionalInformation('acceptjs_key', 'COMMON.ACCEPT.INAPP.PAYMENT');
+        $payment->setAdditionalInformation('acceptjs_value', 'nonce');
+        $payment->setAdditionalInformation('cc_bin', '411111');
+
+        $reimport = $payment->getData();
+        unset($reimport['quote']);
+
+        $this->observer->execute($this->createObserver($payment, $reimport, '1', ['can_store_bin' => '1']));
+
+        $this->assertSame('1111', $payment->getData('cc_last_4'));
+        $this->assertSame('VI', $payment->getData('cc_type'));
+        $this->assertSame('411111', $payment->getAdditionalInformation('cc_bin'));
+        $this->assertSame('nonce', $payment->getAdditionalInformation('acceptjs_value'));
+        $this->assertNull($payment->getData('tokenbase_id'));
+    }
+
+    /**
+     * A genuine assignment with neither card number nor card ID still clears a stale new-card last4.
+     *
+     * @return void
+     */
+    public function testEmptyAssignmentClearsNewCardLast4(): void
+    {
+        $payment = $this->createQuotePayment(5);
+        $payment->setData('cc_last_4', '1111');
+        $payment->setAdditionalInformation('cc_bin', '411111');
+
+        $this->observer->execute($this->createObserver($payment, [], '1', ['can_store_bin' => '1']));
+
+        $this->assertNull($payment->getData('cc_last_4'));
+        $this->assertSame('', $payment->getAdditionalInformation('cc_bin'));
+    }
+
+    /**
      * Build a quote payment owned by the given customer (null for a guest).
      *
      * @param int|null $customerId
@@ -147,15 +191,18 @@ class PaymentMethodAssignDataObserverTest extends TestCase
      * @param object $payment
      * @param array $data
      * @param string $allowUnsaved
+     * @param array $config
      * @return Observer
      */
-    private function createObserver($payment, array $data, string $allowUnsaved): Observer
+    private function createObserver($payment, array $data, string $allowUnsaved, array $config = []): Observer
     {
+        $config['allow_unsaved'] = $allowUnsaved;
+
         $method = $this->createMock(MethodInterface::class);
         $method->method('getConfigData')
             ->willReturnCallback(
-                static function ($field) use ($allowUnsaved) {
-                    return $field === 'allow_unsaved' ? $allowUnsaved : null;
+                static function ($field) use ($config) {
+                    return $config[$field] ?? null;
                 }
             );
 
