@@ -1,7 +1,7 @@
 # ParadoxLabs_TokenBase Changelog
 
-## Unreleased
-- Fixed the GraphQL placeOrder mutation clearing a new card's last4 (and BIN) from the order and stored card, because Magento re-imports the payment's own data during placement and it was treated as an empty card assignment.
+## 5.1.1 - Sep 15, 2026
+- Fixed the GraphQL placeOrder mutation clearing a new card's last4 and BIN from the order and the stored card, because Magento's payment re-import during order placement was treated as an empty card assignment.
 
 ## 5.1.0 - Aug 12, 2026
 - Added a generic card icon fallback for card types Magento_Payment ships no brand image for (wallet types such as Stripe 'link', and OT/DC), which previously rendered a broken image.
