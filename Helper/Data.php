@@ -52,6 +52,7 @@ use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Store\Model\WebsiteFactory;
+use Magento\Store\Model\ResourceModel\Website as WebsiteResource;
 use ParadoxLabs\TokenBase\Helper\Address as AddressHelper;
 use ParadoxLabs\TokenBase\Helper\Operation as OperationHelper;
 use ParadoxLabs\TokenBase\Model\CardFactory;
@@ -124,6 +125,7 @@ class Data extends \Magento\Payment\Helper\Data
      * @param \ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory $cardCollectionFactory
      * @param AddressHelper $addressHelper *Proxy
      * @param OperationHelper $operationHelper
+     * @param WebsiteResource $websiteResource
      */
     public function __construct(
         Context $context,
@@ -146,7 +148,8 @@ class Data extends \Magento\Payment\Helper\Data
         protected readonly CardFactory $cardFactory,
         protected readonly CollectionFactory $cardCollectionFactory,
         protected readonly AddressHelper $addressHelper,
-        protected readonly OperationHelper $operationHelper
+        protected readonly OperationHelper $operationHelper,
+        protected readonly WebsiteResource $websiteResource
     ) {
         parent::__construct(
             $context,
@@ -246,7 +249,8 @@ class Data extends \Magento\Payment\Helper\Data
                     /** @var Website $website */
                     $websiteId = $this->registry->registry('current_customer')->getWebsiteId();
                     $website   = $this->websiteFactory->create();
-                    $store     = $website->load($websiteId)->getDefaultStore();
+                    $this->websiteResource->load($website, $websiteId, is_numeric($websiteId) ? null : 'code');
+                    $store = $website->getDefaultStore();
 
                     if ($store instanceof Store) {
                         $storeId = $store->getId();

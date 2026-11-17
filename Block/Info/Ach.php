@@ -78,9 +78,9 @@ class Ach extends Cc
             /** @var Template $childBlock */
             $childBlock = $this->getLayout()->createBlock(
                 Template::class,
-                $this->getNameInLayout() . '.multiship'
+                $this->getNameInLayout() . '.multiship',
+                ['data' => ['template' => 'ParadoxLabs_TokenBase::info/ach.phtml']]
             );
-            $childBlock->setTemplate('ParadoxLabs_TokenBase::info/ach.phtml');
             $childBlock->setData('method', $this->getMethod());
 
             $this->setChild(
