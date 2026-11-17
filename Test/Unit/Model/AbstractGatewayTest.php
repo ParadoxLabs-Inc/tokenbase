@@ -8,6 +8,7 @@ use Magento\Framework\HTTP\ClientInterfaceFactory;
 use Magento\Payment\Gateway\Command\CommandException;
 use ParadoxLabs\TokenBase\Api\Data\CardInterface;
 use ParadoxLabs\TokenBase\Helper\Data;
+use ParadoxLabs\TokenBase\Model\AbstractGateway;
 use ParadoxLabs\TokenBase\Model\Gateway\ResponseFactory;
 use ParadoxLabs\TokenBase\Model\Gateway\Xml;
 use PHPUnit\Framework\MockObject\MockObject;
