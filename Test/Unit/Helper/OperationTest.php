@@ -26,9 +26,14 @@ class OperationTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->context = $this->createMock(Context::class);
-        $this->logger = $this->createMock(Logger::class);
-        $this->remoteAddress = $this->createMock(RemoteAddress::class);
+        $this->setUpSubject();
+    }
+
+    private function setUpSubject(array $mocks = []): void
+    {
+        $this->context = $this->createStub(Context::class);
+        $this->logger = $mocks['logger'] ?? $this->createStub(Logger::class);
+        $this->remoteAddress = $this->createStub(RemoteAddress::class);
 
         $this->context->method('getRemoteAddress')
             ->willReturn($this->remoteAddress);
@@ -208,6 +213,10 @@ class OperationTest extends TestCase
 
     public function testLogWritesInfoMessage(): void
     {
+        $this->setUpSubject([
+            'logger' => $this->createMock(Logger::class),
+        ]);
+
         $this->logger->expects($this->once())
             ->method('info')
             ->with($this->stringContains('TestCode'));
@@ -217,6 +226,10 @@ class OperationTest extends TestCase
 
     public function testLogWritesDebugMessage(): void
     {
+        $this->setUpSubject([
+            'logger' => $this->createMock(Logger::class),
+        ]);
+
         $this->logger->expects($this->once())
             ->method('debug')
             ->with($this->stringContains('TestCode'));
@@ -226,6 +239,10 @@ class OperationTest extends TestCase
 
     public function testLogHandlesPhrase(): void
     {
+        $this->setUpSubject([
+            'logger' => $this->createMock(Logger::class),
+        ]);
+
         $phrase = new Phrase('Translated message');
 
         $this->logger->expects($this->once())
@@ -237,6 +254,10 @@ class OperationTest extends TestCase
 
     public function testLogHandlesDataObject(): void
     {
+        $this->setUpSubject([
+            'logger' => $this->createMock(Logger::class),
+        ]);
+
         $dataObject = new DataObject(['key' => 'value']);
 
         $this->logger->expects($this->once())
@@ -248,6 +269,10 @@ class OperationTest extends TestCase
 
     public function testLogHandlesArray(): void
     {
+        $this->setUpSubject([
+            'logger' => $this->createMock(Logger::class),
+        ]);
+
         $this->logger->expects($this->once())
             ->method('info')
             ->with($this->stringContains('test_key'));
@@ -257,6 +282,10 @@ class OperationTest extends TestCase
 
     public function testLogIncludesRemoteAddress(): void
     {
+        $this->setUpSubject([
+            'logger' => $this->createMock(Logger::class),
+        ]);
+
         $this->logger->expects($this->once())
             ->method('info')
             ->with($this->stringContains('127.0.0.1'));
@@ -273,6 +302,10 @@ class OperationTest extends TestCase
 
     public function testLogHandlesStdClassObject(): void
     {
+        $this->setUpSubject([
+            'logger' => $this->createMock(Logger::class),
+        ]);
+
         $object = new stdClass();
         $object->property = 'value';
 

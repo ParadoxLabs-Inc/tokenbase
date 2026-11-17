@@ -19,6 +19,7 @@ use ParadoxLabs\TokenBase\Helper\Data;
 use ParadoxLabs\TokenBase\Model\AbstractGateway;
 use ParadoxLabs\TokenBase\Model\AbstractMethod;
 use ParadoxLabs\TokenBase\Model\Card;
+use ParadoxLabs\TokenBase\Test\Unit\PartialStubTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -28,6 +29,8 @@ use ReflectionClass;
  */
 class TransactionTest extends TestCase
 {
+    use PartialStubTrait;
+
     private AbstractMethod|MockObject $method;
     private Repository|MockObject $transactionRepository;
     private Data|MockObject $helper;
@@ -40,19 +43,26 @@ class TransactionTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->transactionRepository = $this->createMock(Repository::class);
-        $this->helper = $this->createMock(Data::class);
-        $this->gateway = $this->createMock(AbstractGateway::class);
-        $this->cardFactory = $this->createMock(CardInterfaceFactory::class);
-        $this->cardRepository = $this->createMock(CardRepositoryInterface::class);
-        $this->addressHelper = $this->createMock(Address::class);
-        $this->config = $this->createMock(ConfigInterface::class);
-        $this->registry = $this->createMock(Registry::class);
+        $this->setUpSubject();
+    }
+
+    private function setUpSubject(array $mocks = []): void
+    {
+        $this->transactionRepository = $this->createStub(Repository::class);
+        $this->helper = $this->createStub(Data::class);
+        $this->gateway = $this->createStub(AbstractGateway::class);
+        $this->cardFactory = $this->createStub(CardInterfaceFactory::class);
+        $this->cardRepository = $mocks['cardRepository'] ?? $this->createStub(CardRepositoryInterface::class);
+        $this->addressHelper = $this->createStub(Address::class);
+        $this->config = $this->createStub(ConfigInterface::class);
+        $this->registry = $mocks['registry'] ?? $this->createStub(Registry::class);
 
         $this->helper->method('getCurrentStoreId')->willReturn(1);
 
-        $this->method = $this->getMockBuilder(AbstractMethod::class)
-            ->setConstructorArgs([
+        $this->method = $this->createPartialStub(
+            AbstractMethod::class,
+            ['getInfoInstance', 'getCustomer', 'gateway', 'getCard', 'hasData', 'setInfoInstance'],
+            [
                 $this->transactionRepository,
                 $this->helper,
                 $this->gateway,
@@ -62,9 +72,8 @@ class TransactionTest extends TestCase
                 $this->config,
                 $this->registry,
                 'testmethod',
-            ])
-            ->onlyMethods(['getInfoInstance', 'getCustomer', 'gateway', 'getCard', 'hasData', 'setInfoInstance'])
-            ->getMock();
+            ]
+        );
 
         $this->method->method('gateway')->willReturn($this->gateway);
     }
@@ -88,7 +97,7 @@ class TransactionTest extends TestCase
     {
         $payment = $this->createOrderPaymentMock();
 
-        $existingTxn = $this->createMock(TransactionInterface::class);
+        $existingTxn = $this->createStub(TransactionInterface::class);
 
         $callCount = 0;
         $this->transactionRepository->method('getByTransactionId')
@@ -114,7 +123,7 @@ class TransactionTest extends TestCase
     {
         $payment = $this->createOrderPaymentMock();
 
-        $existingTxn = $this->createMock(TransactionInterface::class);
+        $existingTxn = $this->createStub(TransactionInterface::class);
 
         $callCount = 0;
         $this->transactionRepository->method('getByTransactionId')
@@ -138,6 +147,10 @@ class TransactionTest extends TestCase
 
     public function testResyncStoredCardSkipsWhenNoCard(): void
     {
+        $this->setUpSubject([
+            'cardRepository' => $this->createMock(CardRepositoryInterface::class),
+        ]);
+
         $payment = $this->createOrderPaymentMock();
 
         $this->method->method('getCard')->willReturn(null);
@@ -156,6 +169,10 @@ class TransactionTest extends TestCase
 
     public function testResyncStoredCardSkipsWhenCardHasNoId(): void
     {
+        $this->setUpSubject([
+            'cardRepository' => $this->createMock(CardRepositoryInterface::class),
+        ]);
+
         $card = $this->createCardMock(null);
 
         $this->method->method('getCard')->willReturn($card);
@@ -175,6 +192,10 @@ class TransactionTest extends TestCase
 
     public function testResyncStoredCardSavesWhenAdditionalDataChanged(): void
     {
+        $this->setUpSubject([
+            'cardRepository' => $this->createMock(CardRepositoryInterface::class),
+        ]);
+
         $card = $this->createCardMock(123);
         $card->method('getOrigData')
             ->willReturnMap([
@@ -202,6 +223,10 @@ class TransactionTest extends TestCase
 
     public function testResyncStoredCardSavesWhenAddressChanged(): void
     {
+        $this->setUpSubject([
+            'cardRepository' => $this->createMock(CardRepositoryInterface::class),
+        ]);
+
         $card = $this->createCardMock(123);
         $card->method('getOrigData')
             ->willReturnMap([
@@ -222,7 +247,7 @@ class TransactionTest extends TestCase
 
         $this->method->method('getCard')->willReturn($card);
 
-        $orderAddress = $this->createMock(OrderAddress::class);
+        $orderAddress = $this->createStub(OrderAddress::class);
         $orderAddress->method('getData')
             ->willReturnCallback(function ($field = null) {
                 if ($field === 'city') {
@@ -235,14 +260,14 @@ class TransactionTest extends TestCase
                 return null;
             });
 
-        $order = $this->createMock(Order::class);
+        $order = $this->createStub(Order::class);
         $order->method('getBillingAddress')->willReturn($orderAddress);
 
-        $payment = $this->createMock(OrderPayment::class);
+        $payment = $this->createStub(OrderPayment::class);
         $payment->method('getOrder')->willReturn($order);
         $payment->method('getId')->willReturn(1);
 
-        $newAddress = $this->createMock(AddressInterface::class);
+        $newAddress = $this->createStub(AddressInterface::class);
         $this->addressHelper->method('buildAddressFromInput')
             ->willReturn($newAddress);
 
@@ -259,6 +284,10 @@ class TransactionTest extends TestCase
 
     public function testResyncStoredCardSkipsWhenNoChangesAndNoBillingAddress(): void
     {
+        $this->setUpSubject([
+            'cardRepository' => $this->createMock(CardRepositoryInterface::class),
+        ]);
+
         // When there's no billing address at all and no additional data changes, skip save
         $card = $this->createCardMock(123);
         $card->method('getOrigData')
@@ -281,10 +310,10 @@ class TransactionTest extends TestCase
         $this->method->method('getCard')->willReturn($card);
 
         // No billing address - getBillingAddress returns null
-        $order = $this->createMock(Order::class);
+        $order = $this->createStub(Order::class);
         $order->method('getBillingAddress')->willReturn(null);
 
-        $payment = $this->createMock(OrderPayment::class);
+        $payment = $this->createStub(OrderPayment::class);
         $payment->method('getOrder')->willReturn($order);
         $payment->method('getData')
             ->willReturnCallback(function ($key = null) {
@@ -303,6 +332,10 @@ class TransactionTest extends TestCase
 
     public function testResyncStoredCardUpdatesRegistryOnSave(): void
     {
+        $this->setUpSubject([
+            'registry' => $this->createMock(Registry::class),
+        ]);
+
         $card = $this->createCardMock(123);
         $card->method('getOrigData')
             ->willReturnMap([
@@ -360,8 +393,10 @@ class TransactionTest extends TestCase
                     return $f === $field ? 'old_value' : 'same';
                 });
 
-            $methodInstance = $this->getMockBuilder(AbstractMethod::class)
-                ->setConstructorArgs([
+            $methodInstance = $this->createPartialStub(
+                AbstractMethod::class,
+                ['getInfoInstance', 'getCustomer', 'gateway', 'getCard', 'hasData', 'setInfoInstance'],
+                [
                     $this->transactionRepository,
                     $this->helper,
                     $this->gateway,
@@ -371,14 +406,13 @@ class TransactionTest extends TestCase
                     $this->config,
                     $this->registry,
                     'testmethod',
-                ])
-                ->onlyMethods(['getInfoInstance', 'getCustomer', 'gateway', 'getCard', 'hasData', 'setInfoInstance'])
-                ->getMock();
+                ]
+            );
 
             $methodInstance->method('getCard')->willReturn($card);
             $methodInstance->method('hasData')->willReturn(true);
 
-            $orderAddress = $this->createMock(OrderAddress::class);
+            $orderAddress = $this->createStub(OrderAddress::class);
             $orderAddress->method('getData')
                 ->willReturnCallback(function ($f = null) use ($field) {
                     if ($f === null) {
@@ -388,13 +422,13 @@ class TransactionTest extends TestCase
                     return $f === $field ? 'new_value' : 'same';
                 });
 
-            $order = $this->createMock(Order::class);
+            $order = $this->createStub(Order::class);
             $order->method('getBillingAddress')->willReturn($orderAddress);
 
-            $payment = $this->createMock(OrderPayment::class);
+            $payment = $this->createStub(OrderPayment::class);
             $payment->method('getOrder')->willReturn($order);
 
-            $newAddress = $this->createMock(AddressInterface::class);
+            $newAddress = $this->createStub(AddressInterface::class);
             $this->addressHelper->method('buildAddressFromInput')->willReturn($newAddress);
             $this->cardRepository->method('save')->willReturn($card);
 
@@ -411,11 +445,11 @@ class TransactionTest extends TestCase
 
     private function createOrderPaymentMock(): OrderPayment|MockObject
     {
-        $order = $this->createMock(Order::class);
+        $order = $this->createStub(Order::class);
         $order->method('getId')->willReturn(1);
         $order->method('getBillingAddress')->willReturn(null);
 
-        $payment = $this->createMock(OrderPayment::class);
+        $payment = $this->createStub(OrderPayment::class);
         $payment->method('getId')->willReturn(1);
         $payment->method('getOrder')->willReturn($order);
 
@@ -424,9 +458,9 @@ class TransactionTest extends TestCase
 
     private function createCardMock(?int $id): Card|MockObject
     {
-        $card = $this->getMockBuilder(Card::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods([
+        $card = $this->createPartialStub(
+            Card::class,
+            [
                 'getId',
                 'getOrigData',
                 'getData',
@@ -434,8 +468,8 @@ class TransactionTest extends TestCase
                 'setMethodInstance',
                 'setInfoInstance',
                 'setAddress',
-            ])
-            ->getMock();
+            ]
+        );
 
         $card->method('getId')->willReturn($id);
         $card->method('setMethodInstance')->willReturnSelf();

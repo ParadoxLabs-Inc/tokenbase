@@ -166,7 +166,6 @@ class Data extends \Magento\Payment\Helper\Data
      *
      * @return array
      * @api
-     *
      */
     public function getActiveMethods()
     {
@@ -191,7 +190,6 @@ class Data extends \Magento\Payment\Helper\Data
      *
      * @return array
      * @api
-     *
      */
     public function getAllMethods()
     {
@@ -541,7 +539,7 @@ class Data extends \Magento\Payment\Helper\Data
     /**
      * Turn the given internal card type ID into a proper translated label.
      *
-     * @param $type
+     * @param string $type
      * @return Phrase
      * @api
      */
@@ -604,7 +602,6 @@ class Data extends \Magento\Payment\Helper\Data
      * @param string $type
      * @return string|null
      * @api
-     *
      */
     public function mapCcTypeToMagento($type)
     {
@@ -614,7 +611,7 @@ class Data extends \Magento\Payment\Helper\Data
     /**
      * Recursively cleanup array from objects
      *
-     * @param $array
+     * @param array $array
      * @return void
      */
     public function cleanupArray(&$array)

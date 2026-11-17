@@ -28,11 +28,16 @@ class StoredCardTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->resultFactory = $this->createMock(ResultInterfaceFactory::class);
-        $this->ccValidator = $this->createMock(CreditCard::class);
-        $this->config = $this->createMock(ConfigInterface::class);
-        $this->ccTypes = $this->createMock(Types::class);
-        $this->result = $this->createMock(ResultInterface::class);
+        $this->setUpSubject();
+    }
+
+    private function setUpSubject(array $mocks = []): void
+    {
+        $this->resultFactory = $mocks['resultFactory'] ?? $this->createStub(ResultInterfaceFactory::class);
+        $this->ccValidator = $mocks['ccValidator'] ?? $this->createStub(CreditCard::class);
+        $this->config = $mocks['config'] ?? $this->createStub(ConfigInterface::class);
+        $this->ccTypes = $mocks['ccTypes'] ?? $this->createStub(Types::class);
+        $this->result = $this->createStub(ResultInterface::class);
 
         $this->resultFactory->method('create')
             ->willReturn($this->result);
@@ -49,6 +54,10 @@ class StoredCardTest extends TestCase
 
     public function testValidatePassesForNewCard(): void
     {
+        $this->setUpSubject([
+            'resultFactory' => $this->createMock(ResultInterfaceFactory::class),
+        ]);
+
         $payment = $this->createMock(Info::class);
         $payment->method('getData')
             ->with('tokenbase_id')
@@ -66,7 +75,12 @@ class StoredCardTest extends TestCase
 
     public function testValidatePassesForStoredCardWhenCvvNotRequired(): void
     {
-        $payment = $this->createMock(Info::class);
+        $this->setUpSubject([
+            'config' => $this->createMock(ConfigInterface::class),
+            'resultFactory' => $this->createMock(ResultInterfaceFactory::class),
+        ]);
+
+        $payment = $this->createStub(Info::class);
         $payment->method('getData')
             ->willReturnMap([
                 ['tokenbase_id', null, '123'],
@@ -89,6 +103,12 @@ class StoredCardTest extends TestCase
 
     public function testValidateFailsForStoredCardWithMissingCvv(): void
     {
+        $this->setUpSubject([
+            'ccTypes' => $this->createMock(Types::class),
+            'config' => $this->createMock(ConfigInterface::class),
+            'resultFactory' => $this->createMock(ResultInterfaceFactory::class),
+        ]);
+
         $payment = $this->createMock(Info::class);
         $payment->method('getData')
             ->willReturnMap([
@@ -126,6 +146,11 @@ class StoredCardTest extends TestCase
 
     public function testValidatePassesForSubscriptionGeneratedPayment(): void
     {
+        $this->setUpSubject([
+            'config' => $this->createMock(ConfigInterface::class),
+            'resultFactory' => $this->createMock(ResultInterfaceFactory::class),
+        ]);
+
         $payment = $this->createMock(Info::class);
         $payment->method('getData')
             ->willReturnMap([
@@ -153,6 +178,12 @@ class StoredCardTest extends TestCase
 
     public function testValidateFailsForInvalidCvvLength(): void
     {
+        $this->setUpSubject([
+            'ccTypes' => $this->createMock(Types::class),
+            'config' => $this->createMock(ConfigInterface::class),
+            'resultFactory' => $this->createMock(ResultInterfaceFactory::class),
+        ]);
+
         $payment = $this->createMock(Info::class);
         $payment->method('getData')
             ->willReturnMap([
@@ -189,6 +220,12 @@ class StoredCardTest extends TestCase
 
     public function testValidatePassesForValidCvv(): void
     {
+        $this->setUpSubject([
+            'ccTypes' => $this->createMock(Types::class),
+            'config' => $this->createMock(ConfigInterface::class),
+            'resultFactory' => $this->createMock(ResultInterfaceFactory::class),
+        ]);
+
         $payment = $this->createMock(Info::class);
         $payment->method('getData')
             ->willReturnMap([
@@ -223,6 +260,12 @@ class StoredCardTest extends TestCase
 
     public function testValidateFailsForAmexWith3DigitCvv(): void
     {
+        $this->setUpSubject([
+            'ccTypes' => $this->createMock(Types::class),
+            'config' => $this->createMock(ConfigInterface::class),
+            'resultFactory' => $this->createMock(ResultInterfaceFactory::class),
+        ]);
+
         $payment = $this->createMock(Info::class);
         $payment->method('getData')
             ->willReturnMap([
@@ -259,7 +302,13 @@ class StoredCardTest extends TestCase
 
     public function testValidateSkipsCardNumberValidationForMaskedNumber(): void
     {
-        $payment = $this->createMock(Info::class);
+        $this->setUpSubject([
+            'ccValidator' => $this->createMock(CreditCard::class),
+            'config' => $this->createMock(ConfigInterface::class),
+            'resultFactory' => $this->createMock(ResultInterfaceFactory::class),
+        ]);
+
+        $payment = $this->createStub(Info::class);
         $payment->method('getData')
             ->willReturnMap([
                 ['tokenbase_id', null, '123'],
@@ -286,7 +335,13 @@ class StoredCardTest extends TestCase
 
     public function testValidateFailsForInvalidCardNumberOnEdit(): void
     {
-        $payment = $this->createMock(Info::class);
+        $this->setUpSubject([
+            'ccValidator' => $this->createMock(CreditCard::class),
+            'config' => $this->createMock(ConfigInterface::class),
+            'resultFactory' => $this->createMock(ResultInterfaceFactory::class),
+        ]);
+
+        $payment = $this->createStub(Info::class);
         $payment->method('getData')
             ->willReturnMap([
                 ['tokenbase_id', null, '123'],
@@ -315,7 +370,12 @@ class StoredCardTest extends TestCase
 
     public function testValidateFailsForTooShortCardNumber(): void
     {
-        $payment = $this->createMock(Info::class);
+        $this->setUpSubject([
+            'config' => $this->createMock(ConfigInterface::class),
+            'resultFactory' => $this->createMock(ResultInterfaceFactory::class),
+        ]);
+
+        $payment = $this->createStub(Info::class);
         $payment->method('getData')
             ->willReturnMap([
                 ['tokenbase_id', null, '123'],
@@ -340,7 +400,12 @@ class StoredCardTest extends TestCase
 
     public function testValidateFailsForNonNumericCardNumber(): void
     {
-        $payment = $this->createMock(Info::class);
+        $this->setUpSubject([
+            'config' => $this->createMock(ConfigInterface::class),
+            'resultFactory' => $this->createMock(ResultInterfaceFactory::class),
+        ]);
+
+        $payment = $this->createStub(Info::class);
         $payment->method('getData')
             ->willReturnMap([
                 ['tokenbase_id', null, '123'],
@@ -365,7 +430,13 @@ class StoredCardTest extends TestCase
 
     public function testValidateFailsForExpiredCard(): void
     {
-        $payment = $this->createMock(Info::class);
+        $this->setUpSubject([
+            'ccValidator' => $this->createMock(CreditCard::class),
+            'config' => $this->createMock(ConfigInterface::class),
+            'resultFactory' => $this->createMock(ResultInterfaceFactory::class),
+        ]);
+
+        $payment = $this->createStub(Info::class);
         $payment->method('getData')
             ->willReturnMap([
                 ['tokenbase_id', null, '123'],
@@ -394,7 +465,13 @@ class StoredCardTest extends TestCase
 
     public function testValidatePassesForValidExpirationDate(): void
     {
-        $payment = $this->createMock(Info::class);
+        $this->setUpSubject([
+            'ccValidator' => $this->createMock(CreditCard::class),
+            'config' => $this->createMock(ConfigInterface::class),
+            'resultFactory' => $this->createMock(ResultInterfaceFactory::class),
+        ]);
+
+        $payment = $this->createStub(Info::class);
         $payment->method('getData')
             ->willReturnMap([
                 ['tokenbase_id', null, '123'],
@@ -421,7 +498,13 @@ class StoredCardTest extends TestCase
 
     public function testValidateSkipsExpirationCheckWhenNotProvided(): void
     {
-        $payment = $this->createMock(Info::class);
+        $this->setUpSubject([
+            'ccValidator' => $this->createMock(CreditCard::class),
+            'config' => $this->createMock(ConfigInterface::class),
+            'resultFactory' => $this->createMock(ResultInterfaceFactory::class),
+        ]);
+
+        $payment = $this->createStub(Info::class);
         $payment->method('getData')
             ->willReturnMap([
                 ['tokenbase_id', null, '123'],
@@ -448,6 +531,12 @@ class StoredCardTest extends TestCase
 
     public function testValidateHandlesUnknownCardType(): void
     {
+        $this->setUpSubject([
+            'ccTypes' => $this->createMock(Types::class),
+            'config' => $this->createMock(ConfigInterface::class),
+            'resultFactory' => $this->createMock(ResultInterfaceFactory::class),
+        ]);
+
         $payment = $this->createMock(Info::class);
         $payment->method('getData')
             ->willReturnMap([
@@ -481,6 +570,12 @@ class StoredCardTest extends TestCase
 
     public function testValidateFailsForNonNumericCvv(): void
     {
+        $this->setUpSubject([
+            'ccTypes' => $this->createMock(Types::class),
+            'config' => $this->createMock(ConfigInterface::class),
+            'resultFactory' => $this->createMock(ResultInterfaceFactory::class),
+        ]);
+
         $payment = $this->createMock(Info::class);
         $payment->method('getData')
             ->willReturnMap([

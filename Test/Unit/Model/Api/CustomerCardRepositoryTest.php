@@ -35,10 +35,15 @@ class CustomerCardRepositoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->cardRepository = $this->createMock(CardRepositoryInterface::class);
-        $this->filterGroupBuilder = $this->createMock(FilterGroupBuilder::class);
-        $this->filterBuilder = $this->createMock(FilterBuilder::class);
-        $this->scopeConfig = $this->createMock(ScopeConfigInterface::class);
+        $this->setUpSubject();
+    }
+
+    private function setUpSubject(array $mocks = []): void
+    {
+        $this->cardRepository = $mocks['cardRepository'] ?? $this->createStub(CardRepositoryInterface::class);
+        $this->filterGroupBuilder = $this->createStub(FilterGroupBuilder::class);
+        $this->filterBuilder = $mocks['filterBuilder'] ?? $this->createStub(FilterBuilder::class);
+        $this->scopeConfig = $mocks['scopeConfig'] ?? $this->createStub(ScopeConfigInterface::class);
 
         $this->repository = new CustomerCardRepository(
             $this->cardRepository,
@@ -57,6 +62,10 @@ class CustomerCardRepositoryTest extends TestCase
 
     public function testGetByHashThrowsWhenApiDisabled(): void
     {
+        $this->setUpSubject([
+            'scopeConfig' => $this->createMock(ScopeConfigInterface::class),
+        ]);
+
         $this->scopeConfig->method('getValue')
             ->with('checkout/tokenbase/enable_public_api', 'store')
             ->willReturn('0');
@@ -69,9 +78,14 @@ class CustomerCardRepositoryTest extends TestCase
 
     public function testGetByHashReturnsCard(): void
     {
+        $this->setUpSubject([
+            'cardRepository' => $this->createMock(CardRepositoryInterface::class),
+            'scopeConfig' => $this->createMock(ScopeConfigInterface::class),
+        ]);
+
         $this->enableApi();
 
-        $card = $this->createMock(CardInterface::class);
+        $card = $this->createStub(CardInterface::class);
         $card->method('getCustomerId')->willReturn(123);
         $card->method('getActive')->willReturn(1);
 
@@ -86,9 +100,14 @@ class CustomerCardRepositoryTest extends TestCase
 
     public function testGetByHashThrowsForWrongCustomer(): void
     {
+        $this->setUpSubject([
+            'cardRepository' => $this->createMock(CardRepositoryInterface::class),
+            'scopeConfig' => $this->createMock(ScopeConfigInterface::class),
+        ]);
+
         $this->enableApi();
 
-        $card = $this->createMock(CardInterface::class);
+        $card = $this->createStub(CardInterface::class);
         $card->method('getCustomerId')->willReturn(456);
         $card->method('getActive')->willReturn(1);
 
@@ -104,9 +123,14 @@ class CustomerCardRepositoryTest extends TestCase
 
     public function testGetByHashThrowsForInactiveCard(): void
     {
+        $this->setUpSubject([
+            'cardRepository' => $this->createMock(CardRepositoryInterface::class),
+            'scopeConfig' => $this->createMock(ScopeConfigInterface::class),
+        ]);
+
         $this->enableApi();
 
-        $card = $this->createMock(CardInterface::class);
+        $card = $this->createStub(CardInterface::class);
         $card->method('getCustomerId')->willReturn(123);
         $card->method('getActive')->willReturn(0);
 
@@ -122,6 +146,10 @@ class CustomerCardRepositoryTest extends TestCase
 
     public function testDeleteByHashThrowsWhenApiDisabled(): void
     {
+        $this->setUpSubject([
+            'scopeConfig' => $this->createMock(ScopeConfigInterface::class),
+        ]);
+
         $this->scopeConfig->method('getValue')
             ->with('checkout/tokenbase/enable_public_api', 'store')
             ->willReturn('0');
@@ -133,9 +161,14 @@ class CustomerCardRepositoryTest extends TestCase
 
     public function testDeleteByHashDeletesCard(): void
     {
+        $this->setUpSubject([
+            'cardRepository' => $this->createMock(CardRepositoryInterface::class),
+            'scopeConfig' => $this->createMock(ScopeConfigInterface::class),
+        ]);
+
         $this->enableApi();
 
-        $card = $this->createMock(CardInterface::class);
+        $card = $this->createStub(CardInterface::class);
         $card->method('getCustomerId')->willReturn(123);
         $card->method('getActive')->willReturn(1);
 
@@ -155,11 +188,15 @@ class CustomerCardRepositoryTest extends TestCase
 
     public function testGetListThrowsWhenApiDisabled(): void
     {
+        $this->setUpSubject([
+            'scopeConfig' => $this->createMock(ScopeConfigInterface::class),
+        ]);
+
         $this->scopeConfig->method('getValue')
             ->with('checkout/tokenbase/enable_public_api', 'store')
             ->willReturn('0');
 
-        $searchCriteria = $this->createMock(SearchCriteriaInterface::class);
+        $searchCriteria = $this->createStub(SearchCriteriaInterface::class);
 
         $this->expectException(AuthorizationException::class);
 
@@ -168,13 +205,18 @@ class CustomerCardRepositoryTest extends TestCase
 
     public function testGetListAddsMandatoryFilters(): void
     {
+        $this->setUpSubject([
+            'filterBuilder' => $this->createMock(FilterBuilder::class),
+            'scopeConfig' => $this->createMock(ScopeConfigInterface::class),
+        ]);
+
         $this->enableApi();
 
         $searchCriteria = $this->createMock(SearchCriteriaInterface::class);
         $searchCriteria->method('getFilterGroups')->willReturn([]);
 
-        $customerFilter = $this->createMock(Filter::class);
-        $activeFilter = $this->createMock(Filter::class);
+        $customerFilter = $this->createStub(Filter::class);
+        $activeFilter = $this->createStub(Filter::class);
 
         $this->filterBuilder->expects($this->exactly(2))
             ->method('setField')
@@ -190,7 +232,7 @@ class CustomerCardRepositoryTest extends TestCase
             ->method('create')
             ->willReturnOnConsecutiveCalls($customerFilter, $activeFilter);
 
-        $filterGroup = $this->createMock(FilterGroup::class);
+        $filterGroup = $this->createStub(FilterGroup::class);
         $this->filterGroupBuilder->method('setFilters')->willReturnSelf();
         $this->filterGroupBuilder->method('create')->willReturn($filterGroup);
 
@@ -200,7 +242,7 @@ class CustomerCardRepositoryTest extends TestCase
                 return count($groups) === 2;
             }));
 
-        $searchResults = $this->createMock(CardSearchResultsInterface::class);
+        $searchResults = $this->createStub(CardSearchResultsInterface::class);
         $this->cardRepository->method('getList')->willReturn($searchResults);
 
         $result = $this->repository->getList(123, $searchCriteria);
@@ -210,13 +252,17 @@ class CustomerCardRepositoryTest extends TestCase
 
     public function testSaveExtendedThrowsWhenApiDisabled(): void
     {
+        $this->setUpSubject([
+            'scopeConfig' => $this->createMock(ScopeConfigInterface::class),
+        ]);
+
         $this->scopeConfig->method('getValue')
             ->with('checkout/tokenbase/enable_public_api', 'store')
             ->willReturn('0');
 
-        $card = $this->createMock(CardInterface::class);
-        $address = $this->createMock(AddressInterface::class);
-        $additional = $this->createMock(CardAdditionalInterface::class);
+        $card = $this->createStub(CardInterface::class);
+        $address = $this->createStub(AddressInterface::class);
+        $additional = $this->createStub(CardAdditionalInterface::class);
 
         $this->expectException(AuthorizationException::class);
 
@@ -225,18 +271,23 @@ class CustomerCardRepositoryTest extends TestCase
 
     public function testSaveExtendedValidatesNewCard(): void
     {
+        $this->setUpSubject([
+            'cardRepository' => $this->createMock(CardRepositoryInterface::class),
+            'scopeConfig' => $this->createMock(ScopeConfigInterface::class),
+        ]);
+
         $this->enableApi();
 
-        $card = $this->createMock(CardInterface::class);
+        $card = $this->createStub(CardInterface::class);
         $card->method('getHash')->willReturn(null);
         $card->method('getId')->willReturn(null);
         $card->method('getCustomerId')->willReturn(123);
         $card->method('getActive')->willReturn(1);
 
-        $address = $this->createMock(AddressInterface::class);
-        $additional = $this->createMock(CardAdditionalInterface::class);
+        $address = $this->createStub(AddressInterface::class);
+        $additional = $this->createStub(CardAdditionalInterface::class);
 
-        $savedCard = $this->createMock(CardInterface::class);
+        $savedCard = $this->createStub(CardInterface::class);
         $this->cardRepository->expects($this->once())
             ->method('saveExtended')
             ->with($card, $address, $additional)
@@ -249,13 +300,18 @@ class CustomerCardRepositoryTest extends TestCase
 
     public function testSaveExtendedValidatesExistingCardByHash(): void
     {
+        $this->setUpSubject([
+            'cardRepository' => $this->createMock(CardRepositoryInterface::class),
+            'scopeConfig' => $this->createMock(ScopeConfigInterface::class),
+        ]);
+
         $this->enableApi();
 
-        $originalCard = $this->createMock(CardInterface::class);
+        $originalCard = $this->createStub(CardInterface::class);
         $originalCard->method('getCustomerId')->willReturn(123);
         $originalCard->method('getActive')->willReturn(1);
 
-        $card = $this->createMock(CardInterface::class);
+        $card = $this->createStub(CardInterface::class);
         $card->method('getHash')->willReturn('existinghash');
         $card->method('getId')->willReturn(null);
         $card->method('getCustomerId')->willReturn(123);
@@ -265,10 +321,10 @@ class CustomerCardRepositoryTest extends TestCase
             ->with('existinghash')
             ->willReturn($originalCard);
 
-        $address = $this->createMock(AddressInterface::class);
-        $additional = $this->createMock(CardAdditionalInterface::class);
+        $address = $this->createStub(AddressInterface::class);
+        $additional = $this->createStub(CardAdditionalInterface::class);
 
-        $savedCard = $this->createMock(CardInterface::class);
+        $savedCard = $this->createStub(CardInterface::class);
         $this->cardRepository->expects($this->once())
             ->method('saveExtended')
             ->willReturn($savedCard);
@@ -280,13 +336,18 @@ class CustomerCardRepositoryTest extends TestCase
 
     public function testSaveExtendedValidatesExistingCardById(): void
     {
+        $this->setUpSubject([
+            'cardRepository' => $this->createMock(CardRepositoryInterface::class),
+            'scopeConfig' => $this->createMock(ScopeConfigInterface::class),
+        ]);
+
         $this->enableApi();
 
-        $originalCard = $this->createMock(CardInterface::class);
+        $originalCard = $this->createStub(CardInterface::class);
         $originalCard->method('getCustomerId')->willReturn(123);
         $originalCard->method('getActive')->willReturn(1);
 
-        $card = $this->createMock(CardInterface::class);
+        $card = $this->createStub(CardInterface::class);
         $card->method('getHash')->willReturn(null);
         $card->method('getId')->willReturn(456);
         $card->method('getCustomerId')->willReturn(123);
@@ -296,10 +357,10 @@ class CustomerCardRepositoryTest extends TestCase
             ->with(456)
             ->willReturn($originalCard);
 
-        $address = $this->createMock(AddressInterface::class);
-        $additional = $this->createMock(CardAdditionalInterface::class);
+        $address = $this->createStub(AddressInterface::class);
+        $additional = $this->createStub(CardAdditionalInterface::class);
 
-        $savedCard = $this->createMock(CardInterface::class);
+        $savedCard = $this->createStub(CardInterface::class);
         $this->cardRepository->expects($this->once())
             ->method('saveExtended')
             ->willReturn($savedCard);
@@ -311,16 +372,20 @@ class CustomerCardRepositoryTest extends TestCase
 
     public function testSaveExtendedThrowsForWrongCustomerCard(): void
     {
+        $this->setUpSubject([
+            'scopeConfig' => $this->createMock(ScopeConfigInterface::class),
+        ]);
+
         $this->enableApi();
 
-        $card = $this->createMock(CardInterface::class);
+        $card = $this->createStub(CardInterface::class);
         $card->method('getHash')->willReturn(null);
         $card->method('getId')->willReturn(null);
         $card->method('getCustomerId')->willReturn(999);
         $card->method('getActive')->willReturn(1);
 
-        $address = $this->createMock(AddressInterface::class);
-        $additional = $this->createMock(CardAdditionalInterface::class);
+        $address = $this->createStub(AddressInterface::class);
+        $additional = $this->createStub(CardAdditionalInterface::class);
 
         $this->expectException(InputException::class);
         $this->expectExceptionMessage('You do not have permission for this action.');
@@ -330,13 +395,18 @@ class CustomerCardRepositoryTest extends TestCase
 
     public function testSaveExtendedThrowsWhenOriginalCardBelongsToOther(): void
     {
+        $this->setUpSubject([
+            'cardRepository' => $this->createMock(CardRepositoryInterface::class),
+            'scopeConfig' => $this->createMock(ScopeConfigInterface::class),
+        ]);
+
         $this->enableApi();
 
-        $originalCard = $this->createMock(CardInterface::class);
+        $originalCard = $this->createStub(CardInterface::class);
         $originalCard->method('getCustomerId')->willReturn(999);
         $originalCard->method('getActive')->willReturn(1);
 
-        $card = $this->createMock(CardInterface::class);
+        $card = $this->createStub(CardInterface::class);
         $card->method('getHash')->willReturn('existinghash');
         $card->method('getId')->willReturn(null);
         $card->method('getCustomerId')->willReturn(123);
@@ -346,8 +416,8 @@ class CustomerCardRepositoryTest extends TestCase
             ->with('existinghash')
             ->willReturn($originalCard);
 
-        $address = $this->createMock(AddressInterface::class);
-        $additional = $this->createMock(CardAdditionalInterface::class);
+        $address = $this->createStub(AddressInterface::class);
+        $additional = $this->createStub(CardAdditionalInterface::class);
 
         $this->expectException(InputException::class);
         $this->expectExceptionMessage('You do not have permission for this action.');
@@ -357,9 +427,14 @@ class CustomerCardRepositoryTest extends TestCase
 
     public function testSaveExtendedIgnoresNonExistentHashLookup(): void
     {
+        $this->setUpSubject([
+            'cardRepository' => $this->createMock(CardRepositoryInterface::class),
+            'scopeConfig' => $this->createMock(ScopeConfigInterface::class),
+        ]);
+
         $this->enableApi();
 
-        $card = $this->createMock(CardInterface::class);
+        $card = $this->createStub(CardInterface::class);
         $card->method('getHash')->willReturn('nonexistenthash');
         $card->method('getId')->willReturn(null);
         $card->method('getCustomerId')->willReturn(123);
@@ -369,10 +444,10 @@ class CustomerCardRepositoryTest extends TestCase
             ->with('nonexistenthash')
             ->willThrowException(new NoSuchEntityException());
 
-        $address = $this->createMock(AddressInterface::class);
-        $additional = $this->createMock(CardAdditionalInterface::class);
+        $address = $this->createStub(AddressInterface::class);
+        $additional = $this->createStub(CardAdditionalInterface::class);
 
-        $savedCard = $this->createMock(CardInterface::class);
+        $savedCard = $this->createStub(CardInterface::class);
         $this->cardRepository->expects($this->once())
             ->method('saveExtended')
             ->willReturn($savedCard);
@@ -384,16 +459,20 @@ class CustomerCardRepositoryTest extends TestCase
 
     public function testSaveExtendedThrowsForInactiveCard(): void
     {
+        $this->setUpSubject([
+            'scopeConfig' => $this->createMock(ScopeConfigInterface::class),
+        ]);
+
         $this->enableApi();
 
-        $card = $this->createMock(CardInterface::class);
+        $card = $this->createStub(CardInterface::class);
         $card->method('getHash')->willReturn(null);
         $card->method('getId')->willReturn(null);
         $card->method('getCustomerId')->willReturn(123);
         $card->method('getActive')->willReturn(0);
 
-        $address = $this->createMock(AddressInterface::class);
-        $additional = $this->createMock(CardAdditionalInterface::class);
+        $address = $this->createStub(AddressInterface::class);
+        $additional = $this->createStub(CardAdditionalInterface::class);
 
         $this->expectException(InputException::class);
         $this->expectExceptionMessage('You do not have permission for this action.');

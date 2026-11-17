@@ -27,6 +27,7 @@ use Magento\Framework\Api\ExtensibleDataObjectConverter;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\RequestInterface;
 use ParadoxLabs\TokenBase\Helper\Address;
+use ParadoxLabs\TokenBase\Test\Unit\PartialStubTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -35,6 +36,8 @@ use PHPUnit\Framework\TestCase;
  */
 class AddressTest extends TestCase
 {
+    use PartialStubTrait;
+
     private Address $helper;
     private Context|MockObject $context;
     private FormFactory|MockObject $formFactory;
@@ -50,17 +53,22 @@ class AddressTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->context = $this->createMock(Context::class);
-        $this->formFactory = $this->createMock(FormFactory::class);
-        $this->addressDataFactory = $this->createMock(AddressInterfaceFactory::class);
-        $this->dataObjectHelper = $this->createMock(DataObjectHelper::class);
-        $this->regionDataFactory = $this->createMock(RegionInterfaceFactory::class);
-        $this->regionFactory = $this->createMock(RegionFactory::class);
-        $this->regionResource = $this->createMock(RegionResource::class);
-        $this->addressRepository = $this->createMock(AddressRepositoryInterface::class);
-        $this->extensibleDataObjectConverter = $this->createMock(ExtensibleDataObjectConverter::class);
-        $this->addressMapper = $this->createMock(Mapper::class);
-        $this->addressConfig = $this->createMock(Config::class);
+        $this->setUpSubject();
+    }
+
+    private function setUpSubject(array $mocks = []): void
+    {
+        $this->context = $this->createStub(Context::class);
+        $this->formFactory = $this->createStub(FormFactory::class);
+        $this->addressDataFactory = $this->createStub(AddressInterfaceFactory::class);
+        $this->dataObjectHelper = $mocks['dataObjectHelper'] ?? $this->createStub(DataObjectHelper::class);
+        $this->regionDataFactory = $this->createStub(RegionInterfaceFactory::class);
+        $this->regionFactory = $this->createStub(RegionFactory::class);
+        $this->regionResource = $this->createStub(RegionResource::class);
+        $this->addressRepository = $this->createStub(AddressRepositoryInterface::class);
+        $this->extensibleDataObjectConverter = $mocks['extensibleDataObjectConverter'] ?? $this->createStub(ExtensibleDataObjectConverter::class);
+        $this->addressMapper = $mocks['addressMapper'] ?? $this->createStub(Mapper::class);
+        $this->addressConfig = $mocks['addressConfig'] ?? $this->createStub(Config::class);
 
         $this->helper = new Address(
             $this->context,
@@ -86,8 +94,8 @@ class AddressTest extends TestCase
 
     public function testCompareAddressesReturnsTrueForIdentical(): void
     {
-        $address1 = $this->createMock(AddressInterface::class);
-        $address2 = $this->createMock(AddressInterface::class);
+        $address1 = $this->createStub(AddressInterface::class);
+        $address2 = $this->createStub(AddressInterface::class);
 
         $addressData = [
             'firstname' => 'John',
@@ -109,8 +117,8 @@ class AddressTest extends TestCase
 
     public function testCompareAddressesReturnsFalseForDifferent(): void
     {
-        $address1 = $this->createMock(AddressInterface::class);
-        $address2 = $this->createMock(AddressInterface::class);
+        $address1 = $this->createStub(AddressInterface::class);
+        $address2 = $this->createStub(AddressInterface::class);
 
         $addressData1 = [
             'firstname' => 'John',
@@ -136,8 +144,8 @@ class AddressTest extends TestCase
 
     public function testCompareAddressesIgnoresIdDifference(): void
     {
-        $address1 = $this->createMock(AddressInterface::class);
-        $address2 = $this->createMock(AddressInterface::class);
+        $address1 = $this->createStub(AddressInterface::class);
+        $address2 = $this->createStub(AddressInterface::class);
 
         $addressData1 = [
             'id' => 1,
@@ -161,8 +169,8 @@ class AddressTest extends TestCase
 
     public function testCompareAddressesIgnoresRegionIdDifference(): void
     {
-        $address1 = $this->createMock(AddressInterface::class);
-        $address2 = $this->createMock(AddressInterface::class);
+        $address1 = $this->createStub(AddressInterface::class);
+        $address2 = $this->createStub(AddressInterface::class);
 
         $addressData1 = [
             'region_id' => 12,
@@ -184,8 +192,8 @@ class AddressTest extends TestCase
 
     public function testCompareAddressesIgnoresDefaultShippingDifference(): void
     {
-        $address1 = $this->createMock(AddressInterface::class);
-        $address2 = $this->createMock(AddressInterface::class);
+        $address1 = $this->createStub(AddressInterface::class);
+        $address2 = $this->createStub(AddressInterface::class);
 
         $addressData1 = [
             'default_shipping' => true,
@@ -207,8 +215,8 @@ class AddressTest extends TestCase
 
     public function testCompareAddressesIgnoresDefaultBillingDifference(): void
     {
-        $address1 = $this->createMock(AddressInterface::class);
-        $address2 = $this->createMock(AddressInterface::class);
+        $address1 = $this->createStub(AddressInterface::class);
+        $address2 = $this->createStub(AddressInterface::class);
 
         $addressData1 = [
             'default_billing' => true,
@@ -230,7 +238,11 @@ class AddressTest extends TestCase
 
     public function testAddressToArrayConvertsAddressInterface(): void
     {
-        $address = $this->createMock(AddressInterface::class);
+        $this->setUpSubject([
+            'extensibleDataObjectConverter' => $this->createMock(ExtensibleDataObjectConverter::class),
+        ]);
+
+        $address = $this->createStub(AddressInterface::class);
 
         $expectedArray = [
             'firstname' => 'John',
@@ -249,7 +261,11 @@ class AddressTest extends TestCase
 
     public function testAddressToArrayConvertsAddressModelInterface(): void
     {
-        $addressData = $this->createMock(AddressInterface::class);
+        $this->setUpSubject([
+            'extensibleDataObjectConverter' => $this->createMock(ExtensibleDataObjectConverter::class),
+        ]);
+
+        $addressData = $this->createStub(AddressInterface::class);
 
         // getDataModel() is declared on the concrete Address model, not on AddressModelInterface,
         // so it must be mocked via the concrete class (onlyMethods requires a declared method).
@@ -276,10 +292,7 @@ class AddressTest extends TestCase
 
     public function testProcessRegionDataWithRegionId(): void
     {
-        $region = $this->getMockBuilder(Region::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getData'])
-            ->getMock();
+        $region = $this->createPartialStub(Region::class, ['getData']);
         // getCode() and getDefaultName() are magic; they route through DataObject::__call to getData().
         $region->method('getData')->willReturnMap([
             ['code', null, 'CA'],
@@ -288,7 +301,7 @@ class AddressTest extends TestCase
 
         $this->regionFactory->method('create')->willReturn($region);
 
-        $regionInterface = $this->createMock(RegionInterface::class);
+        $regionInterface = $this->createStub(RegionInterface::class);
         $this->regionDataFactory->method('create')->willReturn($regionInterface);
 
         $addressArray = [
@@ -304,10 +317,7 @@ class AddressTest extends TestCase
 
     public function testProcessRegionDataWithRegionCode(): void
     {
-        $region = $this->getMockBuilder(Region::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getId', 'getData'])
-            ->getMock();
+        $region = $this->createPartialStub(Region::class, ['getId', 'getData']);
         $region->method('getId')->willReturn(12);
         // getDefaultName() is magic; it routes through DataObject::__call to getData().
         $region->method('getData')->willReturnMap([
@@ -316,7 +326,7 @@ class AddressTest extends TestCase
 
         $this->regionFactory->method('create')->willReturn($region);
 
-        $regionInterface = $this->createMock(RegionInterface::class);
+        $regionInterface = $this->createStub(RegionInterface::class);
         $this->regionDataFactory->method('create')->willReturn($regionInterface);
 
         $addressArray = [
@@ -332,10 +342,7 @@ class AddressTest extends TestCase
 
     public function testProcessRegionDataWithTwoCharRegion(): void
     {
-        $region = $this->getMockBuilder(Region::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getId', 'getData'])
-            ->getMock();
+        $region = $this->createPartialStub(Region::class, ['getId', 'getData']);
         $region->method('getId')->willReturn(12);
         // getDefaultName() is magic; it routes through DataObject::__call to getData().
         $region->method('getData')->willReturnMap([
@@ -344,7 +351,7 @@ class AddressTest extends TestCase
 
         $this->regionFactory->method('create')->willReturn($region);
 
-        $regionInterface = $this->createMock(RegionInterface::class);
+        $regionInterface = $this->createStub(RegionInterface::class);
         $this->regionDataFactory->method('create')->willReturn($regionInterface);
 
         $addressArray = [
@@ -359,7 +366,7 @@ class AddressTest extends TestCase
 
     public function testProcessRegionDataWithoutRegionInfo(): void
     {
-        $regionInterface = $this->createMock(RegionInterface::class);
+        $regionInterface = $this->createStub(RegionInterface::class);
         $this->regionDataFactory->method('create')->willReturn($regionInterface);
 
         $addressArray = [
@@ -374,10 +381,10 @@ class AddressTest extends TestCase
 
     public function testBuildAddressFromInputConvertsStringStreet(): void
     {
-        $form = $this->createMock(Form::class);
+        $form = $this->createStub(Form::class);
         $this->formFactory->method('create')->willReturn($form);
 
-        $request = $this->createMock(RequestInterface::class);
+        $request = $this->createStub(RequestInterface::class);
         $form->method('prepareRequest')->willReturn($request);
         $form->method('extractData')->willReturn([
             'street' => ['123 Main St', 'Apt 4'],
@@ -388,10 +395,10 @@ class AddressTest extends TestCase
             'city' => 'Anytown',
         ]);
 
-        $address = $this->createMock(AddressInterface::class);
+        $address = $this->createStub(AddressInterface::class);
         $this->addressDataFactory->method('create')->willReturn($address);
 
-        $regionInterface = $this->createMock(RegionInterface::class);
+        $regionInterface = $this->createStub(RegionInterface::class);
         $this->regionDataFactory->method('create')->willReturn($regionInterface);
 
         $inputData = [
@@ -406,10 +413,10 @@ class AddressTest extends TestCase
 
     public function testBuildAddressFromInputWithArrayStreet(): void
     {
-        $form = $this->createMock(Form::class);
+        $form = $this->createStub(Form::class);
         $this->formFactory->method('create')->willReturn($form);
 
-        $request = $this->createMock(RequestInterface::class);
+        $request = $this->createStub(RequestInterface::class);
         $form->method('prepareRequest')->willReturn($request);
         $form->method('extractData')->willReturn([
             'street' => ['123 Main St'],
@@ -418,10 +425,10 @@ class AddressTest extends TestCase
             'street' => ['123 Main St'],
         ]);
 
-        $address = $this->createMock(AddressInterface::class);
+        $address = $this->createStub(AddressInterface::class);
         $this->addressDataFactory->method('create')->willReturn($address);
 
-        $regionInterface = $this->createMock(RegionInterface::class);
+        $regionInterface = $this->createStub(RegionInterface::class);
         $this->regionDataFactory->method('create')->willReturn($regionInterface);
 
         $inputData = [
@@ -435,19 +442,19 @@ class AddressTest extends TestCase
 
     public function testBuildAddressFromInputWithValidation(): void
     {
-        $form = $this->createMock(Form::class);
+        $form = $this->createStub(Form::class);
         $this->formFactory->method('create')->willReturn($form);
 
-        $request = $this->createMock(RequestInterface::class);
+        $request = $this->createStub(RequestInterface::class);
         $form->method('prepareRequest')->willReturn($request);
         $form->method('extractData')->willReturn(['city' => 'Test']);
         $form->method('validateData')->willReturn(true);
         $form->method('compactData')->willReturn(['city' => 'Test']);
 
-        $address = $this->createMock(AddressInterface::class);
+        $address = $this->createStub(AddressInterface::class);
         $this->addressDataFactory->method('create')->willReturn($address);
 
-        $regionInterface = $this->createMock(RegionInterface::class);
+        $regionInterface = $this->createStub(RegionInterface::class);
         $this->regionDataFactory->method('create')->willReturn($regionInterface);
 
         $result = $this->helper->buildAddressFromInput(['city' => 'Test'], [], true);
@@ -457,10 +464,10 @@ class AddressTest extends TestCase
 
     public function testBuildAddressFromInputValidationFailure(): void
     {
-        $form = $this->createMock(Form::class);
+        $form = $this->createStub(Form::class);
         $this->formFactory->method('create')->willReturn($form);
 
-        $request = $this->createMock(RequestInterface::class);
+        $request = $this->createStub(RequestInterface::class);
         $form->method('prepareRequest')->willReturn($request);
         $form->method('extractData')->willReturn([]);
         $form->method('validateData')->willReturn(['City is required', 'Street is required']);
@@ -473,18 +480,22 @@ class AddressTest extends TestCase
 
     public function testBuildAddressFromInputMergesOriginalData(): void
     {
-        $form = $this->createMock(Form::class);
+        $this->setUpSubject([
+            'dataObjectHelper' => $this->createMock(DataObjectHelper::class),
+        ]);
+
+        $form = $this->createStub(Form::class);
         $this->formFactory->method('create')->willReturn($form);
 
-        $request = $this->createMock(RequestInterface::class);
+        $request = $this->createStub(RequestInterface::class);
         $form->method('prepareRequest')->willReturn($request);
         $form->method('extractData')->willReturn(['city' => 'NewCity']);
         $form->method('compactData')->willReturn(['city' => 'NewCity']);
 
-        $address = $this->createMock(AddressInterface::class);
+        $address = $this->createStub(AddressInterface::class);
         $this->addressDataFactory->method('create')->willReturn($address);
 
-        $regionInterface = $this->createMock(RegionInterface::class);
+        $regionInterface = $this->createStub(RegionInterface::class);
         $this->regionDataFactory->method('create')->willReturn($regionInterface);
 
         $origData = ['firstname' => 'John', 'lastname' => 'Doe'];
@@ -511,18 +522,18 @@ class AddressTest extends TestCase
 
     public function testBuildAddressFromInputHandlesNullOrigData(): void
     {
-        $form = $this->createMock(Form::class);
+        $form = $this->createStub(Form::class);
         $this->formFactory->method('create')->willReturn($form);
 
-        $request = $this->createMock(RequestInterface::class);
+        $request = $this->createStub(RequestInterface::class);
         $form->method('prepareRequest')->willReturn($request);
         $form->method('extractData')->willReturn([]);
         $form->method('compactData')->willReturn([]);
 
-        $address = $this->createMock(AddressInterface::class);
+        $address = $this->createStub(AddressInterface::class);
         $this->addressDataFactory->method('create')->willReturn($address);
 
-        $regionInterface = $this->createMock(RegionInterface::class);
+        $regionInterface = $this->createStub(RegionInterface::class);
         $this->regionDataFactory->method('create')->willReturn($regionInterface);
 
         // Pass null as origAddressData - should be converted to empty array
@@ -533,12 +544,17 @@ class AddressTest extends TestCase
 
     public function testGetFormattedAddressReturnsHtml(): void
     {
-        $address = $this->createMock(AddressInterface::class);
+        $this->setUpSubject([
+            'addressConfig' => $this->createMock(Config::class),
+            'addressMapper' => $this->createMock(Mapper::class),
+        ]);
 
-        $renderer = $this->createMock(RendererInterface::class);
+        $address = $this->createStub(AddressInterface::class);
+
+        $renderer = $this->createStub(RendererInterface::class);
         $renderer->method('renderArray')->willReturn('<p>123 Main St</p>');
 
-        $format = $this->createMock(Reader::class);
+        $format = $this->createStub(Reader::class);
         // Create a mock that has getRenderer method
         $formatMock = new class($renderer) {
             public function __construct(private $renderer)
@@ -565,7 +581,7 @@ class AddressTest extends TestCase
 
     public function testGetFormattedAddressReturnsEmptyOnException(): void
     {
-        $address = $this->createMock(AddressInterface::class);
+        $address = $this->createStub(AddressInterface::class);
 
         $this->addressConfig->method('getFormatByCode')
             ->willThrowException(new Exception('Format not found'));

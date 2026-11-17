@@ -27,6 +27,7 @@ use ParadoxLabs\TokenBase\Model\Method\Factory as MethodFactory;
 use ParadoxLabs\TokenBase\Model\ResourceModel\Card as CardResource;
 use ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection;
 use ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory;
+use ParadoxLabs\TokenBase\Test\Unit\PartialStubTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -36,6 +37,8 @@ use ReflectionClass;
  */
 class BeforeSaveTest extends TestCase
 {
+    use PartialStubTrait;
+
     private Card $card;
     private ModelContext|MockObject $context;
     private Registry|MockObject $registry;
@@ -52,35 +55,40 @@ class BeforeSaveTest extends TestCase
 
     protected function setUp(): void
     {
+        $this->setUpSubject();
+    }
+
+    private function setUpSubject(array $mocks = []): void
+    {
         // Initialize ObjectManager
-        $this->resource = $this->createMock(CardResource::class);
+        $this->resource = $mocks['resource'] ?? $this->createStub(CardResource::class);
         $this->resource->method('getIdFieldName')->willReturn('id');
 
-        $objectManager = $this->createMock(ObjectManagerInterface::class);
+        $objectManager = $this->createStub(ObjectManagerInterface::class);
         $objectManager->method('get')
             ->willReturnCallback(function ($className) {
                 if ($className === CardResource::class) {
                     return $this->resource;
                 }
 
-                return $this->createMock($className);
+                return $this->createStub($className);
             });
         ObjectManager::setInstance($objectManager);
 
-        $this->context = $this->createMock(ModelContext::class);
-        $this->registry = $this->createMock(Registry::class);
-        $this->extensionFactory = $this->createMock(ExtensionAttributesFactory::class);
-        $this->customAttributeFactory = $this->createMock(AttributeValueFactory::class);
-        $this->cardContext = $this->createMock(CardContext::class);
-        $this->helper = $this->createMock(Data::class);
-        $this->methodFactory = $this->createMock(MethodFactory::class);
-        $this->orderCollectionFactory = $this->createMock(OrderCollectionFactory::class);
-        $this->dateProcessor = $this->createMock(TimezoneInterface::class);
-        $this->cardCollectionFactory = $this->createMock(CollectionFactory::class);
-        $this->remoteAddress = $this->createMock(RemoteAddress::class);
+        $this->context = $this->createStub(ModelContext::class);
+        $this->registry = $this->createStub(Registry::class);
+        $this->extensionFactory = $this->createStub(ExtensionAttributesFactory::class);
+        $this->customAttributeFactory = $this->createStub(AttributeValueFactory::class);
+        $this->cardContext = $this->createStub(CardContext::class);
+        $this->helper = $mocks['helper'] ?? $this->createStub(Data::class);
+        $this->methodFactory = $this->createStub(MethodFactory::class);
+        $this->orderCollectionFactory = $this->createStub(OrderCollectionFactory::class);
+        $this->dateProcessor = $this->createStub(TimezoneInterface::class);
+        $this->cardCollectionFactory = $mocks['cardCollectionFactory'] ?? $this->createStub(CollectionFactory::class);
+        $this->remoteAddress = $this->createStub(RemoteAddress::class);
 
-        $customerFactory = $this->createMock(CustomerInterfaceFactory::class);
-        $customerRepository = $this->createMock(CustomerRepositoryInterface::class);
+        $customerFactory = $this->createStub(CustomerInterfaceFactory::class);
+        $customerRepository = $this->createStub(CustomerRepositoryInterface::class);
 
         $this->cardContext->method('getHelper')->willReturn($this->helper);
         $this->cardContext->method('getMethodFactory')->willReturn($this->methodFactory);
@@ -91,14 +99,14 @@ class BeforeSaveTest extends TestCase
         $this->cardContext->method('getCardCollectionFactory')->willReturn($this->cardCollectionFactory);
         $this->cardContext->method('getRemoteAddress')->willReturn($this->remoteAddress);
 
-        $customer = $this->createMock(CustomerInterface::class);
+        $customer = $this->createStub(CustomerInterface::class);
         $customerFactory->method('create')->willReturn($customer);
 
-        $eventManager = $this->createMock(ManagerInterface::class);
+        $eventManager = $this->createStub(ManagerInterface::class);
         $this->context->method('getEventDispatcher')->willReturn($eventManager);
 
         // Set up default date mock
-        $dateMock = $this->createMock(DateTime::class);
+        $dateMock = $this->createStub(DateTime::class);
         $dateMock->method('format')->willReturn('2025-01-14 12:00:00');
         $this->dateProcessor->method('date')->willReturn($dateMock);
 
@@ -132,9 +140,9 @@ class BeforeSaveTest extends TestCase
         ]);
 
         // Set up empty collection
-        $collection = $this->createMock(Collection::class);
+        $collection = $this->createStub(Collection::class);
         $collection->method('getSize')->willReturn(0);
-        $collection->method('getFirstItem')->willReturn($this->createMock(Card::class));
+        $collection->method('getFirstItem')->willReturn($this->createStub(Card::class));
         $this->cardCollectionFactory->method('create')->willReturn($collection);
 
         $this->card->beforeSave();
@@ -153,9 +161,9 @@ class BeforeSaveTest extends TestCase
         $this->card->setData('customer_id', 123);
         $this->card->setData('customer_email', 'test@example.com');
 
-        $collection = $this->createMock(Collection::class);
+        $collection = $this->createStub(Collection::class);
         $collection->method('getSize')->willReturn(0);
-        $collection->method('getFirstItem')->willReturn($this->createMock(Card::class));
+        $collection->method('getFirstItem')->willReturn($this->createStub(Card::class));
         $this->cardCollectionFactory->method('create')->willReturn($collection);
 
         $this->card->beforeSave();
@@ -170,9 +178,9 @@ class BeforeSaveTest extends TestCase
         $this->card->setData('method', 'testmethod');
         $this->card->setData('customer_id', 123);
 
-        $collection = $this->createMock(Collection::class);
+        $collection = $this->createStub(Collection::class);
         $collection->method('getSize')->willReturn(0);
-        $collection->method('getFirstItem')->willReturn($this->createMock(Card::class));
+        $collection->method('getFirstItem')->willReturn($this->createStub(Card::class));
         $this->cardCollectionFactory->method('create')->willReturn($collection);
 
         $this->helper->method('getIsFrontend')->willReturn(true);
@@ -188,9 +196,9 @@ class BeforeSaveTest extends TestCase
         $this->card->setData('method', 'testmethod');
         $this->card->setData('customer_id', 123);
 
-        $collection = $this->createMock(Collection::class);
+        $collection = $this->createStub(Collection::class);
         $collection->method('getSize')->willReturn(0);
-        $collection->method('getFirstItem')->willReturn($this->createMock(Card::class));
+        $collection->method('getFirstItem')->willReturn($this->createStub(Card::class));
         $this->cardCollectionFactory->method('create')->willReturn($collection);
 
         $this->helper->method('getIsFrontend')->willReturn(false);
@@ -206,9 +214,9 @@ class BeforeSaveTest extends TestCase
         $this->card->setData('customer_id', 123);
         $this->card->isObjectNew(true);
 
-        $collection = $this->createMock(Collection::class);
+        $collection = $this->createStub(Collection::class);
         $collection->method('getSize')->willReturn(0);
-        $collection->method('getFirstItem')->willReturn($this->createMock(Card::class));
+        $collection->method('getFirstItem')->willReturn($this->createStub(Card::class));
         $this->cardCollectionFactory->method('create')->willReturn($collection);
 
         $this->card->beforeSave();
@@ -221,9 +229,9 @@ class BeforeSaveTest extends TestCase
         $this->card->setData('method', 'testmethod');
         $this->card->setData('customer_id', 123);
 
-        $collection = $this->createMock(Collection::class);
+        $collection = $this->createStub(Collection::class);
         $collection->method('getSize')->willReturn(0);
-        $collection->method('getFirstItem')->willReturn($this->createMock(Card::class));
+        $collection->method('getFirstItem')->willReturn($this->createStub(Card::class));
         $this->cardCollectionFactory->method('create')->willReturn($collection);
 
         $this->card->beforeSave();
@@ -241,13 +249,10 @@ class BeforeSaveTest extends TestCase
         $this->card->setOrigData('payment_id', 'old_payment_id');
 
         // Create a duplicate card mock
-        $duplicateCard = $this->getMockBuilder(Card::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getId'])
-            ->getMock();
+        $duplicateCard = $this->createPartialStub(Card::class, ['getId']);
         $duplicateCard->method('getId')->willReturn(null);
 
-        $collection = $this->createMock(Collection::class);
+        $collection = $this->createStub(Collection::class);
         $collection->method('getSize')->willReturn(0);
         $collection->method('getFirstItem')->willReturn($duplicateCard);
         $collection->method('addFieldToFilter')->willReturnSelf();
@@ -261,6 +266,10 @@ class BeforeSaveTest extends TestCase
 
     public function testBeforeSaveMergesOntoExistingDuplicate(): void
     {
+        $this->setUpSubject([
+            'helper' => $this->createMock(Data::class),
+        ]);
+
         // New card (no ID yet)
         $this->card->setData('method', 'testmethod');
         $this->card->setData('customer_id', 123);
@@ -268,13 +277,10 @@ class BeforeSaveTest extends TestCase
         $this->card->setOrigData('payment_id', null);
 
         // Create a duplicate card mock that exists
-        $duplicateCard = $this->getMockBuilder(Card::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getId'])
-            ->getMock();
+        $duplicateCard = $this->createPartialStub(Card::class, ['getId']);
         $duplicateCard->method('getId')->willReturn(999);
 
-        $collection = $this->createMock(Collection::class);
+        $collection = $this->createStub(Collection::class);
         $collection->method('getSize')->willReturn(1);
         $collection->method('getFirstItem')->willReturn($duplicateCard);
         $collection->method('addFieldToFilter')->willReturnSelf();
@@ -298,6 +304,10 @@ class BeforeSaveTest extends TestCase
 
     public function testBeforeSaveNoDuplicateCheckWhenPaymentIdUnchanged(): void
     {
+        $this->setUpSubject([
+            'cardCollectionFactory' => $this->createMock(CollectionFactory::class),
+        ]);
+
         $this->card->setData('method', 'testmethod');
         $this->card->setData('customer_id', 123);
         $this->card->setData('payment_id', 'same_id');
@@ -312,6 +322,10 @@ class BeforeSaveTest extends TestCase
 
     public function testBeforeSaveRemovesMultipleDuplicates(): void
     {
+        $this->setUpSubject([
+            'resource' => $this->createMock(CardResource::class),
+        ]);
+
         $this->card->setData('id', 1);
         $this->card->setData('method', 'testmethod');
         $this->card->setData('customer_id', 123);
@@ -319,29 +333,23 @@ class BeforeSaveTest extends TestCase
         $this->card->setOrigData('payment_id', 'old_payment_id');
 
         // Create duplicate cards
-        $dupe1 = $this->getMockBuilder(Card::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getId', 'getProfileId'])
-            ->getMock();
+        $dupe1 = $this->createPartialStub(Card::class, ['getId', 'getProfileId']);
         $dupe1->method('getId')->willReturn(2);
         $dupe1->method('getProfileId')->willReturn('profile2');
 
-        $dupe2 = $this->getMockBuilder(Card::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getId', 'getProfileId'])
-            ->getMock();
+        $dupe2 = $this->createPartialStub(Card::class, ['getId', 'getProfileId']);
         $dupe2->method('getId')->willReturn(3);
         $dupe2->method('getProfileId')->willReturn('profile3');
 
-        $collection = $this->createMock(Collection::class);
+        $collection = $this->createStub(Collection::class);
         $collection->method('getSize')->willReturn(3);
         $collection->method('addFieldToFilter')->willReturnSelf();
         $collection->method('getIterator')->willReturn(new ArrayIterator([$this->card, $dupe1, $dupe2]));
-        $collection->method('getFirstItem')->willReturn($this->createMock(Card::class));
+        $collection->method('getFirstItem')->willReturn($this->createStub(Card::class));
         $this->cardCollectionFactory->method('create')->willReturn($collection);
 
         // Set up connection mock for update queries
-        $connection = $this->createMock(AdapterInterface::class);
+        $connection = $this->createStub(AdapterInterface::class);
         $this->resource->method('getConnection')->willReturn($connection);
         $this->resource->method('getTable')->willReturnArgument(0);
 

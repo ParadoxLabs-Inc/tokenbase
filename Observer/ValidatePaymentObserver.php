@@ -43,6 +43,8 @@ class ValidatePaymentObserver implements ObserverInterface
     }
 
     /**
+     * Validate the order or quote payment with the configured validators.
+     *
      * @param Observer $observer
      * @return void
      */

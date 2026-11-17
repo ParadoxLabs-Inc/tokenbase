@@ -42,27 +42,32 @@ class DeleteTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->request = $this->createMock(Request::class);
-        $this->messageManager = $this->createMock(MessageManagerInterface::class);
-        $this->cardRepository = $this->createMock(CardRepositoryInterface::class);
-        $this->helper = $this->createMock(Data::class);
-        $this->formKeyValidator = $this->createMock(Validator::class);
-        $this->jsonResult = $this->createMock(Json::class);
-        $this->redirectResult = $this->createMock(Redirect::class);
+        $this->setUpSubject();
+    }
 
-        $resultFactory = $this->createMock(ResultFactory::class);
+    private function setUpSubject(array $mocks = []): void
+    {
+        $this->request = $this->createStub(Request::class);
+        $this->messageManager = $mocks['messageManager'] ?? $this->createStub(MessageManagerInterface::class);
+        $this->cardRepository = $this->createStub(CardRepositoryInterface::class);
+        $this->helper = $this->createStub(Data::class);
+        $this->formKeyValidator = $this->createStub(Validator::class);
+        $this->jsonResult = $mocks['jsonResult'] ?? $this->createStub(Json::class);
+        $this->redirectResult = $this->createStub(Redirect::class);
+
+        $resultFactory = $this->createStub(ResultFactory::class);
         $resultFactory->method('create')->willReturn($this->jsonResult);
 
-        $redirectFactory = $this->createMock(RedirectFactory::class);
+        $redirectFactory = $this->createStub(RedirectFactory::class);
         $redirectFactory->method('create')->willReturn($this->redirectResult);
 
-        $context = $this->createMock(Context::class);
+        $context = $this->createStub(Context::class);
         $context->method('getRequest')->willReturn($this->request);
         $context->method('getMessageManager')->willReturn($this->messageManager);
         $context->method('getResultFactory')->willReturn($resultFactory);
         $context->method('getResultRedirectFactory')->willReturn($redirectFactory);
 
-        $customer = $this->createMock(CustomerInterface::class);
+        $customer = $this->createStub(CustomerInterface::class);
         $customer->method('getId')->willReturn(123);
         $this->helper->method('getCurrentCustomer')->willReturn($customer);
         $this->helper->method('getActiveMethods')->willReturn(['test_method']);
@@ -71,14 +76,14 @@ class DeleteTest extends TestCase
 
         $this->controller = new Delete(
             $context,
-            $this->createMock(Session::class),
-            $this->createMock(PageFactory::class),
+            $this->createStub(Session::class),
+            $this->createStub(PageFactory::class),
             $this->formKeyValidator,
-            $this->createMock(Registry::class),
-            $this->createMock(CardFactory::class),
+            $this->createStub(Registry::class),
+            $this->createStub(CardFactory::class),
             $this->cardRepository,
             $this->helper,
-            $this->createMock(Address::class)
+            $this->createStub(Address::class)
         );
     }
 
@@ -89,6 +94,11 @@ class DeleteTest extends TestCase
      */
     public function testAjaxFailureReturnsReason(): void
     {
+        $this->setUpSubject([
+            'jsonResult' => $this->createMock(Json::class),
+            'messageManager' => $this->createMock(MessageManagerInterface::class),
+        ]);
+
         $this->mockRequest(true);
         $this->mockCard();
 
@@ -117,6 +127,10 @@ class DeleteTest extends TestCase
      */
     public function testAjaxSuccess(): void
     {
+        $this->setUpSubject([
+            'jsonResult' => $this->createMock(Json::class),
+        ]);
+
         $this->mockRequest(true);
         $this->mockCard();
 
@@ -135,6 +149,11 @@ class DeleteTest extends TestCase
      */
     public function testAjaxInvalidRequestReturnsReason(): void
     {
+        $this->setUpSubject([
+            'jsonResult' => $this->createMock(Json::class),
+            'messageManager' => $this->createMock(MessageManagerInterface::class),
+        ]);
+
         $this->mockRequest(true, null);
 
         $this->messageManager->expects($this->never())->method('addErrorMessage');
@@ -159,6 +178,10 @@ class DeleteTest extends TestCase
      */
     public function testNonAjaxFailureQueuesMessageAndRedirects(): void
     {
+        $this->setUpSubject([
+            'messageManager' => $this->createMock(MessageManagerInterface::class),
+        ]);
+
         $this->mockRequest(false);
         $this->mockCard();
 
@@ -201,7 +224,7 @@ class DeleteTest extends TestCase
      */
     private function mockCard(): void
     {
-        $card = $this->createMock(Card::class);
+        $card = $this->createStub(Card::class);
         $card->method('getTypeInstance')->willReturnSelf();
         $card->method('getHash')->willReturn('cardhash');
         $card->method('hasOwner')->willReturn(true);

@@ -14,6 +14,7 @@ use Magento\Sales\Model\Order\Payment as OrderPayment;
 use ParadoxLabs\TokenBase\Api\CardRepositoryInterface;
 use ParadoxLabs\TokenBase\Helper\Data;
 use ParadoxLabs\TokenBase\Observer\PaymentMethodAssignDataObserver;
+use ParadoxLabs\TokenBase\Test\Unit\PartialStubTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -22,16 +23,18 @@ use PHPUnit\Framework\TestCase;
  */
 class PaymentMethodAssignDataObserverTest extends TestCase
 {
+    use PartialStubTrait;
+
     private PaymentMethodAssignDataObserver $observer;
     private Data|MockObject $helper;
 
     protected function setUp(): void
     {
-        $this->helper = $this->createMock(Data::class);
+        $this->helper = $this->createStub(Data::class);
 
         $this->observer = new PaymentMethodAssignDataObserver(
             $this->helper,
-            $this->createMock(CardRepositoryInterface::class)
+            $this->createStub(CardRepositoryInterface::class)
         );
     }
 
@@ -98,16 +101,10 @@ class PaymentMethodAssignDataObserverTest extends TestCase
      */
     public function testForcedSaveAppliesToOrderPayment(): void
     {
-        $order = $this->getMockBuilder(Order::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getCustomerId'])
-            ->getMock();
+        $order = $this->createPartialStub(Order::class, ['getCustomerId']);
         $order->method('getCustomerId')->willReturn(5);
 
-        $payment = $this->getMockBuilder(OrderPayment::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getOrder', 'getExtensionAttributes'])
-            ->getMock();
+        $payment = $this->createPartialStub(OrderPayment::class, ['getOrder', 'getExtensionAttributes']);
         $payment->method('getOrder')->willReturn($order);
         $payment->method('getExtensionAttributes')->willReturn(null);
 
@@ -169,16 +166,10 @@ class PaymentMethodAssignDataObserverTest extends TestCase
     private function createQuotePayment(?int $customerId)
     {
         // Left unstubbed: getCustomerId() is a DataObject magic method, which PHPUnit cannot stub.
-        $quote = $this->getMockBuilder(Quote::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods([])
-            ->getMock();
+        $quote = $this->createPartialStub(Quote::class, []);
         $quote->setData('customer_id', $customerId);
 
-        $payment = $this->getMockBuilder(QuotePayment::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getQuote', 'getExtensionAttributes'])
-            ->getMock();
+        $payment = $this->createPartialStub(QuotePayment::class, ['getQuote', 'getExtensionAttributes']);
         $payment->method('getQuote')->willReturn($quote);
         $payment->method('getExtensionAttributes')->willReturn(null);
 
@@ -198,7 +189,7 @@ class PaymentMethodAssignDataObserverTest extends TestCase
     {
         $config['allow_unsaved'] = $allowUnsaved;
 
-        $method = $this->createMock(MethodInterface::class);
+        $method = $this->createStub(MethodInterface::class);
         $method->method('getConfigData')
             ->willReturnCallback(
                 static function ($field) use ($config) {

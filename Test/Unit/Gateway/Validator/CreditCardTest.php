@@ -30,11 +30,16 @@ class CreditCardTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->resultFactory = $this->createMock(ResultInterfaceFactory::class);
-        $this->config = $this->createMock(ConfigInterface::class);
-        $this->ccTypes = $this->createMock(Types::class);
-        $this->dateProcessor = $this->createMock(TimezoneInterface::class);
-        $this->result = $this->createMock(ResultInterface::class);
+        $this->setUpSubject();
+    }
+
+    private function setUpSubject(array $mocks = []): void
+    {
+        $this->resultFactory = $mocks['resultFactory'] ?? $this->createStub(ResultInterfaceFactory::class);
+        $this->config = $mocks['config'] ?? $this->createStub(ConfigInterface::class);
+        $this->ccTypes = $mocks['ccTypes'] ?? $this->createStub(Types::class);
+        $this->dateProcessor = $this->createStub(TimezoneInterface::class);
+        $this->result = $this->createStub(ResultInterface::class);
 
         $this->resultFactory->method('create')
             ->willReturn($this->result);
@@ -95,7 +100,7 @@ class CreditCardTest extends TestCase
 
     public function testIsDateExpiredReturnsTrueForPastYear(): void
     {
-        $dateMock = $this->createMock(DateTime::class);
+        $dateMock = $this->createStub(DateTime::class);
         $dateMock->method('format')
             ->willReturnMap([
                 ['Y', '2025'],
@@ -110,7 +115,7 @@ class CreditCardTest extends TestCase
 
     public function testIsDateExpiredReturnsTrueForPastMonth(): void
     {
-        $dateMock = $this->createMock(DateTime::class);
+        $dateMock = $this->createStub(DateTime::class);
         $dateMock->method('format')
             ->willReturnMap([
                 ['Y', '2025'],
@@ -125,7 +130,7 @@ class CreditCardTest extends TestCase
 
     public function testIsDateExpiredReturnsFalseForCurrentMonth(): void
     {
-        $dateMock = $this->createMock(DateTime::class);
+        $dateMock = $this->createStub(DateTime::class);
         $dateMock->method('format')
             ->willReturnMap([
                 ['Y', '2025'],
@@ -140,7 +145,7 @@ class CreditCardTest extends TestCase
 
     public function testIsDateExpiredReturnsFalseForFutureMonth(): void
     {
-        $dateMock = $this->createMock(DateTime::class);
+        $dateMock = $this->createStub(DateTime::class);
         $dateMock->method('format')
             ->willReturnMap([
                 ['Y', '2025'],
@@ -155,7 +160,7 @@ class CreditCardTest extends TestCase
 
     public function testIsDateExpiredReturnsFalseForFutureYear(): void
     {
-        $dateMock = $this->createMock(DateTime::class);
+        $dateMock = $this->createStub(DateTime::class);
         $dateMock->method('format')
             ->willReturnMap([
                 ['Y', '2025'],
@@ -170,7 +175,7 @@ class CreditCardTest extends TestCase
 
     public function testIsDateExpiredReturnsTrueForInvalidYear(): void
     {
-        $dateMock = $this->createMock(DateTime::class);
+        $dateMock = $this->createStub(DateTime::class);
         $dateMock->method('format')
             ->willReturnMap([
                 ['Y', '2025'],
@@ -185,7 +190,7 @@ class CreditCardTest extends TestCase
 
     public function testIsDateExpiredReturnsTrueForInvalidMonth(): void
     {
-        $dateMock = $this->createMock(DateTime::class);
+        $dateMock = $this->createStub(DateTime::class);
         $dateMock->method('format')
             ->willReturnMap([
                 ['Y', '2025'],
@@ -201,6 +206,10 @@ class CreditCardTest extends TestCase
 
     public function testValidateSkipsValidationForStoredCard(): void
     {
+        $this->setUpSubject([
+            'resultFactory' => $this->createMock(ResultInterfaceFactory::class),
+        ]);
+
         $payment = $this->createMock(Info::class);
         $payment->method('getData')
             ->with('tokenbase_id')
@@ -218,7 +227,11 @@ class CreditCardTest extends TestCase
 
     public function testValidateFailsForDisallowedCardType(): void
     {
-        $payment = $this->createMock(Info::class);
+        $this->setUpSubject([
+            'resultFactory' => $this->createMock(ResultInterfaceFactory::class),
+        ]);
+
+        $payment = $this->createStub(Info::class);
         $payment->method('getData')
             ->willReturnMap([
                 ['tokenbase_id', null, null],
@@ -244,7 +257,7 @@ class CreditCardTest extends TestCase
                 'code' => ['name' => 'CVV', 'size' => 3],
             ]);
 
-        $dateMock = $this->createMock(DateTime::class);
+        $dateMock = $this->createStub(DateTime::class);
         $dateMock->method('format')
             ->willReturnMap([
                 ['Y', '2025'],
@@ -266,7 +279,11 @@ class CreditCardTest extends TestCase
 
     public function testValidateFailsForInvalidLuhnNumber(): void
     {
-        $payment = $this->createMock(Info::class);
+        $this->setUpSubject([
+            'resultFactory' => $this->createMock(ResultInterfaceFactory::class),
+        ]);
+
+        $payment = $this->createStub(Info::class);
         $payment->method('getData')
             ->willReturnMap([
                 ['tokenbase_id', null, null],
@@ -292,7 +309,7 @@ class CreditCardTest extends TestCase
                 'code' => ['name' => 'CVV', 'size' => 3],
             ]);
 
-        $dateMock = $this->createMock(DateTime::class);
+        $dateMock = $this->createStub(DateTime::class);
         $dateMock->method('format')
             ->willReturn('2025');
         $this->dateProcessor->method('date')
@@ -310,7 +327,11 @@ class CreditCardTest extends TestCase
 
     public function testValidateFailsForInvalidCvv(): void
     {
-        $payment = $this->createMock(Info::class);
+        $this->setUpSubject([
+            'resultFactory' => $this->createMock(ResultInterfaceFactory::class),
+        ]);
+
+        $payment = $this->createStub(Info::class);
         $payment->method('getData')
             ->willReturnMap([
                 ['tokenbase_id', null, null],
@@ -336,7 +357,7 @@ class CreditCardTest extends TestCase
                 'code' => ['name' => 'CVV', 'size' => 3],
             ]);
 
-        $dateMock = $this->createMock(DateTime::class);
+        $dateMock = $this->createStub(DateTime::class);
         $dateMock->method('format')
             ->willReturn('2025');
         $this->dateProcessor->method('date')
@@ -354,7 +375,11 @@ class CreditCardTest extends TestCase
 
     public function testValidatePassesForValidCard(): void
     {
-        $payment = $this->createMock(Info::class);
+        $this->setUpSubject([
+            'resultFactory' => $this->createMock(ResultInterfaceFactory::class),
+        ]);
+
+        $payment = $this->createStub(Info::class);
         $payment->method('getData')
             ->willReturnMap([
                 ['tokenbase_id', null, null],
@@ -380,7 +405,7 @@ class CreditCardTest extends TestCase
                 'code' => ['name' => 'CVV', 'size' => 3],
             ]);
 
-        $dateMock = $this->createMock(DateTime::class);
+        $dateMock = $this->createStub(DateTime::class);
         $dateMock->method('format')
             ->willReturnMap([
                 ['Y', '2025'],
@@ -399,7 +424,11 @@ class CreditCardTest extends TestCase
 
     public function testValidateFailsForExpiredCard(): void
     {
-        $payment = $this->createMock(Info::class);
+        $this->setUpSubject([
+            'resultFactory' => $this->createMock(ResultInterfaceFactory::class),
+        ]);
+
+        $payment = $this->createStub(Info::class);
         $payment->method('getData')
             ->willReturnMap([
                 ['tokenbase_id', null, null],
@@ -425,7 +454,7 @@ class CreditCardTest extends TestCase
                 'code' => ['name' => 'CVV', 'size' => 3],
             ]);
 
-        $dateMock = $this->createMock(DateTime::class);
+        $dateMock = $this->createStub(DateTime::class);
         $dateMock->method('format')
             ->willReturnMap([
                 ['Y', '2025'],
@@ -446,7 +475,12 @@ class CreditCardTest extends TestCase
 
     public function testValidateFailsForUndetectedCardType(): void
     {
-        $payment = $this->createMock(Info::class);
+        $this->setUpSubject([
+            'config' => $this->createMock(ConfigInterface::class),
+            'resultFactory' => $this->createMock(ResultInterfaceFactory::class),
+        ]);
+
+        $payment = $this->createStub(Info::class);
         $payment->method('getData')
             ->willReturnMap([
                 ['tokenbase_id', null, null],
@@ -479,6 +513,10 @@ class CreditCardTest extends TestCase
 
     public function testValidateStripsSpacesAndDashesFromCardNumber(): void
     {
+        $this->setUpSubject([
+            'ccTypes' => $this->createMock(Types::class),
+        ]);
+
         $payment = $this->createMock(Info::class);
         $payment->expects($this->atLeastOnce())
             ->method('getData')
@@ -510,7 +548,7 @@ class CreditCardTest extends TestCase
                 'code' => ['name' => 'CVV', 'size' => 3],
             ]);
 
-        $dateMock = $this->createMock(DateTime::class);
+        $dateMock = $this->createStub(DateTime::class);
         $dateMock->method('format')
             ->willReturn('2025');
         $this->dateProcessor->method('date')
@@ -521,7 +559,11 @@ class CreditCardTest extends TestCase
 
     public function testValidateSkipsLuhnForUnionPay(): void
     {
-        $payment = $this->createMock(Info::class);
+        $this->setUpSubject([
+            'resultFactory' => $this->createMock(ResultInterfaceFactory::class),
+        ]);
+
+        $payment = $this->createStub(Info::class);
         $payment->method('getData')
             ->willReturnMap([
                 ['tokenbase_id', null, null],
@@ -548,7 +590,7 @@ class CreditCardTest extends TestCase
                 'code' => ['name' => 'CVN', 'size' => 3],
             ]);
 
-        $dateMock = $this->createMock(DateTime::class);
+        $dateMock = $this->createStub(DateTime::class);
         $dateMock->method('format')
             ->willReturn('2025');
         $this->dateProcessor->method('date')
@@ -565,7 +607,11 @@ class CreditCardTest extends TestCase
 
     public function testAmexRequires4DigitCvv(): void
     {
-        $payment = $this->createMock(Info::class);
+        $this->setUpSubject([
+            'resultFactory' => $this->createMock(ResultInterfaceFactory::class),
+        ]);
+
+        $payment = $this->createStub(Info::class);
         $payment->method('getData')
             ->willReturnMap([
                 ['tokenbase_id', null, null],
@@ -591,7 +637,7 @@ class CreditCardTest extends TestCase
                 'code' => ['name' => 'CID', 'size' => 4],
             ]);
 
-        $dateMock = $this->createMock(DateTime::class);
+        $dateMock = $this->createStub(DateTime::class);
         $dateMock->method('format')
             ->willReturn('2025');
         $this->dateProcessor->method('date')

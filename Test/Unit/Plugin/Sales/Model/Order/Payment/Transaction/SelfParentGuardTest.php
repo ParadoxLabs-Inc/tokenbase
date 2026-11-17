@@ -125,7 +125,7 @@ class SelfParentGuardTest extends TestCase
      */
     private function transaction($id)
     {
-        $transaction = $this->createMock(Transaction::class);
+        $transaction = $this->createStub(Transaction::class);
         $transaction->method('getId')
             ->willReturn($id);
 
