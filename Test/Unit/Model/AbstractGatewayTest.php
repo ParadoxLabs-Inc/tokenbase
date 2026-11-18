@@ -6,11 +6,9 @@ namespace ParadoxLabs\TokenBase\Test\Unit\Model;
 
 use Magento\Framework\HTTP\ClientInterfaceFactory;
 use Magento\Payment\Gateway\Command\CommandException;
-use Magento\Payment\Model\InfoInterface;
 use ParadoxLabs\TokenBase\Api\Data\CardInterface;
 use ParadoxLabs\TokenBase\Helper\Data;
 use ParadoxLabs\TokenBase\Model\AbstractGateway;
-use ParadoxLabs\TokenBase\Model\Gateway\Response;
 use ParadoxLabs\TokenBase\Model\Gateway\ResponseFactory;
 use ParadoxLabs\TokenBase\Model\Gateway\Xml;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -21,18 +19,43 @@ use PHPUnit\Framework\TestCase;
  */
 class AbstractGatewayTest extends TestCase
 {
+
+    /**
+     * @var TestableGateway
+     */
     private TestableGateway $gateway;
+
+    /**
+     * @var Data|MockObject
+     */
     private Data|MockObject $helper;
+
+    /**
+     * @var Xml|MockObject
+     */
     private Xml|MockObject $xml;
+
+    /**
+     * @var ResponseFactory|MockObject
+     */
     private ResponseFactory|MockObject $responseFactory;
+
+    /**
+     * @var ClientInterfaceFactory|MockObject
+     */
     private ClientInterfaceFactory|MockObject $communicatorFactory;
 
     protected function setUp(): void
     {
-        $this->helper = $this->createMock(Data::class);
-        $this->xml = $this->createMock(Xml::class);
-        $this->responseFactory = $this->createMock(ResponseFactory::class);
-        $this->communicatorFactory = $this->createMock(ClientInterfaceFactory::class);
+        $this->setUpSubject();
+    }
+
+    private function setUpSubject(array $mocks = []): void
+    {
+        $this->helper = $mocks['helper'] ?? $this->createStub(Data::class);
+        $this->xml = $this->createStub(Xml::class);
+        $this->responseFactory = $this->createStub(ResponseFactory::class);
+        $this->communicatorFactory = $this->createStub(ClientInterfaceFactory::class);
 
         $this->gateway = new TestableGateway(
             $this->helper,
@@ -259,7 +282,7 @@ class AbstractGatewayTest extends TestCase
 
     public function testSetAndGetCard(): void
     {
-        $card = $this->createMock(CardInterface::class);
+        $card = $this->createStub(CardInterface::class);
 
         $this->gateway->setCard($card);
 
@@ -291,6 +314,10 @@ class AbstractGatewayTest extends TestCase
 
     public function testLogLogs(): void
     {
+        $this->setUpSubject([
+            'helper' => $this->createMock(Data::class),
+        ]);
+
         $this->helper->expects($this->once())
             ->method('log');
 
@@ -337,58 +364,5 @@ class AbstractGatewayTest extends TestCase
         $result = $this->gateway->clearParameters();
 
         $this->assertSame($this->gateway, $result);
-    }
-}
-
-/**
- * Concrete implementation of AbstractGateway for testing
- */
-class TestableGateway extends AbstractGateway
-{
-    protected $endpointLive = 'https://live.example.com';
-    protected $endpointTest = 'https://test.example.com';
-    protected $code = 'test_gateway';
-
-    protected $fields = [
-        'login' => [],
-        'password' => [],
-        'custom_field' => [],
-        'boolean_field' => [],
-        'max_length_field' => ['maxLength' => 10],
-        'no_symbols_field' => ['noSymbols' => true],
-        'char_mask_field' => ['charMask' => '0-9'],
-        'enum_field' => ['enum' => ['value1', 'value2', 'value3']],
-        'auth_code' => [],
-        'transaction_id' => [],
-    ];
-
-    public function getPublicEndpoint(): string
-    {
-        return $this->endpoint ?? '';
-    }
-
-    public function authorize(InfoInterface $payment, $amount): Response
-    {
-        return $this->responseFactory->create();
-    }
-
-    public function capture(InfoInterface $payment, $amount, $transactionId = null): Response
-    {
-        return $this->responseFactory->create();
-    }
-
-    public function refund(InfoInterface $payment, $amount, $transactionId = null): Response
-    {
-        return $this->responseFactory->create();
-    }
-
-    public function void(InfoInterface $payment, $transactionId = null): Response
-    {
-        return $this->responseFactory->create();
-    }
-
-    public function fraudUpdate(InfoInterface $payment, $transactionId): Response
-    {
-        return $this->responseFactory->create();
     }
 }

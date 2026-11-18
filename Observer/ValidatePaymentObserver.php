@@ -43,6 +43,8 @@ class ValidatePaymentObserver implements ObserverInterface
     }
 
     /**
+     * Validate the order or quote payment with the configured validators.
+     *
      * @param Observer $observer
      * @return void
      */
@@ -57,6 +59,8 @@ class ValidatePaymentObserver implements ObserverInterface
             $model = $order;
         } elseif ($quote instanceof CartInterface) {
             $model = $quote;
+        } else {
+            return;
         }
 
         if ($model->getPayment() instanceof InfoInterface === false) {

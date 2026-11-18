@@ -18,6 +18,7 @@ use ParadoxLabs\TokenBase\Helper\Data;
 use ParadoxLabs\TokenBase\Model\AbstractGateway;
 use ParadoxLabs\TokenBase\Model\AbstractMethod;
 use ParadoxLabs\TokenBase\Model\Card;
+use ParadoxLabs\TokenBase\Test\Unit\PartialStubTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -27,32 +28,76 @@ use ReflectionClass;
  */
 class CardLoadingTest extends TestCase
 {
+    use PartialStubTrait;
+
+    /**
+     * @var AbstractMethod|MockObject
+     */
     private AbstractMethod|MockObject $method;
+
+    /**
+     * @var Repository|MockObject
+     */
     private Repository|MockObject $transactionRepository;
+
+    /**
+     * @var Data|MockObject
+     */
     private Data|MockObject $helper;
+
+    /**
+     * @var AbstractGateway|MockObject
+     */
     private AbstractGateway|MockObject $gateway;
+
+    /**
+     * @var CardInterfaceFactory|MockObject
+     */
     private CardInterfaceFactory|MockObject $cardFactory;
+
+    /**
+     * @var CardRepositoryInterface|MockObject
+     */
     private CardRepositoryInterface|MockObject $cardRepository;
+
+    /**
+     * @var Address|MockObject
+     */
     private Address|MockObject $addressHelper;
+
+    /**
+     * @var ConfigInterface|MockObject
+     */
     private ConfigInterface|MockObject $config;
+
+    /**
+     * @var Registry|MockObject
+     */
     private Registry|MockObject $registry;
 
     protected function setUp(): void
     {
-        $this->transactionRepository = $this->createMock(Repository::class);
-        $this->helper = $this->createMock(Data::class);
-        $this->gateway = $this->createMock(AbstractGateway::class);
-        $this->cardFactory = $this->createMock(CardInterfaceFactory::class);
-        $this->cardRepository = $this->createMock(CardRepositoryInterface::class);
-        $this->addressHelper = $this->createMock(Address::class);
-        $this->config = $this->createMock(ConfigInterface::class);
-        $this->registry = $this->createMock(Registry::class);
+        $this->setUpSubject();
+    }
+
+    private function setUpSubject(array $mocks = []): void
+    {
+        $this->transactionRepository = $this->createStub(Repository::class);
+        $this->helper = $this->createStub(Data::class);
+        $this->gateway = $this->createStub(AbstractGateway::class);
+        $this->cardFactory = $this->createStub(CardInterfaceFactory::class);
+        $this->cardRepository = $mocks['cardRepository'] ?? $this->createStub(CardRepositoryInterface::class);
+        $this->addressHelper = $this->createStub(Address::class);
+        $this->config = $this->createStub(ConfigInterface::class);
+        $this->registry = $this->createStub(Registry::class);
 
         $this->helper->method('getCurrentStoreId')->willReturn(1);
 
-        // Create partial mock to test protected methods
-        $this->method = $this->getMockBuilder(AbstractMethod::class)
-            ->setConstructorArgs([
+        // Create a partial stub to test protected methods
+        $this->method = $this->createPartialStub(
+            AbstractMethod::class,
+            ['getInfoInstance', 'getCustomer', 'gateway'],
+            [
                 $this->transactionRepository,
                 $this->helper,
                 $this->gateway,
@@ -62,15 +107,18 @@ class CardLoadingTest extends TestCase
                 $this->config,
                 $this->registry,
                 'testmethod',
-            ])
-            ->onlyMethods(['getInfoInstance', 'getCustomer', 'gateway'])
-            ->getMock();
+            ]
+        );
 
         $this->method->method('gateway')->willReturn($this->gateway);
     }
 
     public function testLoadAndSetCardLoadsValidCard(): void
     {
+        $this->setUpSubject([
+            'cardRepository' => $this->createMock(CardRepositoryInterface::class),
+        ]);
+
         $card = $this->createCardMock(123, 456, 'testmethod', 'hash123');
 
         $this->cardRepository->method('getById')
@@ -87,6 +135,10 @@ class CardLoadingTest extends TestCase
 
     public function testLoadAndSetCardLoadsByHash(): void
     {
+        $this->setUpSubject([
+            'cardRepository' => $this->createMock(CardRepositoryInterface::class),
+        ]);
+
         $card = $this->createCardMock(123, 456, 'testmethod', 'hash123');
 
         $this->cardRepository->method('getById')
@@ -103,6 +155,10 @@ class CardLoadingTest extends TestCase
 
     public function testLoadAndSetCardThrowsForWrongCustomer(): void
     {
+        $this->setUpSubject([
+            'cardRepository' => $this->createMock(CardRepositoryInterface::class),
+        ]);
+
         $card = $this->createCardMock(123, 789, 'testmethod', 'hash123');
 
         $this->cardRepository->method('getById')
@@ -120,6 +176,10 @@ class CardLoadingTest extends TestCase
 
     public function testLoadAndSetCardThrowsForWrongMethod(): void
     {
+        $this->setUpSubject([
+            'cardRepository' => $this->createMock(CardRepositoryInterface::class),
+        ]);
+
         $card = $this->createCardMock(123, 456, 'othermethod', 'hash123');
 
         $this->cardRepository->method('getById')
@@ -137,6 +197,10 @@ class CardLoadingTest extends TestCase
 
     public function testLoadAndSetCardThrowsForInvalidHash(): void
     {
+        $this->setUpSubject([
+            'cardRepository' => $this->createMock(CardRepositoryInterface::class),
+        ]);
+
         $card = $this->createCardMock(123, 456, 'testmethod', 'differenthash');
 
         $this->cardRepository->method('getById')
@@ -168,6 +232,10 @@ class CardLoadingTest extends TestCase
 
     public function testLoadAndSetCardAllowsGuestCard(): void
     {
+        $this->setUpSubject([
+            'cardRepository' => $this->createMock(CardRepositoryInterface::class),
+        ]);
+
         // Card with empty customer_id
         $card = $this->createCardMock(123, null, 'testmethod', 'hash123');
 
@@ -232,6 +300,10 @@ class CardLoadingTest extends TestCase
 
     public function testLoadOrCreateCardLoadsFromTokenbaseId(): void
     {
+        $this->setUpSubject([
+            'cardRepository' => $this->createMock(CardRepositoryInterface::class),
+        ]);
+
         $card = $this->createCardMock(123, 456, 'testmethod', 'hash123');
 
         $payment = $this->createOrderPaymentMock(456);
@@ -261,7 +333,7 @@ class CardLoadingTest extends TestCase
 
     public function testPaymentContainsCardReturnsTrueWhenAllFieldsPresent(): void
     {
-        $payment = $this->createMock(OrderPayment::class);
+        $payment = $this->createStub(OrderPayment::class);
         $payment->method('hasData')
             ->willReturnMap([
                 ['cc_number', true],
@@ -279,7 +351,7 @@ class CardLoadingTest extends TestCase
 
     public function testPaymentContainsCardReturnsFalseWhenMissingNumber(): void
     {
-        $payment = $this->createMock(OrderPayment::class);
+        $payment = $this->createStub(OrderPayment::class);
         $payment->method('hasData')
             ->willReturnMap([
                 ['cc_number', false],
@@ -297,7 +369,7 @@ class CardLoadingTest extends TestCase
 
     public function testPaymentContainsCardReturnsFalseWhenMissingExpYear(): void
     {
-        $payment = $this->createMock(OrderPayment::class);
+        $payment = $this->createStub(OrderPayment::class);
         $payment->method('hasData')
             ->willReturnMap([
                 ['cc_number', true],
@@ -315,7 +387,7 @@ class CardLoadingTest extends TestCase
 
     public function testPaymentContainsCardReturnsFalseWhenMissingExpMonth(): void
     {
-        $payment = $this->createMock(OrderPayment::class);
+        $payment = $this->createStub(OrderPayment::class);
         $payment->method('hasData')
             ->willReturnMap([
                 ['cc_number', true],
@@ -333,7 +405,7 @@ class CardLoadingTest extends TestCase
 
     public function testLoadOrCreateCardThrowsWhenNoCardData(): void
     {
-        $payment = $this->createMock(OrderPayment::class);
+        $payment = $this->createStub(OrderPayment::class);
         $payment->method('getData')
             ->willReturnMap([
                 ['tokenbase_card', null, null],
@@ -367,9 +439,9 @@ class CardLoadingTest extends TestCase
         string $method,
         string $hash,
     ): Card|MockObject {
-        $card = $this->getMockBuilder(Card::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods([
+        $card = $this->createPartialStub(
+            Card::class,
+            [
                 'getId',
                 'getCustomerId',
                 'getMethod',
@@ -379,8 +451,8 @@ class CardLoadingTest extends TestCase
                 'setInfoInstance',
                 'getAdditional',
                 'getType',
-            ])
-            ->getMock();
+            ]
+        );
 
         $card->method('getId')->willReturn($id);
         $card->method('getCustomerId')->willReturn($customerId);
@@ -397,10 +469,10 @@ class CardLoadingTest extends TestCase
 
     private function createOrderPaymentMock(int $customerId): OrderPayment|MockObject
     {
-        $order = $this->createMock(Order::class);
+        $order = $this->createStub(Order::class);
         $order->method('getCustomerId')->willReturn($customerId);
 
-        $payment = $this->createMock(OrderPayment::class);
+        $payment = $this->createStub(OrderPayment::class);
         $payment->method('getOrder')->willReturn($order);
         $payment->method('setData')->willReturnSelf();
         $payment->method('setAdditionalInformation')->willReturnSelf();

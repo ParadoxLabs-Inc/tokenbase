@@ -31,6 +31,10 @@ use PHPUnit\Framework\TestCase;
  */
 class SelfParentGuardTest extends TestCase
 {
+
+    /**
+     * @var SelfParentGuard
+     */
     private SelfParentGuard $plugin;
 
     protected function setUp(): void
@@ -125,7 +129,7 @@ class SelfParentGuardTest extends TestCase
      */
     private function transaction($id)
     {
-        $transaction = $this->createMock(Transaction::class);
+        $transaction = $this->createStub(Transaction::class);
         $transaction->method('getId')
             ->willReturn($id);
 

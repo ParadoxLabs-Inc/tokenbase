@@ -18,6 +18,7 @@ use ParadoxLabs\TokenBase\Helper\Data;
 use ParadoxLabs\TokenBase\Model\AbstractGateway;
 use ParadoxLabs\TokenBase\Model\AbstractMethod;
 use ParadoxLabs\TokenBase\Model\Gateway\Response;
+use ParadoxLabs\TokenBase\Test\Unit\PartialStubTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -26,30 +27,40 @@ use PHPUnit\Framework\TestCase;
  */
 class VoidTest extends TestCase
 {
+    use PartialStubTrait;
+
+    /**
+     * @var AbstractMethod|MockObject
+     */
     private AbstractMethod|MockObject $method;
+
+    /**
+     * @var AbstractGateway|MockObject
+     */
     private AbstractGateway|MockObject $gateway;
 
     protected function setUp(): void
     {
-        $this->gateway = $this->createMock(AbstractGateway::class);
+        $this->gateway = $this->createStub(AbstractGateway::class);
 
-        $helper = $this->createMock(Data::class);
+        $helper = $this->createStub(Data::class);
         $helper->method('getCurrentStoreId')->willReturn(1);
 
-        $this->method = $this->getMockBuilder(AbstractMethod::class)
-            ->setConstructorArgs([
-                $this->createMock(Repository::class),
+        $this->method = $this->createPartialStub(
+            AbstractMethod::class,
+            ['gateway', 'getCard', 'loadOrCreateCard', 'log'],
+            [
+                $this->createStub(Repository::class),
                 $helper,
                 $this->gateway,
-                $this->createMock(CardInterfaceFactory::class),
-                $this->createMock(CardRepositoryInterface::class),
-                $this->createMock(Address::class),
-                $this->createMock(ConfigInterface::class),
-                $this->createMock(Registry::class),
+                $this->createStub(CardInterfaceFactory::class),
+                $this->createStub(CardRepositoryInterface::class),
+                $this->createStub(Address::class),
+                $this->createStub(ConfigInterface::class),
+                $this->createStub(Registry::class),
                 'testmethod',
-            ])
-            ->onlyMethods(['gateway', 'getCard', 'loadOrCreateCard', 'log'])
-            ->getMock();
+            ]
+        );
 
         $this->method->method('gateway')->willReturn($this->gateway);
         $this->method->method('getCard')->willReturn(null);
@@ -64,7 +75,7 @@ class VoidTest extends TestCase
     {
         $payment = $this->createPaymentMock();
 
-        $response = $this->createMock(Response::class);
+        $response = $this->createStub(Response::class);
         $response->method('getData')->willReturn(['response_code' => 1]);
         $this->gateway->method('void')->willReturn($response);
 
@@ -150,23 +161,24 @@ class VoidTest extends TestCase
      */
     public function testGatewayClassifierCanMarkFailureExpected(): void
     {
-        $helper = $this->createMock(Data::class);
+        $helper = $this->createStub(Data::class);
         $helper->method('getCurrentStoreId')->willReturn(1);
 
-        $method = $this->getMockBuilder(AbstractMethod::class)
-            ->setConstructorArgs([
-                $this->createMock(Repository::class),
+        $method = $this->createPartialStub(
+            AbstractMethod::class,
+            ['gateway', 'getCard', 'loadOrCreateCard', 'log', 'isExpectedVoidFailure'],
+            [
+                $this->createStub(Repository::class),
                 $helper,
                 $this->gateway,
-                $this->createMock(CardInterfaceFactory::class),
-                $this->createMock(CardRepositoryInterface::class),
-                $this->createMock(Address::class),
-                $this->createMock(ConfigInterface::class),
-                $this->createMock(Registry::class),
+                $this->createStub(CardInterfaceFactory::class),
+                $this->createStub(CardRepositoryInterface::class),
+                $this->createStub(Address::class),
+                $this->createStub(ConfigInterface::class),
+                $this->createStub(Registry::class),
                 'testmethod',
-            ])
-            ->onlyMethods(['gateway', 'getCard', 'loadOrCreateCard', 'log', 'isExpectedVoidFailure'])
-            ->getMock();
+            ]
+        );
 
         $method->method('gateway')->willReturn($this->gateway);
         $method->method('getCard')->willReturn(null);
@@ -193,10 +205,7 @@ class VoidTest extends TestCase
      */
     private function createPaymentMock()
     {
-        $payment = $this->getMockBuilder(OrderPayment::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods([])
-            ->getMock();
+        $payment = $this->createPartialStub(OrderPayment::class, []);
 
         $payment->setData('parent_transaction_id', 'txn123');
 

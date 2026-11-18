@@ -32,49 +32,97 @@ use ReflectionClass;
  */
 class CardTest extends TestCase
 {
+
+    /**
+     * @var Card
+     */
     private Card $card;
+
+    /**
+     * @var ModelContext|MockObject
+     */
     private ModelContext|MockObject $context;
+
+    /**
+     * @var Registry|MockObject
+     */
     private Registry|MockObject $registry;
+
+    /**
+     * @var ExtensionAttributesFactory|MockObject
+     */
     private ExtensionAttributesFactory|MockObject $extensionFactory;
+
+    /**
+     * @var AttributeValueFactory|MockObject
+     */
     private AttributeValueFactory|MockObject $customAttributeFactory;
+
+    /**
+     * @var CardContext|MockObject
+     */
     private CardContext|MockObject $cardContext;
+
+    /**
+     * @var Data|MockObject
+     */
     private Data|MockObject $helper;
+
+    /**
+     * @var MethodFactory|MockObject
+     */
     private MethodFactory|MockObject $methodFactory;
+
+    /**
+     * @var OrderCollectionFactory|MockObject
+     */
     private OrderCollectionFactory|MockObject $orderCollectionFactory;
+
+    /**
+     * @var TimezoneInterface|MockObject
+     */
     private TimezoneInterface|MockObject $dateProcessor;
+
+    /**
+     * @var AbstractMethod|MockObject
+     */
     private AbstractMethod|MockObject $method;
+
+    /**
+     * @var CardResource|MockObject
+     */
     private CardResource|MockObject $resource;
 
     protected function setUp(): void
     {
         // Initialize ObjectManager with mocks to prevent "ObjectManager isn't initialized" errors
-        $this->resource = $this->createMock(CardResource::class);
+        $this->resource = $this->createStub(CardResource::class);
         $this->resource->method('getIdFieldName')->willReturn('id');
 
-        $objectManager = $this->createMock(ObjectManagerInterface::class);
+        $objectManager = $this->createStub(ObjectManagerInterface::class);
         $objectManager->method('get')
             ->willReturnCallback(function ($className) {
                 if ($className === CardResource::class) {
                     return $this->resource;
                 }
 
-                return $this->createMock($className);
+                return $this->createStub($className);
             });
         ObjectManager::setInstance($objectManager);
 
-        $this->context = $this->createMock(ModelContext::class);
-        $this->registry = $this->createMock(Registry::class);
-        $this->extensionFactory = $this->createMock(ExtensionAttributesFactory::class);
-        $this->customAttributeFactory = $this->createMock(AttributeValueFactory::class);
-        $this->cardContext = $this->createMock(CardContext::class);
-        $this->helper = $this->createMock(Data::class);
-        $this->methodFactory = $this->createMock(MethodFactory::class);
-        $this->orderCollectionFactory = $this->createMock(OrderCollectionFactory::class);
-        $this->dateProcessor = $this->createMock(TimezoneInterface::class);
-        $this->method = $this->createMock(AbstractMethod::class);
+        $this->context = $this->createStub(ModelContext::class);
+        $this->registry = $this->createStub(Registry::class);
+        $this->extensionFactory = $this->createStub(ExtensionAttributesFactory::class);
+        $this->customAttributeFactory = $this->createStub(AttributeValueFactory::class);
+        $this->cardContext = $this->createStub(CardContext::class);
+        $this->helper = $this->createStub(Data::class);
+        $this->methodFactory = $this->createStub(MethodFactory::class);
+        $this->orderCollectionFactory = $this->createStub(OrderCollectionFactory::class);
+        $this->dateProcessor = $this->createStub(TimezoneInterface::class);
+        $this->method = $this->createStub(AbstractMethod::class);
 
-        $customerFactory = $this->createMock(CustomerInterfaceFactory::class);
-        $customerRepository = $this->createMock(CustomerRepositoryInterface::class);
+        $customerFactory = $this->createStub(CustomerInterfaceFactory::class);
+        $customerRepository = $this->createStub(CustomerRepositoryInterface::class);
 
         $this->cardContext->method('getHelper')->willReturn($this->helper);
         $this->cardContext->method('getMethodFactory')->willReturn($this->methodFactory);
@@ -83,10 +131,10 @@ class CardTest extends TestCase
         $this->cardContext->method('getCustomerFactory')->willReturn($customerFactory);
         $this->cardContext->method('getCustomerRepository')->willReturn($customerRepository);
 
-        $customer = $this->createMock(CustomerInterface::class);
+        $customer = $this->createStub(CustomerInterface::class);
         $customerFactory->method('create')->willReturn($customer);
 
-        $eventManager = $this->createMock(ManagerInterface::class);
+        $eventManager = $this->createStub(ManagerInterface::class);
         $this->context->method('getEventDispatcher')->willReturn($eventManager);
 
         $this->card = new Card(
@@ -232,7 +280,7 @@ class CardTest extends TestCase
 
     public function testUpdateLastUse(): void
     {
-        $dateMock = $this->createMock(DateTime::class);
+        $dateMock = $this->createStub(DateTime::class);
         $dateMock->method('format')
             ->willReturn('2025-01-14 12:00:00');
 
@@ -246,7 +294,7 @@ class CardTest extends TestCase
 
     public function testUpdateLastUseReturnsThis(): void
     {
-        $dateMock = $this->createMock(DateTime::class);
+        $dateMock = $this->createStub(DateTime::class);
         $dateMock->method('format')->willReturn('2025-01-14 12:00:00');
         $this->dateProcessor->method('date')->willReturn($dateMock);
 

@@ -10,6 +10,7 @@ use Magento\Framework\ObjectManagerInterface;
 use ParadoxLabs\TokenBase\Api\Data\CardInterface;
 use ParadoxLabs\TokenBase\Model\Card;
 use ParadoxLabs\TokenBase\Model\Card\Factory;
+use ParadoxLabs\TokenBase\Test\Unit\PartialStubTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -19,14 +20,32 @@ use stdClass;
  */
 class FactoryTest extends TestCase
 {
+    use PartialStubTrait;
+
+    /**
+     * @var Factory
+     */
     private Factory $factory;
+
+    /**
+     * @var ObjectManagerInterface|MockObject
+     */
     private ObjectManagerInterface|MockObject $objectManager;
+
+    /**
+     * @var ScopeConfigInterface|MockObject
+     */
     private ScopeConfigInterface|MockObject $scopeConfig;
 
     protected function setUp(): void
     {
-        $this->objectManager = $this->createMock(ObjectManagerInterface::class);
-        $this->scopeConfig = $this->createMock(ScopeConfigInterface::class);
+        $this->setUpSubject();
+    }
+
+    private function setUpSubject(array $mocks = []): void
+    {
+        $this->objectManager = $mocks['objectManager'] ?? $this->createStub(ObjectManagerInterface::class);
+        $this->scopeConfig = $mocks['scopeConfig'] ?? $this->createStub(ScopeConfigInterface::class);
 
         $this->factory = new Factory(
             $this->objectManager,
@@ -36,7 +55,11 @@ class FactoryTest extends TestCase
 
     public function testCreateReturnsCardInstance(): void
     {
-        $card = $this->createMock(CardInterface::class);
+        $this->setUpSubject([
+            'objectManager' => $this->createMock(ObjectManagerInterface::class),
+        ]);
+
+        $card = $this->createStub(CardInterface::class);
 
         $this->objectManager->expects($this->once())
             ->method('create')
@@ -50,7 +73,11 @@ class FactoryTest extends TestCase
 
     public function testCreatePassesDataToObjectManager(): void
     {
-        $card = $this->createMock(CardInterface::class);
+        $this->setUpSubject([
+            'objectManager' => $this->createMock(ObjectManagerInterface::class),
+        ]);
+
+        $card = $this->createStub(CardInterface::class);
         $data = ['customer_id' => 123, 'method' => 'authnetcim'];
 
         $this->objectManager->expects($this->once())
@@ -78,7 +105,7 @@ class FactoryTest extends TestCase
 
     public function testGetTypeInstanceReturnsOriginalWhenNoMethod(): void
     {
-        $card = $this->createMock(CardInterface::class);
+        $card = $this->createStub(CardInterface::class);
         $card->method('getMethod')->willReturn(null);
 
         $result = $this->factory->getTypeInstance($card);
@@ -88,7 +115,11 @@ class FactoryTest extends TestCase
 
     public function testGetTypeInstanceReturnsOriginalWhenNoCardModel(): void
     {
-        $card = $this->createMock(CardInterface::class);
+        $this->setUpSubject([
+            'scopeConfig' => $this->createMock(ScopeConfigInterface::class),
+        ]);
+
+        $card = $this->createStub(CardInterface::class);
         $card->method('getMethod')->willReturn('authnetcim');
 
         $this->scopeConfig->method('getValue')
@@ -102,9 +133,13 @@ class FactoryTest extends TestCase
 
     public function testGetTypeInstanceReturnsOriginalWhenSameClass(): void
     {
+        $this->setUpSubject([
+            'scopeConfig' => $this->createMock(ScopeConfigInterface::class),
+        ]);
+
         // When card_model config matches the card's class, return original
         // Note: Since mocks have different class names, we test with empty cardModel
-        $card = $this->createMock(CardInterface::class);
+        $card = $this->createStub(CardInterface::class);
         $card->method('getMethod')->willReturn('authnetcim');
 
         // Test the case where cardModel is empty (which should return original card)
@@ -119,13 +154,15 @@ class FactoryTest extends TestCase
 
     public function testGetTypeInstanceCreatesNewTypeInstance(): void
     {
+        $this->setUpSubject([
+            'objectManager' => $this->createMock(ObjectManagerInterface::class),
+            'scopeConfig' => $this->createMock(ScopeConfigInterface::class),
+        ]);
+
         // getData()/getOrigData()/setData()/setOrigData() are declared on the concrete Card
         // model (via AbstractModel/DataObject), not on CardInterface, so they must be mocked
         // via the concrete class (onlyMethods requires a declared method).
-        $originalCard = $this->getMockBuilder(Card::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getMethod', 'getData', 'getOrigData'])
-            ->getMock();
+        $originalCard = $this->createPartialStub(Card::class, ['getMethod', 'getData', 'getOrigData']);
         $originalCard->method('getMethod')->willReturn('authnetcim');
         $originalCard->method('getData')->willReturn(['customer_id' => 123]);
         $originalCard->method('getOrigData')->willReturn(['customer_id' => 123]);
@@ -156,8 +193,12 @@ class FactoryTest extends TestCase
 
     public function testGetTypeInstanceReturnsSameInstanceWhenCardModelDiffersButEmpty(): void
     {
+        $this->setUpSubject([
+            'scopeConfig' => $this->createMock(ScopeConfigInterface::class),
+        ]);
+
         // When card_model is empty, should return original card
-        $card = $this->createMock(CardInterface::class);
+        $card = $this->createStub(CardInterface::class);
         $card->method('getMethod')->willReturn('some_method');
 
         $this->scopeConfig->method('getValue')
@@ -171,7 +212,11 @@ class FactoryTest extends TestCase
 
     public function testCreateCastsClassNameToString(): void
     {
-        $card = $this->createMock(CardInterface::class);
+        $this->setUpSubject([
+            'objectManager' => $this->createMock(ObjectManagerInterface::class),
+        ]);
+
+        $card = $this->createStub(CardInterface::class);
 
         $this->objectManager->expects($this->once())
             ->method('create')

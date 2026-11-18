@@ -28,6 +28,8 @@ use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Store\Model\StoreFactory;
 use Magento\Store\Model\WebsiteFactory;
+use Magento\Store\Model\ResourceModel\Store as StoreResource;
+use Magento\Store\Model\ResourceModel\Website as WebsiteResource;
 use Override;
 use ParadoxLabs\TokenBase\Helper\Data;
 use ParadoxLabs\TokenBase\Model\Method\Factory;
@@ -48,6 +50,8 @@ abstract class ApiTest extends Field
      * @param StoreFactory $storeFactory
      * @param WebsiteFactory $websiteFactory
      * @param Factory $methodFactory
+     * @param StoreResource $storeResource
+     * @param WebsiteResource $websiteResource
      * @param array $data
      */
     public function __construct(
@@ -56,6 +60,8 @@ abstract class ApiTest extends Field
         protected readonly StoreFactory $storeFactory,
         protected readonly WebsiteFactory $websiteFactory,
         protected readonly Factory $methodFactory,
+        protected readonly StoreResource $storeResource,
+        protected readonly WebsiteResource $websiteResource,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -72,13 +78,15 @@ abstract class ApiTest extends Field
             if ($this->_request->getParam('store') != '') {
                 /** @var Store $store */
                 $store = $this->storeFactory->create();
-                $store->load($this->_request->getParam('store'));
+                $storeId = $this->_request->getParam('store');
+                $this->storeResource->load($store, $storeId, is_numeric($storeId) ? null : 'code');
 
                 $this->storeId = (int)$store->getId();
             } elseif ($this->_request->getParam('website') != '') {
                 /** @var Website $website */
                 $website = $this->websiteFactory->create();
-                $website->load($this->_request->getParam('website'));
+                $websiteId = $this->_request->getParam('website');
+                $this->websiteResource->load($website, $websiteId, is_numeric($websiteId) ? null : 'code');
 
                 $this->storeId = $website->getDefaultStore()->getId();
             } else {

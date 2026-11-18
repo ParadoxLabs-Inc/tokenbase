@@ -22,6 +22,7 @@ use ParadoxLabs\TokenBase\Model\ResourceModel\Card as CardResource;
 use ParadoxLabs\TokenBase\Model\ResourceModel\Card\Collection;
 use ParadoxLabs\TokenBase\Model\ResourceModel\Card\CollectionFactory;
 use ParadoxLabs\TokenBase\Model\ResourceModel\CardRepository;
+use ParadoxLabs\TokenBase\Test\Unit\PartialStubTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -30,30 +31,80 @@ use PHPUnit\Framework\TestCase;
  */
 class CardRepositoryTest extends TestCase
 {
+    use PartialStubTrait;
+
+    /**
+     * @var CardRepository
+     */
     private CardRepository $repository;
+
+    /**
+     * @var CardResource|MockObject
+     */
     private CardResource|MockObject $resource;
+
+    /**
+     * @var CardFactory|MockObject
+     */
     private CardFactory|MockObject $cardFactory;
+
+    /**
+     * @var CardInterfaceFactory|MockObject
+     */
     private CardInterfaceFactory|MockObject $dataCardFactory;
+
+    /**
+     * @var CollectionFactory|MockObject
+     */
     private CollectionFactory|MockObject $cardCollectionFactory;
+
+    /**
+     * @var CardSearchResultsInterfaceFactory|MockObject
+     */
     private CardSearchResultsInterfaceFactory|MockObject $searchResultsFactory;
+
+    /**
+     * @var DataObjectHelper|MockObject
+     */
     private DataObjectHelper|MockObject $dataObjectHelper;
+
+    /**
+     * @var DataObjectProcessor|MockObject
+     */
     private DataObjectProcessor|MockObject $dataObjectProcessor;
+
+    /**
+     * @var PaymentFactory|MockObject
+     */
     private PaymentFactory|MockObject $paymentFactory;
+
+    /**
+     * @var CartInterfaceFactory|MockObject
+     */
     private CartInterfaceFactory|MockObject $quoteFactory;
+
+    /**
+     * @var PaymentHelper|MockObject
+     */
     private PaymentHelper|MockObject $paymentHelper;
 
     protected function setUp(): void
     {
-        $this->resource = $this->createMock(CardResource::class);
-        $this->cardFactory = $this->createMock(CardFactory::class);
-        $this->dataCardFactory = $this->createMock(CardInterfaceFactory::class);
-        $this->cardCollectionFactory = $this->createMock(CollectionFactory::class);
-        $this->searchResultsFactory = $this->createMock(CardSearchResultsInterfaceFactory::class);
-        $this->dataObjectHelper = $this->createMock(DataObjectHelper::class);
-        $this->dataObjectProcessor = $this->createMock(DataObjectProcessor::class);
-        $this->paymentFactory = $this->createMock(PaymentFactory::class);
-        $this->quoteFactory = $this->createMock(CartInterfaceFactory::class);
-        $this->paymentHelper = $this->createMock(PaymentHelper::class);
+        $this->setUpSubject();
+    }
+
+    private function setUpSubject(array $mocks = []): void
+    {
+        $this->resource = $mocks['resource'] ?? $this->createStub(CardResource::class);
+        $this->cardFactory = $this->createStub(CardFactory::class);
+        $this->dataCardFactory = $this->createStub(CardInterfaceFactory::class);
+        $this->cardCollectionFactory = $this->createStub(CollectionFactory::class);
+        $this->searchResultsFactory = $this->createStub(CardSearchResultsInterfaceFactory::class);
+        $this->dataObjectHelper = $this->createStub(DataObjectHelper::class);
+        $this->dataObjectProcessor = $this->createStub(DataObjectProcessor::class);
+        $this->paymentFactory = $this->createStub(PaymentFactory::class);
+        $this->quoteFactory = $this->createStub(CartInterfaceFactory::class);
+        $this->paymentHelper = $this->createStub(PaymentHelper::class);
 
         $this->repository = new CardRepository(
             $this->resource,
@@ -71,7 +122,11 @@ class CardRepositoryTest extends TestCase
 
     public function testGetByIdLoadsNumericId(): void
     {
-        $card = $this->createMock(Card::class);
+        $this->setUpSubject([
+            'resource' => $this->createMock(CardResource::class),
+        ]);
+
+        $card = $this->createStub(Card::class);
         $card->method('getId')->willReturn(123);
 
         $this->cardFactory->method('create')->willReturn($card);
@@ -87,7 +142,11 @@ class CardRepositoryTest extends TestCase
 
     public function testGetByIdLoadsByHashForNonNumeric(): void
     {
-        $card = $this->createMock(Card::class);
+        $this->setUpSubject([
+            'resource' => $this->createMock(CardResource::class),
+        ]);
+
+        $card = $this->createStub(Card::class);
         $card->method('getId')->willReturn(123);
 
         $this->cardFactory->method('create')->willReturn($card);
@@ -103,7 +162,7 @@ class CardRepositoryTest extends TestCase
 
     public function testGetByIdThrowsForNotFound(): void
     {
-        $card = $this->createMock(Card::class);
+        $card = $this->createStub(Card::class);
         $card->method('getId')->willReturn(null);
 
         $this->cardFactory->method('create')->willReturn($card);
@@ -116,7 +175,11 @@ class CardRepositoryTest extends TestCase
 
     public function testGetByHashLoadsCard(): void
     {
-        $card = $this->createMock(Card::class);
+        $this->setUpSubject([
+            'resource' => $this->createMock(CardResource::class),
+        ]);
+
+        $card = $this->createStub(Card::class);
         $card->method('getId')->willReturn(123);
 
         $this->cardFactory->method('create')->willReturn($card);
@@ -132,7 +195,7 @@ class CardRepositoryTest extends TestCase
 
     public function testGetByHashThrowsForNotFound(): void
     {
-        $card = $this->createMock(Card::class);
+        $card = $this->createStub(Card::class);
         $card->method('getId')->willReturn(null);
 
         $this->cardFactory->method('create')->willReturn($card);
@@ -145,7 +208,7 @@ class CardRepositoryTest extends TestCase
 
     public function testLoadCallsGetById(): void
     {
-        $card = $this->createMock(Card::class);
+        $card = $this->createStub(Card::class);
         $card->method('getId')->willReturn(123);
 
         $this->cardFactory->method('create')->willReturn($card);
@@ -157,6 +220,10 @@ class CardRepositoryTest extends TestCase
 
     public function testSaveSetsNullIdForZero(): void
     {
+        $this->setUpSubject([
+            'resource' => $this->createMock(CardResource::class),
+        ]);
+
         $card = $this->getMockBuilder(Card::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getId', 'setId', 'getTypeInstance'])
@@ -175,6 +242,10 @@ class CardRepositoryTest extends TestCase
 
     public function testSaveSetsNullIdForStringZero(): void
     {
+        $this->setUpSubject([
+            'resource' => $this->createMock(CardResource::class),
+        ]);
+
         $card = $this->getMockBuilder(Card::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getId', 'setId', 'getTypeInstance'])
@@ -193,11 +264,13 @@ class CardRepositoryTest extends TestCase
 
     public function testSaveSavesCardDirectlyWhenNotBaseCardClass(): void
     {
+        $this->setUpSubject([
+            'resource' => $this->createMock(CardResource::class),
+        ]);
+
         // When passed a mock (or subclass), the ::class check fails,
         // so the card is saved directly without calling getTypeInstance()
-        $card = $this->getMockBuilder(Card::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $card = $this->createStub(Card::class);
         $card->method('getId')->willReturn(123);
 
         $this->resource->expects($this->once())
@@ -211,6 +284,10 @@ class CardRepositoryTest extends TestCase
 
     public function testDeleteQueuesDeletionForActiveCard(): void
     {
+        $this->setUpSubject([
+            'resource' => $this->createMock(CardResource::class),
+        ]);
+
         $card = $this->createMock(Card::class);
         $card->method('getActive')->willReturn(1);
 
@@ -230,10 +307,11 @@ class CardRepositoryTest extends TestCase
 
     public function testDeleteRemovesInactiveCard(): void
     {
-        $card = $this->getMockBuilder(Card::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getActive', 'getTypeInstance'])
-            ->getMock();
+        $this->setUpSubject([
+            'resource' => $this->createMock(CardResource::class),
+        ]);
+
+        $card = $this->createPartialStub(Card::class, ['getActive', 'getTypeInstance']);
 
         $card->method('getActive')->willReturn(0);
         $card->method('getTypeInstance')->willReturn($card);
@@ -252,7 +330,7 @@ class CardRepositoryTest extends TestCase
 
     public function testDeleteThrowsCouldNotDeleteOnException(): void
     {
-        $card = $this->createMock(Card::class);
+        $card = $this->createStub(Card::class);
         $card->method('getActive')->willReturn(0);
 
         $this->resource->method('delete')
@@ -281,13 +359,13 @@ class CardRepositoryTest extends TestCase
 
     public function testGetListReturnsSearchResults(): void
     {
-        $searchCriteria = $this->createMock(SearchCriteriaInterface::class);
+        $searchCriteria = $this->createStub(SearchCriteriaInterface::class);
         $searchCriteria->method('getFilterGroups')->willReturn([]);
         $searchCriteria->method('getSortOrders')->willReturn(null);
         $searchCriteria->method('getCurrentPage')->willReturn(1);
         $searchCriteria->method('getPageSize')->willReturn(10);
 
-        $collection = $this->createMock(Collection::class);
+        $collection = $this->createStub(Collection::class);
         $collection->method('getSize')->willReturn(0);
         $collection->method('getItems')->willReturn([]);
 
