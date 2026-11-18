@@ -31,13 +31,45 @@ use PHPUnit\Framework\TestCase;
  */
 class DeleteTest extends TestCase
 {
+
+    /**
+     * @var Delete
+     */
     private Delete $controller;
+
+    /**
+     * @var Request|MockObject
+     */
     private Request|MockObject $request;
+
+    /**
+     * @var MessageManagerInterface|MockObject
+     */
     private MessageManagerInterface|MockObject $messageManager;
+
+    /**
+     * @var CardRepositoryInterface|MockObject
+     */
     private CardRepositoryInterface|MockObject $cardRepository;
+
+    /**
+     * @var Data|MockObject
+     */
     private Data|MockObject $helper;
+
+    /**
+     * @var Validator|MockObject
+     */
     private Validator|MockObject $formKeyValidator;
+
+    /**
+     * @var Json|MockObject
+     */
     private Json|MockObject $jsonResult;
+
+    /**
+     * @var Redirect|MockObject
+     */
     private Redirect|MockObject $redirectResult;
 
     protected function setUp(): void

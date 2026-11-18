@@ -25,7 +25,14 @@ class PaymentMethodAssignDataObserverTest extends TestCase
 {
     use PartialStubTrait;
 
+    /**
+     * @var PaymentMethodAssignDataObserver
+     */
     private PaymentMethodAssignDataObserver $observer;
+
+    /**
+     * @var Data|MockObject
+     */
     private Data|MockObject $helper;
 
     protected function setUp(): void

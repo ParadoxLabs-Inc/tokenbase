@@ -39,18 +39,69 @@ class BeforeSaveTest extends TestCase
 {
     use PartialStubTrait;
 
+    /**
+     * @var Card
+     */
     private Card $card;
+
+    /**
+     * @var ModelContext|MockObject
+     */
     private ModelContext|MockObject $context;
+
+    /**
+     * @var Registry|MockObject
+     */
     private Registry|MockObject $registry;
+
+    /**
+     * @var ExtensionAttributesFactory|MockObject
+     */
     private ExtensionAttributesFactory|MockObject $extensionFactory;
+
+    /**
+     * @var AttributeValueFactory|MockObject
+     */
     private AttributeValueFactory|MockObject $customAttributeFactory;
+
+    /**
+     * @var CardContext|MockObject
+     */
     private CardContext|MockObject $cardContext;
+
+    /**
+     * @var Data|MockObject
+     */
     private Data|MockObject $helper;
+
+    /**
+     * @var MethodFactory|MockObject
+     */
     private MethodFactory|MockObject $methodFactory;
+
+    /**
+     * @var OrderCollectionFactory|MockObject
+     */
     private OrderCollectionFactory|MockObject $orderCollectionFactory;
+
+    /**
+     * @var TimezoneInterface|MockObject
+     */
     private TimezoneInterface|MockObject $dateProcessor;
+
+    /**
+     * @var CardResource|MockObject
+     */
     private CardResource|MockObject $resource;
+
+    /**
+     * @var CollectionFactory|MockObject
+     */
     private CollectionFactory|MockObject $cardCollectionFactory;
+
+    /**
+     * @var RemoteAddress|MockObject
+     */
     private RemoteAddress|MockObject $remoteAddress;
 
     protected function setUp(): void

@@ -22,8 +22,19 @@ class FactoryTest extends TestCase
 {
     use PartialStubTrait;
 
+    /**
+     * @var Factory
+     */
     private Factory $factory;
+
+    /**
+     * @var ObjectManagerInterface|MockObject
+     */
     private ObjectManagerInterface|MockObject $objectManager;
+
+    /**
+     * @var ScopeConfigInterface|MockObject
+     */
     private ScopeConfigInterface|MockObject $scopeConfig;
 
     protected function setUp(): void

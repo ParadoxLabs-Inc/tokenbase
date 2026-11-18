@@ -19,11 +19,35 @@ use PHPUnit\Framework\TestCase;
  */
 class StoredCardTest extends TestCase
 {
+
+    /**
+     * @var StoredCard
+     */
     private StoredCard $validator;
+
+    /**
+     * @var ResultInterfaceFactory|MockObject
+     */
     private ResultInterfaceFactory|MockObject $resultFactory;
+
+    /**
+     * @var CreditCard|MockObject
+     */
     private CreditCard|MockObject $ccValidator;
+
+    /**
+     * @var ConfigInterface|MockObject
+     */
     private ConfigInterface|MockObject $config;
+
+    /**
+     * @var Types|MockObject
+     */
     private Types|MockObject $ccTypes;
+
+    /**
+     * @var ResultInterface|MockObject
+     */
     private ResultInterface|MockObject $result;
 
     protected function setUp(): void

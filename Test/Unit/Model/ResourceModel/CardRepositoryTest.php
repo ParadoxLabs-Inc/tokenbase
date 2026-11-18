@@ -33,16 +33,59 @@ class CardRepositoryTest extends TestCase
 {
     use PartialStubTrait;
 
+    /**
+     * @var CardRepository
+     */
     private CardRepository $repository;
+
+    /**
+     * @var CardResource|MockObject
+     */
     private CardResource|MockObject $resource;
+
+    /**
+     * @var CardFactory|MockObject
+     */
     private CardFactory|MockObject $cardFactory;
+
+    /**
+     * @var CardInterfaceFactory|MockObject
+     */
     private CardInterfaceFactory|MockObject $dataCardFactory;
+
+    /**
+     * @var CollectionFactory|MockObject
+     */
     private CollectionFactory|MockObject $cardCollectionFactory;
+
+    /**
+     * @var CardSearchResultsInterfaceFactory|MockObject
+     */
     private CardSearchResultsInterfaceFactory|MockObject $searchResultsFactory;
+
+    /**
+     * @var DataObjectHelper|MockObject
+     */
     private DataObjectHelper|MockObject $dataObjectHelper;
+
+    /**
+     * @var DataObjectProcessor|MockObject
+     */
     private DataObjectProcessor|MockObject $dataObjectProcessor;
+
+    /**
+     * @var PaymentFactory|MockObject
+     */
     private PaymentFactory|MockObject $paymentFactory;
+
+    /**
+     * @var CartInterfaceFactory|MockObject
+     */
     private CartInterfaceFactory|MockObject $quoteFactory;
+
+    /**
+     * @var PaymentHelper|MockObject
+     */
     private PaymentHelper|MockObject $paymentHelper;
 
     protected function setUp(): void

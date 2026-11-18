@@ -19,10 +19,30 @@ use PHPUnit\Framework\TestCase;
  */
 class AbstractGatewayTest extends TestCase
 {
+
+    /**
+     * @var TestableGateway
+     */
     private TestableGateway $gateway;
+
+    /**
+     * @var Data|MockObject
+     */
     private Data|MockObject $helper;
+
+    /**
+     * @var Xml|MockObject
+     */
     private Xml|MockObject $xml;
+
+    /**
+     * @var ResponseFactory|MockObject
+     */
     private ResponseFactory|MockObject $responseFactory;
+
+    /**
+     * @var ClientInterfaceFactory|MockObject
+     */
     private ClientInterfaceFactory|MockObject $communicatorFactory;
 
     protected function setUp(): void

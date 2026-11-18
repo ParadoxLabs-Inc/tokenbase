@@ -31,6 +31,10 @@ use PHPUnit\Framework\TestCase;
  */
 class SelfParentGuardTest extends TestCase
 {
+
+    /**
+     * @var SelfParentGuard
+     */
     private SelfParentGuard $plugin;
 
     protected function setUp(): void

@@ -38,17 +38,64 @@ class AddressTest extends TestCase
 {
     use PartialStubTrait;
 
+    /**
+     * @var Address
+     */
     private Address $helper;
+
+    /**
+     * @var Context|MockObject
+     */
     private Context|MockObject $context;
+
+    /**
+     * @var FormFactory|MockObject
+     */
     private FormFactory|MockObject $formFactory;
+
+    /**
+     * @var AddressInterfaceFactory|MockObject
+     */
     private AddressInterfaceFactory|MockObject $addressDataFactory;
+
+    /**
+     * @var DataObjectHelper|MockObject
+     */
     private DataObjectHelper|MockObject $dataObjectHelper;
+
+    /**
+     * @var RegionInterfaceFactory|MockObject
+     */
     private RegionInterfaceFactory|MockObject $regionDataFactory;
+
+    /**
+     * @var RegionFactory|MockObject
+     */
     private RegionFactory|MockObject $regionFactory;
+
+    /**
+     * @var RegionResource|MockObject
+     */
     private RegionResource|MockObject $regionResource;
+
+    /**
+     * @var AddressRepositoryInterface|MockObject
+     */
     private AddressRepositoryInterface|MockObject $addressRepository;
+
+    /**
+     * @var ExtensibleDataObjectConverter|MockObject
+     */
     private ExtensibleDataObjectConverter|MockObject $extensibleDataObjectConverter;
+
+    /**
+     * @var Mapper|MockObject
+     */
     private Mapper|MockObject $addressMapper;
+
+    /**
+     * @var Config|MockObject
+     */
     private Config|MockObject $addressConfig;
 
     protected function setUp(): void
@@ -66,7 +113,8 @@ class AddressTest extends TestCase
         $this->regionFactory = $this->createStub(RegionFactory::class);
         $this->regionResource = $this->createStub(RegionResource::class);
         $this->addressRepository = $this->createStub(AddressRepositoryInterface::class);
-        $this->extensibleDataObjectConverter = $mocks['extensibleDataObjectConverter'] ?? $this->createStub(ExtensibleDataObjectConverter::class);
+        $this->extensibleDataObjectConverter = $mocks['extensibleDataObjectConverter']
+            ?? $this->createStub(ExtensibleDataObjectConverter::class);
         $this->addressMapper = $mocks['addressMapper'] ?? $this->createStub(Mapper::class);
         $this->addressConfig = $mocks['addressConfig'] ?? $this->createStub(Config::class);
 

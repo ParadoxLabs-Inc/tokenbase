@@ -29,7 +29,14 @@ class VoidTest extends TestCase
 {
     use PartialStubTrait;
 
+    /**
+     * @var AbstractMethod|MockObject
+     */
     private AbstractMethod|MockObject $method;
+
+    /**
+     * @var AbstractGateway|MockObject
+     */
     private AbstractGateway|MockObject $gateway;
 
     protected function setUp(): void

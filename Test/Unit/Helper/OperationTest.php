@@ -19,9 +19,25 @@ use stdClass;
  */
 class OperationTest extends TestCase
 {
+
+    /**
+     * @var Operation
+     */
     private Operation $helper;
+
+    /**
+     * @var Context|MockObject
+     */
     private Context|MockObject $context;
+
+    /**
+     * @var Logger|MockObject
+     */
     private Logger|MockObject $logger;
+
+    /**
+     * @var RemoteAddress|MockObject
+     */
     private RemoteAddress|MockObject $remoteAddress;
 
     protected function setUp(): void

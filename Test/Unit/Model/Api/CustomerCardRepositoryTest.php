@@ -27,10 +27,30 @@ use PHPUnit\Framework\TestCase;
  */
 class CustomerCardRepositoryTest extends TestCase
 {
+
+    /**
+     * @var CustomerCardRepository
+     */
     private CustomerCardRepository $repository;
+
+    /**
+     * @var CardRepositoryInterface|MockObject
+     */
     private CardRepositoryInterface|MockObject $cardRepository;
+
+    /**
+     * @var FilterGroupBuilder|MockObject
+     */
     private FilterGroupBuilder|MockObject $filterGroupBuilder;
+
+    /**
+     * @var FilterBuilder|MockObject
+     */
     private FilterBuilder|MockObject $filterBuilder;
+
+    /**
+     * @var ScopeConfigInterface|MockObject
+     */
     private ScopeConfigInterface|MockObject $scopeConfig;
 
     protected function setUp(): void

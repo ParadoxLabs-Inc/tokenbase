@@ -13,10 +13,24 @@ use ParadoxLabs\TokenBase\Model\Gateway\Response;
  */
 class TestableGateway extends AbstractGateway
 {
+    /**
+     * @var string
+     */
     protected $endpointLive = 'https://live.example.com';
+
+    /**
+     * @var string
+     */
     protected $endpointTest = 'https://test.example.com';
+
+    /**
+     * @var string
+     */
     protected $code = 'test_gateway';
 
+    /**
+     * @var array
+     */
     protected $fields = [
         'login' => [],
         'password' => [],

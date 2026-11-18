@@ -21,11 +21,35 @@ use PHPUnit\Framework\TestCase;
  */
 class CreditCardTest extends TestCase
 {
+
+    /**
+     * @var CreditCard
+     */
     private CreditCard $validator;
+
+    /**
+     * @var ResultInterfaceFactory|MockObject
+     */
     private ResultInterfaceFactory|MockObject $resultFactory;
+
+    /**
+     * @var ConfigInterface|MockObject
+     */
     private ConfigInterface|MockObject $config;
+
+    /**
+     * @var Types|MockObject
+     */
     private Types|MockObject $ccTypes;
+
+    /**
+     * @var TimezoneInterface|MockObject
+     */
     private TimezoneInterface|MockObject $dateProcessor;
+
+    /**
+     * @var ResultInterface|MockObject
+     */
     private ResultInterface|MockObject $result;
 
     protected function setUp(): void

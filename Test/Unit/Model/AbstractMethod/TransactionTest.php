@@ -31,14 +31,49 @@ class TransactionTest extends TestCase
 {
     use PartialStubTrait;
 
+    /**
+     * @var AbstractMethod|MockObject
+     */
     private AbstractMethod|MockObject $method;
+
+    /**
+     * @var Repository|MockObject
+     */
     private Repository|MockObject $transactionRepository;
+
+    /**
+     * @var Data|MockObject
+     */
     private Data|MockObject $helper;
+
+    /**
+     * @var AbstractGateway|MockObject
+     */
     private AbstractGateway|MockObject $gateway;
+
+    /**
+     * @var CardInterfaceFactory|MockObject
+     */
     private CardInterfaceFactory|MockObject $cardFactory;
+
+    /**
+     * @var CardRepositoryInterface|MockObject
+     */
     private CardRepositoryInterface|MockObject $cardRepository;
+
+    /**
+     * @var Address|MockObject
+     */
     private Address|MockObject $addressHelper;
+
+    /**
+     * @var ConfigInterface|MockObject
+     */
     private ConfigInterface|MockObject $config;
+
+    /**
+     * @var Registry|MockObject
+     */
     private Registry|MockObject $registry;
 
     protected function setUp(): void
